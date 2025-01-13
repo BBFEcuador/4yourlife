@@ -3,7 +3,7 @@ package com.foryourlife.server.config;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.foryourlife.shared.DomainExceptionsWrapper;
+import com.foryourlife.shared.domain.exception.DomainExceptionsWrapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

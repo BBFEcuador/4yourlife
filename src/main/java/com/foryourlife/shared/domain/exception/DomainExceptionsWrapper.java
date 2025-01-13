@@ -1,4 +1,4 @@
-package com.foryourlife.shared;
+package com.foryourlife.shared.domain.exception;
 
 import java.util.List;
 

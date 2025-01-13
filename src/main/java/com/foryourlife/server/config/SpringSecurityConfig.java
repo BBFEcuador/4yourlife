@@ -31,7 +31,10 @@ public class SpringSecurityConfig {
         String[] unauthorizedRoutes = {"/metric/**", "/server/**", "/actuator/**", "/auth/**", "/admin/login", "/swagger-ui/**", "/swagger-ui.html/**", "/v3/api-docs/**"};
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> {
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    session.maximumSessions(1);
+                })
                 .authorizeHttpRequests(http -> {
                     http.requestMatchers(unauthorizedRoutes).permitAll().anyRequest().authenticated();
                 })

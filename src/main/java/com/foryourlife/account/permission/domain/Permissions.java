@@ -1,5 +1,6 @@
 package com.foryourlife.account.permission.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -9,12 +10,13 @@ import jakarta.persistence.Table;
 public class Permissions {
     @Id
     private String id;
+    @Column(name = "permissionName",columnDefinition = "permissionName")
     private String permissionName;
 
     protected Permissions() {
     }
 
-    public Permissions(String id, String permissionName) {
+    private Permissions(String id, String permissionName) {
         this.id = id;
         this.permissionName = permissionName;
     }
@@ -25,5 +27,10 @@ public class Permissions {
 
     public String getPermissionName() {
         return permissionName;
+    }
+
+    public static Permissions create (String id, String permissionName){
+        var newPermission = new Permissions(id, permissionName);
+        return newPermission;
     }
 }

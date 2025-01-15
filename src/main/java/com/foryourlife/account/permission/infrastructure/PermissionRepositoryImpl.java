@@ -21,6 +21,11 @@ public class PermissionRepositoryImpl implements PermissionRepository {
     }
 
     @Override
+    public void saveAll(List<Permissions> permissions) {
+        this.repository.saveAll(permissions);
+    }
+
+    @Override
     public List<Permissions> getAll() {
         return this.repository.findAll();
     }

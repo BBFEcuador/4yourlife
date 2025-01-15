@@ -7,3 +7,85 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '5432:5432'
+#  prometheus:
+#    container_name: prometheus
+#    image: prom/prometheus:v2.36.2
+#    volumes:
+#      - ./platform/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+#    command:
+#      - '--config.file=/etc/prometheus/prometheus.yml'
+#      - '--storage.tsdb.path=/prometheus'
+#      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+#      - '--web.console.templates=/usr/share/prometheus/consoles'
+#      - '--web.enable-remote-write-receiver'
+#    ports:
+#      - 9090:9090
+#    restart: always
+#  grafana:
+#    image: grafana/grafana
+#    container_name: grafana
+#    restart: always
+#    ports:
+#      - 3003:3003
+#    volumes:
+#      - ./platform/grafana/provisioning:/etc/grafana/provisioning
+#      - ./platform/grafana/grafana.ini:/etc/grafana/grafana.ini
+#    env_file:
+#      - ./platform/grafana/grafana.env
+#    depends_on:
+#      - loki
+#      - prometheus
+#      - tempo
+#  loki:
+#    image: docker.io/grafana/loki:2.9.4
+#    container_name: loki
+#    volumes:
+#      - ./platform/loki/loki.yml:/etc/config/loki.yml
+#    command: -config.file=/etc/config/loki.yml
+#    ports:
+#      - "3100:3100"
+#    hostname: ${HOST_NAME:-localhost}
+#    restart: unless-stopped
+#  tempo:
+#    image: docker.io/grafana/tempo:2.3.1
+#    container_name: tempo
+#    command: -config.file /etc/tempo-config.yml
+#    ports:
+#      - "3110"     # Tempo
+#      - "4317"     # OTLP gRPC
+#      - "4318"     # OTLP HTTP
+#      - "9411"     # Zipkin
+#    hostname: ${HOST_NAME:-localhost}
+#    volumes:
+#      - ./platform/tempo/tempo.yml:/etc/tempo-config.yml
+#    restart: unless-stopped
+#  grafana-agent:
+#    image: docker.io/grafana/agent:v0.39.1
+#    container_name: grafana-agent
+#    command:
+#      - "run"
+#      - "--server.http.listen-addr=0.0.0.0:12345"
+#      - "--storage.path=/data-agent"
+#      - "--disable-reporting"
+#      - "/etc/agent/config.river"
+#    depends_on:
+#      - loki
+#      - prometheus
+#      - tempo
+#    hostname: ${HOST_NAME:-localhost}
+#    environment:
+#      - AGENT_MODE=flow
+#      - ENVIRONMENT=dev
+#      - LOKI_URL=http://host.docker.internal:3100/loki/api/v1/push
+#      - PROMETHEUS_URL=http://host.docker.internal:9090/api/v1/write
+#      - TEMPO_URL=http://host.docker.internal:4317
+#      - POSTGRES_USER=myuser
+#      - POSTGRES_PASSWORD=secret
+#    ports:
+#      - "12345:12345"
+#      - "4317:4317"
+#      - "4318:4318"
+#    volumes:
+#      - ./platform/agent/agent.river:/etc/agent/config.river
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    restart: unless-stopped

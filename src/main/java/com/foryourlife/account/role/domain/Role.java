@@ -11,12 +11,13 @@ public class Role {
 
     @Id
     private String id;
+    @Column(name = "roleName")
     private String roleName;
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
-            name = "account_roles_permissions",
-            joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "permission_id", referencedColumnName = "id"))
+            name = "roles_permissions",
+            joinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "permissionId", referencedColumnName = "id"))
     private Set<Permissions> permissions;
 
     protected Role() {
@@ -43,7 +44,7 @@ public class Role {
         }
     }
 
-    public Role create(String id, String roleName, Set<Permissions> permissions) {
+    public static Role create(String id, String roleName, Set<Permissions> permissions) {
         var newRole = new Role(id, roleName, permissions);
         return newRole;
     }

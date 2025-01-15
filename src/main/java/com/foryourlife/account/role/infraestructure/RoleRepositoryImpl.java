@@ -21,6 +21,11 @@ public class RoleRepositoryImpl implements RoleRepository {
         this.repository.save(role);
     }
 
+    @Override
+    public void saveAll(List<Role> roles) {
+        this.repository.saveAll(roles);
+    }
+
     public Optional<Role> findById(String id) {
         return this.repository.findById(id);
     }

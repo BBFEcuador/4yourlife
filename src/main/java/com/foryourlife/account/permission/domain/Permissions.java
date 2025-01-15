@@ -2,8 +2,10 @@ package com.foryourlife.account.permission.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "permissions")
 public class Permissions {
     @Id
     private String id;

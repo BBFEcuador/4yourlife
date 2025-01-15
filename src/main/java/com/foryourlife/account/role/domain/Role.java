@@ -1,4 +1,4 @@
-package com.foryourlife.account;
+package com.foryourlife.account.role.domain;
 
 import jakarta.persistence.*;
 import com.foryourlife.account.permission.domain.Permissions;

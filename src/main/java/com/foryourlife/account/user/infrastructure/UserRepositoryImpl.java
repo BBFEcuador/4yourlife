@@ -67,6 +67,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<Users> findById(String id){
+        return repository.findById(id);
+    }
+
+    @Override
     public void save(Users user) {
         this.repository.save(user);
     }

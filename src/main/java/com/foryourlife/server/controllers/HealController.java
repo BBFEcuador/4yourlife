@@ -25,11 +25,4 @@ public class HealController {
     public String hello() {
         return "Ok";
     }
-
-    @PostMapping("/save")
-    public ResponseEntity<?> saveUser(@RequestBody @Valid SaveUserRequest request) {
-        request.password = passwordEncoder.encode((request.password));
-        createUser.save(request.toDomain());
-        return new ResponseEntity<>("message:'User created successfully'",HttpStatus.CREATED);
-    }
 }

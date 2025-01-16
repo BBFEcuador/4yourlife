@@ -1,6 +1,7 @@
 package com.foryourlife.shared.infrastructure.controller;
 
 import com.foryourlife.account.user.domain.UserAlreadyCreatedException;
+import com.foryourlife.account.user.domain.UserNotFoundException;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.exception.DomainExceptionsWrapper;
 import jakarta.annotation.Nullable;
@@ -46,6 +47,11 @@ public class GlobalControllerHandlerException extends ResponseEntityExceptionHan
     }
     @ExceptionHandler(UserAlreadyCreatedException.class)
     public ResponseEntity<Object> handleUserAlreadyCreatedException(UserAlreadyCreatedException ex) {
+        DomainExceptionsWrapper errors = new DomainExceptionsWrapper(ex.getMessage(), List.of(ex.getMessage()));
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
         DomainExceptionsWrapper errors = new DomainExceptionsWrapper(ex.getMessage(), List.of(ex.getMessage()));
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }

@@ -1,5 +1,6 @@
 package com.foryourlife.account.user.application;
 
+import com.foryourlife.account.user.domain.LoginResponse;
 import com.foryourlife.account.user.domain.UserAlreadyCreatedException;
 import com.foryourlife.account.user.domain.UserRepository;
 import com.foryourlife.account.user.domain.Users;
@@ -19,8 +20,8 @@ public class CreateUser {
         this.bus = bus;
     }
 
-    public void save (Users user){
-        if(this._userRepository.findByEmail(user.getEmail()).isPresent())
+    public void save(Users user) {
+        if (this._userRepository.findByEmail(user.getEmail()).isPresent())
             throw new UserAlreadyCreatedException("The email " + user.getEmail() + "is already registered");
         try {
             this._userRepository.save(user);
@@ -28,5 +29,9 @@ public class CreateUser {
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);
         }
+    }
+
+    public LoginResponse login(String username, String password) {
+        return this._userRepository.login(username, password);
     }
 }

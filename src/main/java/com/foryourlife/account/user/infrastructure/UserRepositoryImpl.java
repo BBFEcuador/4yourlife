@@ -61,7 +61,13 @@ public class UserRepositoryImpl implements UserRepository {
         return new UsernamePasswordAuthenticationToken(username, password, authorityList);
     }
 
-    public Optional<Users> findByEmail(){
+    @Override
+    public Optional<Users> findByEmail(String email){
+        return repository.findByEmail(email);
+    }
 
+    @Override
+    public void save(Users user) {
+        this.repository.save(user);
     }
 }

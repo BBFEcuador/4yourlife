@@ -3,9 +3,11 @@ package com.foryourlife.shared.infrastructure.bus;
 import com.foryourlife.shared.domain.bus.DomainEvent;
 import com.foryourlife.shared.domain.bus.EventBus;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class SpringBootBus implements EventBus {
 
     private final ApplicationEventPublisher publisher;

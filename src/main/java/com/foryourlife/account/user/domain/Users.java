@@ -31,7 +31,7 @@ public class Users extends AggregateRoot {
         this.phone = phone;
     }
 
-    private static Users create(String id, String email, String password, String name, String phone) {
+    public static Users create(String id, String email, String password, String name, String phone) {
         var user = new Users(id, email, password, name, phone);
         user.record(new UserCreated(id, user));
         return user;

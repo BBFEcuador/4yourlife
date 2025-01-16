@@ -1,11 +1,17 @@
 package com.foryourlife.account.user.infrastructure.httpControllers;
 
-import org.jetbrains.annotations.NotNull;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class UserLoginRequest {
     @NotNull
+    @Email
+    @NotBlank(message = "The User/Email field is required")
     public String username;
     @NotNull
+    @NotBlank(message = "The password field is required")
     public String password;
 
     public UserLoginRequest(String username, String password) {

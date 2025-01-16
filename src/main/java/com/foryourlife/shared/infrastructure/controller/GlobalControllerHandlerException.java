@@ -1,5 +1,6 @@
 package com.foryourlife.shared.infrastructure.controller;
 
+import com.foryourlife.account.user.domain.UserAlreadyCreatedException;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.exception.DomainExceptionsWrapper;
 import jakarta.annotation.Nullable;
@@ -41,6 +42,11 @@ public class GlobalControllerHandlerException extends ResponseEntityExceptionHan
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleBaseException(BaseException ex) {
         DomainExceptionsWrapper errors = new DomainExceptionsWrapper(ex.getMessage(), ex.getErrors());
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(UserAlreadyCreatedException.class)
+    public ResponseEntity<Object> handleUserAlreadyCreatedException(UserAlreadyCreatedException ex) {
+        DomainExceptionsWrapper errors = new DomainExceptionsWrapper(ex.getMessage(), List.of(ex.getMessage()));
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 }

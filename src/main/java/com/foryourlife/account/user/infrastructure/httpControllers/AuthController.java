@@ -1,15 +1,15 @@
-package com.foryourlife.server.controllers;
+package com.foryourlife.account.user.infrastructure.httpControllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/server")
-public class HealController {
+@RequestMapping("/auth")
+public class AuthController {
 
-    @GetMapping("/hello")
-    public String hello(){
-        return "Ok";
+    @GetMapping("/login")
+    public String login(){
+        return "ok";
     }
 }

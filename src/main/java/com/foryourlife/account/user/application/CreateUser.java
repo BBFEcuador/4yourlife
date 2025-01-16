@@ -24,9 +24,9 @@ public class CreateUser {
             throw new UserAlreadyCreatedException("The email " + user.getEmail() + "is already registered");
         try {
             this._userRepository.save(user);
-            bus.publish(user.pullDomainEvents());
+            this.bus.publish(user.pullDomainEvents());
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            this.logger.error(e.getMessage(), e);
         }
     }
 }

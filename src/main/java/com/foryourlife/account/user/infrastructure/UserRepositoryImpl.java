@@ -4,6 +4,7 @@ import com.foryourlife.account.user.domain.LoginResponse;
 import com.foryourlife.account.user.domain.UserRepository;
 import com.foryourlife.account.user.domain.Users;
 import com.foryourlife.shared.JWTUtils;
+import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,21 +33,21 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public LoginResponse login(String username, String password) {
+    public LoginResponse login(String username, String password) throws BaseException {
         Authentication authentication = this.authenticate(username, password);
         var token = jwtUtils.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return new LoginResponse(token, this.loadUser);
     }
 
-    private Users loadUserByUsername(String username) throws UsernameNotFoundException {
+    private Users loadUserByUsername(String username) throws BaseException {
         var user = repository.findByEmail(username)
-                .orElseThrow(() -> new IllegalArgumentException("The user " + username + " does not exist."));
+                .orElseThrow(() -> new BaseException("Login Error",List.of("The user " + username + " does not exist.")));
         loadUser = user;
         return user;
     }
 
-    private Authentication authenticate(String username, String password) {
+    private Authentication authenticate(String username, String password) throws BaseException {
         this.loadUserByUsername(username);
         var userDetails = this.loadUserByUsername(username);
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();

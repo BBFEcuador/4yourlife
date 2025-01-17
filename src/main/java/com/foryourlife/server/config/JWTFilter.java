@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 public class JWTFilter extends OncePerRequestFilter {
 
@@ -28,7 +29,16 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        boolean isUnauthorizedRoute = UnauthRoutes.ROUTES.stream().anyMatch(route -> requestURI.matches(route.replace("**", ".*")));
+
+        if (isUnauthorizedRoute) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+
         if (jwtToken != null) {
             jwtToken = jwtToken.substring(7);
             String username = "";

@@ -43,4 +43,8 @@ public class CreateUser {
     public LoginResponse login(String username, String password) throws BaseException {
             return this._userRepository.login(username, password);
     }
+
+    public Users getUser(String id) {
+        return this._userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The Id: " + id + " doesn't exist."));
+    }
 }

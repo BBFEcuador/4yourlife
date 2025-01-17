@@ -18,22 +18,22 @@ public class Users extends AggregateRoot {
     private String phone;
     @ManyToOne
     @JoinColumn(name = "rol_id", referencedColumnName = "id")
-    private Role rol;
+    private Role role;
 
     protected Users() {
     }
 
-    private Users(String id, String email, String password, String name, String phone, Role rol) {
+    private Users(String id, String email, String password, String name, String phone, Role role) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;
         this.phone = phone;
-        this.rol=rol;
+        this.role=role;
     }
 
-    public static Users create(String id, String email, String password, String name, String phone, Role rol) {
-        var user = new Users(id, email, password, name, phone, rol);
+    public static Users create(String id, String email, String password, String name, String phone, Role role) {
+        var user = new Users(id, email, password, name, phone, role);
         user.record(new UserCreated(id, user));
         return user;
     }
@@ -58,7 +58,7 @@ public class Users extends AggregateRoot {
         return phone;
     }
 
-    public Role getRol() {
-        return rol;
+    public Role getRole() {
+        return role;
     }
 }

@@ -26,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> saveUser(@RequestBody  SaveUserRequest request) {
+    public ResponseEntity<?> saveUser(@Valid @RequestBody SaveUserRequest request) {
         request.password = passwordEncoder.encode((request.password));
         userService.save(request.toDomain());
         return new ResponseEntity<>("message:'User created successfully'", HttpStatus.CREATED);

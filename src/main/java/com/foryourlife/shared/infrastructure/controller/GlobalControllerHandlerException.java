@@ -60,4 +60,9 @@ public class GlobalControllerHandlerException extends ResponseEntityExceptionHan
         DomainExceptionsWrapper errors = new DomainExceptionsWrapper(ex.getMessage(), List.of(ex.getMessage()));
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleException(Exception ex) {
+        DomainExceptionsWrapper errors = new DomainExceptionsWrapper(ex.getMessage(), List.of(ex.getMessage()));
+        return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

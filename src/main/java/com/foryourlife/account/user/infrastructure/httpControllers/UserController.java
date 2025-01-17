@@ -10,10 +10,7 @@ import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -27,8 +24,8 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestBody @Valid SaveUserRequest request) {
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@Valid @RequestBody SaveUserRequest request) {
         request.password = passwordEncoder.encode((request.password));
         createUser.update(request.toDomain());
         return new ResponseEntity<>("message:'User updated successfully'",HttpStatus.CREATED);

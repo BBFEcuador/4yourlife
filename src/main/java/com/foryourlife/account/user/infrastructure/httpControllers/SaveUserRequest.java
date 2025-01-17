@@ -26,7 +26,6 @@ public class SaveUserRequest {
     @Pattern(regexp = "^[0-9]*$", message = "The phone field only accept digits")
     public String phone;
     @NotNull
-    @NotBlank(message = "The role field is required")
     public Role role;
 
     public SaveUserRequest(String phone, String name, String password, String email, String id) {

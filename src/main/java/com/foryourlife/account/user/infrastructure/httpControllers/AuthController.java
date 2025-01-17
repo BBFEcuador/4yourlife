@@ -1,6 +1,7 @@
 package com.foryourlife.account.user.infrastructure.httpControllers;
 
 import com.foryourlife.account.user.application.CreateUser;
+import com.foryourlife.account.user.domain.LoginResponse;
 import com.foryourlife.account.user.domain.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,14 +23,14 @@ public class AuthController {
         this._userRepository=_userRepository;
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<?> login(String username, String password){
-
-        return new ResponseEntity<>("message:'User created successfully'",HttpStatus.CREATED);
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid UserLoginRequest request) {
+        var response = this._userRepository.login(request.getUsername(), request.getPassword());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> saveUser(@RequestBody @Valid SaveUserRequest request) {
+    public ResponseEntity<?> saveUser(@RequestBody  SaveUserRequest request) {
         request.password = passwordEncoder.encode((request.password));
         createUser.save(request.toDomain());
         return new ResponseEntity<>("message:'User created successfully'",HttpStatus.CREATED);

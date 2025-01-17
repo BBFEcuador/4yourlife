@@ -1,5 +1,6 @@
 package com.foryourlife.account.user.infrastructure.httpControllers;
 
+import com.foryourlife.account.role.domain.Role;
 import com.foryourlife.account.user.domain.Users;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -24,6 +25,9 @@ public class SaveUserRequest {
     @NotBlank(message = "The phone field is required")
     @Pattern(regexp = "^[0-9]*$", message = "The phone field only accept digits")
     public String phone;
+    @NotNull
+    @NotBlank(message = "The role field is required")
+    public Role role;
 
     public SaveUserRequest(String phone, String name, String password, String email, String id) {
         this.id = id;
@@ -54,6 +58,6 @@ public class SaveUserRequest {
     }
 
     public Users toDomain() {
-        return Users.create(id != null ? id : UUID.randomUUID().toString(), email, password, name, phone);
+        return Users.create(id != null ? id : UUID.randomUUID().toString(), email, password, name, phone, role);
     }
 }

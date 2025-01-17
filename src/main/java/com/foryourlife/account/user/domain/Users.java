@@ -23,16 +23,17 @@ public class Users extends AggregateRoot {
     protected Users() {
     }
 
-    private Users(String id, String email, String password, String name, String phone) {
+    private Users(String id, String email, String password, String name, String phone, Role rol) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;
         this.phone = phone;
+        this.rol=rol;
     }
 
-    public static Users create(String id, String email, String password, String name, String phone) {
-        var user = new Users(id, email, password, name, phone);
+    public static Users create(String id, String email, String password, String name, String phone, Role rol) {
+        var user = new Users(id, email, password, name, phone, rol);
         user.record(new UserCreated(id, user));
         return user;
     }
@@ -55,5 +56,9 @@ public class Users extends AggregateRoot {
 
     public String getPhone() {
         return phone;
+    }
+
+    public Role getRol() {
+        return rol;
     }
 }

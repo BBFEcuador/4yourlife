@@ -53,7 +53,7 @@ public class UserRepositoryImpl implements UserRepository {
         if (userDetails == null) {
             throw new BadCredentialsException("Invalid username or password");
         }
-
+        authorityList.add(new SimpleGrantedAuthority("Fantastic Role"));
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException("Invalid username or password");
         }

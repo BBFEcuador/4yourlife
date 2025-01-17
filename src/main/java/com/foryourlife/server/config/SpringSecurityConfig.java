@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
@@ -38,7 +39,7 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(http -> {
                     http.requestMatchers(unauthorizedRoutes).permitAll().anyRequest().authenticated();
                 })
-                .addFilterBefore(new JWTFilter(jwtUtils), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTFilter(jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(h -> h
                         .accessDeniedHandler(new EmrExceptionHandler())
                         .authenticationEntryPoint(new JWTInvalidExceptionHandler())

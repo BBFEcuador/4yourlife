@@ -14,6 +14,9 @@ public class UserLoginRequest {
     @NotBlank(message = "The password field is required")
     public String password;
 
+    public UserLoginRequest() {
+    }
+
     public UserLoginRequest(String username, String password) {
         this.username = username;
         this.password = password;

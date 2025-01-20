@@ -2,6 +2,7 @@ package com.foryourlife.account.role.infraestructure;
 
 import com.foryourlife.account.role.domain.Role;
 import com.foryourlife.account.role.domain.RoleRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,30 +18,27 @@ public class RoleRepositoryImpl implements RoleRepository {
     }
 
     @Override
-    public void save(Role role) {
-        this.repository.save(role);
-    }
-
-    @Override
     public void saveAll(List<Role> roles) {
         this.repository.saveAll(roles);
     }
 
+    @Override
     public Optional<Role> findById(String id) {
         return this.repository.findById(id);
-    }
-
-    public Optional<Role> findByRoleName(String roleName) {
-        return this.repository.findByRoleName(roleName);
-    }
-
-    @Override
-    public void deleteById(String id) {
-        this.repository.deleteById(id);
     }
 
     @Override
     public List<Role> getAll() {
         return this.repository.findAll();
+    }
+
+    @Override
+    public List<Role> findByCriteria(Specification<Role> specification) {
+        return this.repository.findAll(specification);
+    }
+
+    @Override
+    public Optional<Role> findOneByCriteria(Specification<Role> specification) {
+        return this.repository.findOne(specification);
     }
 }

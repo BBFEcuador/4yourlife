@@ -1,5 +1,6 @@
 package com.foryourlife.account.user.domain;
 
+import com.foryourlife.account.permission.domain.Permissions;
 import com.foryourlife.account.role.domain.Role;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.UserCreated;
@@ -7,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+
+import java.util.List;
 
 @Entity
 public class Users extends AggregateRoot {
@@ -60,5 +63,17 @@ public class Users extends AggregateRoot {
 
     public Role getRole() {
         return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public String getRoleId(){
+        return role.getId();
+    }
+
+    public List<Permissions> getUsersPermissions(){
+        return role.getPermissions().stream().toList();
     }
 }

@@ -2,7 +2,7 @@ package com.foryourlife.shared.domain.exception;
 
 import java.util.List;
 
-public class BaseException extends Exception{
+public class BaseException extends RuntimeException{
     private List<String> errors;
     public BaseException(String message, List<String> errors) {
         super(message);

@@ -19,15 +19,17 @@ public class Role {
             joinColumns = @JoinColumn(name = "roleId", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "permissionId", referencedColumnName = "id"))
     private Set<Permissions> permissions;
+    private Boolean isStarted;
 
-    protected Role() {
+    private Role() {
 
     }
 
-    private Role(String id, String roleName, Set<Permissions> permissions) {
+    private Role(String id, String roleName, Set<Permissions> permissions, Boolean isStarted) {
         this.id = id;
         this.roleName = roleName;
         this.permissions = permissions;
+        this.isStarted = isStarted;
     }
 
     public String getId() {
@@ -38,14 +40,19 @@ public class Role {
         return roleName;
     }
 
-    public void addPermission(Permissions permission) {
-        if (!this.permissions.contains(permission)) {
-            this.permissions.add(permission);
-        }
+    public Set<Permissions> getPermissions() {
+        return permissions;
     }
 
-    public static Role create(String id, String roleName, Set<Permissions> permissions) {
-        var newRole = new Role(id, roleName, permissions);
-        return newRole;
+    public Boolean getStarted() {
+        return isStarted;
+    }
+
+    public void addPermission(Permissions permission) {
+        this.permissions.add(permission);
+    }
+
+    public static Role create(String id, String roleName, Set<Permissions> permissions, Boolean isStarted) {
+        return new Role(id, roleName, permissions, isStarted);
     }
 }

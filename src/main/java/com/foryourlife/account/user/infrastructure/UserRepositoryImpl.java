@@ -58,6 +58,12 @@ public class UserRepositoryImpl implements UserRepository {
             throw new BadCredentialsException("Invalid username or password");
         }
         authorityList.add(new SimpleGrantedAuthority(userDetails.getRole().getRoleName()));
+
+        userDetails.getUsersPermissions().forEach(permissions -> {
+            new SimpleGrantedAuthority(permissions.getPermissionName());
+        });
+
+        authorityList.add(new SimpleGrantedAuthority(userDetails.getRole().getRoleName()));
         return new UsernamePasswordAuthenticationToken(username, password, authorityList);
     }
 

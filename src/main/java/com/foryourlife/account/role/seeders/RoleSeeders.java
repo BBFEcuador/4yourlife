@@ -31,8 +31,11 @@ public class RoleSeeders {
             this._permissionRepository.saveAll(permissionsList);
             Set<Permissions> permissions = Set.copyOf(permissionsList);
             List<Role> roles = Arrays.asList(
-                    Role.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0","Fantastic role",permissions),
-                    Role.create("3024c8f1-d603-47fc-8369-0e90cd2e703e","Normal role",permissions));
+                    Role.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0","ROLE_INIT",permissions,true),
+                    Role.create("3024c8f1-d603-47fc-8369-0e90cd2e703e","ROLE_FOCUS",permissions,false),
+                    Role.create("3024c8f1-d603-47fc-8369-0e90cd2e703e","ROLE_YOUR",permissions,false),
+                    Role.create("3024c8f1-d603-47fc-8369-0e90cd2e703e","ROLE_LIFE",permissions,false)
+            );
             this._roleRepository.saveAll(roles);
         };
     }

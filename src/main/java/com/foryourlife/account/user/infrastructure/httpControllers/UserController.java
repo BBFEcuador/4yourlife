@@ -36,4 +36,11 @@ public class UserController {
     public ResponseEntity<?> getUser(@PathVariable String id) {
         return new ResponseEntity<>(createUser.getUser(id), HttpStatus.OK);
     }
+
+    @PostMapping("/save")
+    public ResponseEntity<?> saveUser(@Valid @RequestBody SaveUserRequest request) {
+        request.password = passwordEncoder.encode((request.password));
+        createUser.save(request.toDomain());
+        return new ResponseEntity<>("message:'User created successfully'", HttpStatus.CREATED);
+    }
 }

@@ -1,7 +1,6 @@
 package com.foryourlife.payments.payment.domain;
 
 import com.foryourlife.payments.plan.domain.Plan;
-import com.foryourlife.payments.tenant.domain.Tenant;
 import com.foryourlife.shared.domain.AggregateRoot;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -28,14 +27,10 @@ public class Payment extends AggregateRoot {
     @ManyToOne
     @JoinColumn(name = "planId", referencedColumnName = "id")
     private Plan plan;
-    @ManyToOne
-    @JoinColumn(name = "tenantId", referencedColumnName = "id")
-    private Tenant tenant;
-
     protected Payment() {
     }
 
-    private Payment(String id, String lastDigits, String clientTransactionId, String transactionId, String phoneNumber, String email, String cardType, String transactionStatus, String authorizationCode, float amount, Date paymentDate, Plan plan, Tenant tenant) {
+    private Payment(String id, String lastDigits, String clientTransactionId, String transactionId, String phoneNumber, String email, String cardType, String transactionStatus, String authorizationCode, float amount, Date paymentDate, Plan plan) {
         this.id = id;
         this.lastDigits = lastDigits;
         this.clientTransactionId = clientTransactionId;
@@ -48,16 +43,11 @@ public class Payment extends AggregateRoot {
         this.amount = amount;
         this.paymentDate = paymentDate;
         this.plan = plan;
-        this.tenant = tenant;
     }
 
-    public static Payment create(String id, String lastDigits, String clientTransactionId, String transactionId, String phoneNumber, String email, String cardType, String transactionStatus, String authorizationCode, float amount, Date paymentDate, Plan plan, Tenant tenant) {
-        var payment = new Payment(id, lastDigits, clientTransactionId, transactionId, phoneNumber, email, cardType, transactionStatus, authorizationCode, amount, paymentDate, plan, tenant);
+    public static Payment create(String id, String lastDigits, String clientTransactionId, String transactionId, String phoneNumber, String email, String cardType, String transactionStatus, String authorizationCode, float amount, Date paymentDate, Plan plan) {
+        var payment = new Payment(id, lastDigits, clientTransactionId, transactionId, phoneNumber, email, cardType, transactionStatus, authorizationCode, amount, paymentDate, plan);
         return payment;
-    }
-
-    public Tenant getTenant() {
-        return tenant;
     }
 
     public Plan getPlan() {

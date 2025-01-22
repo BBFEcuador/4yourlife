@@ -1,6 +1,6 @@
 package com.foryourlife.shared.domain.events;
 
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.invitations.domain.Invitation;
 import com.foryourlife.shared.domain.bus.DomainEvent;
 
 import java.io.Serializable;
@@ -9,24 +9,22 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class UserCreated extends DomainEvent {
+public class InvitationCreated extends DomainEvent {
 
-    private final Users user;
+    private Invitation invitation;
 
-    public UserCreated(String aggregateId, Users user) {
-        super(
-                aggregateId,
-                UUID.randomUUID().toString(),
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
-        );
-        this.user = user;
+    public InvitationCreated(String aggregateId, Invitation invitation) {
+        super(aggregateId, UUID.randomUUID().toString(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
+        this.invitation = invitation;
     }
-    public Users getUser() {
-        return user;
+
+    public Invitation getInvitation() {
+        return invitation;
     }
+
     @Override
     public String eventName() {
-        return "account.users.created";
+        return "";
     }
 
     @Override

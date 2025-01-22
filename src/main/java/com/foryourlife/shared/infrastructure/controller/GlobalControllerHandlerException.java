@@ -1,7 +1,7 @@
 package com.foryourlife.shared.infrastructure.controller;
 
-import com.foryourlife.account.user.domain.UserAlreadyCreatedException;
-import com.foryourlife.account.user.domain.UserNotFoundException;
+import com.foryourlife.clients.account.user.domain.UserAlreadyCreatedException;
+import com.foryourlife.clients.account.user.domain.UserNotFoundException;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.exception.DomainExceptionsWrapper;
 import jakarta.annotation.Nullable;

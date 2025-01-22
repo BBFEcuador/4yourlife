@@ -1,10 +1,9 @@
 package com.foryourlife.account.user.domain;
 
+import com.foryourlife.clients.account.user.domain.Users;
 import net.datafaker.Faker;
 
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class UsersMother {
 

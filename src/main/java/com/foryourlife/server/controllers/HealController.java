@@ -1,11 +1,6 @@
 package com.foryourlife.server.controllers;
 
-import com.foryourlife.account.user.application.CreateUser;
-import com.foryourlife.account.user.infrastructure.httpControllers.SaveUserRequest;
-import jakarta.validation.Valid;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.foryourlife.clients.account.user.application.CommandUsersService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +8,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/server")
 public class HealController {
 
-    private CreateUser createUser;
+    private CommandUsersService createUser;
     private PasswordEncoder passwordEncoder;
 
-    public HealController(CreateUser createUser, PasswordEncoder passwordEncoder) {
+    public HealController(CommandUsersService createUser, PasswordEncoder passwordEncoder) {
         this.createUser = createUser;
         this.passwordEncoder =passwordEncoder;
     }

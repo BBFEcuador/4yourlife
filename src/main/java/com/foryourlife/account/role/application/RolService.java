@@ -24,13 +24,13 @@ public class RolService {
     public Role getInitRole() throws BaseException {
         Specification<Role> specification = (root, query, cb) -> cb.equal(root.get("isStarted").as(Boolean.class), true);
         return this.repository.findOneByCriteria(specification).orElseThrow(() ->
-                new BaseException("Role Problem", List.of("The initial role is not on database"))
+                new BaseException("AdminRole Problem", List.of("The initial role is not on database"))
         );
     }
 
     public Role getRoleById(String id) {
         return this.repository.findById(id).orElseThrow(() ->
-                new BaseException("Role Not found", List.of("The role with id "+id+" does not exist"))
+                new BaseException("AdminRole Not found", List.of("The role with id "+id+" does not exist"))
         );
     }
 }

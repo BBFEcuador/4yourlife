@@ -69,7 +69,7 @@ public class AdminRepositoryImpl implements AdminRepository {
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException("Invalid username or password");
         }
-        authorityList.add(new SimpleGrantedAuthority(userDetails.getRole_id().getName()));
+        authorityList.add(new SimpleGrantedAuthority(userDetails.getRole().getName()));
         return new UsernamePasswordAuthenticationToken(username, password, authorityList);
     }
 

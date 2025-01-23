@@ -15,10 +15,7 @@ public class AdminLoginRequest {
         this.password = password;
     }
 
-    public AdminLoginRequest() {
-    }
-
-    public String getEmail() {
+    public String getUsername() {
         return username;
     }
 

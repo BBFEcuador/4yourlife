@@ -1,14 +1,12 @@
 package com.foryourlife.admin.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
-import java.util.Date;
 
 @Entity
 @Table(name = "admins_users")
@@ -25,7 +23,8 @@ public class Admin {
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST})
     @JoinColumn(name = "role_id", referencedColumnName = "id")
-    private AdminRole adminRole_id;
+    @JsonProperty("role")
+    private AdminRole role;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -40,12 +39,12 @@ public class Admin {
 
     }
 
-    public Admin(String id, String name, String email, String password, AdminRole adminRole_id) {
+    public Admin(String id, String name, String email, String password, AdminRole role) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.adminRole_id = adminRole_id;
+        this.role = role;
     }
 
     public String getId() {
@@ -80,12 +79,8 @@ public class Admin {
         this.password = password;
     }
 
-    public AdminRole getRole_id() {
-        return adminRole_id;
-    }
-
-    public void setRole_id(AdminRole adminRole) {
-        this.adminRole_id = adminRole;
+    public AdminRole getRole() {
+        return role;
     }
 
     @Override

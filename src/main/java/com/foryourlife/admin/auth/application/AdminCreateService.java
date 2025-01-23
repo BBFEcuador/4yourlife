@@ -24,24 +24,6 @@ public class AdminCreateService {
         this.bus = bus;
     }
 
-    public void save(Admin admin){
-        if(this.repository.findByEmail(admin.getEmail()).isPresent()){
-            throw new UserAlreadyCreatedException("The email " + admin.getEmail() + "is already registered");
-        }
-        try{
-            admin.setPassword(passwordEncoder.encode(admin.getPassword()));
-            this.repository.save(admin);
-        }catch (Exception e){
-            this.logger.error(e.getMessage(), e);
-        }
-    }
 
-    public void update(Admin admin){
-        try{
-            this.repository.save(admin);
-        }catch (Exception e){
-            this.logger.error(e.getMessage(), e);
-        }
-    }
 
 }

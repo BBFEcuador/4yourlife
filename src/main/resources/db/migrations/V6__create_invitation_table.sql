@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS invitation(
     isAdmin BOOLEAN not null default false,
     isUsed BOOLEAN not null default false,
     user_id text,
+    senderId text not null,
+    enrolled jsonb not null,
     CONSTRAINT fk_invitation_on_user FOREIGN KEY (user_id) REFERENCES users (id),
     CONSTRAINT pk_invitation PRIMARY KEY (id)
 );

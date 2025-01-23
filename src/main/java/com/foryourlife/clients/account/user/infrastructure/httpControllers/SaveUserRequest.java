@@ -20,6 +20,9 @@ public class SaveUserRequest {
     @NotBlank(message = "The password field is required")
     public String password;
     @NotNull
+    @NotBlank(message = "The token field is required")
+    public String token;
+    @NotNull
     @NotBlank(message = "The name field is required")
     public String name;
     @NotNull
@@ -61,6 +64,6 @@ public class SaveUserRequest {
     }
 
     public Users toDomain() {
-        return Users.create(id != null ? id : UUID.randomUUID().toString(), email, password, name, phone, role, profile.toDomain());
+        return Users.create(id != null ? id : UUID.randomUUID().toString(), email, password, name, phone, role, profile.toDomain(),token);
     }
 }

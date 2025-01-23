@@ -1,5 +1,6 @@
 package com.foryourlife.clients.account.user.application;
 
+import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
 import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
 import com.foryourlife.clients.account.user.domain.*;
@@ -9,30 +10,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CommandUsersService {
     private final UserRepository _userRepository;
+    private final QueryInvitationServices queryInvitationServices;
     private final ParticipantLevelService _rolRepository;
     private final EventBus bus;
     private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
 
-    public CommandUsersService(UserRepository _userRepository, ParticipantLevelRepository rolRepository, ParticipantLevelService rolRepository1, EventBus bus) {
+    public CommandUsersService(UserRepository _userRepository, ParticipantLevelRepository rolRepository, QueryInvitationServices queryInvitationServices, ParticipantLevelService rolRepository1, EventBus bus) {
         this._userRepository = _userRepository;
+        this.queryInvitationServices = queryInvitationServices;
         _rolRepository = rolRepository1;
         this.bus = bus;
     }
 
-    public void createInitUser(Users user){
+    public void createInitUser(Users user) {
         if (this._userRepository.findByEmail(user.getEmail()).isPresent())
             throw new UserAlreadyCreatedException("The email " + user.getEmail() + "is already registered");
-        try {
-            var role = this._rolRepository.getInitRole();
-            user.setParticipantLevel(role);
-            this._userRepository.save(user);
-            this.bus.publish(user.pullDomainEvents());
-        } catch (Exception e) {
-            this.logger.error(e.getMessage(), e);
-        }
+        var token = queryInvitationServices.findInvitationByToken(user.getInvitationToken());
+        if (token.getUsed())
+            throw new BaseException("Token expired", List.of("The token " + user.getInvitationToken() + " was used"));
+        var role = this._rolRepository.getInitRole();
+        user.setParticipantLevel(role);
+        this._userRepository.save(user);
+        this.bus.publish(user.pullDomainEvents());
     }
 
     public void save(Users user) {
@@ -59,7 +63,7 @@ public class CommandUsersService {
     }
 
     public LoginResponse login(String username, String password) throws BaseException {
-            return this._userRepository.login(username, password);
+        return this._userRepository.login(username, password);
     }
 
     public Users getUser(String id) {

@@ -3,9 +3,12 @@ package com.foryourlife.admin.auth.application;
 import com.foryourlife.admin.auth.domain.Admin;
 import com.foryourlife.admin.auth.domain.AdminLoginResponse;
 import com.foryourlife.admin.auth.domain.AdminRepository;
+import com.foryourlife.shared.domain.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AdminFinderService {
@@ -17,7 +20,7 @@ public class AdminFinderService {
     }
 
     public Admin findById(String id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id).orElseThrow(() -> new BaseException("Not found", List.of("Admin not found")));
     }
 
     public Admin findByEmail(String email) {

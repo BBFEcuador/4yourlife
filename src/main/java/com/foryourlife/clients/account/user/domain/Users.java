@@ -18,24 +18,26 @@ public class Users extends AggregateRoot {
     @JoinColumn(name = "participant_level_id", referencedColumnName = "id")
     private ParticipantLevel participantLevel;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(referencedColumnName = "id",name = "profile_id")
+    @JoinColumn(referencedColumnName = "id", name = "profile_id")
     private ProfileDetails profile;
+    private String invitationToken;
 
     protected Users() {
     }
 
-    private Users(String id, String email, String password, String name, String phone, ParticipantLevel role,ProfileDetails profile) {
+    private Users(String id, String email, String password, String name, String phone, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;
         this.phone = phone;
-        this.participantLevel =role;
-        this.profile =profile;
+        this.participantLevel = role;
+        this.profile = profile;
+        this.invitationToken = invitationToken;
     }
 
-    public static Users create(String id, String email, String password, String name, String phone, ParticipantLevel role,ProfileDetails profile) {
-        var user = new Users(id, email, password, name, phone, role,profile);
+    public static Users create(String id, String email, String password, String name, String phone, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
+        var user = new Users(id, email, password, name, phone, role, profile, invitationToken);
         user.record(new UserCreated(id, user));
         return user;
     }
@@ -68,8 +70,15 @@ public class Users extends AggregateRoot {
         this.participantLevel = participantLevel;
     }
 
-    public String getRoleId(){
+    public String getRoleId() {
         return participantLevel.getId();
     }
 
+    public ProfileDetails getProfile() {
+        return profile;
+    }
+
+    public String getInvitationToken() {
+        return invitationToken;
+    }
 }

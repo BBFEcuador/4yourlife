@@ -23,9 +23,9 @@ public class AdminSeeder {
         return args -> {
             Admin admin = new Admin(
                     "3936ae5e-0cc1-4375-abc7-520d16999110",
-                    "Diegowowowowo",
-                    "diegowo@admin.com",
-                    passwordEncoder.encode("diegowo"),
+                    "Diego FYL",
+                    "diegofly@admin.com",
+                    passwordEncoder.encode("FocusYourLife2025--"),
                     new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206","Gerente","ROLE_ADMIN")
             );
             repository.save(admin);

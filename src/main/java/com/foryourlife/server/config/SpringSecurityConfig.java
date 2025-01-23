@@ -37,7 +37,7 @@ public class SpringSecurityConfig {
                     session.maximumSessions(1);
                 })
                 .authorizeHttpRequests(http -> {
-                    http.requestMatchers(UnauthRoutes.ROUTES.toArray(new String[0])).permitAll().anyRequest().authenticated();
+                    http.requestMatchers(unauthorizedRoutes).permitAll().anyRequest().authenticated();
                 })
                 .addFilterBefore(new JWTFilter(jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(h -> h

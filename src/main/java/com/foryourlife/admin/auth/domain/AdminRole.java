@@ -5,7 +5,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "admin_roles", schema = "PUBLIC")
+@Table(name = "admin_roles")
 public class AdminRole {
     @Id
     private String id;

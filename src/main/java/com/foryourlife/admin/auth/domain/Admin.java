@@ -3,12 +3,16 @@ package com.foryourlife.admin.auth.domain;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
-@Table(name = "admins", schema = "PUBLIC")
-
+@Table(name = "admins_users")
+@EntityListeners(AuditingEntityListener.class)
 public class Admin {
     @Id
     private String id;
@@ -19,19 +23,17 @@ public class Admin {
 
     private String password;
 
-    @ManyToOne
-    @JoinColumn(name = "rol_id", referencedColumnName = "id")
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST})
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
     private AdminRole adminRole_id;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at")
-    private Date created_at;
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private Instant created_at;
 
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
+    @LastModifiedDate
     @Column(name = "updated_at")
-    private Date updated_at;
+    private Instant updated_at;
 
 
     protected Admin() {
@@ -68,22 +70,6 @@ public class Admin {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Date getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
-    }
-
-    public Date getUpdated_at() {
-        return updated_at;
-    }
-
-    public void setUpdated_at(Date updated_at) {
-        this.updated_at = updated_at;
     }
 
     public String getPassword() {

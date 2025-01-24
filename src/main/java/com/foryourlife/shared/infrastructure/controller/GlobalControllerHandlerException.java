@@ -1,5 +1,6 @@
 package com.foryourlife.shared.infrastructure.controller;
 
+import com.foryourlife.admin.training.campus.domain.CampusNotFoundException;
 import com.foryourlife.clients.account.user.domain.UserAlreadyCreatedException;
 import com.foryourlife.clients.account.user.domain.UserNotFoundException;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -57,6 +58,11 @@ public class GlobalControllerHandlerException extends ResponseEntityExceptionHan
     }
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
+        DomainExceptionsWrapper errors = new DomainExceptionsWrapper(ex.getMessage(), List.of(ex.getMessage()));
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(CampusNotFoundException.class)
+    public ResponseEntity<Object> handleCampusNotFoundException(CampusNotFoundException ex) {
         DomainExceptionsWrapper errors = new DomainExceptionsWrapper(ex.getMessage(), List.of(ex.getMessage()));
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }

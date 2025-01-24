@@ -3,7 +3,6 @@ package com.foryourlife.clients.account.participantLevel.domain;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 @Entity
@@ -19,7 +18,7 @@ public class ParticipantLevel {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private CourseLevel courseLevel;
 
-    private ParticipantLevel() {
+    protected ParticipantLevel() {
 
     }
 

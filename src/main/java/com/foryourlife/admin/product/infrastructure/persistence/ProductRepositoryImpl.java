@@ -35,4 +35,9 @@ public class ProductRepositoryImpl implements ProductRepository {
     public List<Product> findAll() {
         return this.impl.findAll();
     }
+
+    @Override
+    public void saveAll(List<Product> products) {
+        this.impl.saveAll(products);
+    }
 }

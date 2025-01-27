@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class QueryUsersService {
     private final UserRepository _userRepository;
-    private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
+    private final Logger logger = LoggerFactory.getLogger(QueryUsersService.class);
 
     public QueryUsersService(UserRepository _userRepository) {
         this._userRepository = _userRepository;

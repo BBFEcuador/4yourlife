@@ -1,7 +1,7 @@
-package com.foryourlife.admin.training.campus.infrastructure.httpControllers;
+package com.foryourlife.admin.programs.campus.infrastructure.httpControllers;
 
-import com.foryourlife.admin.training.campus.application.CommandCampusService;
-import com.foryourlife.admin.training.campus.application.QueryCampusService;
+import com.foryourlife.admin.programs.campus.application.CommandCampusService;
+import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

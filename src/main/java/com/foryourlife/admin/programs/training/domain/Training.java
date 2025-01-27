@@ -1,21 +1,21 @@
-package com.foryourlife.admin.training.program.domain;
+package com.foryourlife.admin.programs.training.domain;
 
-import com.foryourlife.admin.training.campus.domain.Campus;
+import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.springframework.data.relational.core.sql.In;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table()
+@Table(name = "training")
 public class Training extends AggregateRoot {
     @Id
     private String id;
@@ -30,16 +30,17 @@ public class Training extends AggregateRoot {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private CourseLevel courseLevel;
-    @OneToOne(cascade = {CascadeType.MERGE})
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST})
+    @JoinColumn(name = "nextLevel",referencedColumnName = "id")
     private Training nextLevel;
-    @OneToMany
+    @ManyToOne
     private Campus campus;
     private Boolean state;
 
     protected Training() {
     }
 
-    private Training(String id, Integer number, String name, Date startDate, Date endDate, CourseLevel courseLevel, Training nextLevel, Campus campus, Boolean state) {
+    private Training(String id, Integer number, String name, LocalDate startDate, LocalDate endDate, CourseLevel courseLevel, Training nextLevel, Campus campus, Boolean state) {
         this.id = id;
         this.number = number;
         this.name = name;
@@ -55,8 +56,8 @@ public class Training extends AggregateRoot {
             String id,
             Integer number,
             String name,
-            Date startDate,
-            Date endDate,
+            LocalDate startDate,
+            LocalDate endDate,
             CourseLevel courseLevel,
             Training nextLevel,
             Campus campus,
@@ -89,11 +90,11 @@ public class Training extends AggregateRoot {
     }
 
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate.getValue();
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate.getValue();
     }
 
@@ -113,33 +114,31 @@ public class Training extends AggregateRoot {
         return state;
     }
 
-    public Training generateNextLevel() {
-        if (this.courseLevel == CourseLevel.FOCUS) {
-            var life = new Training(UUID.randomUUID().toString(), this.number, setName(this.number), setDates(this.startDate.getValue(), 3), setDates(this.endDate.getValue(), 3), CourseLevel.YOUR, null, campus, true);
-            return new Training(
-                    UUID.randomUUID().toString(),
-                    this.number,
-                    setName(this.number),
-                    setDates(this.startDate.getValue(), 3),
-                    setDates(this.endDate.getValue(), 3),
-                    CourseLevel.YOUR,
-                    life,
-                    campus,
-                    true
-            );
-        } else {
+    public List<Training> generateNextLevel(Integer numberOfFocus) {
+        if (this.courseLevel != CourseLevel.FOCUS) {
             throw new BaseException("Level problem", List.of("Only focus"));
         }
+        var life = new Training(UUID.randomUUID().toString(), this.number, setName(this.number), setDates(this.startDate.getValue(), 4), setDates(this.endDate.getValue(), 4), CourseLevel.LIFE, null, campus, true);
+
+        this.nextLevel = new Training(
+                UUID.randomUUID().toString(),
+                this.number,
+                setName(this.number),
+                setDates(this.startDate.getValue(), 3),
+                setDates(this.endDate.getValue(), 3),
+                CourseLevel.YOUR,
+                life,
+                campus,
+                true
+        );
+        return List.of(this);
     }
 
     private String setName(Integer number) {
         return this.campus.getCity() + "-" + number;
     }
 
-    private Date setDates(Date date, Integer weeks) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(this.startDate.getValue());
-        calendar.add(Calendar.WEEK_OF_YEAR, weeks);
-        return calendar.getTime();
+    private LocalDate setDates(LocalDate date, Integer weeks) {
+        return date.plusWeeks(weeks);
     }
 }

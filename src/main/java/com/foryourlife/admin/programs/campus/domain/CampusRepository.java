@@ -1,4 +1,4 @@
-package com.foryourlife.admin.training.campus.domain;
+package com.foryourlife.admin.programs.campus.domain;
 
 import java.util.List;
 import java.util.Optional;

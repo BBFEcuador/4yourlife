@@ -1,7 +1,6 @@
-package com.foryourlife.admin.training.campus.infrastructure.httpControllers;
+package com.foryourlife.admin.programs.campus.infrastructure.httpControllers;
 
-import com.foryourlife.admin.training.campus.domain.Campus;
-import jakarta.validation.constraints.Email;
+import com.foryourlife.admin.programs.campus.domain.Campus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

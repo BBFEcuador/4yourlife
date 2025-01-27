@@ -1,4 +1,4 @@
-package com.foryourlife.admin.training.program.domain;
+package com.foryourlife.admin.programs.training.domain;
 
 import java.util.List;
 

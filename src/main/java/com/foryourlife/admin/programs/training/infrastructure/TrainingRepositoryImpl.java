@@ -1,7 +1,7 @@
-package com.foryourlife.admin.training.program.infrastructure;
+package com.foryourlife.admin.programs.training.infrastructure;
 
-import com.foryourlife.admin.training.program.domain.Training;
-import com.foryourlife.admin.training.program.domain.TrainingRepository;
+import com.foryourlife.admin.programs.training.domain.Training;
+import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

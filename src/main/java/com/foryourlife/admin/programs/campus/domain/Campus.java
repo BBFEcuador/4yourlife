@@ -1,4 +1,4 @@
-package com.foryourlife.admin.training.campus.domain;
+package com.foryourlife.admin.programs.campus.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

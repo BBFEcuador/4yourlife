@@ -1,6 +1,6 @@
 package com.foryourlife.shared.infrastructure.controller;
 
-import com.foryourlife.admin.training.campus.domain.CampusNotFoundException;
+import com.foryourlife.admin.programs.campus.domain.CampusNotFoundException;
 import com.foryourlife.clients.account.user.domain.UserAlreadyCreatedException;
 import com.foryourlife.clients.account.user.domain.UserNotFoundException;
 import com.foryourlife.shared.domain.exception.BaseException;

@@ -1,8 +1,8 @@
-package com.foryourlife.admin.training.campus.application;
+package com.foryourlife.admin.programs.campus.application;
 
-import com.foryourlife.admin.training.campus.domain.Campus;
-import com.foryourlife.admin.training.campus.domain.CampusNotFoundException;
-import com.foryourlife.admin.training.campus.domain.CampusRepository;
+import com.foryourlife.admin.programs.campus.domain.Campus;
+import com.foryourlife.admin.programs.campus.domain.CampusNotFoundException;
+import com.foryourlife.admin.programs.campus.domain.CampusRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

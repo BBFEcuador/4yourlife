@@ -32,7 +32,7 @@ public class Training extends AggregateRoot {
     private CourseLevel courseLevel;
     @OneToOne(cascade = {CascadeType.MERGE})
     private Training nextLevel;
-    @OneToMany
+    @ManyToOne
     private Campus campus;
     private Boolean state;
 

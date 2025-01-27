@@ -1,8 +1,9 @@
 package com.foryourlife.admin.programs.campus.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.foryourlife.admin.auth.domain.Admin;
+import jakarta.persistence.*;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "campus")
@@ -14,6 +15,7 @@ public class Campus {
     private String city;
     private String address;
     private String phone;
+
 
     protected Campus() {
     }

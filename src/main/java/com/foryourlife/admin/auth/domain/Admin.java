@@ -1,12 +1,15 @@
 package com.foryourlife.admin.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.foryourlife.admin.programs.campus.domain.Campus;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.Set;
+
 
 @Entity
 @Table(name = "admins_users")
@@ -26,6 +29,13 @@ public class Admin {
     @JsonProperty("role")
     private AdminRole role;
 
+    @ManyToMany
+    @JoinTable(
+            name = "campus_admins",
+            joinColumns = @JoinColumn(name = "admin_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "campus_id", referencedColumnName = "id"))
+    private Set<Campus> campus;
+
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private Instant created_at;
@@ -36,15 +46,15 @@ public class Admin {
 
 
     protected Admin() {
-
     }
 
-    public Admin(String id, String name, String email, String password, AdminRole role) {
+    public Admin(String id, String name, String email, String password, AdminRole role, Set<Campus> campus) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.campus = campus;
     }
 
     public String getId() {
@@ -93,5 +103,9 @@ public class Admin {
                 ", created_at=" + created_at +
                 ", updated_at=" + updated_at +
                 '}';
+    }
+
+    public Set<Campus> getCampus() {
+        return campus;
     }
 }

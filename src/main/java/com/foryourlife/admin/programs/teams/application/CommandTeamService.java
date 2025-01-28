@@ -41,13 +41,18 @@ public class CommandTeamService {
     }
 
     public void assignParticipants(String teamId, String userId) {
-        if (!this._teamRepository.findById(teamId).isPresent()) {
+        var team = _teamRepository.findById(teamId);
+        if (!team.isPresent()) {
             throw new BaseException("Team not found", List.of(""));
         } else if (!_userRepository.findById(userId).isPresent()) {
             throw new BaseException("User not found", List.of(""));
         }
+        team.orElseThrow().getUsers().forEach(user -> {
+            if (user.getId().equals(userId)) {
+                throw new BaseException("User already assigned", List.of(""));
+            }
+        });
         _teamRepository.assignParticipants(teamId, userId);
-
     }
 
     public void assignMastersLife(String teamId, String userId) {

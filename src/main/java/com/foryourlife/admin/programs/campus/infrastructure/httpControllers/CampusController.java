@@ -18,12 +18,12 @@ public class CampusController {
         this.commandCampusService = commandCampusService;
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/getCampus")
     public ResponseEntity<?> getAll() {
         return new ResponseEntity<>(this.queryCampusService.getAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/findById/{id}")
+    @GetMapping("/getCampus/{id}")
     public ResponseEntity<?> findById(@PathVariable String id) {
         return new ResponseEntity<>(this.queryCampusService.findById(id), HttpStatus.OK);
     }

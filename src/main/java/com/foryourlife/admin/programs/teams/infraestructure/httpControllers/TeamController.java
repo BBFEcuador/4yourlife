@@ -1,4 +1,74 @@
 package com.foryourlife.admin.programs.teams.infraestructure.httpControllers;
 
+import com.foryourlife.admin.programs.teams.application.CommandTeamService;
+import com.foryourlife.admin.programs.teams.application.QueryTeamService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/teams")
 public class TeamController {
+
+    private final CommandTeamService commandTeamService;
+    private final QueryTeamService queryTeamService;
+
+    public TeamController(CommandTeamService commandTeamService, QueryTeamService queryTeamService) {
+        this.commandTeamService = commandTeamService;
+        this.queryTeamService = queryTeamService;
+    }
+
+    @GetMapping("/getTeam")
+    public ResponseEntity<?> getAll() {
+        return new ResponseEntity<>(this.queryTeamService.getAllTeams(), HttpStatus.OK);
+    }
+
+    @GetMapping("/getTeam/{id}")
+    public ResponseEntity<?> findById(@PathVariable String id) {
+        return new ResponseEntity<>(this.queryTeamService.getTeamById(id), HttpStatus.OK);
+    }
+
+    @PostMapping("/save")
+    public void saveTeam(@RequestBody SaveTeamRequest request) {
+        commandTeamService.save(request.toDomain());
+        new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update")
+    public void updateTeam(@RequestBody SaveTeamRequest request) {
+        commandTeamService.update(request.toDomain());
+        new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/assignParticipants")
+    public void assignParticipants(@RequestBody AssignParticipantsRequest request) {
+        for (var user:request.getUsers()){
+            commandTeamService.assignParticipants(request.getTeamId(), user.getId());
+        }
+        new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/assignMaterlife")
+    public void assignMasterlife(@RequestBody AssignParticipantsRequest request) {
+        for (var user:request.getUsers()){
+            commandTeamService.assignMastersLife(request.getTeamId(), user.getId());
+        }
+        new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/removeParticipants")
+    public void removeParticipants(@RequestBody AssignParticipantsRequest request) {
+        for (var user:request.getUsers()){
+            commandTeamService.removeParticipants(request.getTeamId(), user.getId());
+        }
+        new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/removeMasterlife")
+    public void removeMasterlife(@RequestBody AssignParticipantsRequest request) {
+        for (var user:request.getUsers()){
+            commandTeamService.removeMastersLife(request.getTeamId(), user.getId());
+        }
+        new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }

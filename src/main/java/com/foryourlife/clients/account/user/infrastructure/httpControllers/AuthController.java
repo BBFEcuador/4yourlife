@@ -29,6 +29,6 @@ public class AuthController {
     public ResponseEntity<?> saveUser(@Valid @RequestBody SaveUserRequest request) {
         request.password = passwordEncoder.encode((request.password));
         userService.createInitUser(request.toDomain());
-        return new ResponseEntity<>("message:'User created successfully'", HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

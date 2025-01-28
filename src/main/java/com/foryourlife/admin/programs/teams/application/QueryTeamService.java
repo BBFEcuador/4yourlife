@@ -2,7 +2,6 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
-import com.foryourlife.clients.account.user.application.QueryUsersService;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,8 @@ public class QueryTeamService {
     }
 
     public Team getTeamById(String id) {
-        return this._teamRepository.findById(id).orElseThrow(() -> new BaseException("Team not found", List.of("")));
+        return this._teamRepository.findById(id).orElseThrow(
+                () -> new BaseException("Not found", List.of("The team with id " + id + " does not exist")));
     }
 
     public List<Team> getAllTeams() {

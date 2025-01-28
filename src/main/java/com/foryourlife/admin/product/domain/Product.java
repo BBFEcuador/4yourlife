@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 
 @Entity
@@ -63,7 +64,7 @@ public class Product {
 
     }
 
-    public Product(String id, String name, String code, Boolean isActive, String description, Double minValue, int taxPercentage, String type, String category_id, Double price_1, Double price_2, Double price_3, Double price_4) {
+    public Product(String id, String name, String code, Boolean isActive, String description, Double minValue, int taxPercentage, String type, String category_id, Double price_1, Double price_2, Double price_3, Double price_4, Instant created_at, Instant updated_at) {
         this.id = id;
         this.name = name;
         this.code = code;
@@ -77,6 +78,8 @@ public class Product {
         this.price_2 = price_2;
         this.price_3 = price_3;
         this.price_4 = price_4;
+        this.created_at = created_at;
+        this.updated_at = updated_at;
     }
 
     public String getId() {
@@ -199,8 +202,8 @@ public class Product {
         this.updated_at = updated_at;
     }
 
-    public static Product create(String id, String name, String code, Boolean isActive, String description, Double minValue, int taxPercentage, String type, String category_id, Double price_1, Double price_2, Double price_3, Double price_4) {
-        return new Product(id, name, code, isActive, description, minValue, taxPercentage, type, category_id, price_1, price_2, price_3, price_4);
+    public static Product create(String id, String name, String code, Boolean isActive, String description, Double minValue, int taxPercentage, String type, String category_id, Double price_1, Double price_2, Double price_3, Double price_4, Instant created_at, Instant updated_at) {
+        return new Product(id, name, code, isActive, description, minValue, taxPercentage, type, category_id, price_1, price_2, price_3, price_4,created_at, updated_at);
     }
 
 

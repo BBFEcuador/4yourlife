@@ -11,4 +11,6 @@ public interface ProductRepository {
     void deleteById(String id);
 
     List<Product> findAll();
+
+    void saveAll(List<Product> products);
 }

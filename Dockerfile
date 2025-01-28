@@ -1,7 +1,6 @@
 FROM ubuntu:latest as build
 RUN apt-get update
-RUN apt-get update
-RUN apt-get install -y java-21-amazon-corretto-jdk
+RUN apt-get install openjdk-21-jdk -y
 
 COPY . .amazon
 RUN ./gradlew bootJar --no-daemon

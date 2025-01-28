@@ -14,14 +14,13 @@ public class QueryTeamService {
     private final TeamRepository _teamRepository;
     private final Logger logger = LoggerFactory.getLogger(QueryTeamService.class);
 
-
     public QueryTeamService(TeamRepository _teamRepository) {
         this._teamRepository = _teamRepository;
     }
 
     public Team getTeamById(String id) {
-        return this._teamRepository.findById(id).orElseThrow(() ->
-                new BaseException("Not found",List.of("The team with id "+id+" does not exist")));
+        return this._teamRepository.findById(id).orElseThrow(
+                () -> new BaseException("Not found", List.of("The team with id " + id + " does not exist")));
     }
 
     public List<Team> getAllTeams() {

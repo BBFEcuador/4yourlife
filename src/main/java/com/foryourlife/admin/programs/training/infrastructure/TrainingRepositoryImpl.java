@@ -5,6 +5,7 @@ import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TrainingRepositoryImpl implements TrainingRepository {
@@ -28,5 +29,10 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     @Override
     public List<Training> getAll() {
         return this.repository.findAll();
+    }
+
+    @Override
+    public Optional<Training> findById(String id) {
+        return this.repository.findById(id);
     }
 }

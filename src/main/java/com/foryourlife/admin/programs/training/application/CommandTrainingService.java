@@ -7,8 +7,6 @@ import com.foryourlife.admin.programs.training.infrastructure.TrainingAutoGenera
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.UUID;
 
 @Service

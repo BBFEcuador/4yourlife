@@ -2,9 +2,9 @@ CREATE TABLE IF NOT EXISTS teams
 (
     id text not null,
     name text not null,
-    photo text not null,
-    training_id text not null,
-    training_number text not null,
+    photo text,
+    training_id text,
+    training_number text,
     CONSTRAINT fk_trainingId FOREIGN KEY (training_id) REFERENCES training (id),
     CONSTRAINT pk_teams PRIMARY KEY (id)
 );

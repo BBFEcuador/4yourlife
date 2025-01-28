@@ -1,11 +1,16 @@
 package com.foryourlife.admin.programs.training.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foryourlife.admin.programs.campus.domain.Campus;
+import com.foryourlife.admin.programs.teams.domain.Team;
+import com.foryourlife.clients.account.invitations.domain.Sender;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
@@ -33,6 +38,10 @@ public class Training extends AggregateRoot {
     @ManyToOne
     private Campus campus;
     private Boolean state;
+    @JsonIgnore
+    @Type(JsonType.class)
+    @Column(columnDefinition = "jsonb")
+    private Team originalTeam;
 
     protected Training() {
     }
@@ -180,5 +189,31 @@ public class Training extends AggregateRoot {
 
     private LocalDate setDates(LocalDate date, Integer weeks) {
         return date.plusWeeks(weeks);
+    }
+
+    public Team getOriginalTeam() {
+        return originalTeam;
+    }
+
+    public void setOriginalTeam(Team originalTeam) {
+        this.originalTeam = originalTeam;
+    }
+
+    @Override
+    public String toString() {
+        var s = "Training{" +
+                "id='" + id + '\'' +
+                ", number=" + number +
+                ", name='" + name + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", courseLevel=" + courseLevel +
+                ", nextLevel=" + nextLevel +
+                ", campus=" + campus +
+                ", state=" + state +
+                ", originalTeam=" + originalTeam +
+                '}';
+        System.out.println(s);
+        return s;
     }
 }

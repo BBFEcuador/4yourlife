@@ -18,15 +18,15 @@ public class CampusController {
         this.commandCampusService = commandCampusService;
     }
 
-    @GetMapping("/getCampus")
+    @GetMapping("")
     public ResponseEntity<?> getAll() {
         return new ResponseEntity<>(this.queryCampusService.getAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/getCampus/{id}")
-    public ResponseEntity<?> findById(@PathVariable String id) {
-        return new ResponseEntity<>(this.queryCampusService.findById(id), HttpStatus.OK);
-    }
+//    @GetMapping("{id}")
+//    public ResponseEntity<?> findById(@PathVariable String id) {
+//        return new ResponseEntity<>(this.queryCampusService.findById(id), HttpStatus.OK);
+//    }
 
     @PostMapping("/save")
     public ResponseEntity<?> save(@RequestBody CampusRequest request) {

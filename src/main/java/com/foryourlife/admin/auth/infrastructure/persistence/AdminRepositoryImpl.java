@@ -50,6 +50,11 @@ public class AdminRepositoryImpl implements AdminRepository {
     }
 
     @Override
+    public List<Admin> getAll() {
+        return this.repository.findAll();
+    }
+
+    @Override
     public Admin save(Admin admin) {
         return this.repository.save(admin);
     }

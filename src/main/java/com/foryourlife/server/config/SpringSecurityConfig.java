@@ -17,7 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +25,8 @@ public class SpringSecurityConfig {
 
     @Autowired
     private JWTUtils jwtUtils;
+
+    @Autowired private CustomCorsConfiguration customCorsConfiguration;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -39,6 +40,7 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(http -> {
                     http.requestMatchers(unauthorizedRoutes).permitAll().anyRequest().authenticated();
                 })
+                .cors(c-> c.configurationSource(customCorsConfiguration))
                 .addFilterBefore(new JWTFilter(jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(h -> h
                         .accessDeniedHandler(new EmrExceptionHandler())

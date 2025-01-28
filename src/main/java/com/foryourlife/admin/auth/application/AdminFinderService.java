@@ -26,6 +26,9 @@ public class AdminFinderService {
     public Admin findByEmail(String email) {
         return repository.findByEmail(email).orElse(null);
     }
+    public List<Admin> getAll() {
+        return repository.getAll();
+    }
 
     public AdminLoginResponse login(String username, String password){
         try{

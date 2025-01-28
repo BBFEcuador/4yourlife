@@ -12,11 +12,11 @@ public class SaveTeamRequest {
     private String name;
     private String photo;
     private Training trainingId;
-    private Training trainingNumber;
+    private Integer trainingNumber;
     private Set<Users> users;
     private Set<Users> masterLife;
 
-    public SaveTeamRequest(String id, String name, String photo, Training trainingId, Training trainingNumber, Set<Users> users, Set<Users> masterLife) {
+    public SaveTeamRequest(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Users> users, Set<Users> masterLife) {
         this.id = id;
         this.name = name;
         this.photo = photo;
@@ -42,7 +42,7 @@ public class SaveTeamRequest {
         return trainingId;
     }
 
-    public Training getTrainingNumber() {
+    public Integer getTrainingNumber() {
         return trainingNumber;
     }
 

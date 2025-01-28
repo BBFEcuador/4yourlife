@@ -20,7 +20,7 @@ public class QueryTeamService {
     }
 
     public Team getTeamById(String id) {
-        return this._teamRepository.findById(id);
+        return this._teamRepository.findById(id).orElseThrow();
     }
 
     public List<Team> getAllTeams() {

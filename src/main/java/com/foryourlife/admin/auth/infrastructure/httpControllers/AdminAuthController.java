@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth/admin")
+@RequestMapping("/auth")
 public class AdminAuthController {
     @Autowired
     private AdminFinderService service;
@@ -20,7 +20,7 @@ public class AdminAuthController {
     @Autowired
     private AdminCreateService serviceCreateService;
 
-    @PostMapping("/login")
+    @PostMapping("/admin-login")
     public ResponseEntity<?> login(@Valid  @RequestBody AdminLoginRequest request) {
         return new ResponseEntity<>(service.login(request.getUsername(), request.getPassword()),HttpStatus.OK);
     }

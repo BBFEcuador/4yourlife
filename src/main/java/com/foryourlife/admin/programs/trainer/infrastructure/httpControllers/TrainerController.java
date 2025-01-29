@@ -27,7 +27,7 @@ public class TrainerController {
         trainerCreateService.createTrainer(request.toDomain());
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<Trainer>> getAllTrainers() {
         return new ResponseEntity<>(trainerFinderService.findTrainers(), HttpStatus.OK);
     }

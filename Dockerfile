@@ -1,6 +1,7 @@
 FROM gradle:8-jdk21-corretto AS build
 WORKDIR /home/gradle
 COPY . .
+RUN gradle flywayRepair
 RUN gradle bootJar --no-daemon
 
 FROM openjdk:21-jdk-slim

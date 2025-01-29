@@ -9,6 +9,12 @@ plugins {
 group = 'com.foryourlife'
 version = '0.0.1-SNAPSHOT'
 
+flyway {
+	url = "jdbc:postgresql://${System.getenv("PGHOST")}:${System.getenv("PGPORT")}/${System.getenv("PGDATABASE")}"
+	user = System.getenv("POSTGRES_USER") ?: "default_user"
+	password = System.getenv("POSTGRES_PASSWORD") ?: "default_password"
+}
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)

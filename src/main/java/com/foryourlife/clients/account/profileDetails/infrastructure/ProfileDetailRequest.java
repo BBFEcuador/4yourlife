@@ -1,4 +1,4 @@
-package com.foryourlife.clients.account.user.infrastructure.httpControllers;
+package com.foryourlife.clients.account.profileDetails.infrastructure;
 
 import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import org.hibernate.validator.constraints.Length;
 import java.util.Date;
 import java.util.UUID;
 
-public class UserProfileRequest {
+public class ProfileDetailRequest {
 
     public String id;
     @Past(message = "fecha debe ser en pasado")

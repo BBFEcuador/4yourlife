@@ -54,4 +54,8 @@ public class AdminRole {
                 ", type='" + type + '\'' +
                 '}';
     }
+
+    public static AdminRole create(String id, String name, String type){
+        return new AdminRole(id, name, type);
+    }
 }

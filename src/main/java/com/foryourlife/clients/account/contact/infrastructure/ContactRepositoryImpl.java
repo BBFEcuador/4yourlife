@@ -5,6 +5,7 @@ import com.foryourlife.clients.account.contact.domain.ContactRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContactRepositoryImpl implements ContactRepository {
@@ -26,17 +27,12 @@ public class ContactRepositoryImpl implements ContactRepository {
     }
 
     @Override
-    public void update(Contact contact) {
-        _jpaContactRepository.save(contact);
-    }
-
-    @Override
     public List<Contact> findAllByUser(String userId) {
         return _jpaContactRepository.findByUser_id(userId);
     }
 
     @Override
-    public Contact findById(String id) {
-        return null;
+    public Optional<Contact> findById(String id) {
+        return _jpaContactRepository.findById(id);
     }
 }

@@ -2,6 +2,8 @@ package com.foryourlife.admin.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.programs.campus.domain.Campus;
+import com.foryourlife.shared.domain.AggregateRoot;
+import com.foryourlife.shared.domain.events.AdminCreated;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -14,7 +16,7 @@ import java.util.Set;
 @Entity
 @Table(name = "admins_users")
 @EntityListeners(AuditingEntityListener.class)
-public class Admin {
+public class Admin extends AggregateRoot {
     @Id
     private String id;
 
@@ -55,6 +57,12 @@ public class Admin {
         this.password = password;
         this.role = role;
         this.campus = campus;
+    }
+
+    public static Admin create(String id, String name, String email, String password, AdminRole role, Set<Campus> campus,String plainPassword) {
+        var admin = new Admin(id, name, email, password, role, campus);
+        admin.record(new AdminCreated(id, admin,plainPassword));
+        return admin;
     }
 
     public String getId() {

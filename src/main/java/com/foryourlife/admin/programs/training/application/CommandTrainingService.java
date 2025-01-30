@@ -36,4 +36,8 @@ public class CommandTrainingService {
         var trainingList = focus.generateNextLevel(request.numberOfFocus);
         this.repository.saveAll(trainingList);
     }
+
+    public void saveTraining(Training training) {
+        this.repository.save(training);
+    }
 }

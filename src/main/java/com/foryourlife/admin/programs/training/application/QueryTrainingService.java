@@ -20,4 +20,8 @@ public class QueryTrainingService {
                 () -> new BaseException("Training not found", List.of("The training does not exist"))
         );
     }
+
+    public List<Training> getAllTrainings() {
+        return this.repository.getAll();
+    }
 }

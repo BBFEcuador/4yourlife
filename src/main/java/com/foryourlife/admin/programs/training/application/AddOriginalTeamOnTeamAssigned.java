@@ -26,8 +26,8 @@ public class AddOriginalTeamOnTeamAssigned {
     @EventListener
     @Transactional
     public void on(TeamToTrainingAssigned event) {
-        var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow(() -> new RuntimeException("SEXOOOOOOOOO1"));
-        var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException("SEXOOOOOOOOO"));
+        var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow(() -> new RuntimeException(""));
+        var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException(""));
         training.setOriginalTeam(team);
         trainingRepository.save(training);
     }

@@ -1,6 +1,7 @@
 package com.foryourlife.clients.account.user.infrastructure.httpControllers;
 
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
+import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
 import com.foryourlife.clients.account.user.domain.Users;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -33,7 +34,7 @@ public class SaveUserRequest {
     public ParticipantLevel role;
     @NotNull
     @Valid
-    public UserProfileRequest profile;
+    public ProfileDetailRequest profile;
 
     public SaveUserRequest(String phone, String name, String password, String email, String id) {
         this.id = id;

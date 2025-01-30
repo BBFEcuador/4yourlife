@@ -71,6 +71,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<Users> getAll() {
+        return repository.findAll();
+    }
+
+    @Override
     public void save(Users user) {
         this.repository.save(user);
     }

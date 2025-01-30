@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class QueryUsersService {
     private final UserRepository _userRepository;
@@ -19,5 +21,9 @@ public class QueryUsersService {
 
     public Users getUserById(String id) {
         return this._userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The Id: " + id + " doesn't exist."));
+    }
+
+    public List<Users> getAll() {
+        return this._userRepository.getAll();
     }
 }

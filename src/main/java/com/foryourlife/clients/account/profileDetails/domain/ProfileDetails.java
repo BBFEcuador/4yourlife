@@ -1,6 +1,7 @@
 package com.foryourlife.clients.account.profileDetails.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.shared.domain.AggregateRoot;
 import jakarta.persistence.*;
 
@@ -42,8 +43,9 @@ public class ProfileDetails extends AggregateRoot {
         return id;
     }
 
-    public UserBirthday getBirthday() {
-        return birthday;
+    @JsonProperty("birthday")
+    public Date getBirthday() {
+        return birthday.getValue();
     }
 
     public String getAddress() {

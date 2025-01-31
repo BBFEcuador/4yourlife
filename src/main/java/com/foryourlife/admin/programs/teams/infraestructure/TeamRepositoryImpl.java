@@ -26,8 +26,11 @@ public class TeamRepositoryImpl implements TeamRepository {
     }
 
     @Override
-    public void update(Team team) {
-        _jpaTeamRepository.save(team);
+    public void updatePhoto(String id, String photo) {
+        _jpaTeamRepository.save(_jpaTeamRepository.findById(id).map(team -> {
+            team.setPhoto(photo);
+            return team;
+        }).orElseThrow(() -> new BaseException("Team not found",List.of(""))));
     }
 
     @Override

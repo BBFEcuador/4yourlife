@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface TeamRepository {
 
     void save(Team team);
-    void update(Team team);
+    void updatePhoto(String id, String photo);
     Optional<Team> findById(String id);
     List<Team> findAll();
     void assignParticipants(String teamId, String userId);

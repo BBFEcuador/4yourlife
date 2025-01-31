@@ -4,7 +4,12 @@ CREATE TABLE IF NOT EXISTS trainers (
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(255) NOT NULL,
     password TEXT NOT NULL,
+    isActive BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_trainers PRIMARY KEY (id)
-    );
+);
+
+ALTER TABLE teams
+    ADD COLUMN trainer_id VARCHAR(255),
+    ADD CONSTRAINT fk_trainer_id FOREIGN KEY (trainer_id) REFERENCES trainers (id);

@@ -18,15 +18,18 @@ public class Trainer {
 
     private String password;
 
+    private Boolean isActive;
+
     protected Trainer() {
     }
 
-    private Trainer(String id, String name, String email, String phone, String password) {
+    private Trainer(String id, String name, String email, String phone, String password, Boolean isActive) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.password = password;
+        this.isActive = isActive;
     }
 
     public String getId() {
@@ -69,7 +72,15 @@ public class Trainer {
         this.password = password;
     }
 
-    public static Trainer create(String id, String name, String email, String phone, String password) {
-        return new Trainer(id, name, email, phone, password);
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
+    public static Trainer create(String id, String name, String email, String phone, String password, Boolean isActive) {
+        return new Trainer(id, name, email, phone, password, isActive);
     }
 }

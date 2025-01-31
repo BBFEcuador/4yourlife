@@ -3,6 +3,7 @@ package com.foryourlife.admin.programs.trainer.infrastructure.httpControllers;
 import com.foryourlife.admin.programs.trainer.application.TrainerCreatorService;
 import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
+import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,18 @@ public class TrainerController {
     private TrainerCreatorService trainerCreateService;
 
     @PostMapping("/add")
-    public void createTrainer(@RequestBody TrainerRequest request, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<?> createTrainer(@RequestBody TrainerRequest request) {
         trainerCreateService.createTrainer(request.toDomain());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateTrainer(@RequestBody TrainerRequest request) {
+        if(!trainerFinderService.findTrainerById(request.getId()).isPresent()){
+            throw new BaseException("Trainer not found", List.of(""));
+        }
+        trainerCreateService.createTrainer(request.toDomain());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("")

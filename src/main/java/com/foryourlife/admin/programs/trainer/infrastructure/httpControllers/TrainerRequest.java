@@ -21,6 +21,9 @@ public class TrainerRequest {
     @NotBlank(message = "El campo telefono es requerido")
     public String phone;
 
+    @NotBlank(message = "El campo estado-activo es requerido")
+    public Boolean isActive;
+
     public TrainerRequest() {
     }
 
@@ -72,7 +75,15 @@ public class TrainerRequest {
         this.phone = phone;
     }
 
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
     public Trainer toDomain(){
-        return Trainer.create(id != null ? id : UUID.randomUUID().toString(), this.name, this.email, this.phone, this.password);
+        return Trainer.create(id != null ? id : UUID.randomUUID().toString(), this.name, this.email, this.phone, this.password, this.isActive);
     }
 }

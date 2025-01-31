@@ -3,7 +3,6 @@ package com.foryourlife.admin.programs.teams.application;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
-import com.foryourlife.clients.account.user.application.CommandUsersService;
 import com.foryourlife.clients.account.user.domain.UserRepository;
 import com.foryourlife.clients.account.user.domain.Users;
 import com.foryourlife.shared.domain.bus.EventBus;
@@ -11,24 +10,32 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Service
 public class CommandTeamService {
 
+    @Value("${api.url}")
+    private String baseUrl;
     private final TeamRepository _teamRepository;
     private final EventBus bus;
     private final UserRepository _userRepository;
     private final QueryTrainingService queryTrainingService;
+    private final QueryTeamService queryTeamService;
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
 
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, UserRepository _userRepository, QueryTrainingService queryTrainingService) {
+    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, UserRepository _userRepository, QueryTrainingService queryTrainingService, QueryTeamService queryTeamService) {
         this._teamRepository = _teamRepository;
         this.bus = bus;
         this._userRepository = _userRepository;
         this.queryTrainingService = queryTrainingService;
+        this.queryTeamService = queryTeamService;
     }
 
     public void save(Team team) {
@@ -89,6 +96,7 @@ public class CommandTeamService {
         }
         _teamRepository.removeMastersLife(teamId, userId);
     }
+
     public void assignTeams(String teamId, String trainingId) {
         var team = this._teamRepository.findById(teamId).orElseThrow(() ->
                 new BaseException("Team not found", List.of("The team with id " + teamId + " does not exist"))
@@ -97,5 +105,49 @@ public class CommandTeamService {
         team.setTraining(training);
         this._teamRepository.save(team);
         this.bus.publish(team.pullDomainEvents());
+    }
+
+    public String updatePhoto(String id, MultipartFile photo) throws IOException {
+        String imagePath = null;
+        try {
+            if (photo != null && !photo.isEmpty()) {
+                imagePath = saveImage(id, photo);
+                var team = queryTeamService.getTeamById(id);
+                team.setPhoto(imagePath);
+                save(team);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        }
+        return baseUrl + imagePath;
+    }
+
+    public String saveImage(String id, MultipartFile photo) throws IOException {
+        String projectDir = System.getProperty("user.dir");
+        String uploadDir = projectDir + "/src/main/resources/assets/teamPhotos/";
+        String originalFilename = photo.getOriginalFilename();
+
+        if (originalFilename == null) {
+            throw new IOException("El nombre del archivo es nulo.");
+        }
+
+        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+
+        String newFileName = id + fileExtension;
+
+        String relativeFilePath = "/teamPhotos/" + newFileName;
+
+        String filePath = uploadDir + newFileName;
+
+        File directory = new File(uploadDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        File dest = new File(filePath);
+        photo.transferTo(dest);
+
+        return relativeFilePath;
     }
 }

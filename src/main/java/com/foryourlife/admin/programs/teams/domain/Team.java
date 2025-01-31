@@ -1,6 +1,7 @@
 package com.foryourlife.admin.programs.teams.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.user.domain.Users;
 import com.foryourlife.shared.domain.AggregateRoot;
@@ -37,7 +38,11 @@ public class Team extends AggregateRoot{
             name = "team_master_life",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "masterlife_id", referencedColumnName = "id"))
-    private Set<Users> masterLife = Collections.emptySet();
+    private Set<Users> masterLife = Collections.emptySet();@ManyToMany(cascade = {CascadeType.MERGE})
+
+    @ManyToOne
+    @JoinColumn(name = "trainer_id", referencedColumnName = "id")
+    private Trainer trainer;
 
     protected Team() {
     }
@@ -98,6 +103,10 @@ public class Team extends AggregateRoot{
     public void setTraining(Training newTraining) {
         this.training = newTraining;
         this.record(new TeamToTrainingAssigned(this.id, this,newTraining));
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 
     @Override

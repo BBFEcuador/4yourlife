@@ -33,6 +33,11 @@ public class TeamController {
         return new ResponseEntity<>(this.queryTeamService.getTeamById(id), HttpStatus.OK);
     }
 
+    @GetMapping("/photo/{id}")
+    public ResponseEntity<?> getPhoto(@PathVariable String id) {
+        return new ResponseEntity<>(this.queryTeamService.getPhoto(id), HttpStatus.OK);
+    }
+
     @PostMapping("/save")
     public ResponseEntity<?> saveTeam(@RequestBody SaveTeamRequest request) {
         commandTeamService.save(request.toDomain());

@@ -27,4 +27,9 @@ public class QueryTeamService {
     public List<Team> getAllTeams() {
         return this._teamRepository.findAll();
     }
+
+    public String getPhoto(String id) {
+        return this._teamRepository.findById(id).orElseThrow(
+                () -> new BaseException("Not found", List.of("The team with id " + id + " does not exist"))).getPhoto();
+    }
 }

@@ -8,6 +8,7 @@ import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.TeamCreated;
 import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Collections;
 import java.util.Set;
@@ -44,6 +45,10 @@ public class Team extends AggregateRoot{
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
     private Trainer trainer;
 
+    @Transient
+    @Value("${api.url}")
+    private String baseUrl;
+
     protected Team() {
     }
 
@@ -73,7 +78,7 @@ public class Team extends AggregateRoot{
     }
 
     public String getPhoto() {
-        return photo;
+        return (photo != null && !photo.isEmpty()) ? baseUrl + photo : baseUrl + "resources/assets/teamPhotos/DefaultTeam.png";
     }
 
     public Training getTraining() {

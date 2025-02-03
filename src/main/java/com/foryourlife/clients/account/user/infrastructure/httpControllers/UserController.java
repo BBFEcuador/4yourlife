@@ -30,6 +30,6 @@ public class UserController {
 
     @PostMapping("/match")
     public ResponseEntity<?> match(@RequestBody Criteria criteria) {
-        return new ResponseEntity<>(queryUsersService.getAll(), HttpStatus.OK);
+        return new ResponseEntity<>(queryUsersService.matchers(criteria), HttpStatus.OK);
     }
 }

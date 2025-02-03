@@ -2,6 +2,7 @@ package com.foryourlife.shared.infrastructure.criteria;
 
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

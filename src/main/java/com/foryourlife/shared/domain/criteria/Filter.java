@@ -1,10 +1,10 @@
 package com.foryourlife.shared.domain.criteria;
 
 public class Filter {
-    private final String column;
-    private final String value;
-    private final String joinTable;
-    private final Operation operation;
+    public final String column;
+    public final String value;
+    public final String joinTable;
+    public final Operation operation;
 
     public Filter(String column, String value, String joinTable, Operation operation) {
         this.column = column;

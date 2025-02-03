@@ -20,7 +20,7 @@ public class TeamCreated extends DomainEvent {
         );
         this.team = team;
     }
-    public Team getUser() {
+    public Team getTeam() {
         return team;
     }
     @Override

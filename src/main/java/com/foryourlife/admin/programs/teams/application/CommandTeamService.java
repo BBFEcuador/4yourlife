@@ -136,7 +136,7 @@ public class CommandTeamService {
 
         String newFileName = id + fileExtension;
 
-        String relativeFilePath = "/teamPhotos/" + newFileName;
+        String relativeFilePath = "resources/assets/teamPhotos/" + newFileName;
 
         String filePath = uploadDir + newFileName;
 

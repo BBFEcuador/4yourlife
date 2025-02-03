@@ -3,6 +3,7 @@ package com.foryourlife.clients.account.user.application;
 import com.foryourlife.clients.account.user.domain.UserNotFoundException;
 import com.foryourlife.clients.account.user.domain.UserRepository;
 import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,5 +26,8 @@ public class QueryUsersService {
 
     public List<Users> getAll() {
         return this._userRepository.getAll();
+    }
+    public List<Users> matchers(Criteria criteria) {
+        return this._userRepository.match(criteria);
     }
 }

@@ -4,7 +4,9 @@ import com.foryourlife.clients.account.user.domain.LoginResponse;
 import com.foryourlife.clients.account.user.domain.UserRepository;
 import com.foryourlife.clients.account.user.domain.Users;
 import com.foryourlife.shared.JWTUtils;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,11 +26,13 @@ public class UserRepositoryImpl implements UserRepository {
     private final PasswordEncoder passwordEncoder;
     private final JWTUtils jwtUtils;
     private Users loadUser;
+    private final JPACriteriaConverter<Users> criteriaConverter;
 
-    public UserRepositoryImpl(JPAUserRepository repository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils) {
+    public UserRepositoryImpl(JPAUserRepository repository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils, JPACriteriaConverter<Users> criteriaConverter) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
+        this.criteriaConverter = criteriaConverter;
     }
 
     @Override
@@ -73,6 +77,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<Users> getAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public List<Users> match(Criteria criteria) {
+        var jpaCriteria = criteriaConverter.getJpaSpecifications(criteria);
+        return repository.findAll(jpaCriteria);
     }
 
     @Override

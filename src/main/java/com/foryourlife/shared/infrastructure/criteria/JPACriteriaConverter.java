@@ -16,63 +16,54 @@ import java.util.List;
 @Service
 public class JPACriteriaConverter<T> {
 
-    public Pageable getJpaPageable(Criteria criteria){
-        return PageRequest.of(criteria.getLimit().get(),criteria.getOffset().get());
+    public Pageable getJpaPageable(Criteria criteria) {
+        return PageRequest.of(criteria.getLimit().get(), criteria.getOffset().get());
     }
 
     public Specification<T> getJpaSpecifications(Criteria criteria) {
         return (root, query, criteriaBuilder) -> {
-
-            List<Predicate> predicates = new ArrayList<>();
+            List<Predicate> andPredicates = new ArrayList<>();
+            List<Predicate> orPredicates = new ArrayList<>();
 
             for (Filter filter : criteria.getFilters()) {
-
-                switch (filter.getOperation()) {
-
-                    case EQUAL:
-                        Predicate equal = criteriaBuilder.equal(root.get(filter.getColumn()), filter.getValue());
-                        predicates.add(equal);
-                        break;
-
-                    case LIKE:
-                        Predicate like = criteriaBuilder.like(root.get(filter.getColumn()), "%" + filter.getValue() + "%");
-                        predicates.add(like);
-                        break;
-
-                    case IN:
+                Predicate predicate = switch (filter.getOperation()) {
+                    case EQUAL -> criteriaBuilder.equal(root.get(filter.getColumn()), filter.getValue());
+                    case LIKE -> criteriaBuilder.like(root.get(filter.getColumn()), "%" + filter.getValue() + "%");
+                    case IN -> {
                         String[] split = filter.getValue().split(",");
-                        Predicate in = root.get(filter.getColumn()).in(Arrays.asList(split));
-                        predicates.add(in);
-                        break;
-
-                    case GREATER_THAN:
-                        Predicate greaterThan = criteriaBuilder.greaterThan(root.get(filter.getColumn()), filter.getValue());
-                        predicates.add(greaterThan);
-                        break;
-
-                    case LESS_THAN:
-                        Predicate lessThan = criteriaBuilder.lessThan(root.get(filter.getColumn()), filter.getValue());
-                        predicates.add(lessThan);
-                        break;
-
-                    case BETWEEN:
-                        //"10, 20"
+                        yield root.get(filter.getColumn()).in(Arrays.asList(split));
+                    }
+                    case GREATER_THAN -> criteriaBuilder.greaterThan(root.get(filter.getColumn()), filter.getValue());
+                    case LESS_THAN -> criteriaBuilder.lessThan(root.get(filter.getColumn()), filter.getValue());
+                    case BETWEEN -> {
                         String[] split1 = filter.getValue().split(",");
-                        Predicate between = criteriaBuilder.between(root.get(filter.getColumn()), Long.parseLong(split1[0]), Long.parseLong(split1[1]));
-                        predicates.add(between);
-                        break;
+                        yield criteriaBuilder.between(root.get(filter.getColumn()), Long.parseLong(split1[0]), Long.parseLong(split1[1]));
+                    }
+                    case JOIN ->
+                            criteriaBuilder.equal(root.join(filter.getJoinTable()).get(filter.getColumn()), filter.getValue());
+                    default -> throw new IllegalStateException("Unexpected value: " + "");
+                };
 
-                    case JOIN:
-                        Predicate join = criteriaBuilder.equal(root.join(filter.getJoinTable()).get(filter.getColumn()), filter.getValue());
-                        predicates.add(join);
-                        break;
-
-                    default:
-                        throw new IllegalStateException("Unexpected value: " + "");
+                if (filter.getLogicalOperator() == Filter.LogicalOperator.OR) {
+                    orPredicates.add(predicate);
+                } else {
+                    andPredicates.add(predicate);
                 }
 
             }
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            Predicate finalPredicate = null;
+
+            if (!andPredicates.isEmpty() && !orPredicates.isEmpty()) {
+                finalPredicate = criteriaBuilder.and(
+                        criteriaBuilder.and(andPredicates.toArray(new Predicate[0])),
+                        criteriaBuilder.or(orPredicates.toArray(new Predicate[0]))
+                );
+            } else if (!andPredicates.isEmpty()) {
+                finalPredicate = criteriaBuilder.and(andPredicates.toArray(new Predicate[0]));
+            } else if (!orPredicates.isEmpty()) {
+                finalPredicate = criteriaBuilder.or(orPredicates.toArray(new Predicate[0]));
+            }
+            return finalPredicate;
         };
     }
 }

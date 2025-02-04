@@ -4,7 +4,6 @@ import com.foryourlife.admin.programs.trainer.application.TrainerCreatorService;
 import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.shared.domain.exception.BaseException;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

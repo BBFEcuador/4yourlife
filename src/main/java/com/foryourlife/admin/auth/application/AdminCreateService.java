@@ -4,7 +4,6 @@ package com.foryourlife.admin.auth.application;
 import com.foryourlife.admin.auth.domain.Admin;
 import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.admin.auth.infrastructure.httpControllers.CreateAdminRequest;
-import com.foryourlife.clients.account.user.domain.UserAlreadyCreatedException;
 import com.foryourlife.shared.domain.bus.EventBus;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;

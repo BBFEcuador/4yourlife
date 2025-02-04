@@ -21,7 +21,7 @@ public class Attendance {
     @Enumerated(EnumType.STRING)
     private AttendanceStatus sundayAttendance;
     @Enumerated(EnumType.STRING)
-    private CourseLevel stage;
+    private FylStage stage;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users userId;
@@ -32,7 +32,7 @@ public class Attendance {
     public Attendance() {
     }
 
-    private Attendance(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, CourseLevel stage, Users userId, Training trainingId) {
+    private Attendance(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, Users userId, Training trainingId) {
         this.id = id;
         this.fridayAttendance = fridayAttendance;
         this.saturdayAttendance = saturdayAttendance;
@@ -42,7 +42,7 @@ public class Attendance {
         this.trainingId = trainingId;
     }
 
-    public static Attendance create(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, CourseLevel stage, Users userId, Training trainingId) {
+    public static Attendance create(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, Users userId, Training trainingId) {
         return new Attendance(id, fridayAttendance, saturdayAttendance, sundayAttendance, stage, userId, trainingId);
     }
 
@@ -62,7 +62,7 @@ public class Attendance {
         return sundayAttendance;
     }
 
-    public CourseLevel getStage() {
+    public FylStage getStage() {
         return stage;
     }
 

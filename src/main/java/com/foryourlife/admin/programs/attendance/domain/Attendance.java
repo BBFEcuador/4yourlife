@@ -2,6 +2,8 @@ package com.foryourlife.admin.programs.attendance.domain;
 
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.shared.domain.AggregateRoot;
+import com.foryourlife.shared.domain.events.OnNullDesistedAttend;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -11,7 +13,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "attendances")
-public class Attendance {
+public class Attendance extends AggregateRoot {
     @Id
     private String id;
     @Enumerated(EnumType.STRING)
@@ -72,5 +74,26 @@ public class Attendance {
 
     public Training getTrainingId() {
         return trainingId;
+    }
+
+    public boolean HasUnAttendance() {
+        var unAttendance = this.fridayAttendance ==
+                AttendanceStatus.NO_ASISTIO
+                || this.fridayAttendance ==
+                AttendanceStatus.DESERTO
+                ||
+                this.saturdayAttendance ==
+                        AttendanceStatus.NO_ASISTIO
+                || this.saturdayAttendance ==
+                AttendanceStatus.DESERTO
+                ||
+                this.sundayAttendance ==
+                        AttendanceStatus.NO_ASISTIO
+                || this.sundayAttendance ==
+                AttendanceStatus.DESERTO;
+        if (unAttendance) {
+            this.record(new OnNullDesistedAttend(this.userId.getId(), this.userId, this.trainingId));
+        }
+        return unAttendance;
     }
 }

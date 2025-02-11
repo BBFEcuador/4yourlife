@@ -85,6 +85,11 @@ public class TeamRepositoryImpl implements TeamRepository {
     }
 
     @Override
+    public Optional<Team> findByTrainingId(String id) {
+        return Optional.empty();
+    }
+
+    @Override
     public List<Team> findAll() {
         return _jpaTeamRepository.findAll();
     }

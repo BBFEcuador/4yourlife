@@ -37,7 +37,7 @@ public class AttendanceController {
 
     @PostMapping("/saveAll")
     public ResponseEntity<?> saveAttendance(@RequestBody List<SaveAttendanceRequest> request) {
-        _commandAttendanceService.saveAllAttendance(request.stream().map(SaveAttendanceRequest::toDomain).toList());
+        _commandAttendanceService.saveAttendance(request.stream().map(SaveAttendanceRequest::toDomain).toList());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

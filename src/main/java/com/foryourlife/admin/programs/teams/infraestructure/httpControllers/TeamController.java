@@ -51,7 +51,7 @@ public class TeamController {
     }
 
     @PutMapping("/updatePhoto/{id}")
-    public ResponseEntity<?> updatePohoto(@PathVariable String id, @RequestParam("photo") MultipartFile photo) {
+    public ResponseEntity<?> updatePhoto(@PathVariable String id, @RequestParam("photo") MultipartFile photo) {
         try {
             return new ResponseEntity<>(commandTeamService.updatePhoto(id, photo), HttpStatus.CREATED);
         } catch (IOException e) {

@@ -39,7 +39,7 @@ public class Team extends AggregateRoot{
             name = "team_master_life",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "masterlife_id", referencedColumnName = "id"))
-    private Set<Users> masterLife = Collections.emptySet();@ManyToMany(cascade = {CascadeType.MERGE})
+    private Set<Users> masterLife = Collections.emptySet();
 
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")

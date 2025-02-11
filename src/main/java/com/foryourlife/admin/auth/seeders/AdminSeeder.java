@@ -1,6 +1,5 @@
 package com.foryourlife.admin.auth.seeders;
 
-import com.foryourlife.admin.auth.application.AdminCreateService;
 import com.foryourlife.admin.auth.domain.Admin;
 import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.admin.auth.domain.AdminRole;
@@ -11,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Configuration

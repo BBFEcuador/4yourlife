@@ -1,6 +1,8 @@
 package com.foryourlife.clients.account.user.application;
 
 import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
+import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
+import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
 import com.foryourlife.clients.account.user.domain.*;
@@ -11,20 +13,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CommandUsersService {
     private final UserRepository _userRepository;
     private final QueryInvitationServices queryInvitationServices;
     private final ParticipantLevelService _rolRepository;
+    private final ClientModuleCreatorService _clientModuleRepository;
     private final EventBus bus;
     private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
 
-    public CommandUsersService(UserRepository _userRepository, ParticipantLevelRepository rolRepository, QueryInvitationServices queryInvitationServices, ParticipantLevelService rolRepository1, EventBus bus) {
+    public CommandUsersService(UserRepository _userRepository, ParticipantLevelRepository rolRepository, QueryInvitationServices queryInvitationServices, ParticipantLevelService rolRepository1, EventBus bus, ClientModuleCreatorService _clientModuleRepository) {
         this._userRepository = _userRepository;
         this.queryInvitationServices = queryInvitationServices;
         _rolRepository = rolRepository1;
         this.bus = bus;
+        this._clientModuleRepository = _clientModuleRepository;
     }
 
     public void createInitUser(Users user) {
@@ -36,6 +41,7 @@ public class CommandUsersService {
         var role = this._rolRepository.getInitRole();
         user.setParticipantLevel(role);
         this._userRepository.save(user);
+        this._clientModuleRepository.createClientModule(ClientModule.create(UUID.randomUUID().toString(), false, false, false, user));
         this.bus.publish(user.pullDomainEvents());
     }
 
@@ -45,6 +51,7 @@ public class CommandUsersService {
         try {
             var ensureRolExist = this._rolRepository.getRoleById(user.getRoleId());
             this._userRepository.save(user);
+
             this.bus.publish(user.pullDomainEvents());
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);

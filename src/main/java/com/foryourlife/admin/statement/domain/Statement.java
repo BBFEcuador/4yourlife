@@ -26,7 +26,7 @@ public class Statement {
     private Users users;
 
     @OneToOne(optional = true)
-    @JoinColumn(referencedColumnName = "id", name = "trainer_id", nullable = true)
+    @JoinColumn(referencedColumnName = "id", name = "training_id", nullable = true)
     private Training trainer;
 
     protected Statement() {

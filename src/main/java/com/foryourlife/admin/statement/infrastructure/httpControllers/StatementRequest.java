@@ -17,7 +17,6 @@ public class StatementRequest {
     @NotBlank(message = "¡La declaracion es requerida!")
     private Integer statement;
 
-
     private Integer registered;
 
     private Integer paid;

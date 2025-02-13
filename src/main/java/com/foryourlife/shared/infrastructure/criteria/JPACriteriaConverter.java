@@ -2,6 +2,7 @@ package com.foryourlife.shared.infrastructure.criteria;
 
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
+import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +18,7 @@ import java.util.List;
 public class JPACriteriaConverter<T> {
 
     public Pageable getJpaPageable(Criteria criteria) {
-        return PageRequest.of(criteria.getLimit().get(), criteria.getOffset().get());
+        return PageRequest.of(criteria.getLimit().orElseThrow(() -> new BaseException("Not limit given", List.of("You must need to provide a limit"))), criteria.getOffset().orElseThrow(() -> new BaseException("Not offset given", List.of("You must need to provide a offset"))));
     }
 
     public Specification<T> getJpaSpecifications(Criteria criteria) {

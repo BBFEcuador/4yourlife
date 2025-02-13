@@ -1,7 +1,6 @@
 package com.foryourlife.clients.account.contact.domain;
 
-import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,9 +14,9 @@ public class Contact {
     private String phone;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private Users user;
+    private Participant user;
 
-    private Contact(String id, String name, String relationship, String phone, Users user) {
+    private Contact(String id, String name, String relationship, String phone, Participant user) {
         this.id = id;
         this.name = name;
         this.relationship = relationship;
@@ -44,11 +43,11 @@ public class Contact {
         return phone;
     }
 
-    public Users getUser() {
+    public Participant getUser() {
         return user;
     }
 
-    public static Contact create(String id, String name, String relationship, String phone, Users user) {
+    public static Contact create(String id, String name, String relationship, String phone, Participant user) {
         return new Contact(id, name, relationship, phone, user);
     }
 }

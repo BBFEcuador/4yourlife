@@ -3,7 +3,6 @@ package com.foryourlife.admin.programs.training.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.programs.teams.domain.Team;
-import com.foryourlife.clients.account.invitations.domain.Sender;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;

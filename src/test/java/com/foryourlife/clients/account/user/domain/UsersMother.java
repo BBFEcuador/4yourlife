@@ -7,9 +7,9 @@ import net.datafaker.Faker;
 import java.util.UUID;
 
 public class UsersMother {
-    public static Users random(){
+    public static Participant random(){
         var faker = new Faker();
-        return Users.create(
+        return Participant.create(
                 UUID.randomUUID().toString(),
                 faker.internet().emailAddress(),
                 faker.internet().password(),

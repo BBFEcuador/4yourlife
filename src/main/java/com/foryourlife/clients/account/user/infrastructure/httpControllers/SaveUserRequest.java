@@ -2,7 +2,7 @@ package com.foryourlife.clients.account.user.infrastructure.httpControllers;
 
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -64,7 +64,7 @@ public class SaveUserRequest {
         return id;
     }
 
-    public Users toDomain() {
-        return Users.create(id != null ? id : UUID.randomUUID().toString(), email, password, name, phone, role, profile.toDomain(),token);
+    public Participant toDomain() {
+        return Participant.create(id != null ? id : UUID.randomUUID().toString(), email, password, name, phone, role, profile.toDomain(),token);
     }
 }

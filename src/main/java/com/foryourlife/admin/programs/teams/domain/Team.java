@@ -3,7 +3,7 @@ package com.foryourlife.admin.programs.teams.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.TeamCreated;
 import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
@@ -33,13 +33,13 @@ public class Team extends AggregateRoot{
             name = "team_users",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"))
-    private Set<Users> users = Collections.emptySet();
+    private Set<Participant> users = Collections.emptySet();
     @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "team_master_life",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "masterlife_id", referencedColumnName = "id"))
-    private Set<Users> masterLife = Collections.emptySet();@ManyToMany(cascade = {CascadeType.MERGE})
+    private Set<Participant> masterLife = Collections.emptySet();@ManyToMany(cascade = {CascadeType.MERGE})
 
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
@@ -52,7 +52,7 @@ public class Team extends AggregateRoot{
     protected Team() {
     }
 
-    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Users> users, Set<Users> masterLife) {
+    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Participant> users, Set<Participant> masterLife) {
         this.id = id;
         this.name = name;
         this.photo = photo;
@@ -62,7 +62,7 @@ public class Team extends AggregateRoot{
         this.masterLife = masterLife;
     }
 
-    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Users> users, Set<Users> masterLife) {
+    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Participant> users, Set<Participant> masterLife) {
         var team = new Team(id, name, photo, trainingId, trainingNumber, users, masterLife);
         team.setTraining(trainingId);
         team.record(new TeamCreated(id, team));
@@ -89,19 +89,19 @@ public class Team extends AggregateRoot{
         return trainingNumber;
     }
 
-    public Set<Users> getUsers() {
+    public Set<Participant> getUsers() {
         return users;
     }
 
-    public Set<Users> getMasterLife() {
+    public Set<Participant> getMasterLife() {
         return masterLife;
     }
 
-    public void setUsers(Set<Users> users) {
+    public void setUsers(Set<Participant> users) {
         this.users = users;
     }
 
-    public void setMasterLife(Set<Users> masterLife) {
+    public void setMasterLife(Set<Participant> masterLife) {
         this.masterLife = masterLife;
     }
 

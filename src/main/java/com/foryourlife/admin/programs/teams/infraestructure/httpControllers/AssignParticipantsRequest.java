@@ -1,15 +1,15 @@
 package com.foryourlife.admin.programs.teams.infraestructure.httpControllers;
 
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 
 import java.util.Set;
 
 public class AssignParticipantsRequest {
 
     private String teamId;
-    private Set<Users> users;
+    private Set<Participant> users;
 
-    public AssignParticipantsRequest(String teamId, Set<Users> users) {
+    public AssignParticipantsRequest(String teamId, Set<Participant> users) {
         this.teamId = teamId;
         this.users = users;
     }
@@ -18,7 +18,7 @@ public class AssignParticipantsRequest {
         return teamId;
     }
 
-    public Set<Users> getUsers() {
+    public Set<Participant> getUsers() {
         return users;
     }
 }

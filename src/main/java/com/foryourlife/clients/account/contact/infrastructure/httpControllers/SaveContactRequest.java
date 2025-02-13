@@ -1,7 +1,7 @@
 package com.foryourlife.clients.account.contact.infrastructure.httpControllers;
 
 import com.foryourlife.clients.account.contact.domain.Contact;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 
 import java.util.UUID;
 
@@ -10,9 +10,9 @@ public class SaveContactRequest {
     private String name;
     private String relationship;
     private String phone;
-    private Users userId;
+    private Participant userId;
 
-    public SaveContactRequest(String id, String name, String relationship, String phone, Users userId) {
+    public SaveContactRequest(String id, String name, String relationship, String phone, Participant userId) {
         this.id = id;
         this.name = name;
         this.relationship = relationship;
@@ -40,7 +40,7 @@ public class SaveContactRequest {
         return phone;
     }
 
-    public Users getUserId() {
+    public Participant getUserId() {
         return userId;
     }
 }

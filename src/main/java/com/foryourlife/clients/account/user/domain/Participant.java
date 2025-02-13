@@ -7,7 +7,8 @@ import com.foryourlife.shared.domain.events.UserCreated;
 import jakarta.persistence.*;
 
 @Entity
-public class Users extends AggregateRoot {
+@Table(name = "participants")
+public class Participant extends AggregateRoot {
     @Id
     private String id;
     private String email;
@@ -21,11 +22,12 @@ public class Users extends AggregateRoot {
     @JoinColumn(referencedColumnName = "id", name = "profile_id")
     private ProfileDetails profile;
     private String invitationToken;
+    private Boolean isLingerer = false;
 
-    protected Users() {
+    protected Participant() {
     }
 
-    private Users(String id, String email, String password, String name, String phone, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
+    private Participant(String id, String email, String password, String name, String phone, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -36,8 +38,8 @@ public class Users extends AggregateRoot {
         this.invitationToken = invitationToken;
     }
 
-    public static Users create(String id, String email, String password, String name, String phone, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
-        var user = new Users(id, email, password, name, phone, role, profile, invitationToken);
+    public static Participant create(String id, String email, String password, String name, String phone, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
+        var user = new Participant(id, email, password, name, phone, role, profile, invitationToken);
         user.record(new UserCreated(id, user));
         return user;
     }
@@ -80,5 +82,9 @@ public class Users extends AggregateRoot {
 
     public String getInvitationToken() {
         return invitationToken;
+    }
+
+    public Boolean getLingerer() {
+        return isLingerer;
     }
 }

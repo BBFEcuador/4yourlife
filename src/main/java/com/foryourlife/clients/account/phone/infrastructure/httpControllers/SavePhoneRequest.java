@@ -1,14 +1,14 @@
 package com.foryourlife.clients.account.phone.infrastructure.httpControllers;
 
 import com.foryourlife.clients.account.phone.domain.Phone;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 
 public class SavePhoneRequest {
     private String id;
     private String phone;
-    private Users user;
+    private Participant user;
 
-    public SavePhoneRequest(String id, String phone, Users user) {
+    public SavePhoneRequest(String id, String phone, Participant user) {
         this.id = id;
         this.phone = phone;
         this.user = user;
@@ -26,7 +26,7 @@ public class SavePhoneRequest {
         return phone;
     }
 
-    public Users getUser() {
+    public Participant getUser() {
         return user;
     }
 }

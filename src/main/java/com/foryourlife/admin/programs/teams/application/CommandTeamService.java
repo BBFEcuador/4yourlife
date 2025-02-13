@@ -4,7 +4,7 @@ import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
 import com.foryourlife.clients.account.user.domain.UserRepository;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -71,7 +71,7 @@ public class CommandTeamService {
         } else if (_userRepository.findById(userId).isEmpty()) {
             throw new BaseException("User not found", List.of(""));
         }
-        Users user = _userRepository.findById(userId).get();
+        Participant user = _userRepository.findById(userId).get();
         if (user.getParticipantLevel().getCourseLevel() == CourseLevel.MASTER_LIFE) {
             _teamRepository.assignMastersLife(teamId, userId);
         } else {

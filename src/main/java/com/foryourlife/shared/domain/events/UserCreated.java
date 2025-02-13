@@ -1,6 +1,6 @@
 package com.foryourlife.shared.domain.events;
 
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.bus.DomainEvent;
 
 import java.io.Serializable;
@@ -11,9 +11,9 @@ import java.util.UUID;
 
 public class UserCreated extends DomainEvent {
 
-    private final Users user;
+    private final Participant user;
 
-    public UserCreated(String aggregateId, Users user) {
+    public UserCreated(String aggregateId, Participant user) {
         super(
                 aggregateId,
                 UUID.randomUUID().toString(),
@@ -21,7 +21,7 @@ public class UserCreated extends DomainEvent {
         );
         this.user = user;
     }
-    public Users getUser() {
+    public Participant getUser() {
         return user;
     }
     @Override

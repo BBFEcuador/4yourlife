@@ -27,7 +27,7 @@ public class CommandUsersService {
         this.bus = bus;
     }
 
-    public void createInitUser(Users user) {
+    public void createInitUser(Participant user) {
         if (this._userRepository.findByEmail(user.getEmail()).isPresent())
             throw new UserAlreadyCreatedException("The email " + user.getEmail() + "is already registered");
         var token = queryInvitationServices.findInvitationByToken(user.getInvitationToken());
@@ -39,7 +39,7 @@ public class CommandUsersService {
         this.bus.publish(user.pullDomainEvents());
     }
 
-    public void save(Users user) {
+    public void save(Participant user) {
         if (this._userRepository.findByEmail(user.getEmail()).isPresent())
             throw new UserAlreadyCreatedException("The email " + user.getEmail() + " is already registered");
         try {
@@ -51,7 +51,7 @@ public class CommandUsersService {
         }
     }
 
-    public void update(Users user) {
+    public void update(Participant user) {
         if (this._userRepository.findById(user.getId()).isEmpty())
             throw new UserNotFoundException("The Id: " + user.getId() + " doesn't exist.");
         try {
@@ -66,7 +66,7 @@ public class CommandUsersService {
         return this._userRepository.login(username, password);
     }
 
-    public Users getUser(String id) {
+    public Participant getUser(String id) {
         return this._userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The Id: " + id + " doesn't exist."));
     }
 }

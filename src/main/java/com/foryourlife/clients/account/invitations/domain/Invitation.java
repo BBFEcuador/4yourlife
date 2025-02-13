@@ -1,6 +1,6 @@
 package com.foryourlife.clients.account.invitations.domain;
 
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.InvitationCreated;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -16,7 +16,7 @@ public class Invitation extends AggregateRoot {
     private String token;
     @OneToOne(optional = true)
     @JoinColumn(referencedColumnName = "id", name = "user_id", nullable = true)
-    private Users users;
+    private Participant users;
     private Boolean isAdmin;
     private Boolean isUsed;
     private String senderId;
@@ -24,7 +24,7 @@ public class Invitation extends AggregateRoot {
     @Column(columnDefinition = "jsonb")
     private Sender enrolled;
 
-    private Invitation(String id, String token, Users users, Boolean isAdmin, Boolean isUsed, String senderId, Sender enrolled) {
+    private Invitation(String id, String token, Participant users, Boolean isAdmin, Boolean isUsed, String senderId, Sender enrolled) {
         this.id = id;
         this.token = token;
         this.users = users;
@@ -39,7 +39,7 @@ public class Invitation extends AggregateRoot {
     }
 
 
-    public static Invitation create(String id, String token, Users users, Boolean isAdmin, String senderId, Sender enrolled) {
+    public static Invitation create(String id, String token, Participant users, Boolean isAdmin, String senderId, Sender enrolled) {
         var invitation = new Invitation(id, token, users, isAdmin, false, senderId, enrolled);
         invitation.record(new InvitationCreated(id, invitation));
         return invitation;
@@ -54,7 +54,7 @@ public class Invitation extends AggregateRoot {
         return token;
     }
 
-    public Users getUsers() {
+    public Participant getUsers() {
         return users;
     }
 
@@ -78,7 +78,7 @@ public class Invitation extends AggregateRoot {
         this.isUsed = true;
     }
 
-    public void setUsers(Users users) {
+    public void setUsers(Participant users) {
         this.users = users;
     }
 }

@@ -2,7 +2,7 @@ package com.foryourlife.clients.account.user.infrastructure;
 
 import com.foryourlife.clients.account.user.domain.LoginResponse;
 import com.foryourlife.clients.account.user.domain.UserRepository;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.JWTUtils;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -25,10 +25,10 @@ public class UserRepositoryImpl implements UserRepository {
     private final JPAUserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JWTUtils jwtUtils;
-    private Users loadUser;
-    private final JPACriteriaConverter<Users> criteriaConverter;
+    private Participant loadUser;
+    private final JPACriteriaConverter<Participant> criteriaConverter;
 
-    public UserRepositoryImpl(JPAUserRepository repository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils, JPACriteriaConverter<Users> criteriaConverter) {
+    public UserRepositoryImpl(JPAUserRepository repository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils, JPACriteriaConverter<Participant> criteriaConverter) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
@@ -43,7 +43,7 @@ public class UserRepositoryImpl implements UserRepository {
         return new LoginResponse(token, this.loadUser);
     }
 
-    private Users loadUserByUsername(String username) throws BaseException {
+    private Participant loadUserByUsername(String username) throws BaseException {
         var user = repository.findByEmail(username)
                 .orElseThrow(() -> new BaseException("Login Error", List.of("The user " + username + " does not exist.")));
         loadUser = user;
@@ -65,28 +65,28 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<Users> findByEmail(String email) {
+    public Optional<Participant> findByEmail(String email) {
         return repository.findByEmail(email);
     }
 
     @Override
-    public Optional<Users> findById(String id) {
+    public Optional<Participant> findById(String id) {
         return repository.findById(id);
     }
 
     @Override
-    public List<Users> getAll() {
+    public List<Participant> getAll() {
         return repository.findAll();
     }
 
     @Override
-    public List<Users> match(Criteria criteria) {
+    public List<Participant> match(Criteria criteria) {
         var jpaCriteria = criteriaConverter.getJpaSpecifications(criteria);
         return repository.findAll(jpaCriteria);
     }
 
     @Override
-    public void save(Users user) {
+    public void save(Participant user) {
         this.repository.save(user);
     }
 }

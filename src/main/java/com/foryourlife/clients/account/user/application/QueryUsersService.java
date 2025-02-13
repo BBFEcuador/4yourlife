@@ -2,7 +2,7 @@ package com.foryourlife.clients.account.user.application;
 
 import com.foryourlife.clients.account.user.domain.UserNotFoundException;
 import com.foryourlife.clients.account.user.domain.UserRepository;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +20,14 @@ public class QueryUsersService {
     }
 
 
-    public Users getUserById(String id) {
+    public Participant getUserById(String id) {
         return this._userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The Id: " + id + " doesn't exist."));
     }
 
-    public List<Users> getAll() {
+    public List<Participant> getAll() {
         return this._userRepository.getAll();
     }
-    public List<Users> matchers(Criteria criteria) {
+    public List<Participant> matchers(Criteria criteria) {
         return this._userRepository.match(criteria);
     }
 }

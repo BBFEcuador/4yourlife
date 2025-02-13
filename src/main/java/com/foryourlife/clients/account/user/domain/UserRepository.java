@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface UserRepository {
     LoginResponse login(String username,String password) throws BaseException;
-    Optional<Users> findByEmail(String email);
-    Optional<Users> findById(String id);
-    List<Users> getAll();
-    List<Users> match(Criteria criteria);
-    void save(Users user);
+    Optional<Participant> findByEmail(String email);
+    Optional<Participant> findById(String id);
+    List<Participant> getAll();
+    List<Participant> match(Criteria criteria);
+    void save(Participant user);
 }

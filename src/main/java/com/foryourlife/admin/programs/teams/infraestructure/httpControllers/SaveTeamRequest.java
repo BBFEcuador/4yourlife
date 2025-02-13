@@ -2,8 +2,7 @@ package com.foryourlife.admin.programs.teams.infraestructure.httpControllers;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Users;
-import jakarta.persistence.*;
+import com.foryourlife.clients.account.user.domain.Participant;
 
 import java.util.Set;
 
@@ -13,10 +12,10 @@ public class SaveTeamRequest {
     private String photo;
     private Training trainingId;
     private Integer trainingNumber;
-    private Set<Users> users;
-    private Set<Users> masterLife;
+    private Set<Participant> users;
+    private Set<Participant> masterLife;
 
-    public SaveTeamRequest(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Users> users, Set<Users> masterLife) {
+    public SaveTeamRequest(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Participant> users, Set<Participant> masterLife) {
         this.id = id;
         this.name = name;
         this.photo = photo;
@@ -46,11 +45,11 @@ public class SaveTeamRequest {
         return trainingNumber;
     }
 
-    public Set<Users> getUsers() {
+    public Set<Participant> getUsers() {
         return users;
     }
 
-    public Set<Users> getMasterLife() {
+    public Set<Participant> getMasterLife() {
         return masterLife;
     }
 

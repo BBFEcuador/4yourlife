@@ -4,12 +4,7 @@ import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 import com.foryourlife.admin.programs.attendance.domain.FylStage;
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Users;
-import com.foryourlife.shared.domain.level.CourseLevel;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.validation.constraints.NotNull;
 
 public class SaveAttendanceRequest {
@@ -21,7 +16,7 @@ public class SaveAttendanceRequest {
     @NotNull
     private FylStage stage;
     @NotNull
-    private Users userId;
+    private Participant userId;
     @NotNull
     private Training trainingId;
 

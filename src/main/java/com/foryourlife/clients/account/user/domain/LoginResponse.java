@@ -3,9 +3,9 @@ package com.foryourlife.clients.account.user.domain;
 public class LoginResponse {
     public String token;
 
-    public Users user;
+    public Participant user;
 
-    public LoginResponse(String token, Users user) {
+    public LoginResponse(String token, Participant user) {
         this.token = token;
         this.user = user;
     }

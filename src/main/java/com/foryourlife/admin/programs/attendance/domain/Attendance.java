@@ -1,13 +1,8 @@
 package com.foryourlife.admin.programs.attendance.domain;
 
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Users;
-import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.persistence.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "attendances")
@@ -24,7 +19,7 @@ public class Attendance {
     private FylStage stage;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private Users userId;
+    private Participant userId;
     @ManyToOne
     @JoinColumn(name = "training_id", referencedColumnName = "id")
     private Training trainingId;
@@ -32,7 +27,7 @@ public class Attendance {
     public Attendance() {
     }
 
-    private Attendance(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, Users userId, Training trainingId) {
+    private Attendance(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, Participant userId, Training trainingId) {
         this.id = id;
         this.fridayAttendance = fridayAttendance;
         this.saturdayAttendance = saturdayAttendance;
@@ -42,7 +37,7 @@ public class Attendance {
         this.trainingId = trainingId;
     }
 
-    public static Attendance create(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, Users userId, Training trainingId) {
+    public static Attendance create(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, Participant userId, Training trainingId) {
         return new Attendance(id, fridayAttendance, saturdayAttendance, sundayAttendance, stage, userId, trainingId);
     }
 
@@ -66,7 +61,7 @@ public class Attendance {
         return stage;
     }
 
-    public Users getUserId() {
+    public Participant getUserId() {
         return userId;
     }
 

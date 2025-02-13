@@ -1,11 +1,8 @@
 package com.foryourlife.admin.statement.domain;
 
-import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.persistence.*;
-import org.springframework.data.relational.core.sql.In;
-import org.springframework.security.core.userdetails.User;
 
 @Entity
 @Table(name = "statements")
@@ -23,7 +20,7 @@ public class Statement {
 
     @OneToOne(optional = true)
     @JoinColumn(referencedColumnName = "id", name = "user_id", nullable = true)
-    private Users users;
+    private Participant users;
 
     @OneToOne(optional = true)
     @JoinColumn(referencedColumnName = "id", name = "training_id", nullable = true)
@@ -32,7 +29,7 @@ public class Statement {
     protected Statement() {
     }
 
-    public Statement(String id, Integer statements, Integer registered, Integer paid, Boolean isActive, Users users, Training trainer) {
+    public Statement(String id, Integer statements, Integer registered, Integer paid, Boolean isActive, Participant users, Training trainer) {
         this.id = id;
         this.statements = statements;
         this.registered = registered;
@@ -82,11 +79,11 @@ public class Statement {
         isActive = active;
     }
 
-    public Users getUsers() {
+    public Participant getUsers() {
         return users;
     }
 
-    public void setUsers(Users users) {
+    public void setUsers(Participant users) {
         this.users = users;
     }
 
@@ -98,7 +95,7 @@ public class Statement {
         this.trainer = trainer;
     }
 
-    public static Statement create(String id, Integer statements, Integer registered, Integer paid, Boolean isActive, Users user, Training training) {
+    public static Statement create(String id, Integer statements, Integer registered, Integer paid, Boolean isActive, Participant user, Training training) {
         return new Statement(id, statements, registered, paid, isActive, user, training);
     }
 }

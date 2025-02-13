@@ -1,7 +1,7 @@
 package com.foryourlife.clients.account.module.infrastructure.httpControllers;
 
 import com.foryourlife.clients.account.module.domain.ClientModule;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -19,9 +19,9 @@ public class ClientModuleRequest {
     @NotNull
     private Boolean hasLife;
 
-    private Users userId;
+    private Participant userId;
 
-    public ClientModuleRequest(String id, Boolean hasFocus, Boolean hasYour, Boolean hasLife, Users userId) {
+    public ClientModuleRequest(String id, Boolean hasFocus, Boolean hasYour, Boolean hasLife, Participant userId) {
         this.id = id;
         this.hasFocus = hasFocus;
         this.hasYour = hasYour;
@@ -45,7 +45,7 @@ public class ClientModuleRequest {
         this.hasLife = hasLife;
     }
 
-    public void setUserId(Users userId) {
+    public void setUserId(Participant userId) {
         this.userId = userId;
     }
 

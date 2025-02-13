@@ -1,12 +1,10 @@
 package com.foryourlife.admin.statement.infrastructure.httpControllers;
 
-import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.SaveTeamRequest;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.statement.domain.Statement;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.security.core.userdetails.User;
 
 import java.util.UUID;
 
@@ -27,9 +25,9 @@ public class StatementRequest {
     private Training training;
 
     @NotNull()
-    private Users user;
+    private Participant user;
 
-    public StatementRequest(String id, Integer statement, Integer registered, Integer paid, Boolean isActive, Training training, Users user) {
+    public StatementRequest(String id, Integer statement, Integer registered, Integer paid, Boolean isActive, Training training, Participant user) {
         this.id = id;
         this.statement = statement;
         this.registered = registered;
@@ -87,11 +85,11 @@ public class StatementRequest {
         this.training = training;
     }
 
-    public Users getUser() {
+    public Participant getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(Participant user) {
         this.user = user;
     }
 

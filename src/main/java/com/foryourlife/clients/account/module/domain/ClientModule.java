@@ -1,11 +1,8 @@
 package com.foryourlife.clients.account.module.domain;
 
-import com.foryourlife.clients.account.user.domain.Users;
-import jakarta.persistence.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.Instant;
+import com.foryourlife.clients.account.user.domain.Participant;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "client_modules")
@@ -17,12 +14,12 @@ public class ClientModule {
     private Boolean hasLife;
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private Users user;
+    private Participant user;
 
     protected ClientModule() {
     }
 
-    public ClientModule(String id, Boolean hasFocus, Boolean hasYour, Boolean hasLife, Users user) {
+    public ClientModule(String id, Boolean hasFocus, Boolean hasYour, Boolean hasLife, Participant user) {
         this.id = id;
         this.hasFocus = hasFocus;
         this.hasYour = hasYour;
@@ -62,15 +59,15 @@ public class ClientModule {
         this.hasLife = hasLife;
     }
 
-    public Users getUser() {
+    public Participant getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(Participant user) {
         this.user = user;
     }
 
-    public static ClientModule create(String id, Boolean hasFocus, Boolean hasYour, Boolean hasLife, Users user) {
+    public static ClientModule create(String id, Boolean hasFocus, Boolean hasYour, Boolean hasLife, Participant user) {
         return new ClientModule(id, hasFocus, hasYour, hasLife, user);
     }
 }

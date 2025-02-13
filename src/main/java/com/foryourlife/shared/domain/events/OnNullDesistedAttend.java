@@ -1,8 +1,7 @@
 package com.foryourlife.shared.domain.events;
 
-import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Users;
+import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.bus.DomainEvent;
 
 import java.io.Serializable;
@@ -12,10 +11,10 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class OnNullDesistedAttend extends DomainEvent {
-    private final Users user;
+    private final Participant user;
     private final Training training;
 
-    public OnNullDesistedAttend(String aggregateId, Users user, Training training) {
+    public OnNullDesistedAttend(String aggregateId, Participant user, Training training) {
         super(
                 aggregateId,
                 UUID.randomUUID().toString(),
@@ -25,7 +24,7 @@ public class OnNullDesistedAttend extends DomainEvent {
         this.training = training;
     }
 
-    public Users getUser() {
+    public Participant getUser() {
         return user;
     }
 

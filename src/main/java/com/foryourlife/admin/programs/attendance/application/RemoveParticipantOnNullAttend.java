@@ -1,0 +1,44 @@
+package com.foryourlife.admin.programs.attendance.application;
+
+import com.foryourlife.admin.programs.attendance.domain.Attendance;
+import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
+import com.foryourlife.admin.programs.attendance.domain.FylStage;
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.admin.programs.training.domain.TrainingRepository;
+import com.foryourlife.shared.domain.bus.DomainEventSubscriber;
+import com.foryourlife.shared.domain.events.OnNullDesistedAttend;
+import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
+import com.foryourlife.shared.domain.level.CourseLevel;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+@Service
+@DomainEventSubscriber({OnNullDesistedAttend.class})
+public class RemoveParticipantOnNullAttend {
+    private final TrainingRepository trainingRepository;
+    private final TeamRepository teamRepository;
+    private final AttendanceRepository attendanceRepository;
+
+    public RemoveParticipantOnNullAttend(TrainingRepository trainingRepository, TeamRepository teamRepository, AttendanceRepository attendanceRepository) {
+        this.trainingRepository = trainingRepository;
+        this.teamRepository = teamRepository;
+        this.attendanceRepository = attendanceRepository;
+    }
+
+    @Async
+    @EventListener
+    public void on(OnNullDesistedAttend event) {
+        var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow();
+
+        var team = teamRepository.findByTrainingId(training.getId());
+        if (team.isPresent()) {
+            var user = event.getUser();
+            team.get().getUsers().remove(user);
+            teamRepository.save(team.get());
+        }
+
+    }
+}

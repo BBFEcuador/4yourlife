@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS invitation(
     user_id text,
     senderId text not null,
     enrolled jsonb not null,
-    CONSTRAINT fk_invitation_on_user FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_invitation_on_user FOREIGN KEY (user_id) REFERENCES participants (id),
     CONSTRAINT pk_invitation PRIMARY KEY (id)
 );

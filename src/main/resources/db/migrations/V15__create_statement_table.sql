@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS statements(
     training_id text not null,
     created_at timestamp not null DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp,
-    CONSTRAINT fk_statements_on_user FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_statements_on_user FOREIGN KEY (user_id) REFERENCES participants (id),
     CONSTRAINT fk_statements_on_training FOREIGN KEY (training_id) REFERENCES training (id),
     CONSTRAINT pk_statements PRIMARY KEY (id)
     );

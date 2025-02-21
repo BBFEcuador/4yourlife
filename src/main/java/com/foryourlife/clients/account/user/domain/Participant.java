@@ -8,7 +8,7 @@ import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.UserCreated;
 import jakarta.persistence.*;
-import org.springframework.beans.factory.annotation.Value;
+import org.hibernate.Hibernate;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,7 +41,9 @@ public class Participant extends AggregateRoot {
     
     public Team getTeam() {
         if (teams != null && !teams.isEmpty()) {
-            return teams.stream().findFirst().get();
+            var team = teams.stream().findFirst().get();
+            Hibernate.initialize(team.getTrainer());
+            return team;
         }
         return null;
     }

@@ -8,7 +8,11 @@ import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.UserCreated;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,15 +32,18 @@ public class Participant extends AggregateRoot {
     private ProfileDetails profile;
     private String invitationToken;
     private Boolean isLingerer = false;
-    @OneToOne(mappedBy = "user",targetEntity = ClientModule.class)
+    @OneToOne(mappedBy = "user", targetEntity = ClientModule.class)
     private ClientModule modules;
-    @OneToMany(mappedBy = "user", targetEntity = Contact.class)
-    private Set<Contact> contacts;
-    @ManyToMany(mappedBy = "users", targetEntity = Team.class)
+    @OneToMany(mappedBy = "user", targetEntity = Contact.class,fetch = FetchType.EAGER)
+    private List<Contact> contacts = new ArrayList<>();
+    @ManyToMany(mappedBy = "users", targetEntity = Team.class,fetch = FetchType.EAGER)
     private Set<Team> teams;
-
-    public Set<Team> getTeams() {
-        return teams;
+    
+    public Team getTeam() {
+        if (teams != null && !teams.isEmpty()) {
+            return teams.stream().findFirst().get();
+        }
+        return null;
     }
 
     protected Participant() {
@@ -46,7 +53,7 @@ public class Participant extends AggregateRoot {
         return modules;
     }
 
-    public Set<Contact> getContacts() {
+    public List<Contact> getContacts() {
         return contacts;
     }
 

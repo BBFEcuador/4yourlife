@@ -1,6 +1,7 @@
 package com.foryourlife.clients.account.module.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.persistence.*;
 
@@ -59,6 +60,7 @@ public class ClientModule {
         this.hasLife = hasLife;
     }
 
+    @JsonIgnore
     public Participant getUser() {
         return user;
     }

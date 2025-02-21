@@ -1,5 +1,6 @@
 package com.foryourlife.clients.account.contact.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Fetch;
@@ -44,7 +45,7 @@ public class Contact {
     public String getPhone() {
         return phone;
     }
-
+    @JsonIgnore
     public Participant getUser() {
         return user;
     }

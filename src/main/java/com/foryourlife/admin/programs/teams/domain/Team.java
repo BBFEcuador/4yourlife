@@ -88,7 +88,7 @@ public class Team extends AggregateRoot{
     public Integer getTrainingNumber() {
         return trainingNumber;
     }
-
+    @JsonIgnore
     public Set<Participant> getUsers() {
         return users;
     }

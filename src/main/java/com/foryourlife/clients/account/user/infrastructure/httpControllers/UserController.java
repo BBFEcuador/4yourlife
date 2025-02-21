@@ -28,6 +28,17 @@ public class UserController {
         return new ResponseEntity<>(queryUsersService.getAll(), HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUser(@PathVariable String id) {
+        return new ResponseEntity<> (queryUsersService.getUserById(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/")
+    public ResponseEntity<?> updateUser(@RequestBody SaveUserRequest participant) {
+        queryUsersService.saveUser(participant.toDomain());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/match")
     public ResponseEntity<?> match(@RequestBody Criteria criteria) {
         return new ResponseEntity<>(queryUsersService.matchers(criteria), HttpStatus.OK);

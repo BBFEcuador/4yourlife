@@ -43,6 +43,8 @@ public class Participant extends AggregateRoot {
         if (teams != null && !teams.isEmpty()) {
             var team = teams.stream().findFirst().get();
             Hibernate.initialize(team.getTrainer());
+            Hibernate.initialize(team.getTraining());
+            System.out.println(team.getTraining());
             return team;
         }
         return null;

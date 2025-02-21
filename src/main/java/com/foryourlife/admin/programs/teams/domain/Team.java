@@ -10,9 +10,7 @@ import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "teams")
@@ -127,5 +125,14 @@ public class Team extends AggregateRoot{
                 ", users=" + users +
                 ", masterLife=" + masterLife +
                 '}';
+    }
+
+    public Map<String,String> getTrainingData(){
+        return new HashMap<String,String>(){{
+            put("startDate",training.getStartDate().toString());
+            put("endDate",training.getEndDate().toString());
+            put("name",training.getName());
+            put("curseLevel",training.getCourseLevel().name());
+        }};
     }
 }

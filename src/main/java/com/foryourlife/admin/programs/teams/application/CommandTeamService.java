@@ -2,6 +2,8 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.TeamRequest;
+import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
 import com.foryourlife.clients.account.user.domain.UserRepository;
 import com.foryourlife.clients.account.user.domain.Participant;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CommandTeamService {
@@ -27,20 +30,33 @@ public class CommandTeamService {
     private final EventBus bus;
     private final UserRepository _userRepository;
     private final QueryTrainingService queryTrainingService;
+    private final TrainerFinderService trainerFinderService;
     private final QueryTeamService queryTeamService;
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
 
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, UserRepository _userRepository, QueryTrainingService queryTrainingService, QueryTeamService queryTeamService) {
+    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, UserRepository _userRepository, QueryTrainingService queryTrainingService, TrainerFinderService trainerFinderService, QueryTeamService queryTeamService) {
         this._teamRepository = _teamRepository;
         this.bus = bus;
         this._userRepository = _userRepository;
         this.queryTrainingService = queryTrainingService;
+        this.trainerFinderService = trainerFinderService;
         this.queryTeamService = queryTeamService;
     }
 
     public void save(Team team) {
         this._teamRepository.save(team);
         this.bus.publish(team.pullDomainEvents());
+    }
+    public void saveHttp(TeamRequest request) {
+        try {
+            var training = queryTrainingService.getTrainingById(request.training);
+            var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+            var team = Team.create(request.id != null ? request.id: UUID.randomUUID().toString(),request.name,request.photo,training,training.getNumber(),request.users,trainer);
+            this._teamRepository.save(team);
+            this.bus.publish(team.pullDomainEvents());
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     public void update(Team team) {

@@ -1,28 +1,38 @@
 package com.foryourlife.admin.programs.teams.infraestructure.httpControllers;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
+import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.user.domain.Participant;
 
 import java.util.Set;
+import java.util.UUID;
 
 public class SaveTeamRequest {
-    private String id;
-    private String name;
-    private String photo;
-    private Training trainingId;
-    private Integer trainingNumber;
-    private Set<Participant> users;
-    private Set<Participant> masterLife;
+    public String id;
+    public String name;
+    public String photo;
+    public Training training;
+    public Integer trainingNumber;
+    public Set<Participant> users;
+    public Trainer trainer;
 
-    public SaveTeamRequest(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Participant> users, Set<Participant> masterLife) {
+    public SaveTeamRequest(
+            String id,
+            String name,
+            String photo,
+            Training training,
+            Integer trainingNumber,
+            Set<Participant> users,
+            Trainer trainer
+    ) {
         this.id = id;
         this.name = name;
         this.photo = photo;
-        this.trainingId = trainingId;
+        this.training = training;
         this.trainingNumber = trainingNumber;
         this.users = users;
-        this.masterLife = masterLife;
+        this.trainer = trainer;
     }
 
     public String getId() {
@@ -37,8 +47,8 @@ public class SaveTeamRequest {
         return photo;
     }
 
-    public Training getTrainingId() {
-        return trainingId;
+    public Training getTraining() {
+        return training;
     }
 
     public Integer getTrainingNumber() {
@@ -49,11 +59,19 @@ public class SaveTeamRequest {
         return users;
     }
 
-    public Set<Participant> getMasterLife() {
-        return masterLife;
+    public Trainer getTrainer() {
+        return trainer;
     }
 
     public Team toDomain() {
-        return Team.create(id, name, photo, trainingId, trainingNumber, users, masterLife);
+        return Team.create(
+                id != null ? id : UUID.randomUUID().toString(),
+                name,
+                photo,
+                training,
+                trainingNumber,
+                users,
+                trainer
+        );
     }
 }

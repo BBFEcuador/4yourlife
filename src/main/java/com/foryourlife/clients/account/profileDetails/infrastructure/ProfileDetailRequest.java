@@ -20,7 +20,7 @@ public class ProfileDetailRequest {
     @NotNull(message = "ocupacion es requerida")
     public String occupation;
     @NotNull(message = "genero es requerido")
-    @Pattern(regexp = "^[MG]$", message = "genero debe ser M o G")
+    @Pattern(regexp = "^[MH]$", message = "genero debe ser M o H")
     @Length(min = 1, max = 1)
     public String gender;
     @NotNull(message = "estatus civil")

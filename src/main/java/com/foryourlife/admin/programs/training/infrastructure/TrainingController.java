@@ -37,7 +37,7 @@ public class TrainingController {
     }
 
     //@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'USER')")
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<?> getAll() {
         return new ResponseEntity<>(queryTrainingService.getAllTrainings(), HttpStatus.OK);
     }

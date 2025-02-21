@@ -31,8 +31,6 @@ public class SaveUserRequest {
     @Pattern(regexp = "^[0-9]*$", message = "The phone field only accept digits")
     public String phone;
     @NotNull
-    public ParticipantLevel role;
-    @NotNull
     @Valid
     public ProfileDetailRequest profile;
 
@@ -65,6 +63,6 @@ public class SaveUserRequest {
     }
 
     public Participant toDomain() {
-        return Participant.create(id != null ? id : UUID.randomUUID().toString(), email, password, name, phone, role, profile.toDomain(),token);
+        return Participant.create(id != null ? id : UUID.randomUUID().toString(), email, password, name, phone, null, profile.toDomain(),token);
     }
 }

@@ -32,10 +32,7 @@ public class TrainerController {
 
     @PutMapping("")
     public ResponseEntity<?> updateTrainer(@RequestBody TrainerRequest request) {
-        if(trainerFinderService.findTrainerById(request.getId()).isEmpty()){
-            throw new BaseException("Trainer not found", List.of(""));
-        }
-        trainerCreateService.createTrainer(request.toDomain());
+        trainerCreateService.updateTrainer(request.toDomain());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -1,10 +1,13 @@
 package com.foryourlife.clients.account.user.domain;
 
+import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.UserCreated;
 import jakarta.persistence.*;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "participants")
@@ -15,10 +18,10 @@ public class Participant extends AggregateRoot {
     private String password;
     private String name;
     private String phone;
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "participant_level_id", referencedColumnName = "id")
     private ParticipantLevel participantLevel;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "id", name = "profile_id")
     private ProfileDetails profile;
     private String invitationToken;

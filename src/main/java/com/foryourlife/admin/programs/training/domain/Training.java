@@ -12,12 +12,13 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 
 @Entity
 @Table(name = "training")
-public class Training extends AggregateRoot {
+public class Training extends AggregateRoot implements Serializable {
     @Id
     private String id;
     private Integer number;
@@ -31,7 +32,9 @@ public class Training extends AggregateRoot {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private CourseLevel courseLevel;
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST})
+    @OneToOne(
+            cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST}
+    )
     @JoinColumn(name = "nextLevel", referencedColumnName = "id")
     private Training nextLevel;
     @ManyToOne
@@ -124,14 +127,14 @@ public class Training extends AggregateRoot {
             throw new BaseException("Level problem", List.of("Only focus"));
         }
         var trainingList = new ArrayList<Training>();
-        var life = new Training(UUID.randomUUID().toString(), this.number, setName(this.number), setDates(this.startDate.getValue(), 4), setDates(this.endDate.getValue(), 4), CourseLevel.LIFE, null, campus, true);
+        var life = new Training(UUID.randomUUID().toString(), this.number, setName(this.number), setDates(this.startDate.getValue(), 3), setDates(this.endDate.getValue(), 3), CourseLevel.LIFE, null, campus, true);
 
         this.nextLevel = new Training(
                 UUID.randomUUID().toString(),
                 this.number,
                 setName(this.number),
-                setDates(this.startDate.getValue(), 3),
-                setDates(this.endDate.getValue(), 3),
+                setDates(this.startDate.getValue(), 2),
+                setDates(this.endDate.getValue(), 2),
                 CourseLevel.YOUR,
                 life,
                 campus,
@@ -139,7 +142,7 @@ public class Training extends AggregateRoot {
         );
         trainingList.add(this);
         for (int i = 1; i < numberOfFocus; i++) {
-            trainingList.add(this.geneNext(this.startDate.getValue().plusWeeks(i * 4L), i + this.number));
+            trainingList.add(this.geneNext(this.startDate.getValue().plusWeeks(i * 5L), i + this.number));
         }
         return trainingList;
     }
@@ -149,8 +152,8 @@ public class Training extends AggregateRoot {
                 UUID.randomUUID().toString(),
                 nexFocusNumber,
                 setName(nexFocusNumber),
-                startDate.plusWeeks(4),
-                startDate.plusWeeks(4).plusDays(2),
+                startDate.plusWeeks(3),
+                startDate.plusWeeks(3).plusDays(2),
                 CourseLevel.LIFE,
                 null,
                 campus,
@@ -161,8 +164,8 @@ public class Training extends AggregateRoot {
                 UUID.randomUUID().toString(),
                 nexFocusNumber,
                 setName(nexFocusNumber),
-                startDate.plusWeeks(3),
-                startDate.plusWeeks(3).plusDays(2),
+                startDate.plusWeeks(2),
+                startDate.plusWeeks(2).plusDays(2),
                 CourseLevel.YOUR,
                 life,
                 campus,

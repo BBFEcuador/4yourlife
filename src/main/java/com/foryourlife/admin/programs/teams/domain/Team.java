@@ -11,12 +11,12 @@ import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "teams")
 public class Team extends AggregateRoot{
-
     @Id
     private String id;
     private String name;
@@ -32,15 +32,14 @@ public class Team extends AggregateRoot{
     @JoinTable(
             name = "team_users",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"))
-    private Set<Participant> users = Collections.emptySet();
+            inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id",unique = true))
+    private Set<Participant> users = new HashSet<>();
     @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "team_master_life",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "masterlife_id", referencedColumnName = "id"))
-    private Set<Participant> masterLife = Collections.emptySet();@ManyToMany(cascade = {CascadeType.MERGE})
-
+    private Set<Participant> masterLife = new HashSet<>();
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
     private Trainer trainer;
@@ -52,18 +51,18 @@ public class Team extends AggregateRoot{
     protected Team() {
     }
 
-    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Participant> users, Set<Participant> masterLife) {
+    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Participant> users,Trainer trainer) {
         this.id = id;
         this.name = name;
         this.photo = photo;
         this.training = trainingId;
         this.trainingNumber = trainingNumber;
         this.users = users;
-        this.masterLife = masterLife;
+        this.trainer = trainer;
     }
 
-    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Participant> users, Set<Participant> masterLife) {
-        var team = new Team(id, name, photo, trainingId, trainingNumber, users, masterLife);
+    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Participant> users,Trainer trainer) {
+        var team = new Team(id, name, photo, trainingId, trainingNumber, users,trainer);
         team.setTraining(trainingId);
         team.record(new TeamCreated(id, team));
         return team;

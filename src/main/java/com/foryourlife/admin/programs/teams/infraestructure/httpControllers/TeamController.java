@@ -3,6 +3,7 @@ package com.foryourlife.admin.programs.teams.infraestructure.httpControllers;
 import com.foryourlife.admin.programs.teams.application.CommandTeamService;
 import com.foryourlife.admin.programs.teams.application.QueryTeamService;
 import com.foryourlife.shared.domain.exception.BaseException;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,8 +40,8 @@ public class TeamController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> saveTeam(@RequestBody SaveTeamRequest request) {
-        commandTeamService.save(request.toDomain());
+    public ResponseEntity<?> saveTeam(@Valid @RequestBody TeamRequest request) {
+        commandTeamService.saveHttp(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

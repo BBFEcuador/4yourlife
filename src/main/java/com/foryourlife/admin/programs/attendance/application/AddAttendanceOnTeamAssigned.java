@@ -9,6 +9,7 @@ import com.foryourlife.shared.domain.bus.DomainEventSubscriber;
 import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -30,9 +31,10 @@ public class AddAttendanceOnTeamAssigned {
 
     @Async
     @EventListener
+    @Transactional
     public void on(TeamToTrainingAssigned event) {
         var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow(() -> new RuntimeException(""));
-        var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException(""));
+        var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException("Not team found"));
         team.getUsers().forEach(user -> {
             switch (training.getCourseLevel()){
                 case CourseLevel.FOCUS:

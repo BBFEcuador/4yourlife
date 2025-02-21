@@ -1,12 +1,18 @@
 package com.foryourlife.clients.account.user.domain;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
+import com.foryourlife.clients.account.contact.domain.Contact;
+import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.UserCreated;
 import jakarta.persistence.*;
+import org.hibernate.Hibernate;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -18,16 +24,39 @@ public class Participant extends AggregateRoot {
     private String password;
     private String name;
     private String phone;
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "participant_level_id", referencedColumnName = "id")
     private ParticipantLevel participantLevel;
-    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id", name = "profile_id")
     private ProfileDetails profile;
     private String invitationToken;
     private Boolean isLingerer = false;
+    @OneToOne(mappedBy = "user", targetEntity = ClientModule.class)
+    private ClientModule modules;
+    @OneToMany(mappedBy = "user", targetEntity = Contact.class,fetch = FetchType.EAGER)
+    private List<Contact> contacts = new ArrayList<>();
+    @ManyToMany(mappedBy = "users", targetEntity = Team.class,fetch = FetchType.EAGER)
+    private Set<Team> teams;
+
+    public Team getTeam() {
+        if (teams != null && !teams.isEmpty()) {
+            var team = teams.stream().findFirst().get();
+            Hibernate.initialize(team.getTrainer());
+            return team;
+        }
+        return null;
+    }
 
     protected Participant() {
+    }
+
+    public ClientModule getModules() {
+        return modules;
+    }
+
+    public List<Contact> getContacts() {
+        return contacts;
     }
 
     private Participant(String id, String email, String password, String name, String phone, ParticipantLevel role, ProfileDetails profile, String invitationToken) {

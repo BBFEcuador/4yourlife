@@ -1,7 +1,9 @@
 package com.foryourlife.clients.account.contact.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
 
 @Entity
 @Table(name = "contacts")
@@ -12,7 +14,8 @@ public class Contact {
     private String name;
     private String relationship;
     private String phone;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Participant user;
 
@@ -42,7 +45,7 @@ public class Contact {
     public String getPhone() {
         return phone;
     }
-
+    @JsonIgnore
     public Participant getUser() {
         return user;
     }

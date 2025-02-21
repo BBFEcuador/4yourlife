@@ -1,6 +1,7 @@
 package com.foryourlife.clients.account.module.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.persistence.*;
 
@@ -12,7 +13,7 @@ public class ClientModule {
     private Boolean hasFocus;
     private Boolean hasYour;
     private Boolean hasLife;
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Participant user;
 
@@ -59,6 +60,7 @@ public class ClientModule {
         this.hasLife = hasLife;
     }
 
+    @JsonIgnore
     public Participant getUser() {
         return user;
     }

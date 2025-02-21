@@ -28,7 +28,7 @@ public class Team extends AggregateRoot{
     @Column(name = "training_number")
     private Integer trainingNumber;
 
-    @ManyToMany(cascade = {CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "team_users",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
@@ -87,7 +87,7 @@ public class Team extends AggregateRoot{
     public Integer getTrainingNumber() {
         return trainingNumber;
     }
-
+    @JsonIgnore
     public Set<Participant> getUsers() {
         return users;
     }
@@ -111,6 +111,10 @@ public class Team extends AggregateRoot{
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public Trainer getTrainer() {
+        return trainer;
     }
 
     @Override

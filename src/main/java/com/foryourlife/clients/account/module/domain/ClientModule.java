@@ -12,7 +12,7 @@ public class ClientModule {
     private Boolean hasFocus;
     private Boolean hasYour;
     private Boolean hasLife;
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Participant user;
 

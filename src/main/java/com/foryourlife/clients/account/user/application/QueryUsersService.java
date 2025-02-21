@@ -1,5 +1,6 @@
 package com.foryourlife.clients.account.user.application;
 
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.clients.account.user.domain.UserNotFoundException;
 import com.foryourlife.clients.account.user.domain.UserRepository;
 import com.foryourlife.clients.account.user.domain.Participant;
@@ -15,13 +16,14 @@ public class QueryUsersService {
     private final UserRepository _userRepository;
     private final Logger logger = LoggerFactory.getLogger(QueryUsersService.class);
 
-    public QueryUsersService(UserRepository _userRepository) {
+    public QueryUsersService(UserRepository _userRepository, TeamRepository teamRepository) {
         this._userRepository = _userRepository;
     }
 
 
     public Participant getUserById(String id) {
         return this._userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The Id: " + id + " doesn't exist."));
+
     }
 
     public void saveUser(Participant participant) {

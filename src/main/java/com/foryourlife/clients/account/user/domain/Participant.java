@@ -1,10 +1,15 @@
 package com.foryourlife.clients.account.user.domain;
 
+import com.foryourlife.admin.programs.teams.domain.Team;
+import com.foryourlife.clients.account.contact.domain.Contact;
+import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.UserCreated;
 import jakarta.persistence.*;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "participants")
@@ -23,8 +28,26 @@ public class Participant extends AggregateRoot {
     private ProfileDetails profile;
     private String invitationToken;
     private Boolean isLingerer = false;
+    @OneToOne(mappedBy = "user",targetEntity = ClientModule.class)
+    private ClientModule modules;
+    @OneToMany(mappedBy = "user", targetEntity = Contact.class)
+    private Set<Contact> contacts;
+    @ManyToMany(mappedBy = "users", targetEntity = Team.class)
+    private Set<Team> teams;
+
+    public Set<Team> getTeams() {
+        return teams;
+    }
 
     protected Participant() {
+    }
+
+    public ClientModule getModules() {
+        return modules;
+    }
+
+    public Set<Contact> getContacts() {
+        return contacts;
     }
 
     private Participant(String id, String email, String password, String name, String phone, ParticipantLevel role, ProfileDetails profile, String invitationToken) {

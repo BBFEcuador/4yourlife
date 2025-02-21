@@ -28,7 +28,7 @@ public class Team extends AggregateRoot{
     @Column(name = "training_number")
     private Integer trainingNumber;
 
-    @ManyToMany(cascade = {CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "team_users",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),

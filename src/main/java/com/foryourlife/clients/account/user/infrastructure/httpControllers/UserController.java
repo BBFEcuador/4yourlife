@@ -18,9 +18,11 @@ import java.util.Optional;
 public class UserController {
 
     private final QueryUsersService queryUsersService;
+    private final CommandUsersService commandUsersService;
 
-    public UserController(QueryUsersService queryUsersService) {
+    public UserController(QueryUsersService queryUsersService, CommandUsersService commandUsersService) {
         this.queryUsersService = queryUsersService;
+        this.commandUsersService = commandUsersService;
     }
 
     @GetMapping("")
@@ -35,7 +37,14 @@ public class UserController {
 
     @PutMapping("/")
     public ResponseEntity<?> updateUser(@RequestBody SaveUserRequest participant) {
-        queryUsersService.saveUser(participant.toDomain());
+        commandUsersService.update(participant.toDomain());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/level/{id}/{levelId}")
+    public ResponseEntity<?> setLevel(@PathVariable String id, @PathVariable String levelId){
+        System.out.println(levelId);
+        commandUsersService.setLevel(id, levelId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

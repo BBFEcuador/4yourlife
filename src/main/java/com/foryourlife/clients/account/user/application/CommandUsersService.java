@@ -21,15 +21,17 @@ public class CommandUsersService {
     private final QueryInvitationServices queryInvitationServices;
     private final ParticipantLevelService _rolRepository;
     private final ClientModuleCreatorService _clientModuleRepository;
+    private final ParticipantLevelService participantLevelService;
     private final EventBus bus;
     private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
 
-    public CommandUsersService(UserRepository _userRepository, ParticipantLevelRepository rolRepository, QueryInvitationServices queryInvitationServices, ParticipantLevelService rolRepository1, EventBus bus, ClientModuleCreatorService _clientModuleRepository) {
+    public CommandUsersService(UserRepository _userRepository, ParticipantLevelRepository rolRepository, QueryInvitationServices queryInvitationServices, ParticipantLevelService rolRepository1, EventBus bus, ClientModuleCreatorService _clientModuleRepository, ParticipantLevelService participantLevelService) {
         this._userRepository = _userRepository;
         this.queryInvitationServices = queryInvitationServices;
         _rolRepository = rolRepository1;
         this.bus = bus;
         this._clientModuleRepository = _clientModuleRepository;
+        this.participantLevelService = participantLevelService;
     }
 
     public void createInitUser(Participant user) {
@@ -75,5 +77,11 @@ public class CommandUsersService {
 
     public Participant getUser(String id) {
         return this._userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The Id: " + id + " doesn't exist."));
+    }
+
+    public void setLevel(String userId, String levelId) {
+        var user = this._userRepository.findById(userId).get();
+        user.setParticipantLevel(participantLevelService.getRoleById(levelId));
+        _userRepository.save(user);
     }
 }

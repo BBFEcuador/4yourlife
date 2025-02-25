@@ -33,10 +33,6 @@ public class QueryUsersService {
         return this._userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The Id: " + id + " doesn't exist."));
     }
 
-    public void saveUser(Participant participant) {
-        this._userRepository.save(participant);
-    }
-
     public List<Participant> getAll() {
         return this._userRepository.getAll();
     }

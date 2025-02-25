@@ -61,11 +61,16 @@ public class CommandUsersService {
     }
 
     public void update(Participant user) {
+        ;
         if (this._userRepository.findById(user.getId()).isEmpty())
             throw new UserNotFoundException("The Id: " + user.getId() + " doesn't exist.");
         try {
-            this._userRepository.save(user);
-            this.bus.publish(user.pullDomainEvents());
+            var auxUser = this._userRepository.findById(user.getId()).get();
+            auxUser.setEmail(user.getEmail());
+            auxUser.setName(user.getName());
+            auxUser.setPhone(user.getPhone());
+            auxUser.setProfile(user.getProfile());
+            this._userRepository.save(auxUser);
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);
         }

@@ -1,4 +1,4 @@
-package com.foryourlife.admin.programs.training.infrastructure;
+package com.foryourlife.admin.programs.training.infrastructure.httpControllers;
 
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.programs.teams.domain.Team;

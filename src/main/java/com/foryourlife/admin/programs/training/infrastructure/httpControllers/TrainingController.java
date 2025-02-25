@@ -1,4 +1,4 @@
-package com.foryourlife.admin.programs.training.infrastructure;
+package com.foryourlife.admin.programs.training.infrastructure.httpControllers;
 
 import com.foryourlife.admin.programs.training.application.CommandTrainingService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/training")
@@ -39,6 +42,13 @@ public class TrainingController {
     //@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'USER')")
     @GetMapping("")
     public ResponseEntity<?> getAll() {
-        return new ResponseEntity<>(queryTrainingService.getAllTrainings(), HttpStatus.OK);
+        var trainings = queryTrainingService.getAllTrainings();
+List<TrainingResponse> trainingResponse = new ArrayList<>();
+trainings.forEach(training -> {
+            trainingResponse.add(
+                    new TrainingResponse(training.getId(), training.getName()+ " "+training.getNumber(),training.getStartDate(),training.getEndDate(),false,"#ffffff", new TrainingResponse.ExtendedProps("Epic description","Nice location",new String[]{"clave","valor"}))
+            );
+        });
+        return new ResponseEntity<>(trainingResponse, HttpStatus.OK);
     }
 }

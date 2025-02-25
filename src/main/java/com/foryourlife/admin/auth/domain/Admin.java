@@ -38,6 +38,8 @@ public class Admin extends AggregateRoot {
             inverseJoinColumns = @JoinColumn(name = "campus_id", referencedColumnName = "id"))
     private Set<Campus> campus;
 
+private boolean isActive;
+
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private Instant created_at;
@@ -50,17 +52,18 @@ public class Admin extends AggregateRoot {
     protected Admin() {
     }
 
-    public Admin(String id, String name, String email, String password, AdminRole role, Set<Campus> campus) {
+    public Admin(String id, String name, String email, String password, AdminRole role, Set<Campus> campus, boolean isActive) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
         this.campus = campus;
+        this.isActive=isActive;
     }
 
     public static Admin create(String id, String name, String email, String password, AdminRole role, Set<Campus> campus,String plainPassword) {
-        var admin = new Admin(id, name, email, password, role, campus);
+        var admin = new Admin(id, name, email, password, role, campus, true);
         admin.record(new AdminCreated(id, admin,plainPassword));
         return admin;
     }
@@ -99,6 +102,18 @@ public class Admin extends AggregateRoot {
 
     public AdminRole getRole() {
         return role;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public void setRole(AdminRole role) {
+        this.role = role;
     }
 
     @Override

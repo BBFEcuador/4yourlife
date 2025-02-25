@@ -14,6 +14,10 @@ public class AdminRoleRepositoryImpl implements AdminRoleRepository {
         this.repository = repository;
     }
 
+    public AdminRole findById(String id){
+        return repository.findById(id).get();
+    }
+
     @Override
     public List<AdminRole> getAll() {
         return repository.findAll();

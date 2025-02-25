@@ -46,7 +46,7 @@ public class TrainingController {
 List<TrainingResponse> trainingResponse = new ArrayList<>();
 trainings.forEach(training -> {
             trainingResponse.add(
-                    new TrainingResponse(training.getId(), training.getName()+ " "+training.getNumber(),training.getStartDate(),training.getEndDate(),false,"#ffffff", new TrainingResponse.ExtendedProps("Epic description","Nice location",new String[]{"clave","valor"}))
+                    new TrainingResponse(training.getId(), training.getName() + " " + training.getCourseLevel().name(),training.getStartDate(),training.getEndDate(),false,"#ffffff", new TrainingResponse.ExtendedProps("Epic description","Nice location",new String[]{"clave","valor"}))
             );
         });
         return new ResponseEntity<>(trainingResponse, HttpStatus.OK);

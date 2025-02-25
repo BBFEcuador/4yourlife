@@ -29,4 +29,10 @@ public class AdminController {
         this.adminCreateService.create(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("/disabled")
+    public ResponseEntity<?> disableAdmin(@RequestBody DisableAdminRequest disabled){
+        adminCreateService.update(disabled);
+    return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

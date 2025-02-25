@@ -1,4 +1,4 @@
-package com.foryourlife.admin.programs.training.infrastructure;
+package com.foryourlife.admin.programs.training.infrastructure.httpControllers;
 
 import jakarta.validation.constraints.NotNull;
 

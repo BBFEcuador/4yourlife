@@ -3,7 +3,7 @@ package com.foryourlife.admin.programs.training.application;
 import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
-import com.foryourlife.admin.programs.training.infrastructure.TrainingAutoGenerateRequest;
+import com.foryourlife.admin.programs.training.infrastructure.httpControllers.TrainingAutoGenerateRequest;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 

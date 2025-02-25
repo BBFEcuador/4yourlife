@@ -121,4 +121,24 @@ public class Participant extends AggregateRoot {
     public Boolean getLingerer() {
         return isLingerer;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setProfile(ProfileDetails profile) {
+        this.profile = profile;
+    }
 }

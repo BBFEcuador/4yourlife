@@ -16,7 +16,7 @@ public class ClientModuleController {
     @Autowired
     private ClientModuleFinderService clientModuleFinderService;
 
-    @PostMapping("update")
+    @PutMapping("update")
     public ResponseEntity<?> updateClientModule(@RequestBody ClientModuleRequest request) {
         clientModuleService.createClientModule(request.toDomain());
         return new ResponseEntity<>(HttpStatus.CREATED);

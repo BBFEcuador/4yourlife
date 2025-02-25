@@ -35,7 +35,7 @@ public class UserController {
         return new ResponseEntity<> (queryUsersService.getUserTrainerById(id), HttpStatus.OK);
     }
 
-    @PutMapping("/")
+    @PutMapping("")
     public ResponseEntity<?> updateUser(@RequestBody SaveUserRequest participant) {
         commandUsersService.update(participant.toDomain());
         return new ResponseEntity<>(HttpStatus.OK);

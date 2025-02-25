@@ -37,7 +37,7 @@ public class Participant extends AggregateRoot {
     @OneToMany(mappedBy = "user", targetEntity = Contact.class,fetch = FetchType.EAGER)
     private List<Contact> contacts = new ArrayList<>();
     @ManyToMany(mappedBy = "users", targetEntity = Team.class,fetch = FetchType.EAGER)
-    private Set<Team> teams;
+    private Set<Team> teams = new HashSet<>();
 
     public Team getTeam() {
         if (teams != null && !teams.isEmpty()) {

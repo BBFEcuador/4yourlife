@@ -35,4 +35,11 @@ public class AdminController {
         adminCreateService.update(disabled);
     return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("{adminId}/{roleId}")
+    public ResponseEntity<?> changeRole(@PathVariable String adminId, @PathVariable String roleId){
+        System.out.println(roleId);
+        adminCreateService.changeRole(adminId, roleId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

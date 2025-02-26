@@ -7,12 +7,14 @@ import com.foryourlife.admin.auth.domain.AdminRoleRepository;
 import com.foryourlife.admin.auth.infrastructure.httpControllers.CreateAdminRequest;
 import com.foryourlife.admin.auth.infrastructure.httpControllers.DisableAdminRequest;
 import com.foryourlife.shared.domain.bus.EventBus;
+import com.foryourlife.shared.domain.exception.BaseException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -38,8 +40,15 @@ public class AdminCreateService {
     }
 
     public void update(DisableAdminRequest adminReq){
-        var admin = this.repository.findById(adminReq.getId()).get();
+        var admin = this.repository.findById(adminReq.getId()).orElseThrow(() -> new BaseException("Admin not found", List.of()));
         admin.setActive(adminReq.isActive());
+        repository.save(admin);
+    }
+
+    public void changeRole(String id, String roleId){
+        var admin = this.repository.findById(id).orElseThrow(() -> new BaseException("Admin not found", List.of()));
+        var role = this.roleFinderService.findById(roleId).orElseThrow(() -> new BaseException("Role not found", List.of()));
+        admin.setRole(role);
         repository.save(admin);
     }
 

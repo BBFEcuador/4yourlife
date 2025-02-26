@@ -5,6 +5,7 @@ import com.foryourlife.admin.auth.domain.AdminRoleRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminRoleRepositoryImpl implements AdminRoleRepository {
@@ -14,8 +15,8 @@ public class AdminRoleRepositoryImpl implements AdminRoleRepository {
         this.repository = repository;
     }
 
-    public AdminRole findById(String id){
-        return repository.findById(id).get();
+    public Optional<AdminRole> findById(String id){
+        return repository.findById(id);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.foryourlife.admin.programs.trainer.infrastructure.httpControllers;
 
+import com.foryourlife.admin.auth.infrastructure.httpControllers.DisableAdminRequest;
 import com.foryourlife.admin.programs.trainer.application.TrainerCreatorService;
 import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
@@ -44,5 +45,11 @@ public class TrainerController {
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Trainer>> getTrainerById(@PathVariable String id) {
         return new ResponseEntity<>(trainerFinderService.findTrainerById(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/disabled")
+    public ResponseEntity<?> disableAdmin(@RequestBody DisableTrainerRequest disabled){
+        trainerCreateService.update(disabled);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

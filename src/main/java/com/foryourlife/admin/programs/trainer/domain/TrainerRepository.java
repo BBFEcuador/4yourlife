@@ -9,4 +9,6 @@ public interface TrainerRepository {
     Optional<Trainer> findTrainerById(String id);
 
     List<Trainer> getTrainers();
+
+
 }

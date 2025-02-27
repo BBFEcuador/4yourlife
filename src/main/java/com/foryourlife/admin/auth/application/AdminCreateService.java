@@ -6,6 +6,7 @@ import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.admin.auth.domain.AdminRoleRepository;
 import com.foryourlife.admin.auth.infrastructure.httpControllers.CreateAdminRequest;
 import com.foryourlife.admin.auth.infrastructure.httpControllers.DisableAdminRequest;
+import com.foryourlife.admin.auth.infrastructure.httpControllers.UpdateAdminRequest;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -39,7 +40,15 @@ public class AdminCreateService {
         this.repository.save(newAdmin);
     }
 
-    public void update(DisableAdminRequest adminReq){
+    public void update(UpdateAdminRequest request){
+        var admin = this.repository.findById(request.getId()).orElseThrow(() -> new BaseException("Admin not found", List.of()));
+        admin.setName(request.getName());
+        admin.setEmail(request.getEmail());
+        admin.setPassword(request.getPassword());
+        repository.save(admin);
+    }
+
+    public void updateState(DisableAdminRequest adminReq){
         var admin = this.repository.findById(adminReq.getId()).orElseThrow(() -> new BaseException("Admin not found", List.of()));
         admin.setActive(adminReq.isActive());
         repository.save(admin);

@@ -24,15 +24,26 @@ public class AdminController {
         return new ResponseEntity<>(adminFinderService.getAll(), HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?>getAdmin(@PathVariable String id){
+        return new ResponseEntity<>(adminFinderService.findById(id), HttpStatus.OK);
+    }
+
     @PostMapping("")
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateAdminRequest request) {
         this.adminCreateService.create(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PutMapping("")
+    public ResponseEntity<?> updateAdmin(@Valid @RequestBody UpdateAdminRequest request) {
+        this.adminCreateService.update(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PutMapping("/disabled")
     public ResponseEntity<?> disableAdmin(@RequestBody DisableAdminRequest disabled){
-        adminCreateService.update(disabled);
+        adminCreateService.updateState(disabled);
     return new ResponseEntity<>(HttpStatus.OK);
     }
 

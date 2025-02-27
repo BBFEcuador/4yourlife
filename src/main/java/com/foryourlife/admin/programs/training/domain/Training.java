@@ -97,6 +97,13 @@ public class Training extends AggregateRoot implements Serializable {
         return name;
     }
 
+    public void setStartDate(StartDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(EndDate endDate) {
+        this.endDate = endDate;
+    }
 
     public LocalDate getEndDate() {
         return endDate.getValue();

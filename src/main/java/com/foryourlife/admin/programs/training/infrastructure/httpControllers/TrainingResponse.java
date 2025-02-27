@@ -1,12 +1,13 @@
 package com.foryourlife.admin.programs.training.infrastructure.httpControllers;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TrainingResponse {
         private String id;
         private String title;
         private LocalDate start;
-        private LocalDate end;
+        private LocalDateTime end;
         private boolean allDay;
         private String color;
 
@@ -49,7 +50,7 @@ public class TrainingResponse {
 
         private ExtendedProps extendedProps;
 
-    public TrainingResponse(String id, String title, LocalDate start, LocalDate end, boolean allDay, String color, ExtendedProps extendedProps) {
+    public TrainingResponse(String id, String title, LocalDate start, LocalDateTime end, boolean allDay, String color, ExtendedProps extendedProps) {
         this.id = id;
         this.title = title;
         this.start = start;
@@ -83,11 +84,11 @@ public class TrainingResponse {
         this.start = start;
     }
 
-    public LocalDate getEnd() {
+    public LocalDateTime getEnd() {
         return end;
     }
 
-    public void setEnd(LocalDate end) {
+    public void setEnd(LocalDateTime end) {
         this.end = end;
     }
 

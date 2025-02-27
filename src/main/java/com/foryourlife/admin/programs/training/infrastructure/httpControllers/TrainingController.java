@@ -39,21 +39,29 @@ public class TrainingController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PutMapping("/date")
+    public ResponseEntity<?> updateStartDate(@Valid @RequestBody UpdateStartDateTrainingRequest request) {
+        if (queryTrainingService.getTrainingById(request.getId()) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        commandTrainingService.updateStartDate(request.getId(),request.getStartDate());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     //@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'USER')")
     @GetMapping("")
     public ResponseEntity<?> getAll() {
         var trainings = queryTrainingService.getAllTrainings();
-List<TrainingResponse> trainingResponse = new ArrayList<>();
-trainings.forEach(training -> {
-    String color = switch (training.getCourseLevel()) {
-        case FOCUS -> "#2f49f5";
-        case YOUR -> "#f52f9c";
-        case LIFE -> "#f5922f";
-        default -> "#00FF00";
-    };
-
-    trainingResponse.add(
-                    new TrainingResponse(training.getId(), training.getName() + " " + training.getCourseLevel().name(),training.getStartDate(),training.getEndDate(),false,color, new TrainingResponse.ExtendedProps("Epic description","Nice location",new String[]{"clave","valor"}))
+        List<TrainingResponse> trainingResponse = new ArrayList<>();
+        trainings.forEach(training -> {
+            String color = switch (training.getCourseLevel()) {
+                                        case FOCUS -> "#2f49f5";
+                                        case YOUR -> "#f52f9c";
+                                        case LIFE -> "#f5922f";
+                                        default -> "#00FF00";
+            };
+            trainingResponse.add(
+                    new TrainingResponse(training.getId(), training.getName() + " " + training.getCourseLevel().name(),training.getStartDate(),training.getEndDate().atTime(23,59),false,color, new TrainingResponse.ExtendedProps("Epic description","Nice location",new String[]{"clave","valor"}))
             );
         });
         return new ResponseEntity<>(trainingResponse, HttpStatus.OK);

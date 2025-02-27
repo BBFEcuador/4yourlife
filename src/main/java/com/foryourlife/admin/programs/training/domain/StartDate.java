@@ -21,7 +21,7 @@ public class StartDate {
 
     private LocalDate validate(LocalDate value){
         if (value.getDayOfWeek() != DayOfWeek.FRIDAY) {
-            throw new BaseException("Mal", List.of("La fecha de inicio debe ser un viernes"));
+            throw new BaseException("Error al actualizar la fecha de inicio", List.of("La fecha de inicio debe ser viernes"));
         }
         return value;
     }

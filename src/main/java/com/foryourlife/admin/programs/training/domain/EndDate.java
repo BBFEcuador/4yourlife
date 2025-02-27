@@ -21,7 +21,7 @@ public class EndDate {
     private LocalDate validate(LocalDate value){
 
         if (value.getDayOfWeek() != DayOfWeek.SUNDAY) {
-            throw new BaseException("Mal", List.of("La fecha final debe ser un domingo"));
+            throw new BaseException("Error al actualizar la fecha de fin", List.of("La fecha de fin debe ser un domingo"));
         }
         return value;
     }

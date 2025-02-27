@@ -1,9 +1,15 @@
 package com.foryourlife.admin.programs.training.infrastructure;
 
+import com.foryourlife.admin.programs.training.domain.StartDate;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
+import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,9 +17,11 @@ import java.util.Optional;
 public class TrainingRepositoryImpl implements TrainingRepository {
 
     private final JPATrainingRepository repository;
+    private final JPACriteriaConverter<Training> criteriaConverter;
 
-    public TrainingRepositoryImpl(JPATrainingRepository repository) {
+    public TrainingRepositoryImpl(JPATrainingRepository repository, JPACriteriaConverter<Training> criteriaConverter) {
         this.repository = repository;
+        this.criteriaConverter = criteriaConverter;
     }
 
     @Override
@@ -29,6 +37,22 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     @Override
     public List<Training> getAll() {
         return this.repository.findAll();
+    }
+
+    @Override
+    public List<Training> match(Criteria criteria) {
+        return repository.findAll(criteriaConverter.getJpaSpecifications(criteria));
+    }
+
+    @Override
+    public Training matchOne(Criteria criteria) {
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        return repository.findAll(criteriaConverter.getJpaSpecifications(criteria), pageRequest).stream().findFirst().orElse(null);
+    }
+
+    @Override
+    public List<Training> findByStartDate(StartDate date) {
+        return repository.findByStartDate(date);
     }
 
     @Override

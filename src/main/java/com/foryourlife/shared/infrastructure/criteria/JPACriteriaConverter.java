@@ -42,6 +42,10 @@ public class JPACriteriaConverter<T> {
                     }
                     case JOIN ->
                             criteriaBuilder.equal(root.join(filter.getJoinTable()).get(filter.getColumn()), filter.getValue());
+                    case GET_LAST -> {
+                        query.orderBy(criteriaBuilder.desc(root.get(filter.getColumn())));
+                        yield criteriaBuilder.conjunction();
+                    }
                     default -> throw new IllegalStateException("Unexpected value: " + "");
                 };
 

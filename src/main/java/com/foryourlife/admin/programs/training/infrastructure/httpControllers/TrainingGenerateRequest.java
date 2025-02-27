@@ -4,10 +4,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-public class TrainingAutoGenerateRequest {
+public class TrainingGenerateRequest {
     @NotNull
     public LocalDate startDate;
-    public Integer firstFocus;
     @NotNull
     public Integer numberOfFocus;
     @NotNull

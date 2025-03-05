@@ -1,7 +1,10 @@
 package com.foryourlife.clients.account.profileDetails.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.persistence.Embeddable;
+import org.apache.catalina.User;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -31,8 +34,13 @@ public class UserBirthday {
             throw new BaseException("No cumple", List.of("El usuario no es mayor de edad"));
         }
     }
-
+    @JsonValue
     public Date getValue() {
         return value;
+    }
+
+    @JsonCreator
+    public static UserBirthday fromValue(Date value) {
+        return new UserBirthday(value);
     }
 }

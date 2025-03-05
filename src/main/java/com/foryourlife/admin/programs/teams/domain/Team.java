@@ -133,6 +133,7 @@ public class Team extends AggregateRoot{
             put("endDate",training.getEndDate().toString());
             put("name",training.getName());
             put("curseLevel",training.getCourseLevel().name());
+            put("sede",training.getCampus().getCity());
         }};
     }
 }

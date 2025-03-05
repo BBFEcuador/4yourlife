@@ -35,7 +35,7 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("")
+    @PutMapping("/")
     public ResponseEntity<?> updateAdmin(@Valid @RequestBody UpdateAdminRequest request) {
         this.adminCreateService.update(request);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -44,6 +44,12 @@ public class AdminController {
     @PutMapping("/disabled")
     public ResponseEntity<?> disableAdmin(@RequestBody DisableAdminRequest disabled){
         adminCreateService.updateState(disabled);
+    return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/pass")
+    public ResponseEntity<?> updatePassAdmin(@RequestBody UpdatePassAdminRequest password){
+        adminCreateService.updatePass(password);
     return new ResponseEntity<>(HttpStatus.OK);
     }
 

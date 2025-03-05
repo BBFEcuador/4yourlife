@@ -15,6 +15,7 @@ public class ProfileDetails extends AggregateRoot {
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "birthday"))
+    @JsonProperty("birthday")
     private UserBirthday birthday;
 
     private String address;

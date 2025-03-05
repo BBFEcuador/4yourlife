@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class CommandTeamService {
@@ -51,7 +52,10 @@ public class CommandTeamService {
         try {
             var training = queryTrainingService.getTrainingById(request.training);
             var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
-            var team = Team.create(request.id != null ? request.id: UUID.randomUUID().toString(),request.name,request.photo,training,training.getNumber(),request.users,trainer);
+            var users = request.users.stream().map(participant -> {
+                return _userRepository.findById(participant.getId()).orElseThrow();
+            }).collect(Collectors.toSet());
+            var team = Team.create(request.id != null ? request.id: UUID.randomUUID().toString(),request.name,request.photo,training,training.getNumber(),users,trainer);
             this._teamRepository.save(team);
             this.bus.publish(team.pullDomainEvents());
         }catch (Exception e){

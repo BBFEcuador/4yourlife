@@ -21,7 +21,6 @@ public class AdminRoleSeeder {
             List<AdminRole> adminRoles = Arrays.asList(
                     AdminRole.create("617bfc68-2e44-4abd-b67f-781a2dca2493", "Operativo", "ROLE_OPERATOR"),
                     AdminRole.create("a39d4053-d591-4d3e-9b8b-a5fccbeb70c7", "Contador", "ROLE_ACCOUNTANT")
-
             );
             adminRoleRepository.saveAll(adminRoles);
         };

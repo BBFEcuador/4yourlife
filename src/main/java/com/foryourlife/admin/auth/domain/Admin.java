@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.AdminCreated;
+import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,11 +21,9 @@ public class Admin extends AggregateRoot {
     @Id
     private String id;
 
-    private String name;
-
-    private String email;
-
-    private String password;
+    @OneToOne()
+    @JoinColumn(referencedColumnName = "id", name = "user_id")
+    private User user;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST})
     @JoinColumn(name = "role_id", referencedColumnName = "id")
@@ -52,18 +51,16 @@ private boolean isActive;
     protected Admin() {
     }
 
-    public Admin(String id, String name, String email, String password, AdminRole role, Set<Campus> campus, boolean isActive) {
+    public Admin(String id, User user, AdminRole role, Set<Campus> campus, boolean isActive) {
         this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
+        this.user = user;
         this.role = role;
         this.campus = campus;
         this.isActive=isActive;
     }
 
-    public static Admin create(String id, String name, String email, String password, AdminRole role, Set<Campus> campus,String plainPassword) {
-        var admin = new Admin(id, name, email, password, role, campus, true);
+    public static Admin create(String id, User user, AdminRole role, Set<Campus> campus,String plainPassword) {
+        var admin = new Admin(id, user, role, campus, true);
         admin.record(new AdminCreated(id, admin,plainPassword));
         return admin;
     }
@@ -77,27 +74,15 @@ private boolean isActive;
     }
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return user.getName();
     }
 
     public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+        return user.getEmail();
     }
 
     public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+        return user.getPassword();
     }
 
     public AdminRole getRole() {
@@ -114,18 +99,6 @@ private boolean isActive;
 
     public void setRole(AdminRole role) {
         this.role = role;
-    }
-
-    @Override
-    public String toString() {
-        return "Admin{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", created_at=" + created_at +
-                ", updated_at=" + updated_at +
-                '}';
     }
 
     public Set<Campus> getCampus() {

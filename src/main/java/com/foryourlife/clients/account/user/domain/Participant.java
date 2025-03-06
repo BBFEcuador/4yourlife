@@ -7,6 +7,7 @@ import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.UserCreated;
+import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 import org.hibernate.Hibernate;
 
@@ -20,10 +21,9 @@ import java.util.Set;
 public class Participant extends AggregateRoot {
     @Id
     private String id;
-    private String email;
-    private String password;
-    private String name;
-    private String phone;
+    @OneToOne()
+    @JoinColumn(referencedColumnName = "id", name = "user_id")
+    private User user;
     @ManyToOne
     @JoinColumn(name = "participant_level_id", referencedColumnName = "id")
     private ParticipantLevel participantLevel;
@@ -34,9 +34,9 @@ public class Participant extends AggregateRoot {
     private Boolean isLingerer = false;
     @OneToOne(mappedBy = "user", targetEntity = ClientModule.class)
     private ClientModule modules;
-    @OneToMany(mappedBy = "user", targetEntity = Contact.class,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", targetEntity = Contact.class, fetch = FetchType.EAGER)
     private List<Contact> contacts = new ArrayList<>();
-    @ManyToMany(mappedBy = "users", targetEntity = Team.class,fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "users", targetEntity = Team.class, fetch = FetchType.EAGER)
     private Set<Team> teams = new HashSet<>();
 
     public Team getTeam() {
@@ -61,21 +61,18 @@ public class Participant extends AggregateRoot {
         return contacts;
     }
 
-    private Participant(String id, String email, String password, String name, String phone, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
+    private Participant(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
         this.id = id;
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.phone = phone;
+        this.user = user;
         this.participantLevel = role;
         this.profile = profile;
         this.invitationToken = invitationToken;
     }
 
-    public static Participant create(String id, String email, String password, String name, String phone, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
-        var user = new Participant(id, email, password, name, phone, role, profile, invitationToken);
-        user.record(new UserCreated(id, user));
-        return user;
+    public static Participant create(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
+        var participant = new Participant(id, user, role, profile, invitationToken);
+        participant.record(new UserCreated(id, participant));
+        return participant;
     }
 
     public String getId() {
@@ -83,19 +80,19 @@ public class Participant extends AggregateRoot {
     }
 
     public String getEmail() {
-        return email;
+        return user.getEmail();
     }
 
     public String getPassword() {
-        return password;
+        return user.getPassword();
     }
 
     public String getName() {
-        return name;
+        return user.getName();
     }
 
     public String getPhone() {
-        return phone;
+        return user.getPhone();
     }
 
     public ParticipantLevel getParticipantLevel() {
@@ -124,18 +121,6 @@ public class Participant extends AggregateRoot {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public void setProfile(ProfileDetails profile) {

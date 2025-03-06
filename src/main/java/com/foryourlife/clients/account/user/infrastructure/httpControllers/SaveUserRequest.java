@@ -63,6 +63,6 @@ public class SaveUserRequest {
     }
 
     public Participant toDomain() {
-        return Participant.create(id != null ? id : UUID.randomUUID().toString(), email, password, name, phone, null, profile.toDomain(),token);
+        return Participant.create(id != null ? id : UUID.randomUUID().toString(), , phone, null, profile.toDomain(),token);
     }
 }

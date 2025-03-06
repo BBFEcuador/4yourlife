@@ -43,9 +43,6 @@ public class AdminCreateService {
 
     public void update(UpdateAdminRequest request){
         var admin = this.repository.findById(request.getId()).orElseThrow(() -> new BaseException("Admin not found", List.of()));
-        admin.setName(request.getName());
-        admin.setEmail(request.getEmail());
-        admin.setPassword(request.getPassword());
         repository.save(admin);
     }
 
@@ -57,7 +54,6 @@ public class AdminCreateService {
 
     public void updatePass(UpdatePassAdminRequest adminReq){
         var admin = this.repository.findById(adminReq.id).orElseThrow(() -> new BaseException("Admin not found", List.of()));
-        admin.setPassword(passwordEncoder.encode(adminReq.password));
         repository.save(admin);
     }
 

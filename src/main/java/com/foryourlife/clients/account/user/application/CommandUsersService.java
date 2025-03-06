@@ -66,10 +66,6 @@ public class CommandUsersService {
             throw new UserNotFoundException("The Id: " + user.getId() + " doesn't exist.");
         try {
             var auxUser = this._userRepository.findById(user.getId()).get();
-            auxUser.setEmail(user.getEmail());
-            auxUser.setName(user.getName());
-            auxUser.setPhone(user.getPhone());
-            auxUser.setProfile(user.getProfile());
             this._userRepository.save(auxUser);
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);

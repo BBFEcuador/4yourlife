@@ -5,6 +5,7 @@ import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.user.domain.Participant;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public class SaveTeamRequest {
     public String photo;
     public Training training;
     public Integer trainingNumber;
-    public Set<Participant> users;
+    public List<Participant> users;
     public Trainer trainer;
 
     public SaveTeamRequest(
@@ -23,7 +24,7 @@ public class SaveTeamRequest {
             String photo,
             Training training,
             Integer trainingNumber,
-            Set<Participant> users,
+            List<Participant> users,
             Trainer trainer
     ) {
         this.id = id;
@@ -55,7 +56,7 @@ public class SaveTeamRequest {
         return trainingNumber;
     }
 
-    public Set<Participant> getUsers() {
+    public List<Participant> getUsers() {
         return users;
     }
 

@@ -48,19 +48,20 @@ public class CommandTeamService {
         this._teamRepository.save(team);
         this.bus.publish(team.pullDomainEvents());
     }
+
     public void saveHttp(TeamRequest request) {
-        try {
-            var training = queryTrainingService.getTrainingById(request.training);
-            var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
-            var users = request.users.stream().map(participant -> {
-                return _userRepository.findById(participant.getId()).orElseThrow();
-            }).collect(Collectors.toSet());
-            var team = Team.create(request.id != null ? request.id: UUID.randomUUID().toString(),request.name,request.photo,training,training.getNumber(),users,trainer);
-            this._teamRepository.save(team);
-            this.bus.publish(team.pullDomainEvents());
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
+        var training = queryTrainingService.getTrainingById(request.training);
+        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+        var users = request.users.stream().map(participant -> {
+            var p = _userRepository.findById(participant.getId()).orElseThrow();
+            if (p.getTeam() != null){
+                throw new BaseException("User not available",List.of("The user "+p.getName()+" has team"));
+            }
+            return p;
+        }).collect(Collectors.toList());
+        var team = Team.create(request.id != null ? request.id : UUID.randomUUID().toString(), request.name, request.photo, training, training.getNumber(), users, trainer);
+        this._teamRepository.save(team);
+        this.bus.publish(team.pullDomainEvents());
     }
 
     public void update(Team team) {
@@ -71,9 +72,9 @@ public class CommandTeamService {
 
     public void assignParticipants(String teamId, String userId) {
         var team = _teamRepository.findById(teamId);
-        if (!team.isPresent()) {
+        if (team.isEmpty()) {
             throw new BaseException("Team not found", List.of(""));
-        } else if (!_userRepository.findById(userId).isPresent()) {
+        } else if (_userRepository.findById(userId).isEmpty()) {
             throw new BaseException("User not found", List.of(""));
         }
         team.orElseThrow().getUsers().forEach(user -> {

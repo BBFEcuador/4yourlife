@@ -19,9 +19,8 @@ public class Team extends AggregateRoot{
     private String id;
     private String name;
     private String photo;
-    @JsonIgnore
     @ManyToOne()
-    @JoinColumn(name = "training_id", referencedColumnName = "id", updatable = false)
+    @JoinColumn(name = "training_id", referencedColumnName = "id")
     private Training training;
     @Column(name = "training_number")
     private Integer trainingNumber;
@@ -30,14 +29,14 @@ public class Team extends AggregateRoot{
     @JoinTable(
             name = "team_users",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id",unique = true))
-    private Set<Participant> users = new HashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"))
+    private List<Participant> users = new ArrayList<>();
     @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "team_master_life",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "masterlife_id", referencedColumnName = "id"))
-    private Set<Participant> masterLife = new HashSet<>();
+    private List<Participant> masterLife = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
     private Trainer trainer;
@@ -49,7 +48,7 @@ public class Team extends AggregateRoot{
     protected Team() {
     }
 
-    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Participant> users,Trainer trainer) {
+    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer) {
         this.id = id;
         this.name = name;
         this.photo = photo;
@@ -59,7 +58,7 @@ public class Team extends AggregateRoot{
         this.trainer = trainer;
     }
 
-    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, Set<Participant> users,Trainer trainer) {
+    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer) {
         var team = new Team(id, name, photo, trainingId, trainingNumber, users,trainer);
         team.setTraining(trainingId);
         team.record(new TeamCreated(id, team));
@@ -86,19 +85,19 @@ public class Team extends AggregateRoot{
         return trainingNumber;
     }
     @JsonIgnore
-    public Set<Participant> getUsers() {
+    public List<Participant> getUsers() {
         return users;
     }
 
-    public Set<Participant> getMasterLife() {
+    public List<Participant> getMasterLife() {
         return masterLife;
     }
 
-    public void setUsers(Set<Participant> users) {
+    public void setUsers(List<Participant> users) {
         this.users = users;
     }
 
-    public void setMasterLife(Set<Participant> masterLife) {
+    public void setMasterLife(List<Participant> masterLife) {
         this.masterLife = masterLife;
     }
 

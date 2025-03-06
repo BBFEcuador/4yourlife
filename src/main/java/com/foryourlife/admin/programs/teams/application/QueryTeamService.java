@@ -2,6 +2,7 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,9 @@ public class QueryTeamService {
 
     public List<Team> getAllTeams() {
         return this._teamRepository.findAll();
+    }
+    public List<Team> match(Criteria criteria) {
+        return this._teamRepository.match(criteria);
     }
 
     public String getPhoto(String id) {

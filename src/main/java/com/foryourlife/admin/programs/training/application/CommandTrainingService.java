@@ -32,27 +32,46 @@ public class CommandTrainingService {
 
     public void autoGenerateTraining(TrainingAutoGenerateRequest request) {
         var campus = campusService.findById(request.campusId);
+        Integer nextNumber = 1;
+        if (request.firstFocus != null){
+            nextNumber = request.firstFocus;
+        }else{
+            Training lastTraining = repository.matchOne(
+                    new Criteria(
+                            List.of(
+                                    new Filter(
+                                            "number", null, null, Filter.Operation.GET_LAST, null
+                                    )
+                            ), Optional.empty(), Optional.empty()
+                    )
+            );
 
-        Training lastTraining = repository.matchOne(
-                new Criteria(
-                        List.of(
-                                new Filter(
-                                        "number", null, null, Filter.Operation.GET_LAST, null
-                                )
-                        ), Optional.empty(), Optional.empty()
-                )
-        );
+            if (lastTraining == null) {
+                throw new BaseException("No previous training found", List.of("Cannot determine the next training number"));
+            }
 
-        if (lastTraining == null) {
-            throw new BaseException("No previous training found", List.of("Cannot determine the next training number"));
+            nextNumber = lastTraining.getNumber() + 1;
         }
-
-        Integer nextNumber = lastTraining.getNumber() + 1 ;
-
+        Criteria ctriCriteria = new Criteria(
+                List.of(
+                        new Filter(
+                                "startDate",
+                                request.startDate.toString(),
+                                null,
+                                Filter.Operation.EQUAL,
+                                Filter.LogicalOperator.AND
+                        )
+                ), Optional.empty(), Optional.empty()
+        );
+        repository.findByStartDate(new StartDate(request.startDate)).forEach(training -> {
+            if (training.getCourseLevel() != LIFE) {
+                throw new BaseException("Error al actualizar la fecha", List.of("Entrenamientos Focus o Your no pueden coincidir"));
+            }
+        });
         var focus = Training.create(
                 UUID.randomUUID().toString(),
                 request.firstFocus != null ? request.firstFocus : nextNumber,
-                campus.getCity() +"-" +(request.firstFocus != null ? request.firstFocus.toString() : nextNumber.toString()),
+                campus.getCity() + "-" + (request.firstFocus != null ? request.firstFocus.toString() : nextNumber.toString()),
                 request.startDate,
                 request.startDate.plusDays(2),
                 FOCUS,
@@ -82,7 +101,7 @@ public class CommandTrainingService {
                 ), Optional.empty(), Optional.empty()
         );
         repository.findByStartDate(new StartDate(date)).forEach(training -> {
-            if (training.getCourseLevel() != LIFE){
+            if (training.getCourseLevel() != LIFE) {
                 throw new BaseException("Error al actualizar la fecha", List.of("Entrenamientos Focus o Your no pueden coincidir"));
             }
         });

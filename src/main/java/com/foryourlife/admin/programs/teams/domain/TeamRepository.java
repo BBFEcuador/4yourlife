@@ -1,5 +1,6 @@
 package com.foryourlife.admin.programs.teams.domain;
 
+import com.foryourlife.shared.domain.criteria.Criteria;
 import net.datafaker.providers.food.Tea;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public interface TeamRepository {
     Optional<Team> findById(String id);
     Optional<Team> findByTrainingId(String id);
     List<Team> findAll();
+    List<Team> match(Criteria criteria);
     void assignParticipants(String teamId, String userId);
     void assignMastersLife(String teamId, String userId);
     void removeParticipants(String teamId, String userId);

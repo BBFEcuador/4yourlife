@@ -4,6 +4,7 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,13 +41,19 @@ public class JPACriteriaConverter<T> {
                         String[] split1 = filter.getValue().split(",");
                         yield criteriaBuilder.between(root.get(filter.getColumn()), Long.parseLong(split1[0]), Long.parseLong(split1[1]));
                     }
-                    case JOIN ->
-                            criteriaBuilder.equal(root.join(filter.getJoinTable()).get(filter.getColumn()), filter.getValue());
+                    case JOIN -> {
+                        From<?, ?> join = root;
+                        for (String table : filter.getJoinTable().split("\\.")) {
+                            join = join.join(table);
+                        }
+
+                        yield criteriaBuilder.equal(join.get(filter.getColumn()), criteriaBuilder.literal(filter.getValue()));
+                    }
                     case GET_LAST -> {
                         query.orderBy(criteriaBuilder.desc(root.get(filter.getColumn())));
                         yield criteriaBuilder.conjunction();
                     }
-                    default -> throw new IllegalStateException("Unexpected value: " + "");
+                    default -> throw new IllegalStateException("Unexpected value: ");
                 };
 
                 if (filter.getLogicalOperator() == Filter.LogicalOperator.OR) {

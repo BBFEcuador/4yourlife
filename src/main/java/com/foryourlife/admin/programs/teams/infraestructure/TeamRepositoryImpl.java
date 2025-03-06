@@ -3,7 +3,9 @@ package com.foryourlife.admin.programs.teams.infraestructure;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.clients.account.user.infrastructure.JPAUserRepository;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,11 +15,13 @@ import java.util.Optional;
 public class TeamRepositoryImpl implements TeamRepository {
 
     private final JPATeamRepository _jpaTeamRepository;
-    private JPAUserRepository _jpaUserRepository;
+    private final JPAUserRepository _jpaUserRepository;
+    private final JPACriteriaConverter<Team> criteriaConverter;
 
-    public TeamRepositoryImpl(JPATeamRepository _jpaTeamRepository, JPAUserRepository jpaUserRepository) {
+    public TeamRepositoryImpl(JPATeamRepository _jpaTeamRepository, JPAUserRepository jpaUserRepository, JPACriteriaConverter<Team> criteriaConverter) {
         this._jpaTeamRepository = _jpaTeamRepository;
         _jpaUserRepository = jpaUserRepository;
+        this.criteriaConverter = criteriaConverter;
     }
 
     @Override
@@ -92,5 +96,10 @@ public class TeamRepositoryImpl implements TeamRepository {
     @Override
     public List<Team> findAll() {
         return _jpaTeamRepository.findAll();
+    }
+
+    @Override
+    public List<Team> match(Criteria criteria) {
+        return _jpaTeamRepository.findAll(criteriaConverter.getJpaSpecifications(criteria));
     }
 }

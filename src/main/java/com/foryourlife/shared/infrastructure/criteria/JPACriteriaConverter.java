@@ -29,8 +29,8 @@ public class JPACriteriaConverter<T> {
 
             for (Filter filter : criteria.getFilters()) {
                 Predicate predicate = switch (filter.getOperation()) {
-                    case EQUAL -> criteriaBuilder.equal(root.get(filter.getColumn()), filter.getValue());
-                    case LIKE -> criteriaBuilder.like(root.get(filter.getColumn()), "%" + filter.getValue() + "%");
+                    case EQUAL -> criteriaBuilder.equal(root.get(filter.getColumn()), criteriaBuilder.literal(filter.getValue()));
+                    case LIKE -> criteriaBuilder.like(root.get(filter.getColumn()), criteriaBuilder.literal("%" + filter.getValue() + "%"));
                     case IN -> {
                         String[] split = filter.getValue().split(",");
                         yield root.get(filter.getColumn()).in(Arrays.asList(split));
@@ -53,6 +53,7 @@ public class JPACriteriaConverter<T> {
                         query.orderBy(criteriaBuilder.desc(root.get(filter.getColumn())));
                         yield criteriaBuilder.conjunction();
                     }
+                    case IS_NULL ->  criteriaBuilder.isNull(root.get(filter.getColumn()));
                     default -> throw new IllegalStateException("Unexpected value: ");
                 };
 

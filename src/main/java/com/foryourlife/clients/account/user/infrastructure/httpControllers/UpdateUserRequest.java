@@ -50,7 +50,7 @@ public class UpdateUserRequest {
         return id;
     }
 
-    public Participant toDomain() {
-        return Participant.create(id, email, null, name, phone, null, profile.toDomain(),null);
-    }
+//    public Participant toDomain() {
+//        return Participant.create(id, email, null, name, phone, null, profile.toDomain(),null);
+//    }
 }

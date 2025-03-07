@@ -34,7 +34,7 @@ public class UserController {
 
     @PutMapping("")
     public ResponseEntity<?> updateUser(@RequestBody UpdateUserRequest participant) {
-        commandUsersService.update(participant.toDomain());
+//        commandUsersService.update(participant.toDomain());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

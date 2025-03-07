@@ -44,7 +44,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private Participant loadUserByUsername(String username) throws BaseException {
-        var user = repository.findByEmail(username)
+        var user = repository.findByUser_email(username)
                 .orElseThrow(() -> new BaseException("Login Error", List.of("The user " + username + " does not exist.")));
         loadUser = user;
         return user;
@@ -66,7 +66,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<Participant> findByEmail(String email) {
-        return repository.findByEmail(email);
+        return repository.findByUser_email(email);
     }
 
     @Override

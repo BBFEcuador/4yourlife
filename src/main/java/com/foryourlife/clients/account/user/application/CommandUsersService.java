@@ -8,9 +8,11 @@ import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelR
 import com.foryourlife.clients.account.user.domain.*;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +20,7 @@ import java.util.UUID;
 @Service
 public class CommandUsersService {
     private final UserRepository _userRepository;
+    private final CommandGeneralUserService commandGeneralUserService;
     private final QueryInvitationServices queryInvitationServices;
     private final ParticipantLevelService _rolRepository;
     private final ClientModuleCreatorService _clientModuleRepository;
@@ -25,26 +28,28 @@ public class CommandUsersService {
     private final EventBus bus;
     private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
 
-    public CommandUsersService(UserRepository _userRepository, ParticipantLevelRepository rolRepository, QueryInvitationServices queryInvitationServices, ParticipantLevelService rolRepository1, EventBus bus, ClientModuleCreatorService _clientModuleRepository, ParticipantLevelService participantLevelService) {
+    public CommandUsersService(UserRepository _userRepository, ParticipantLevelRepository rolRepository, CommandGeneralUserService commandUsersService, QueryInvitationServices queryInvitationServices, ParticipantLevelService rolRepository1, EventBus bus, ClientModuleCreatorService _clientModuleRepository, ParticipantLevelService participantLevelService) {
         this._userRepository = _userRepository;
+        this.commandGeneralUserService = commandUsersService;
         this.queryInvitationServices = queryInvitationServices;
         _rolRepository = rolRepository1;
         this.bus = bus;
         this._clientModuleRepository = _clientModuleRepository;
         this.participantLevelService = participantLevelService;
     }
-
+    @Transactional
     public void createInitUser(Participant user) {
-        if (this._userRepository.findByEmail(user.getEmail()).isPresent())
-            throw new UserAlreadyCreatedException("The email " + user.getEmail() + "is already registered");
         var token = queryInvitationServices.findInvitationByToken(user.getInvitationToken());
         if (token.getUsed())
             throw new BaseException("Token expired", List.of("The token " + user.getInvitationToken() + " was used"));
+        commandGeneralUserService.save(user.getUser());
+
         var role = this._rolRepository.getInitRole();
-        user.setParticipantLevel(role);
-        this._userRepository.save(user);
-        this._clientModuleRepository.createClientModule(ClientModule.create(UUID.randomUUID().toString(), false, false, false, user));
-        this.bus.publish(user.pullDomainEvents());
+        throw new BaseException("Token expired", List.of("The token " + user.getInvitationToken() + " was used"));
+//        user.setParticipantLevel(role);
+//        this._userRepository.save(user);
+//        this._clientModuleRepository.createClientModule(ClientModule.create(UUID.randomUUID().toString(), false, false, false, user));
+//        this.bus.publish(user.pullDomainEvents());
     }
 
     public void save(Participant user) {

@@ -37,8 +37,8 @@ public class AdminCreateService {
 
     public void create(CreateAdminRequest admin){
         var password = RandomStringUtils.randomAlphabetic(10);;
-        var newAdmin =  Admin.create(admin.id != null ? admin.id : UUID.randomUUID().toString(), admin.name, admin.email, passwordEncoder.encode(password), admin.role, admin.campus,password);
-        this.repository.save(newAdmin);
+//        var newAdmin =  Admin.create(admin.id != null ? admin.id : UUID.randomUUID().toString(), admin.name, admin.email, passwordEncoder.encode(password), admin.role, admin.campus,password);
+//        this.repository.save(newAdmin);
     }
 
     public void update(UpdateAdminRequest request){

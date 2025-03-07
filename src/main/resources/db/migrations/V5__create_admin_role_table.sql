@@ -9,12 +9,11 @@ CREATE TABLE IF NOT EXISTS admin_roles
 CREATE TABLE IF NOT EXISTS admins_users
 (
     id text not null,
-    name text not null,
-    email text not null,
-    password text not null,
+    user_id text not null,
     role_id text not null,
     created_at timestamp not null,
     updated_at timestamp,
     CONSTRAINT fk_admins_on_admin_roles FOREIGN KEY (role_id) REFERENCES admin_roles (id),
+    CONSTRAINT fk_admin_on_user FOREIGN KEY (user_id) REFERENCES users (id),
     CONSTRAINT pk_admins PRIMARY KEY (id)
 );

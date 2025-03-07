@@ -5,6 +5,7 @@ import com.foryourlife.admin.auth.domain.AdminLoginResponse;
 import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.shared.JWTUtils;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.user.infrastructure.JpaUserRepository;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,12 +22,14 @@ import java.util.Optional;
 public class AdminRepositoryImpl implements AdminRepository {
 
     private final JPAAdminRepository repository;
+    private final JpaUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JWTUtils jwtUtils;
     private Admin loadAdmin;
 
-    public AdminRepositoryImpl(JPAAdminRepository repository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils) {
+    public AdminRepositoryImpl(JPAAdminRepository repository, JpaUserRepository userRepository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils) {
         this.repository = repository;
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
     }
@@ -46,7 +49,7 @@ public class AdminRepositoryImpl implements AdminRepository {
 
     @Override
     public Optional<Admin> findByEmail(String email) {
-        return this.repository.findByEmail(email);
+        return this.repository.findByUser_email(email);
     }
 
     @Override
@@ -79,9 +82,11 @@ public class AdminRepositoryImpl implements AdminRepository {
     }
 
     private Admin loadAdminByUsername(String email) throws BaseException {
-        var user = repository.findByEmail(email)
+        var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BaseException("Login Error", List.of("The user " + email + " does not exist.")));
-        loadAdmin = user;
-        return user;
+        var admin = repository.findByUser_id(user.getId())
+                .orElseThrow(() -> new BaseException("Login Error", List.of("The user " + email + " does not exist.")));
+        loadAdmin = admin;
+        return admin;
     }
 }

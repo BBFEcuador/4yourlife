@@ -3,12 +3,15 @@ package com.foryourlife.clients.account.user.infrastructure.httpControllers;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
 import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.shared.domain.user.User;
+import com.foryourlife.shared.domain.user.UserEntities;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
+import java.util.List;
 import java.util.UUID;
 
 public class SaveUserRequest {
@@ -63,6 +66,13 @@ public class SaveUserRequest {
     }
 
     public Participant toDomain() {
-        return Participant.create(id != null ? id : UUID.randomUUID().toString(), , phone, null, profile.toDomain(),token);
+        var newId = id != null ? id : UUID.randomUUID().toString();
+        return Participant.create(
+                newId,
+                new User(UUID.randomUUID().toString(), email, password, name, phone, List.of(new UserEntities(newId, "Participant"))),
+                null,
+                profile.toDomain(),
+                token
+        );
     }
 }

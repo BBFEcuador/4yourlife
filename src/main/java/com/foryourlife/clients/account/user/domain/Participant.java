@@ -126,4 +126,8 @@ public class Participant extends AggregateRoot {
     public void setProfile(ProfileDetails profile) {
         this.profile = profile;
     }
+
+    public User getUser() {
+        return user;
+    }
 }

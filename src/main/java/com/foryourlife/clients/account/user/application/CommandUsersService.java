@@ -45,11 +45,10 @@ public class CommandUsersService {
         commandGeneralUserService.save(user.getUser());
 
         var role = this._rolRepository.getInitRole();
-        throw new BaseException("Token expired", List.of("The token " + user.getInvitationToken() + " was used"));
-//        user.setParticipantLevel(role);
-//        this._userRepository.save(user);
-//        this._clientModuleRepository.createClientModule(ClientModule.create(UUID.randomUUID().toString(), false, false, false, user));
-//        this.bus.publish(user.pullDomainEvents());
+        user.setParticipantLevel(role);
+        this._userRepository.save(user);
+        this._clientModuleRepository.createClientModule(ClientModule.create(UUID.randomUUID().toString(), false, false, false, user));
+        this.bus.publish(user.pullDomainEvents());
     }
 
     public void save(Participant user) {

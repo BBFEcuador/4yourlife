@@ -4,6 +4,8 @@ import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class StaffFinderService {
     private final StaffRepository _repository;
@@ -18,5 +20,9 @@ public class StaffFinderService {
 
     public Staff findByUserId(String userId){
         return _repository.findByUserId(userId);
+    }
+
+    public List<Staff> getAll(){
+        return _repository.findAll();
     }
 }

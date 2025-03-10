@@ -24,9 +24,9 @@ public class StaffController {
     }
 
 
-    @GetMapping("{userId}")
+    @GetMapping("")
     public ResponseEntity<?> findStaffByUserId(@PathVariable String userId) {
-        return new ResponseEntity<>(staffFinderService.findByUserId(userId), HttpStatus.OK);
+        return new ResponseEntity<>(staffFinderService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

@@ -2,11 +2,14 @@ package com.foryourlife.visionary.infrastructure.httpControllers;
 
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.visionary.domain.Visionary;
+import jakarta.validation.constraints.NotNull;
 
 public class VisionaryRequest {
-    private String id;
-    private String role;
-    private User user;
+    public String id;
+    @NotNull
+    public String role;
+    @NotNull
+    public User user;
 
     public String getId() {
         return id;

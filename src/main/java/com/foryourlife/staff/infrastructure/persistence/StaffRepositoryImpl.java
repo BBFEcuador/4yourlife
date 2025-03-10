@@ -4,6 +4,7 @@ import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,6 +23,11 @@ public class StaffRepositoryImpl implements StaffRepository {
     @Override
     public Optional<Staff> findById(String id) {
         return repository.findById(id);
+    }
+
+    @Override
+    public List<Staff> findAll() {
+        return repository.findAll();
     }
 
     @Override

@@ -1,7 +1,5 @@
 package com.foryourlife.staff.domain;
 
-import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 
@@ -20,29 +18,25 @@ public class Staff {
 
     }
 
-    public Staff(String id, Training trainingId, Participant participant, User user) {
+    private Staff(String id, String rol, User user) {
         this.id = id;
-
+        this.rol = rol;
         this.user = user;
+    }
+
+    public static Staff create(String id, String rol, User user){
+        return new Staff(id, rol, user);
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getRol() {
+        return rol;
     }
 
     public User getUser() {
         return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public static Staff create(String id, Training training, Participant participant, User user){
-        return new Staff(id, training, participant, user);
     }
 }

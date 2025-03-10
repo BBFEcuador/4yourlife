@@ -33,8 +33,8 @@ public class UserController {
     }
 
     @PutMapping("")
-    public ResponseEntity<?> updateUser(@RequestBody UpdateUserRequest participant) {
-//        commandUsersService.update(participant.toDomain());
+    public ResponseEntity<?> updateUser(@RequestBody UserRequest participant) {
+        commandUsersService.update(participant.toDomain());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

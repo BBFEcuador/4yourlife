@@ -65,8 +65,7 @@ public class CommandUsersService {
     }
 
     public void update(Participant user) {
-        ;
-        if (this._userRepository.findById(user.getId()).isEmpty())
+        if (this._userRepository.findByEmail(user.getId()).isEmpty())
             throw new UserNotFoundException("The Id: " + user.getId() + " doesn't exist.");
         try {
             var auxUser = this._userRepository.findById(user.getId()).get();

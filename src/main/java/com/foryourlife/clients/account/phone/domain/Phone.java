@@ -16,7 +16,7 @@ public class Phone {
     protected Phone() {
     }
 
-    public Phone(String id, String phone, Participant user) {
+    private Phone(String id, String phone, Participant user) {
         this.id = id;
         this.phone = phone;
         this.user = user;

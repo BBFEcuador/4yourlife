@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class VisionaryRepositoryImpl implements VisionaryRepository {
@@ -14,9 +13,6 @@ public class VisionaryRepositoryImpl implements VisionaryRepository {
 
     @Override
     public void save(Visionary visionary) {
-        if (visionary.getId() == null) {
-            visionary.setId(UUID.randomUUID().toString());
-        }
         repository.save(visionary);
     }
 

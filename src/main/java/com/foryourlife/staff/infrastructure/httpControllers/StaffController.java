@@ -1,8 +1,7 @@
-package com.foryourlife.staff.staffUser.infrastructure.httpControllers;
+package com.foryourlife.staff.infrastructure.httpControllers;
 
-import com.foryourlife.staff.staffUser.application.StaffCreatorService;
-import com.foryourlife.staff.staffUser.application.StaffFinderService;
-import com.foryourlife.staff.staffUser.domain.Staff;
+import com.foryourlife.staff.application.StaffCreatorService;
+import com.foryourlife.staff.application.StaffFinderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

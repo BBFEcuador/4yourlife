@@ -1,7 +1,6 @@
-package com.foryourlife.staff.staffUser.domain;
+package com.foryourlife.staff.domain;
 
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;

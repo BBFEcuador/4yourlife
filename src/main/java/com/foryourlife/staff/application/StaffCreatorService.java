@@ -1,7 +1,7 @@
-package com.foryourlife.staff.staffUser.application;
+package com.foryourlife.staff.application;
 
-import com.foryourlife.staff.staffUser.domain.Staff;
-import com.foryourlife.staff.staffUser.domain.StaffRepository;
+import com.foryourlife.staff.domain.Staff;
+import com.foryourlife.staff.domain.StaffRepository;
 import org.springframework.stereotype.Service;
 
 @Service

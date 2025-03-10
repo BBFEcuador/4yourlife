@@ -1,10 +1,9 @@
-package com.foryourlife.staff.staffUser.infrastructure.httpControllers;
+package com.foryourlife.staff.infrastructure.httpControllers;
 
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.user.User;
-import com.foryourlife.staff.staffUser.domain.Staff;
-import org.springframework.data.domain.PageImpl;
+import com.foryourlife.staff.domain.Staff;
 
 public class StaffRequest {
 

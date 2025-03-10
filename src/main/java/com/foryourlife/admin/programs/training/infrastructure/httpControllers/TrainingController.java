@@ -85,13 +85,13 @@ public class TrainingController {
                         List.of(new Filter(
                                 "courseLevel",
                                 CourseLevel.FOCUS.toString(),
-                                "",
+                                null,
                                 Filter.Operation.EQUAL,
                                 Filter.LogicalOperator.AND
                         ),new Filter(
                                 "originalTeam",
                                 null,
-                                "",
+                                null,
                                 Filter.Operation.IS_NULL,
                                 Filter.LogicalOperator.AND
                         )), Optional.empty(), Optional.empty()
@@ -103,13 +103,13 @@ public class TrainingController {
                         List.of(new Filter(
                                 "courseLevel",
                                 CourseLevel.YOUR.name(),
-                                "",
+                                null,
                                 Filter.Operation.EQUAL,
                                 Filter.LogicalOperator.AND
                         ),new Filter(
                                 "originalTeam",
                                 null,
-                                "",
+                                null,
                                 Filter.Operation.IS_NULL,
                                 Filter.LogicalOperator.AND
                         )), Optional.empty(), Optional.empty()
@@ -121,13 +121,13 @@ public class TrainingController {
                         List.of(new Filter(
                                 "courseLevel",
                                 CourseLevel.LIFE.name(),
-                                "",
+                                null,
                                 Filter.Operation.EQUAL,
                                 Filter.LogicalOperator.AND
                         ),new Filter(
                                 "originalTeam",
                                 null,
-                                "",
+                                null,
                                 Filter.Operation.IS_NULL,
                                 Filter.LogicalOperator.AND
                         )), Optional.empty(), Optional.empty()

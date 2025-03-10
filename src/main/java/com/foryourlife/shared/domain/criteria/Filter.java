@@ -15,9 +15,10 @@ public class Filter {
         this.logicalOperator = logicalOperator;
     }
 
-    public enum Operation{
-        EQUAL, LIKE, IN, GREATER_THAN, LESS_THAN, BETWEEN, JOIN, GET_LAST,IS_NULL;
+    public enum Operation {
+        EQUAL, LIKE, IN, GREATER_THAN, LESS_THAN, BETWEEN, JOIN, GET_LAST, IS_NULL, IS_NOT, IS_EMPTY;
     }
+
     public enum LogicalOperator {
         AND,
         OR

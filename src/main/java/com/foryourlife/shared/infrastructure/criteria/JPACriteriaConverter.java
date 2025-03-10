@@ -28,32 +28,38 @@ public class JPACriteriaConverter<T> {
             List<Predicate> orPredicates = new ArrayList<>();
 
             for (Filter filter : criteria.getFilters()) {
+                From<?, ?> join = root;
+                if (filter.getJoinTable() != null && !filter.getJoinTable().isEmpty()) {
+                    for (String table : filter.getJoinTable().split("\\.")) {
+                        join = join.join(table);
+                    }
+                }
                 Predicate predicate = switch (filter.getOperation()) {
-                    case EQUAL -> criteriaBuilder.equal(root.get(filter.getColumn()), criteriaBuilder.literal(filter.getValue()));
-                    case LIKE -> criteriaBuilder.like(root.get(filter.getColumn()), criteriaBuilder.literal("%" + filter.getValue() + "%"));
+                    case EQUAL ->
+                            criteriaBuilder.equal(join.get(filter.getColumn()), criteriaBuilder.literal(filter.getValue()));
+                    case LIKE ->
+                            criteriaBuilder.like(join.get(filter.getColumn()), criteriaBuilder.literal("%" + filter.getValue() + "%"));
                     case IN -> {
                         String[] split = filter.getValue().split(",");
-                        yield root.get(filter.getColumn()).in(Arrays.asList(split));
+                        yield join.get(filter.getColumn()).in(Arrays.asList(split));
                     }
-                    case GREATER_THAN -> criteriaBuilder.greaterThan(root.get(filter.getColumn()), filter.getValue());
-                    case LESS_THAN -> criteriaBuilder.lessThan(root.get(filter.getColumn()), filter.getValue());
+                    case GREATER_THAN -> criteriaBuilder.greaterThan(join.get(filter.getColumn()), filter.getValue());
+                    case LESS_THAN -> criteriaBuilder.lessThan(join.get(filter.getColumn()), filter.getValue());
                     case BETWEEN -> {
                         String[] split1 = filter.getValue().split(",");
-                        yield criteriaBuilder.between(root.get(filter.getColumn()), Long.parseLong(split1[0]), Long.parseLong(split1[1]));
+                        yield criteriaBuilder.between(join.get(filter.getColumn()), Long.parseLong(split1[0]), Long.parseLong(split1[1]));
                     }
                     case JOIN -> {
-                        From<?, ?> join = root;
-                        for (String table : filter.getJoinTable().split("\\.")) {
-                            join = join.join(table);
-                        }
-
                         yield criteriaBuilder.equal(join.get(filter.getColumn()), criteriaBuilder.literal(filter.getValue()));
                     }
                     case GET_LAST -> {
-                        query.orderBy(criteriaBuilder.desc(root.get(filter.getColumn())));
+                        query.orderBy(criteriaBuilder.desc(join.get(filter.getColumn())));
                         yield criteriaBuilder.conjunction();
                     }
-                    case IS_NULL ->  criteriaBuilder.isNull(root.get(filter.getColumn()));
+                    case IS_NULL -> criteriaBuilder.isNull(join.get(filter.getColumn()));
+                    case IS_NOT ->
+                            criteriaBuilder.notEqual(join.get(filter.getColumn()), criteriaBuilder.literal(filter.getValue()));
+                    case IS_EMPTY -> criteriaBuilder.isEmpty(join.get(filter.getColumn()));
                     default -> throw new IllegalStateException("Unexpected value: ");
                 };
 

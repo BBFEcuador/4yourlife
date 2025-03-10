@@ -4,6 +4,7 @@ import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.trainer.domain.TrainerRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,9 @@ public class TrainerFinderService {
 
     public List<Trainer> findTrainers(){
         return repository.getTrainers();
+    }
+    public List<Trainer> findTrainersAvailable(LocalDate startDate, LocalDate endDate){
+        return repository.getAvailableTrainers(startDate,endDate);
     }
 
     public Optional<Trainer> findTrainerById(String trainerId) {

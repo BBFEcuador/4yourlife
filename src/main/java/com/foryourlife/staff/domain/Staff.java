@@ -10,12 +10,8 @@ import jakarta.persistence.*;
 public class Staff {
     @Id
     private String id;
-    @ManyToOne
-    @JoinColumn(name = "training_id", referencedColumnName = "id")
-    private Training trainingId;
-    @OneToOne
-    @JoinColumn(name = "participant_id", referencedColumnName = "id")
-    private Participant participant;
+
+    private String rol;
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
@@ -26,8 +22,7 @@ public class Staff {
 
     public Staff(String id, Training trainingId, Participant participant, User user) {
         this.id = id;
-        this.trainingId = trainingId;
-        this.participant = participant;
+
         this.user = user;
     }
 
@@ -37,22 +32,6 @@ public class Staff {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public Training getTrainingId() {
-        return trainingId;
-    }
-
-    public void setTrainingId(Training trainingId) {
-        this.trainingId = trainingId;
-    }
-
-    public Participant getParticipant() {
-        return participant;
-    }
-
-    public void setParticipant(Participant participant) {
-        this.participant = participant;
     }
 
     public User getUser() {

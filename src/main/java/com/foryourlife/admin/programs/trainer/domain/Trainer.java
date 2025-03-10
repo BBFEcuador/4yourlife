@@ -23,9 +23,6 @@ public class Trainer {
 
     private Boolean isActive;
 
-    @OneToMany(mappedBy = "trainer", targetEntity = Team.class)
-    @JsonBackReference
-    private List<Team> team = new ArrayList<>();
 
     protected Trainer() {
     }

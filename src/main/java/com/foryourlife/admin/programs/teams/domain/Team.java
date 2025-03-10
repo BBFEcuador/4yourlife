@@ -40,7 +40,6 @@ public class Team extends AggregateRoot{
     private List<Participant> masterLife = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
-    @JsonManagedReference
     private Trainer trainer;
 
     @Transient

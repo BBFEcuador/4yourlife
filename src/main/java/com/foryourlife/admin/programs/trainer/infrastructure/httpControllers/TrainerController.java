@@ -41,6 +41,10 @@ public class TrainerController {
     public ResponseEntity<List<Trainer>> getAllTrainers() {
         return new ResponseEntity<>(trainerFinderService.findTrainers(), HttpStatus.OK);
     }
+    @PostMapping("/available")
+    public ResponseEntity<List<Trainer>> getTrainers(@Valid @RequestBody AvailableTrainerRequest request) {
+        return new ResponseEntity<>(trainerFinderService.findTrainersAvailable(request.startDate,request.endDate), HttpStatus.OK);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Trainer>> getTrainerById(@PathVariable String id) {

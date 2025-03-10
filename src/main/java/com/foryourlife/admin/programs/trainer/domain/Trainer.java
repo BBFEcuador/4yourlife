@@ -1,10 +1,11 @@
 package com.foryourlife.admin.programs.trainer.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.foryourlife.admin.programs.teams.domain.Team;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "trainers")
@@ -22,6 +23,10 @@ public class Trainer {
 
     private Boolean isActive;
 
+    @OneToMany(mappedBy = "trainer", targetEntity = Team.class)
+    @JsonBackReference
+    private List<Team> team = new ArrayList<>();
+
     protected Trainer() {
     }
 
@@ -33,7 +38,6 @@ public class Trainer {
         this.password = password;
         this.isActive = isActive;
     }
-
 
 
     public String getId() {

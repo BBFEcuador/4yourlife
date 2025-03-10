@@ -1,6 +1,7 @@
 package com.foryourlife.admin.programs.teams.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.user.domain.Participant;
@@ -39,6 +40,7 @@ public class Team extends AggregateRoot{
     private List<Participant> masterLife = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
+    @JsonManagedReference
     private Trainer trainer;
 
     @Transient

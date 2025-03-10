@@ -58,4 +58,7 @@ public class User {
 
     protected User() {
     }
+    public List<UserEntities> getEntityMap() {
+        return entityMap;
+    }
 }

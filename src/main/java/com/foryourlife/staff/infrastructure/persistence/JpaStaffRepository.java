@@ -1,6 +1,6 @@
-package com.foryourlife.staff.staffUser.infrastructure.persistence;
+package com.foryourlife.staff.infrastructure.persistence;
 
-import com.foryourlife.staff.staffUser.domain.Staff;
+import com.foryourlife.staff.domain.Staff;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

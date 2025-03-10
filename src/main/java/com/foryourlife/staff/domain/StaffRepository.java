@@ -1,4 +1,4 @@
-package com.foryourlife.staff.staffUser.domain;
+package com.foryourlife.staff.domain;
 
 import java.util.Optional;
 

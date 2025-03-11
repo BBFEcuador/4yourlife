@@ -5,6 +5,7 @@ import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -28,5 +29,8 @@ public class StaffFinderService {
     }
     public List<Staff> match(Criteria criteria){
         return _repository.match(criteria);
+    }
+    public List<Staff> findAvailableStaff(LocalDate startDate, LocalDate endDate){
+        return _repository.findAvailableStaff(startDate,endDate);
     }
 }

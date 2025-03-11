@@ -1,11 +1,13 @@
 package com.foryourlife.staff.infrastructure.httpControllers;
 
+import com.foryourlife.admin.programs.trainer.infrastructure.httpControllers.AvailableTrainerRequest;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.staff.application.StaffCreatorService;
 import com.foryourlife.staff.application.StaffFinderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,64 +49,8 @@ public class StaffController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/staff-available/{lvl}")
-    public ResponseEntity<?> getForTeam(@PathVariable String lvl) {
-        switch (lvl) {
-            case "FOCUS" -> {
-                var criteria = new Criteria(
-                        List.of(new Filter(
-                                "courseLevel",
-                                CourseLevel.FOCUS.toString(),
-                                "participantLevel",
-                                Filter.Operation.EQUAL,
-                                Filter.LogicalOperator.AND
-                        ), new Filter(
-                                "teams",
-                                null,
-                                null,
-                                Filter.Operation.IS_EMPTY,
-                                Filter.LogicalOperator.AND
-                        )), Optional.empty(), Optional.empty()
-                );
-                return new ResponseEntity<>(staffFinderService.match(criteria), HttpStatus.OK);
-            }
-            case "YOUR" -> {
-                var criteria = new Criteria(
-                        List.of(new Filter(
-                                "courseLevel",
-                                CourseLevel.YOUR.toString(),
-                                "participantLevel",
-                                Filter.Operation.EQUAL,
-                                Filter.LogicalOperator.AND
-                        ), new Filter(
-                                "teams",
-                                null,
-                                null,
-                                Filter.Operation.IS_EMPTY,
-                                Filter.LogicalOperator.AND
-                        )), Optional.empty(), Optional.empty()
-                );
-                return new ResponseEntity<>(staffFinderService.match(criteria), HttpStatus.OK);
-            }
-            case "LIFE" -> {
-                var criteria = new Criteria(
-                        List.of(new Filter(
-                                "courseLevel",
-                                CourseLevel.LIFE.toString(),
-                                "participantLevel",
-                                Filter.Operation.EQUAL,
-                                Filter.LogicalOperator.AND
-                        ), new Filter(
-                                "teams",
-                                null,
-                                null,
-                                Filter.Operation.IS_EMPTY,
-                                Filter.LogicalOperator.AND
-                        )), Optional.empty(), Optional.empty()
-                );
-                return new ResponseEntity<>(staffFinderService.match(criteria), HttpStatus.OK);
-            }
-            default -> throw new BaseException("Illegal argument", List.of("Type must be FOCUS, YOUR or LIFE"));
-        }
+    @PostMapping("/staff-available")
+    public ResponseEntity<?> getForTeam(@Valid @RequestBody AvailableTrainerRequest request) {
+        return new ResponseEntity<>(staffFinderService.findAvailableStaff(request.startDate, request.endDate), HttpStatus.OK);
     }
 }

@@ -14,6 +14,9 @@ public class Staff {
     private String id;
 
     private String rol;
+
+    private Boolean isActive;
+
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
@@ -25,14 +28,15 @@ public class Staff {
 
     }
 
-    private Staff(String id, String rol, User user) {
+    private Staff(String id, String rol,Boolean isActive, User user) {
         this.id = id;
         this.rol = rol;
+        this.isActive = isActive;
         this.user = user;
     }
 
-    public static Staff create(String id, String rol, User user) {
-        return new Staff(id, rol, user);
+    public static Staff create(String id, String rol, Boolean isActive, User user){
+        return new Staff(id, rol, isActive, user);
     }
 
     public String getId() {
@@ -41,6 +45,14 @@ public class Staff {
 
     public String getRol() {
         return rol;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 
     public User getUser() {

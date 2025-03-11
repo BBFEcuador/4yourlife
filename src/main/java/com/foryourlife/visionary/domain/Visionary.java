@@ -9,6 +9,7 @@ public class Visionary {
     @Id
     private String id;
     private String role;
+    private Boolean isActive;
     @OneToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
@@ -16,9 +17,10 @@ public class Visionary {
     protected Visionary() {
     }
 
-    private Visionary(String id, String role, User user) {
+    private Visionary(String id, String role, Boolean isActive, User user) {
         this.id = id;
         this.role = role;
+        this.isActive = isActive;
         this.user = user;
     }
 
@@ -46,7 +48,15 @@ public class Visionary {
         this.user = user;
     }
 
-    public static Visionary create(String id, String role, User user){
-        return new Visionary(id, role, user);
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
+    public static Visionary create(String id, String role, Boolean isActive, User user){
+        return new Visionary(id, role, isActive, user);
     }
 }

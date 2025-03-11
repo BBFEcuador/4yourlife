@@ -15,4 +15,6 @@ public interface VisionaryRepository {
     List<Visionary> findAll();
 
     List<Visionary> match(Criteria criteria);
+
+    Visionary findByUserId(String userId);
 }

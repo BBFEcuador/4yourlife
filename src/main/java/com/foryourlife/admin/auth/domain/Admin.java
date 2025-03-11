@@ -104,4 +104,12 @@ private boolean isActive;
     public Set<Campus> getCampus() {
         return campus;
     }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

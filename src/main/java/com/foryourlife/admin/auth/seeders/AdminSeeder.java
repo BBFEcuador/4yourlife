@@ -36,7 +36,7 @@ public class AdminSeeder {
     CommandLineRunner initAdmin() {
         return args -> {
             campusRepository.save(Campus.create("61d88b2a-a22e-4cb0-8e43-e036483039d6", "Ecuador", "Quito", "Av. Lo que sea", "094456123"));
-            var user = new User("72efe963-52b5-439a-ada2-3ea7b0258b89", "diegofyl@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "Diego FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "Admin")));
+            var user = new User("72efe963-52b5-439a-ada2-3ea7b0258b89", "diegofyl@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "Diego FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN")));
             userRepository.save(user);
             Admin admin = new Admin(
                     "3936ae5e-0cc1-4375-abc7-520d16999110",

@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +36,7 @@ public class UserController {
     }
 
     @PutMapping("")
-    public ResponseEntity<?> updateUser(@RequestBody UserRequest participant) {
+    public ResponseEntity<?> updateUser(@RequestBody ParticipantRequest participant) {
         commandUsersService.update(participant.toDomain());
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -114,5 +113,11 @@ public class UserController {
             }
             default -> throw new BaseException("Illegal argument", List.of("Type must be FOCUS, YOUR or LIFE"));
         }
+    }
+
+    @PostMapping("/create-from-admin")
+    public ResponseEntity<?> createFromAdmin(@RequestBody ParticipantRequest participant) {
+        commandUsersService.createFromAdmin(participant.toDomain());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

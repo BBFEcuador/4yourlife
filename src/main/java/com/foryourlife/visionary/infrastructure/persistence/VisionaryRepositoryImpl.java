@@ -11,8 +11,13 @@ import java.util.Optional;
 
 @Service
 public class VisionaryRepositoryImpl implements VisionaryRepository {
-    private JpaVisionaryRepository repository;
-    private JPACriteriaConverter<Visionary> converter;
+    private static JpaVisionaryRepository repository;
+    private static JPACriteriaConverter<Visionary> converter;
+
+    public VisionaryRepositoryImpl(JpaVisionaryRepository repository, JPACriteriaConverter<Visionary> converter) {
+        VisionaryRepositoryImpl.repository = repository;
+        VisionaryRepositoryImpl.converter = converter;
+    }
 
     @Override
     public void save(Visionary visionary) {
@@ -37,5 +42,10 @@ public class VisionaryRepositoryImpl implements VisionaryRepository {
     @Override
     public List<Visionary> match(Criteria criteria) {
         return repository.findAll(converter.getJpaSpecifications(criteria));
+    }
+
+    @Override
+    public Visionary findByUserId(String userId) {
+        return repository.findByUser_Id(userId);
     }
 }

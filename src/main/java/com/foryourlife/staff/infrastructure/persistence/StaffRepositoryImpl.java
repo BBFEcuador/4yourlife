@@ -6,6 +6,7 @@ import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,11 @@ public class StaffRepositoryImpl implements StaffRepository {
     @Override
     public List<Staff> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public List<Staff> findAvailableStaff(LocalDate startDate, LocalDate endDate) {
+        return repository.findAvailableStaff(startDate, endDate);
     }
 
     @Override

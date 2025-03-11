@@ -1,5 +1,7 @@
 package com.foryourlife.staff.infrastructure.persistence;
 
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import java.util.Optional;
 @Service
 public class StaffRepositoryImpl implements StaffRepository {
     private static JpaStaffRepository repository;
+    private static JPACriteriaConverter<Staff> criteriaConverter;
 
     public StaffRepositoryImpl(JpaStaffRepository repository) {
         StaffRepositoryImpl.repository = repository;
@@ -28,6 +31,11 @@ public class StaffRepositoryImpl implements StaffRepository {
     @Override
     public List<Staff> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public List<Staff> match(Criteria criteria) {
+        return repository.findAll(criteriaConverter.getJpaSpecifications(criteria));
     }
 
     @Override

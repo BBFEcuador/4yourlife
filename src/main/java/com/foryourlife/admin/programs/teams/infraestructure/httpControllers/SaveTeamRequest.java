@@ -65,14 +65,6 @@ public class SaveTeamRequest {
     }
 
     public Team toDomain() {
-        return Team.create(
-                id != null ? id : UUID.randomUUID().toString(),
-                name,
-                photo,
-                training,
-                trainingNumber,
-                users,
-                trainer
-        );
+        return null;
     }
 }

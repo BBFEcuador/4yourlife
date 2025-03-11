@@ -50,18 +50,18 @@ public class CommandTeamService {
     }
 
     public void saveHttp(TeamRequest request) {
-        var training = queryTrainingService.getTrainingById(request.training);
-        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
-        var users = request.users.stream().map(participant -> {
-            var p = _userRepository.findById(participant.getId()).orElseThrow();
-            if (p.getTeam() != null){
-                throw new BaseException("User not available",List.of("The user "+p.getName()+" has team"));
-            }
-            return p;
-        }).collect(Collectors.toList());
-        var team = Team.create(request.id != null ? request.id : UUID.randomUUID().toString(), request.name, request.photo, training, training.getNumber(), users, trainer);
-        this._teamRepository.save(team);
-        this.bus.publish(team.pullDomainEvents());
+//        var training = queryTrainingService.getTrainingById(request.training);
+//        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+//        var users = request.users.stream().map(participant -> {
+//            var p = _userRepository.findById(participant.getId()).orElseThrow();
+//            if (p.getTeam() != null){
+//                throw new BaseException("User not available",List.of("The user "+p.getName()+" has team"));
+//            }
+//            return p;
+//        }).collect(Collectors.toList());
+//        var team = Team.create(request.id != null ? request.id : UUID.randomUUID().toString(), request.name, request.photo, training, training.getNumber(), users, trainer);
+//        this._teamRepository.save(team);
+//        this.bus.publish(team.pullDomainEvents());
     }
 
     public void update(Team team) {

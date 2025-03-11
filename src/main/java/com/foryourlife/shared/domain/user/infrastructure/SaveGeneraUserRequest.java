@@ -16,14 +16,12 @@ public class SaveGeneraUserRequest {
     @NotNull
     @Email
     public String email;
-    @NotNull
+
     public String password;
     @NotNull
     public String name;
     @NotNull
     public String phone;
-
-    private PasswordEncoder encoder;
 
     public SaveGeneraUserRequest(String id, String email, String password, String name, String phone) {
         this.id = id;
@@ -37,7 +35,7 @@ public class SaveGeneraUserRequest {
         return new User(
                 id != null ? id: UUID.randomUUID().toString(),
                 email,
-                encoder.encode(password),
+                password,
                 name,
                 phone,
                 entity

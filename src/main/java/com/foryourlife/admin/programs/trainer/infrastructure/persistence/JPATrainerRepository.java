@@ -24,7 +24,7 @@ public interface JPATrainerRepository extends JpaRepository<Trainer, String> {
                     JOIN tm.training tr
                     WHERE (
                         (:startDate BETWEEN tr.startDate.value AND tr.endDate.value)
-                        OR (:endDate BETWEEN tr.startDate.value AND tr.endDate.value) 
+                        OR (:endDate BETWEEN tr.startDate.value AND tr.endDate.value)
                         OR (tr.startDate.value BETWEEN :startDate AND :endDate)
                         OR (tr.endDate.value BETWEEN :startDate AND :endDate)
                     )

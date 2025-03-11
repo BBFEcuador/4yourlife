@@ -1,5 +1,6 @@
 package com.foryourlife.staff.application;
 
+import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,8 @@ public class StaffFinderService {
 
     public List<Staff> getAll(){
         return _repository.findAll();
+    }
+    public List<Staff> match(Criteria criteria){
+        return _repository.match(criteria);
     }
 }

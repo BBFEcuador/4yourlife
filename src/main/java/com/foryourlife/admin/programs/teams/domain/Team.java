@@ -8,6 +8,8 @@ import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.TeamCreated;
 import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
+import com.foryourlife.staff.domain.Staff;
+import com.foryourlife.visionary.domain.Visionary;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -42,6 +44,20 @@ public class Team extends AggregateRoot{
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
     private Trainer trainer;
 
+    @ManyToMany(cascade = {CascadeType.MERGE})
+    @JoinTable(
+            name = "team_staff",
+            joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "staff_id", referencedColumnName = "id"))
+    private List<Staff> staffs = new ArrayList<>();
+
+    @ManyToMany(cascade = {CascadeType.MERGE})
+    @JoinTable(
+            name = "team_visionary",
+            joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "visionary_id", referencedColumnName = "id"))
+    private List<Visionary> visionaries = new ArrayList<>();
+
     @Transient
     @Value("${api.url}")
     private String baseUrl;
@@ -49,7 +65,7 @@ public class Team extends AggregateRoot{
     protected Team() {
     }
 
-    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer) {
+    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer, List<Staff> staffs , List<Visionary> visionaries) {
         this.id = id;
         this.name = name;
         this.photo = photo;
@@ -57,10 +73,12 @@ public class Team extends AggregateRoot{
         this.trainingNumber = trainingNumber;
         this.users = users;
         this.trainer = trainer;
+        this.staffs = staffs;
+        this.visionaries = visionaries;
     }
 
-    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer) {
-        var team = new Team(id, name, photo, trainingId, trainingNumber, users,trainer);
+    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer, List<Staff> staffs , List<Visionary> visionaries) {
+        var team = new Team(id, name, photo, trainingId, trainingNumber, users,trainer,staffs,visionaries);
         team.setTraining(trainingId);
         team.record(new TeamCreated(id, team));
         return team;
@@ -113,6 +131,14 @@ public class Team extends AggregateRoot{
 
     public Trainer getTrainer() {
         return trainer;
+    }
+
+    public List<Staff> getStaffs() {
+        return staffs;
+    }
+
+    public List<Visionary> getVisionaries() {
+        return visionaries;
     }
 
     @Override

@@ -1,7 +1,11 @@
 package com.foryourlife.staff.domain;
 
+import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "staffs")
@@ -14,7 +18,10 @@ public class Staff {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    protected Staff(){
+    @ManyToMany(mappedBy = "staffs", targetEntity = Team.class, fetch = FetchType.EAGER)
+    private Set<Team> teams = new HashSet<>();
+
+    protected Staff() {
 
     }
 
@@ -24,7 +31,7 @@ public class Staff {
         this.user = user;
     }
 
-    public static Staff create(String id, String rol, User user){
+    public static Staff create(String id, String rol, User user) {
         return new Staff(id, rol, user);
     }
 
@@ -38,5 +45,9 @@ public class Staff {
 
     public User getUser() {
         return user;
+    }
+
+    public Set<Team> getTeams() {
+        return teams;
     }
 }

@@ -13,4 +13,5 @@ public interface UserRepository {
     List<Participant> getAll();
     List<Participant> match(Criteria criteria);
     void save(Participant user);
+    Participant findByUserId(String userId);
 }

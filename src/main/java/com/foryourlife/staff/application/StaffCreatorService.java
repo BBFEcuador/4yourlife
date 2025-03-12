@@ -1,7 +1,10 @@
 package com.foryourlife.staff.application;
 
+import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.user.UserEntities;
 import com.foryourlife.shared.domain.user.UserRepository;
+import com.foryourlife.shared.domain.user.UserType;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,13 +15,15 @@ import java.util.List;
 @Service
 public class StaffCreatorService {
     private final StaffRepository _repository;
-    private final UserRepository userRepository;
+    private final UserRepository _userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AdminRepository _adminRepository;
 
-    public StaffCreatorService(StaffRepository _repository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public StaffCreatorService(StaffRepository _repository, UserRepository userRepository, PasswordEncoder passwordEncoder, AdminRepository adminRepository) {
         this._repository = _repository;
-        this.userRepository = userRepository;
+        this._userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this._adminRepository = adminRepository;
     }
 
     public void create(Staff staff){
@@ -27,7 +32,7 @@ public class StaffCreatorService {
             user.setPassword(user.getEmail());
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        _userRepository.save(user);
         if (staff.getActive() == null)
             staff.setActive(true);
         _repository.save(staff);
@@ -39,4 +44,18 @@ public class StaffCreatorService {
         _repository.save(staff);
     }
 
+    public void createFromAdmin(Staff staff) {
+        if (_repository.findByUserId(staff.getUser().getId()) != null) {
+            throw new BaseException("The user is already a Staff", List.of("Already exist as staff"));
+        }
+
+        var admin = _adminRepository.findByUserId(staff.getUser().getId()).orElseThrow(() ->
+                new BaseException("User not found", List.of("User does not exist"))
+        );
+
+        var user = admin.getUser();
+        user.getEntityMap().add(new UserEntities(staff.getId(), UserType.STAFF.name()));
+        _userRepository.save(user);
+        _repository.save(staff);
+    }
 }

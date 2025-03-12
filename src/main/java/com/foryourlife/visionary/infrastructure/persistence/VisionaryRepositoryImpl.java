@@ -1,5 +1,7 @@
 package com.foryourlife.visionary.infrastructure.persistence;
 
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import com.foryourlife.visionary.domain.Visionary;
 import com.foryourlife.visionary.domain.VisionaryRepository;
 import org.springframework.stereotype.Service;
@@ -10,10 +12,12 @@ import java.util.Optional;
 
 @Service
 public class VisionaryRepositoryImpl implements VisionaryRepository {
-    private final JpaVisionaryRepository repository;
+    private static JpaVisionaryRepository repository;
+    private static JPACriteriaConverter<Visionary> converter;
 
-    public VisionaryRepositoryImpl(JpaVisionaryRepository repository) {
-        this.repository = repository;
+    public VisionaryRepositoryImpl(JpaVisionaryRepository repository, JPACriteriaConverter<Visionary> converter) {
+        VisionaryRepositoryImpl.repository = repository;
+        VisionaryRepositoryImpl.converter = converter;
     }
 
     @Override
@@ -39,5 +43,15 @@ public class VisionaryRepositoryImpl implements VisionaryRepository {
     @Override
     public List<Visionary> findAvailableVisionaries(LocalDate startDate, LocalDate endDate) {
         return repository.findAvailableVisionaries(startDate,endDate);
+    }
+
+    @Override
+    public List<Visionary> match(Criteria criteria) {
+        return repository.findAll(converter.getJpaSpecifications(criteria));
+    }
+
+    @Override
+    public Optional<Visionary> findByUserId(String userId) {
+        return repository.findByUser_Id(userId);
     }
 }

@@ -1,7 +1,10 @@
 package com.foryourlife.visionary.application;
 
+import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.user.UserEntities;
 import com.foryourlife.shared.domain.user.UserRepository;
+import com.foryourlife.shared.domain.user.UserType;
 import com.foryourlife.visionary.domain.Visionary;
 import com.foryourlife.visionary.domain.VisionaryRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,11 +16,13 @@ import java.util.List;
 @Service
 public class VisionaryCreatorService {
     private final VisionaryRepository repository;
+    private final AdminRepository _adminRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public VisionaryCreatorService(VisionaryRepository repository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public VisionaryCreatorService(VisionaryRepository repository, AdminRepository adminRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        _adminRepository = adminRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -38,6 +43,21 @@ public class VisionaryCreatorService {
     public void changeStatus(String visionaryId) {
         var visionary = repository.findById(visionaryId).orElseThrow(() -> new BaseException("Not Found", List.of()));
         visionary.changeStatus();
+        repository.save(visionary);
+    }
+
+    public void createFromAdmin(Visionary visionary) {
+        if (repository.findByUserId(visionary.getUser().getId()).isPresent()) {
+            throw new BaseException("The user is already a Visionary", List.of("Already exist as visionary"));
+        }
+
+        var admin = _adminRepository.findByUserId(visionary.getUser().getId()).orElseThrow(() ->
+                new BaseException("User not found", List.of("User does not exist"))
+        );
+
+        var user = admin.getUser();
+        user.getEntityMap().add(new UserEntities(visionary.getId(), UserType.STAFF.name()));
+        userRepository.save(user);
         repository.save(visionary);
     }
 }

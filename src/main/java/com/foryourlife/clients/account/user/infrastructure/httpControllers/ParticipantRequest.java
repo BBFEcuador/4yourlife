@@ -7,7 +7,7 @@ import com.foryourlife.shared.domain.user.User;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 
-public class UserRequest {
+public class ParticipantRequest {
 
     @Null
     private String id;

@@ -53,4 +53,10 @@ public class StaffController {
     public ResponseEntity<?> getForTeam(@Valid @RequestBody AvailableTrainerRequest request) {
         return new ResponseEntity<>(staffFinderService.findAvailableStaff(request.startDate, request.endDate), HttpStatus.OK);
     }
+
+    @PostMapping("/staff-admin")
+    public ResponseEntity<?> createFromAdmin(@Valid @RequestBody StaffAdminRequest request){
+            staffService.createFromAdmin(request.toDomain());
+            return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }

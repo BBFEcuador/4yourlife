@@ -67,6 +67,11 @@ public class AdminRepositoryImpl implements AdminRepository {
         this.repository.deleteById(id);
     }
 
+    @Override
+    public Optional<Admin> findByUserId(String userId) {
+            return repository.findByUser_id(userId);
+    }
+
     private Authentication authenticate(String username, String password) throws BaseException {
         this.loadAdminByUsername(username);
         var userDetails = this.loadAdminByUsername(username);

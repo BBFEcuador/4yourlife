@@ -10,4 +10,5 @@ public interface AdminRepository {
     List<Admin> getAll();
     Admin save(Admin admin);
     void deleteById(String id);
+    Optional<Admin> findByUserId(String userId);
 }

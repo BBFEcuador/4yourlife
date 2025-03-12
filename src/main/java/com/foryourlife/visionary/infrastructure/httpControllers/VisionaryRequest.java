@@ -1,6 +1,5 @@
 package com.foryourlife.visionary.infrastructure.httpControllers;
 
-import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserEntities;
 import com.foryourlife.shared.domain.user.UserType;
 import com.foryourlife.shared.domain.user.infrastructure.SaveGeneraUserRequest;
@@ -17,8 +16,7 @@ public class VisionaryRequest {
     @NotNull
     @NotBlank(message = "Role must not be null")
     public String role;
-    @NotNull
-    private Boolean isActive;
+    private Boolean active;
     @NotNull
     @Valid
     public SaveGeneraUserRequest user;
@@ -32,7 +30,7 @@ public class VisionaryRequest {
     }
 
     public Boolean getActive() {
-        return isActive;
+        return active;
     }
 
     public SaveGeneraUserRequest getUser() {
@@ -41,6 +39,6 @@ public class VisionaryRequest {
 
     public Visionary toDomain() {
         var newId = id != null ? id : UUID.randomUUID().toString();
-        return Visionary.create(newId, role, isActive, user.toDomain(List.of(new UserEntities(newId, UserType.VISIONARY.toString()))));
+        return Visionary.create(newId, role, active, user.toDomain(List.of(new UserEntities(newId, UserType.VISIONARY.toString()))));
     }
 }

@@ -1,10 +1,14 @@
 package com.foryourlife.admin.programs.training.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.foryourlife.clients.account.profileDetails.domain.UserBirthday;
 import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.persistence.Embeddable;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Embeddable
@@ -25,8 +29,14 @@ public class StartDate {
         }
         return value;
     }
-
+    @JsonValue
     public LocalDate getValue() {
         return value;
     }
+
+    @JsonCreator
+    public static StartDate fromValue(LocalDate value) {
+        return new StartDate(value);
+    }
 }
+

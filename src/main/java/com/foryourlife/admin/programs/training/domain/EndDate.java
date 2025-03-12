@@ -1,5 +1,7 @@
 package com.foryourlife.admin.programs.training.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.foryourlife.shared.domain.exception.BaseException;
 
 import java.time.DayOfWeek;
@@ -26,7 +28,12 @@ public class EndDate {
         return value;
     }
 
+    @JsonValue
     public LocalDate getValue() {
         return value;
+    }
+    @JsonCreator
+    public static EndDate fromValue(LocalDate value) {
+        return new EndDate(value);
     }
 }

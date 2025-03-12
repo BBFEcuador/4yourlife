@@ -43,9 +43,9 @@ public class StaffController {
         return new ResponseEntity<>(staffFinderService.findById(id), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/change-status/{id}")
     public ResponseEntity<?> deleteStaff(@PathVariable String id) {
-        staffService.delete(id);
+        staffService.changeStatus(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

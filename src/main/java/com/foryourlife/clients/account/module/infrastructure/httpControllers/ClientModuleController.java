@@ -2,6 +2,7 @@ package com.foryourlife.clients.account.module.infrastructure.httpControllers;
 
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.module.application.ClientModuleFinderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class ClientModuleController {
     private ClientModuleFinderService clientModuleFinderService;
 
     @PutMapping("update")
-    public ResponseEntity<?> updateClientModule(@RequestBody ClientModuleRequest request) {
+    public ResponseEntity<?> updateClientModule(@Valid @RequestBody ClientModuleRequest request) {
         clientModuleService.createClientModule(request.toDomain());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

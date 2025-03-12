@@ -77,7 +77,7 @@ public class TrainingController {
         return new ResponseEntity<>(queryTrainingService.getAllTrainings(), HttpStatus.OK);
     }
 
-    @GetMapping("/filter/{lvl}")
+    @PostMapping("/filter/{lvl}")
     public ResponseEntity<?> getByLevel(@PathVariable String lvl) {
         switch (lvl) {
             case "FOCUS" -> {
@@ -88,7 +88,7 @@ public class TrainingController {
                                 null,
                                 Filter.Operation.EQUAL,
                                 Filter.LogicalOperator.AND
-                        ),new Filter(
+                        ), new Filter(
                                 "originalTeam",
                                 null,
                                 null,
@@ -106,7 +106,7 @@ public class TrainingController {
                                 null,
                                 Filter.Operation.EQUAL,
                                 Filter.LogicalOperator.AND
-                        ),new Filter(
+                        ), new Filter(
                                 "originalTeam",
                                 null,
                                 null,
@@ -124,7 +124,7 @@ public class TrainingController {
                                 null,
                                 Filter.Operation.EQUAL,
                                 Filter.LogicalOperator.AND
-                        ),new Filter(
+                        ), new Filter(
                                 "originalTeam",
                                 null,
                                 null,

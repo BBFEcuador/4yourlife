@@ -40,9 +40,15 @@ public class TeamController {
         return new ResponseEntity<>(this.queryTeamService.getPhoto(id), HttpStatus.OK);
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<?> saveTeam(@Valid @RequestBody TeamRequest request) {
-        commandTeamService.saveHttp(request);
+    @PostMapping("/save/focus")
+    public ResponseEntity<?> saveTeamFocus(@Valid @RequestBody SaveFocusTeamsRequest request) {
+        commandTeamService.saveFocusTeam(request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/save/your")
+    public ResponseEntity<?> saveTeamYour(@Valid @RequestBody SaveYourTeamRequest request) {
+        commandTeamService.saveYourTeam(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

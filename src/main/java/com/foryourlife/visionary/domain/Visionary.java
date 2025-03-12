@@ -1,7 +1,11 @@
 package com.foryourlife.visionary.domain;
 
+import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "visionaries")
@@ -9,10 +13,13 @@ public class Visionary {
     @Id
     private String id;
     private String role;
-    private Boolean isActive;
+    private Boolean isActive = true;
     @OneToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
+
+    @ManyToMany(mappedBy = "visionaries", targetEntity = Team.class, fetch = FetchType.EAGER)
+    private Set<Team> teams = new HashSet<>();
 
     protected Visionary() {
     }
@@ -54,6 +61,14 @@ public class Visionary {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    public Set<Team> getTeams() {
+        return teams;
+    }
+
+    public void changeStatus(){
+        this.isActive = !this.isActive;
     }
 
     public static Visionary create(String id, String role, Boolean isActive, User user){

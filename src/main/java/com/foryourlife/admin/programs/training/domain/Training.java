@@ -134,14 +134,14 @@ public class Training extends AggregateRoot implements Serializable {
             throw new BaseException("Level problem", List.of("Only focus"));
         }
         var trainingList = new ArrayList<Training>();
-        var life = new Training(UUID.randomUUID().toString(), this.number, setName(this.number), setDates(this.startDate.getValue(), 3), setDates(this.endDate.getValue(), 3), CourseLevel.LIFE, null, campus, true);
+        var life = new Training(UUID.randomUUID().toString(), this.number, computedName(this.number), computedDate(this.startDate.getValue(), 3), computedDate(this.endDate.getValue(), 3), CourseLevel.LIFE, null, campus, true);
 
         this.nextLevel = new Training(
                 UUID.randomUUID().toString(),
                 this.number,
-                setName(this.number),
-                setDates(this.startDate.getValue(), 2),
-                setDates(this.endDate.getValue(), 2),
+                computedName(this.number),
+                computedDate(this.startDate.getValue(), 2),
+                computedDate(this.endDate.getValue(), 2),
                 CourseLevel.YOUR,
                 life,
                 campus,
@@ -158,7 +158,7 @@ public class Training extends AggregateRoot implements Serializable {
         var life = new Training(
                 UUID.randomUUID().toString(),
                 nexFocusNumber,
-                setName(nexFocusNumber),
+                computedName(nexFocusNumber),
                 startDate.plusWeeks(3),
                 startDate.plusWeeks(3).plusDays(2),
                 CourseLevel.LIFE,
@@ -170,7 +170,7 @@ public class Training extends AggregateRoot implements Serializable {
         var your = new Training(
                 UUID.randomUUID().toString(),
                 nexFocusNumber,
-                setName(nexFocusNumber),
+                computedName(nexFocusNumber),
                 startDate.plusWeeks(2),
                 startDate.plusWeeks(2).plusDays(2),
                 CourseLevel.YOUR,
@@ -182,7 +182,7 @@ public class Training extends AggregateRoot implements Serializable {
         return new Training(
                 UUID.randomUUID().toString(),
                 nexFocusNumber,
-                setName(nexFocusNumber),
+                computedName(nexFocusNumber),
                 startDate,
                 startDate.plusDays(2),
                 CourseLevel.FOCUS,
@@ -192,11 +192,11 @@ public class Training extends AggregateRoot implements Serializable {
         );
     }
 
-    private String setName(Integer number) {
+    private String computedName(Integer number) {
         return this.campus.getCity() + "-" + number;
     }
 
-    private LocalDate setDates(LocalDate date, Integer weeks) {
+    private LocalDate computedDate(LocalDate date, Integer weeks) {
         return date.plusWeeks(weeks);
     }
 

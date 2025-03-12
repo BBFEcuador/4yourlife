@@ -65,7 +65,7 @@ public class Team extends AggregateRoot{
     protected Team() {
     }
 
-    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer, List<Staff> staffs , List<Visionary> visionaries) {
+    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer, List<Staff> staffs , List<Visionary> visionaries, List<Participant> masterLife) {
         this.id = id;
         this.name = name;
         this.photo = photo;
@@ -75,10 +75,11 @@ public class Team extends AggregateRoot{
         this.trainer = trainer;
         this.staffs = staffs;
         this.visionaries = visionaries;
+        this.masterLife = masterLife;
     }
 
-    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer, List<Staff> staffs , List<Visionary> visionaries) {
-        var team = new Team(id, name, photo, trainingId, trainingNumber, users,trainer,staffs,visionaries);
+    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer, List<Staff> staffs , List<Visionary> visionaries, List<Participant> masterLife) {
+        var team = new Team(id, name, photo, trainingId, trainingNumber, users,trainer,staffs,visionaries,masterLife);
         team.setTraining(trainingId);
         team.record(new TeamCreated(id, team));
         return team;

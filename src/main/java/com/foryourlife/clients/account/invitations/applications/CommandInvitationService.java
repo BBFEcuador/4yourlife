@@ -39,16 +39,10 @@ public class CommandInvitationService {
     }
 
     public String createInvitationByAdmin(String id) {
-        try {
-            var user = adminFinderService.findById(id);
-            var token = UUID.randomUUID().toString();
-            var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getName(), user.getEmail()));
-            this.repository.save(invitation);
-            return token;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            logger.error(e.getMessage(), e);
-        }
-        return null;
+        var user = adminFinderService.findById(id);
+        var token = UUID.randomUUID().toString();
+        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getName(), user.getEmail()));
+        this.repository.save(invitation);
+        return token;
     }
 }

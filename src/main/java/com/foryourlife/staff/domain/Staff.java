@@ -15,7 +15,7 @@ public class Staff {
 
     private String rol;
 
-    private Boolean isActive;
+    private Boolean isActive = true;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -61,5 +61,9 @@ public class Staff {
 
     public Set<Team> getTeams() {
         return teams;
+    }
+
+    public void changeStatus(){
+        this.isActive = !this.isActive;
     }
 }

@@ -1,10 +1,13 @@
 package com.foryourlife.staff.application;
 
+import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class StaffCreatorService {
@@ -25,11 +28,15 @@ public class StaffCreatorService {
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+        if (staff.getActive() == null)
+            staff.setActive(true);
         _repository.save(staff);
     }
 
-    public void delete(String id){
-        _repository.deleteById(id);
+    public void changeStatus(String visionaryId){
+        var staff = _repository.findById(visionaryId).orElseThrow(() -> new BaseException("Not Found", List.of()));
+        staff.changeStatus();
+        _repository.save(staff);
     }
 
 }

@@ -3,11 +3,13 @@ package com.foryourlife.clients.account.module.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.shared.domain.AggregateRoot;
+import com.foryourlife.shared.domain.events.ClientModulesUpdated;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "client_modules")
-public class ClientModule {
+public class ClientModule extends AggregateRoot {
     @Id
     private String id;
     private Boolean hasFocus;
@@ -70,6 +72,8 @@ public class ClientModule {
     }
 
     public static ClientModule create(String id, Boolean hasFocus, Boolean hasYour, Boolean hasLife, Participant user) {
-        return new ClientModule(id, hasFocus, hasYour, hasLife, user);
+        var clientModule = new ClientModule(id, hasFocus, hasYour, hasLife, user);
+        clientModule.record(new ClientModulesUpdated(clientModule));
+        return clientModule;
     }
 }

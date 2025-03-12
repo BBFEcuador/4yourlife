@@ -15,12 +15,12 @@ public class StaffRequest {
     @NotNull
     public String rol;
     @NotNull
-    public Boolean isActive;
+    public Boolean active;
     @NotNull
     @Valid
     public SaveGeneraUserRequest user;
     public Staff toDomain(){
         var newId = id != null ? id : UUID.randomUUID().toString();
-        return Staff.create(newId, rol, isActive,user.toDomain(List.of(new UserEntities(newId, UserType.STAFF.toString()))));
+        return Staff.create(newId, rol, active,user.toDomain(List.of(new UserEntities(newId, UserType.STAFF.toString()))));
     }
 }

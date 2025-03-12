@@ -130,4 +130,8 @@ public class Participant extends AggregateRoot {
     public User getUser() {
         return user;
     }
+
+    public void updateLvl(ParticipantLevel newLvl){
+        this.participantLevel = newLvl;
+    }
 }

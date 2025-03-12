@@ -2,6 +2,8 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.SaveFocusTeamsRequest;
+import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.SaveYourTeamRequest;
 import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.TeamRequest;
 import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
@@ -10,6 +12,10 @@ import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.staff.domain.Staff;
+import com.foryourlife.staff.domain.StaffRepository;
+import com.foryourlife.visionary.domain.Visionary;
+import com.foryourlife.visionary.domain.VisionaryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,15 +37,19 @@ public class CommandTeamService {
     private final TeamRepository _teamRepository;
     private final EventBus bus;
     private final UserRepository _userRepository;
+    private final StaffRepository staffRepository;
+    private final VisionaryRepository visionaryRepository;
     private final QueryTrainingService queryTrainingService;
     private final TrainerFinderService trainerFinderService;
     private final QueryTeamService queryTeamService;
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
 
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, UserRepository _userRepository, QueryTrainingService queryTrainingService, TrainerFinderService trainerFinderService, QueryTeamService queryTeamService) {
+    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, UserRepository _userRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerFinderService trainerFinderService, QueryTeamService queryTeamService) {
         this._teamRepository = _teamRepository;
         this.bus = bus;
         this._userRepository = _userRepository;
+        this.staffRepository = staffRepository;
+        this.visionaryRepository = visionaryRepository;
         this.queryTrainingService = queryTrainingService;
         this.trainerFinderService = trainerFinderService;
         this.queryTeamService = queryTeamService;
@@ -62,6 +73,67 @@ public class CommandTeamService {
 //        var team = Team.create(request.id != null ? request.id : UUID.randomUUID().toString(), request.name, request.photo, training, training.getNumber(), users, trainer);
 //        this._teamRepository.save(team);
 //        this.bus.publish(team.pullDomainEvents());
+    }
+
+    public void saveFocusTeam(SaveFocusTeamsRequest request) {
+        var training = queryTrainingService.getTrainingById(request.training);
+        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+        var users = request.users.stream().map(participant -> {
+            var p = _userRepository.findById(participant.getId()).orElseThrow();
+            if (p.getTeam() != null) {
+                throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
+            }
+            return p;
+        }).toList();
+        var staff = request.staffs.stream().map(participant -> {
+            var p = staffRepository.findById(participant.getId()).orElseThrow();
+            return p;
+        }).toList();
+        var visionaries = request.visionaries.stream().map(participant -> {
+            var p = visionaryRepository.findById(participant.getId()).orElseThrow();
+            return p;
+        }).toList();
+        var team = Team.create(
+                request.id != null ? request.id : UUID.randomUUID().toString(),
+                request.name,
+                null,
+                training,
+                training.getNumber(),
+                users,
+                trainer,
+                staff,
+                visionaries,
+                new ArrayList<>()
+        );
+        this._teamRepository.save(team);
+        this.bus.publish(team.pullDomainEvents());
+    }
+    public void saveYourTeam(SaveYourTeamRequest request) {
+        var training = queryTrainingService.getTrainingById(request.training);
+        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+        var users = request.users.stream().map(participant -> {
+            var p = _userRepository.findById(participant.getId()).orElseThrow();
+            if (p.getTeam() != null) {
+                throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
+            }
+            return p;
+        }).toList();
+        var staff = request.staffs.stream().map(participant -> {
+            var p = staffRepository.findById(participant.getId()).orElseThrow();
+            return p;
+        }).toList();
+        var team = Team.create(
+                request.id != null ? request.id : UUID.randomUUID().toString(),
+                request.name,
+                null,
+                training,
+                training.getNumber(),
+                users,
+                trainer,
+                staff,
+                new ArrayList<>(),
+                new ArrayList<>()
+        );
     }
 
     public void update(Team team) {

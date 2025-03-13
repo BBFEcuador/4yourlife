@@ -1,4 +1,4 @@
-package com.foryourlife.admin.programs.teams.infraestructure.httpControllers;
+package com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
@@ -6,8 +6,6 @@ import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.user.domain.Participant;
 
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 public class SaveTeamRequest {
     public String id;

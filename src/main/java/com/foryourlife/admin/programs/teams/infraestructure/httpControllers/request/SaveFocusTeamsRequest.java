@@ -1,13 +1,14 @@
-package com.foryourlife.admin.programs.teams.infraestructure.httpControllers;
+package com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request;
 
 import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.staff.domain.Staff;
+import com.foryourlife.visionary.domain.Visionary;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
-public class SaveYourTeamRequest {
+public class SaveFocusTeamsRequest {
     public String id;
     @NotNull
     public String name;
@@ -16,6 +17,9 @@ public class SaveYourTeamRequest {
     @NotNull
     @Size(min = 1)
     public List<Participant> users;
+    @NotNull
+    @Size(min = 1)
+    public List<Visionary> visionaries;
     @NotNull
     @Size(min = 1)
     public List<Staff> staffs;

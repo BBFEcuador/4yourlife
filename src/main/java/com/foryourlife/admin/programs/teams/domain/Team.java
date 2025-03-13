@@ -12,12 +12,16 @@ import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.visionary.domain.Visionary;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "teams")
-public class Team extends AggregateRoot{
+public class Team extends AggregateRoot {
     @Id
     private String id;
     private String name;
@@ -58,14 +62,10 @@ public class Team extends AggregateRoot{
             inverseJoinColumns = @JoinColumn(name = "visionary_id", referencedColumnName = "id"))
     private List<Visionary> visionaries = new ArrayList<>();
 
-    @Transient
-    @Value("${api.url}")
-    private String baseUrl;
-
     protected Team() {
     }
 
-    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer, List<Staff> staffs , List<Visionary> visionaries, List<Participant> masterLife) {
+    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users, Trainer trainer, List<Staff> staffs, List<Visionary> visionaries, List<Participant> masterLife) {
         this.id = id;
         this.name = name;
         this.photo = photo;
@@ -78,8 +78,8 @@ public class Team extends AggregateRoot{
         this.masterLife = masterLife;
     }
 
-    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users,Trainer trainer, List<Staff> staffs , List<Visionary> visionaries, List<Participant> masterLife) {
-        var team = new Team(id, name, photo, trainingId, trainingNumber, users,trainer,staffs,visionaries,masterLife);
+    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users, Trainer trainer, List<Staff> staffs, List<Visionary> visionaries, List<Participant> masterLife) {
+        var team = new Team(id, name, photo, trainingId, trainingNumber, users, trainer, staffs, visionaries, masterLife);
         team.setTraining(trainingId);
         team.record(new TeamCreated(id, team));
         return team;
@@ -94,7 +94,7 @@ public class Team extends AggregateRoot{
     }
 
     public String getPhoto() {
-        return (photo != null && !photo.isEmpty()) ? baseUrl + photo : baseUrl + "resources/assets/teamPhotos/DefaultTeam.png";
+        return (photo != null && !photo.isEmpty()) ? photo : "api/resources/static/teamPhotos/DefaultTeam.png";
     }
 
     public Training getTraining() {
@@ -104,6 +104,7 @@ public class Team extends AggregateRoot{
     public Integer getTrainingNumber() {
         return trainingNumber;
     }
+
     @JsonIgnore
     public List<Participant> getUsers() {
         return users;
@@ -123,7 +124,7 @@ public class Team extends AggregateRoot{
 
     public void setTraining(Training newTraining) {
         this.training = newTraining;
-        this.record(new TeamToTrainingAssigned(this.id, this,newTraining));
+        this.record(new TeamToTrainingAssigned(this.id, this, newTraining));
     }
 
     public void setPhoto(String photo) {
@@ -154,13 +155,13 @@ public class Team extends AggregateRoot{
                 '}';
     }
 
-    public Map<String,String> getTrainingData(){
-        return new HashMap<String,String>(){{
-            put("startDate",training.getStartDate().toString());
-            put("endDate",training.getEndDate().toString());
-            put("name",training.getName());
-            put("curseLevel",training.getCourseLevel().name());
-            put("sede",training.getCampus().getCity());
+    public Map<String, String> getTrainingData() {
+        return new HashMap<String, String>() {{
+            put("startDate", training.getStartDate().toString());
+            put("endDate", training.getEndDate().toString());
+            put("name", training.getName());
+            put("curseLevel", training.getCourseLevel().name());
+            put("sede", training.getCampus().getCity());
         }};
     }
 }

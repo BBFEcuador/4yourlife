@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS participants
 (
         id text not null,
         user_id text not null,
-        invitationToken text not null unique,
+        invitationToken text not null,
         participant_level_id text,
         profile_id text,
         isLingerer BOOLEAN,

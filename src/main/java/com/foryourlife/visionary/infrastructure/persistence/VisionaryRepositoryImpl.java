@@ -54,4 +54,9 @@ public class VisionaryRepositoryImpl implements VisionaryRepository {
     public Optional<Visionary> findByUserId(String userId) {
         return repository.findByUser_Id(userId);
     }
+
+    @Override
+    public boolean isVisionaryAvailable(String visionaryId, LocalDate startDate, LocalDate endDate, String newTrainingId) {
+        return repository.isVisionaryAvailable(visionaryId, startDate, endDate, newTrainingId);
+    }
 }

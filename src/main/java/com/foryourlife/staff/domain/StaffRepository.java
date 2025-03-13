@@ -16,4 +16,5 @@ public interface StaffRepository {
 
     void deleteById(String id);
     Staff findByUserId(String participantId);
+    boolean isStaffAvailable(String staffId, LocalDate startDate, LocalDate endDate, String newTrainingId);
 }

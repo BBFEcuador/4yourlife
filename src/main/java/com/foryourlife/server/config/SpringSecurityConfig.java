@@ -30,7 +30,7 @@ public class SpringSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        String[] unauthorizedRoutes = {"/metric/**", "/server/**", "/actuator/**", "/auth/**", "/admin/login", "/swagger-ui/**", "/swagger-ui.html/**", "/v3/api-docs/**"};
+        String[] unauthorizedRoutes = {"/metric/**", "/server/**", "/actuator/**", "/auth/**", "/admin/login", "/swagger-ui/**", "/swagger-ui.html/**", "/v3/api-docs/**","/public/**"};
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> {

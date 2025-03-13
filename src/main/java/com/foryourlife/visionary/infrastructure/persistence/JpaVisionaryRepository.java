@@ -1,6 +1,5 @@
 package com.foryourlife.visionary.infrastructure.persistence;
 
-import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.visionary.domain.Visionary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -15,7 +14,9 @@ import java.util.Optional;
 @Repository
 public interface JpaVisionaryRepository extends JpaRepository<Visionary, String>, JpaSpecificationExecutor<Visionary> {
     List<Visionary> findAllByUser_Id(String userId);
+
     Optional<Visionary> findByUser_Id(String userId);
+
     @Query("""
                 SELECT s FROM Visionary s
                 WHERE NOT EXISTS (
@@ -27,7 +28,7 @@ public interface JpaVisionaryRepository extends JpaRepository<Visionary, String>
                     JOIN s2.teams t2
                     JOIN t2.training tr
                     WHERE (
-                        (:startDate BETWEEN tr.startDate.value AND tr.endDate.value) 
+                        (:startDate BETWEEN tr.startDate.value AND tr.endDate.value)
                         OR (:endDate BETWEEN tr.startDate.value AND tr.endDate.value) 
                         OR (tr.startDate.value BETWEEN :startDate AND :endDate)
                         OR (tr.endDate.value BETWEEN :startDate AND :endDate)
@@ -35,4 +36,16 @@ public interface JpaVisionaryRepository extends JpaRepository<Visionary, String>
                 )
             """)
     List<Visionary> findAvailableVisionaries(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    @Query("""
+                SELECT COUNT(s) > 0 FROM Visionary s
+                WHERE s.id = :visionaryId
+                AND NOT EXISTS (
+                    SELECT t FROM Team t
+                    JOIN t.training tr
+                    WHERE t MEMBER OF s.teams
+                    AND tr.startDate BETWEEN :startDate AND :endDate
+                    AND tr.id <> :newTrainingId
+                )
+            """)
+    boolean isVisionaryAvailable(String visionaryId, LocalDate startDate, LocalDate endDate, String newTrainingId);
 }

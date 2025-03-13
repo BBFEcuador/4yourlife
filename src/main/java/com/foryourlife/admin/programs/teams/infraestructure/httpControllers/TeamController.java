@@ -2,6 +2,10 @@ package com.foryourlife.admin.programs.teams.infraestructure.httpControllers;
 
 import com.foryourlife.admin.programs.teams.application.CommandTeamService;
 import com.foryourlife.admin.programs.teams.application.QueryTeamService;
+import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.SaveFocusTeamsRequest;
+import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.SaveLifeTeamRequest;
+import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.SaveTeamRequest;
+import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.SaveYourTeamRequest;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.validation.Valid;
@@ -45,9 +49,26 @@ public class TeamController {
         commandTeamService.saveFocusTeam(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+    @PostMapping("/save/life")
+    public ResponseEntity<?> saveTeamLife(@Valid @RequestBody SaveLifeTeamRequest request) {
+        commandTeamService.saveLifeTeam(request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 
     @PostMapping("/save/your")
     public ResponseEntity<?> saveTeamYour(@Valid @RequestBody SaveYourTeamRequest request) {
+        commandTeamService.saveYourTeam(request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/promotion/life")
+    public ResponseEntity<?> promoTeamToLife(@Valid @RequestBody SaveLifeTeamRequest request) {
+        commandTeamService.saveLifeTeam(request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/promotion/your")
+    public ResponseEntity<?> promoTeamToYour(@Valid @RequestBody SaveYourTeamRequest request) {
         commandTeamService.saveYourTeam(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

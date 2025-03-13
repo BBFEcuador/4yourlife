@@ -53,4 +53,10 @@ public class StaffRepositoryImpl implements StaffRepository {
     public Staff findByUserId(String userId) {
         return repository.findByUser_Id(userId);
     }
+
+    @Override
+    public boolean isStaffAvailable(String staffId, LocalDate startDate, LocalDate endDate, String newTrainingId) {
+        return repository.isStaffAvailable(staffId, startDate, endDate, newTrainingId);
+    }
+
 }

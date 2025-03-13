@@ -39,6 +39,9 @@ public class Participant extends AggregateRoot {
     @ManyToMany(mappedBy = "users", targetEntity = Team.class, fetch = FetchType.EAGER)
     private Set<Team> teams = new HashSet<>();
 
+    @ManyToMany(mappedBy = "masterLife", targetEntity = Team.class, fetch = FetchType.EAGER)
+    private Set<Team> masterLifeTeams = new HashSet<>();
+
     public Team getTeam() {
         if (teams != null && !teams.isEmpty()) {
             var team = teams.stream().findFirst().get();
@@ -133,5 +136,8 @@ public class Participant extends AggregateRoot {
 
     public void updateLvl(ParticipantLevel newLvl){
         this.participantLevel = newLvl;
+    }
+    public Set<Team> getMasterLifeTeams() {
+        return masterLifeTeams;
     }
 }

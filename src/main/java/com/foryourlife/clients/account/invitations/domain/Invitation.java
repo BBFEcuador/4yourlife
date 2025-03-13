@@ -20,17 +20,19 @@ public class Invitation extends AggregateRoot {
     private Boolean isAdmin;
     private Boolean isUsed;
     private String senderId;
+    private Integer quantity;
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Sender enrolled;
 
-    private Invitation(String id, String token, Participant users, Boolean isAdmin, Boolean isUsed, String senderId, Sender enrolled) {
+    private Invitation(String id, String token, Participant users, Boolean isAdmin, Boolean isUsed, String senderId, Sender enrolled, Integer quantity) {
         this.id = id;
         this.token = token;
         this.users = users;
         this.isAdmin = isAdmin;
         this.isUsed = isUsed;
         this.senderId = senderId;
+        this.quantity = quantity;
         this.enrolled = enrolled;
     }
 
@@ -39,8 +41,8 @@ public class Invitation extends AggregateRoot {
     }
 
 
-    public static Invitation create(String id, String token, Participant users, Boolean isAdmin, String senderId, Sender enrolled) {
-        var invitation = new Invitation(id, token, users, isAdmin, false, senderId, enrolled);
+    public static Invitation create(String id, String token, Participant users, Boolean isAdmin, String senderId, Sender enrolled, Integer quantity) {
+        var invitation = new Invitation(id, token, users, isAdmin, false, senderId, enrolled, quantity);
         invitation.record(new InvitationCreated(id, invitation));
         return invitation;
     }
@@ -74,8 +76,12 @@ public class Invitation extends AggregateRoot {
         return enrolled;
     }
 
-    public void consumeToken(){
-        this.isUsed = true;
+    public void consumeToken() {
+        if (this.quantity == 0)
+            return;
+        this.quantity--;
+        if (this.quantity == 0)
+            this.isUsed = true;
     }
 
     public void setUsers(Participant users) {

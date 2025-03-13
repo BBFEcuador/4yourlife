@@ -4,6 +4,7 @@ import com.foryourlife.admin.auth.application.AdminFinderService;
 import com.foryourlife.clients.account.invitations.domain.Invitation;
 import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
 import com.foryourlife.clients.account.invitations.domain.Sender;
+import com.foryourlife.clients.account.invitations.infrastructure.InvitationRequest;
 import com.foryourlife.clients.account.user.application.CommandUsersService;
 import com.foryourlife.clients.account.user.application.QueryUsersService;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public class CommandInvitationService {
         try {
             var user = queryUsersService.getUserById(id);
             var token = UUID.randomUUID().toString();
-            var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, id, new Sender(user.getName(), user.getPhone()));
+            var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, id, new Sender(user.getName(), user.getPhone()),1);
             this.repository.save(invitation);
             return token;
         } catch (Exception e) {
@@ -41,8 +42,29 @@ public class CommandInvitationService {
     public String createInvitationByAdmin(String id) {
         var user = adminFinderService.findById(id);
         var token = UUID.randomUUID().toString();
-        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getName(), user.getEmail()));
+        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getName(), user.getEmail()),1);
         this.repository.save(invitation);
         return token;
+    }
+
+    public String createInvitationByAdminWithQuantity(InvitationRequest request) {
+        var user = adminFinderService.findById(request.id);
+        var token = UUID.randomUUID().toString();
+        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, request.id, new Sender(user.getName(), user.getEmail()),Integer.parseInt(request.quantity));
+        this.repository.save(invitation);
+        return token;
+    }
+
+    public String createInvitationByUserWithQuantity(InvitationRequest request) {
+        try {
+            var user = queryUsersService.getUserById(request.id);
+            var token = UUID.randomUUID().toString();
+            var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, request.id, new Sender(user.getName(), user.getPhone()),Integer.parseInt(request.quantity));
+            this.repository.save(invitation);
+            return token;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
     }
 }

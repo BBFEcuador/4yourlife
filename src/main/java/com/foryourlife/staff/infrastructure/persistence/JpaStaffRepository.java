@@ -34,4 +34,17 @@ public interface JpaStaffRepository extends JpaRepository<Staff, String>, JpaSpe
                 )
             """)
     List<Staff> findAvailableStaff(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("""
+                SELECT COUNT(s) > 0 FROM Staff s
+                WHERE s.id = :staffId
+                AND NOT EXISTS (
+                    SELECT t FROM Team t
+                    JOIN t.training tr
+                    WHERE t MEMBER OF s.teams
+                    AND tr.startDate BETWEEN :startDate AND :endDate
+                    AND tr.id <> :newTrainingId
+                )
+            """)
+    boolean isStaffAvailable(String staffId, LocalDate startDate, LocalDate endDate, String newTrainingId);
 }

@@ -1,8 +1,10 @@
 package com.foryourlife.admin.programs.trainer.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import jakarta.persistence.*;
+import net.datafaker.providers.food.Tea;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,8 @@ public class Trainer {
     private String password;
 
     private Boolean isActive;
-
+    @OneToMany(mappedBy = "trainer")
+    private List<Team> teams;
 
     protected Trainer() {
     }
@@ -87,5 +90,10 @@ public class Trainer {
 
     public static Trainer create(String id, String name, String email, String phone, String password, Boolean isActive) {
         return new Trainer(id, name, email, phone, password, isActive);
+    }
+
+    @JsonBackReference
+    public List<Team> getTeams() {
+        return teams;
     }
 }

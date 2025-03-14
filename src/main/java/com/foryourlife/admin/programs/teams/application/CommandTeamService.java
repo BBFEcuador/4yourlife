@@ -2,10 +2,7 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
-import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.PromotionYourRequest;
-import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.SaveFocusTeamsRequest;
-import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.SaveLifeTeamRequest;
-import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.SaveYourTeamRequest;
+import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.*;
 import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
 import com.foryourlife.clients.account.user.domain.UserRepository;
@@ -292,5 +289,38 @@ public class CommandTeamService {
         photo.transferTo(dest);
 
         return relativeFilePath;
+    }
+
+    public void promotionLifeTeam(PromotionLifeRequest request) {
+        var team = _teamRepository.findById(request.id).orElseThrow();
+        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+        var training = team.getTraining().getNextLevel();
+        var users = request.users.stream().map(participant -> {
+            var p = _userRepository.findById(participant.getId()).orElseThrow();
+            if (p.getTeam().getId() != team.getId()) {
+                throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
+            }
+            return p;
+        }).toList();
+        var masterLife = request.masterLife.stream().map(participant -> {
+            var p = _userRepository.findById(participant.getId()).orElseThrow();
+            if (!_userRepository.isMasterLifeAvailable(p.getId(), training.getStartDate(), training.getEndDate(), training.getId())) {
+                throw new BaseException("Master life not available", List.of("The user " + p.getUser().getName() + " has team"));
+            }
+            return p;
+        }).toList();
+        var n = Team.create(
+                team.getId(),
+                team.getName(),
+                team.getPhoto(),
+                training,
+                training.getNumber(),
+                users,
+                trainer,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                masterLife
+        );
+        _teamRepository.save(n);
     }
 }

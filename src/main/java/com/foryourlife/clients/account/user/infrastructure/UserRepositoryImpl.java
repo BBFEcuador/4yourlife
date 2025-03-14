@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -93,5 +94,10 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Participant findByUserId(String userId) {
         return repository.findByUser_Id(userId);
+    }
+
+    @Override
+    public boolean isMasterLifeAvailable(String participantId, LocalDate startDate, LocalDate endDate, String newTrainingId) {
+        return repository.isMasterLifeAvailable(participantId, startDate, endDate, newTrainingId);
     }
 }

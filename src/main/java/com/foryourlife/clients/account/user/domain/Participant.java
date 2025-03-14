@@ -1,5 +1,7 @@
 package com.foryourlife.clients.account.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.clients.account.contact.domain.Contact;
 import com.foryourlife.clients.account.module.domain.ClientModule;
@@ -11,6 +13,7 @@ import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 import org.hibernate.Hibernate;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +21,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "participants")
-public class Participant extends AggregateRoot {
+public class Participant extends AggregateRoot implements Serializable {
     @Id
     private String id;
     @OneToOne()

@@ -1,6 +1,6 @@
 package com.foryourlife.admin.programs.teams.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
@@ -11,9 +11,8 @@ import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.visionary.domain.Visionary;
 import jakarta.persistence.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.Map;
 
 @Entity
 @Table(name = "teams")
-public class Team extends AggregateRoot {
+public class Team extends AggregateRoot implements Serializable {
     @Id
     private String id;
     private String name;
@@ -37,12 +36,14 @@ public class Team extends AggregateRoot {
             name = "team_users",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"))
+    @JsonIgnoreProperties("team")
     private List<Participant> users = new ArrayList<>();
     @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "team_master_life",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "masterlife_id", referencedColumnName = "id"))
+    @JsonIgnoreProperties("team")
     private List<Participant> masterLife = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
@@ -105,7 +106,6 @@ public class Team extends AggregateRoot {
         return trainingNumber;
     }
 
-    @JsonIgnore
     public List<Participant> getUsers() {
         return users;
     }

@@ -63,10 +63,19 @@ public class TrainingController {
                 case FOCUS -> "#2f49f5";
                 case YOUR -> "#f52f9c";
                 case LIFE -> "#f5922f";
+                case LIFE_2 -> "#418181";
+                case LIFE_3 -> "#b875b5";
+                case LIFE_GRADUATE -> "#24a830";
                 default -> "#00FF00";
             };
+
+            String name = switch (training.getCourseLevel()) {
+                case LIFE, LIFE_2, LIFE_3 -> training.getName() + " LIFE";
+                case LIFE_GRADUATE -> training.getName() + " GRADUACIÓN 🚀";
+                default -> training.getName() + " " + training.getCourseLevel().name();
+            };
             trainingResponse.add(
-                    new TrainingResponse(training.getId(), training.getName() + " " + training.getCourseLevel().name(), training.getStartDate(), training.getEndDate().atTime(23, 59), false, color, new TrainingResponse.ExtendedProps("Epic description", "Nice location", new String[]{"clave", "valor"}))
+                    new TrainingResponse(training.getId(), name, training.getStartDate(), training.getEndDate().atTime(23, 59), false, color, new TrainingResponse.ExtendedProps("Epic description", "Nice location", new String[]{"clave", "valor"}))
             );
         });
         return new ResponseEntity<>(trainingResponse, HttpStatus.OK);

@@ -134,7 +134,50 @@ public class Training extends AggregateRoot implements Serializable {
             throw new BaseException("Level problem", List.of("Only focus"));
         }
         var trainingList = new ArrayList<Training>();
-        var life = new Training(UUID.randomUUID().toString(), this.number, computedName(this.number), computedDate(this.startDate.getValue(), 3), computedDate(this.endDate.getValue(), 3), CourseLevel.LIFE, null, campus, true);
+        var lifeG = new Training(
+                UUID.randomUUID().toString(),
+                this.number,
+                computedLifeName(this.number,4),
+                computedDate(this.startDate.getValue(), 15),
+                computedDate(this.endDate.getValue(), 15),
+                CourseLevel.LIFE_GRADUATE,
+                null,
+                campus,
+                true
+        );
+        var life3 = new Training(
+                UUID.randomUUID().toString(),
+                this.number,
+                computedLifeName(this.number,3),
+                computedDate(this.startDate.getValue(), 13),
+                computedDate(this.endDate.getValue(), 13),
+                CourseLevel.LIFE_3,
+                lifeG,
+                campus,
+                true
+        );
+        var life2 = new Training(
+                UUID.randomUUID().toString(),
+                this.number,
+                computedLifeName(this.number,2),
+                computedDate(this.startDate.getValue(), 8),
+                computedDate(this.endDate.getValue(), 8),
+                CourseLevel.LIFE_2,
+                life3,
+                campus,
+                true
+        );
+        var life = new Training(
+                UUID.randomUUID().toString(),
+                this.number,
+                computedLifeName(this.number,1),
+                computedDate(this.startDate.getValue(), 3),
+                computedDate(this.endDate.getValue(), 3),
+                CourseLevel.LIFE,
+                life2,
+                campus,
+                true
+        );
 
         this.nextLevel = new Training(
                 UUID.randomUUID().toString(),
@@ -155,14 +198,47 @@ public class Training extends AggregateRoot implements Serializable {
     }
 
     private Training geneNext(LocalDate startDate, Integer nexFocusNumber) {
+        var lifeG = new Training(
+                UUID.randomUUID().toString(),
+                nexFocusNumber,
+                computedLifeName(nexFocusNumber,4),
+                startDate.plusWeeks(15),
+                startDate.plusWeeks(15).plusDays(2),
+                CourseLevel.LIFE_GRADUATE,
+                null,
+                campus,
+                true
+        );
+        var life3 = new Training(
+                UUID.randomUUID().toString(),
+                nexFocusNumber,
+                computedLifeName(nexFocusNumber,3),
+                startDate.plusWeeks(13),
+                startDate.plusWeeks(13).plusDays(2),
+                CourseLevel.LIFE_3,
+                lifeG,
+                campus,
+                true
+        );
+        var life2 = new Training(
+                UUID.randomUUID().toString(),
+                nexFocusNumber,
+                computedLifeName(nexFocusNumber,2),
+                startDate.plusWeeks(8),
+                startDate.plusWeeks(8).plusDays(2),
+                CourseLevel.LIFE_2,
+                life3,
+                campus,
+                true
+        );
         var life = new Training(
                 UUID.randomUUID().toString(),
                 nexFocusNumber,
-                computedName(nexFocusNumber),
+                computedLifeName(nexFocusNumber,1),
                 startDate.plusWeeks(3),
                 startDate.plusWeeks(3).plusDays(2),
                 CourseLevel.LIFE,
-                null,
+                life2,
                 campus,
                 true
         );
@@ -194,6 +270,9 @@ public class Training extends AggregateRoot implements Serializable {
 
     private String computedName(Integer number) {
         return this.campus.getCity() + "-" + number;
+    }
+    private String computedLifeName(Integer number,Integer fds) {
+        return this.campus.getCity() + "-" + number + " FDS-"+fds;
     }
 
     private LocalDate computedDate(LocalDate date, Integer weeks) {

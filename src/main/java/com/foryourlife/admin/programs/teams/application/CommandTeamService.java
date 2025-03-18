@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -150,13 +151,14 @@ public class CommandTeamService {
                 new ArrayList<>()
         );
     }
+
     public void promotionYourTeam(PromotionYourRequest request) {
-        var team = _teamRepository.findById(request.id).orElseThrow();
-        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+        var team = _teamRepository.findById(request.id).orElseThrow(() -> new BaseException("Team not found", List.of()));
+        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow(() -> new BaseException("Trainer not found", List.of()));
         var training = team.getTraining().getNextLevel();
         var users = request.users.stream().map(participant -> {
             var p = _userRepository.findById(participant.getId()).orElseThrow();
-            if (p.getTeam().getId() != team.getId()) {
+            if (p.getTeam() != null && !Objects.equals(p.getTeam().getId(), team.getId())) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
             return p;
@@ -236,6 +238,7 @@ public class CommandTeamService {
         }
         _teamRepository.removeMastersLife(teamId, userId);
     }
+
     public void removeStaffs(String teamId, String userId) {
         if (this._teamRepository.findById(teamId).isEmpty()) {
             throw new BaseException("Team not found", List.of(""));

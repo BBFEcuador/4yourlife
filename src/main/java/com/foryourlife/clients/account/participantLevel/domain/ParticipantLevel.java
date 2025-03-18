@@ -37,10 +37,6 @@ public class ParticipantLevel {
         return roleName;
     }
 
-    public Boolean getStarted() {
-        return isStarted;
-    }
-
     public CourseLevel getCourseLevel() {
         return courseLevel;
     }

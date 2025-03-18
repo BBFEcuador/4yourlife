@@ -1,7 +1,5 @@
 package com.foryourlife.clients.account.user.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.clients.account.contact.domain.Contact;
 import com.foryourlife.clients.account.module.domain.ClientModule;
@@ -43,7 +41,7 @@ public class Participant extends AggregateRoot implements Serializable {
     private Set<Team> teams = new HashSet<>();
 
     @ManyToMany(mappedBy = "masterLife", targetEntity = Team.class, fetch = FetchType.EAGER)
-    private Set<Team> masterLifeTeams = new HashSet<>();
+    private Set<Team> masterLife = new HashSet<>();
 
     public Team getTeam() {
         if (teams != null && !teams.isEmpty()) {
@@ -140,7 +138,7 @@ public class Participant extends AggregateRoot implements Serializable {
     public void updateLvl(ParticipantLevel newLvl){
         this.participantLevel = newLvl;
     }
-    public Set<Team> getMasterLifeTeams() {
-        return masterLifeTeams;
+    public Set<Team> getMasterLife() {
+        return masterLife;
     }
 }

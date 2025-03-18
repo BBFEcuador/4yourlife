@@ -23,11 +23,11 @@ public interface JPAUserRepository extends JpaRepository<Participant, String>, J
                 WHERE pl.courseLevel = 'MASTER_LIFE'
                 AND(NOT EXISTS (
                     SELECT t FROM Team t
-                    WHERE t MEMBER OF s.masterLifeTeams
+                    WHERE t MEMBER OF s.masterLife
                 )
                 OR s.id NOT IN (
                     SELECT DISTINCT s2.id FROM Participant s2
-                    JOIN s2.masterLifeTeams t2
+                    JOIN s2.masterLife t2
                     JOIN t2.training tr
                     WHERE (
                         (:startDate BETWEEN tr.startDate.value AND tr.endDate.value)
@@ -45,7 +45,7 @@ public interface JPAUserRepository extends JpaRepository<Participant, String>, J
                 AND NOT EXISTS (
                     SELECT t FROM Team t
                     JOIN t.training tr
-                    WHERE t MEMBER OF s.masterLifeTeams
+                    WHERE t MEMBER OF s.masterLife
                     AND (
                            (:startDate BETWEEN tr.startDate.value AND tr.endDate.value)
                             OR (:endDate BETWEEN tr.startDate.value AND tr.endDate.value)

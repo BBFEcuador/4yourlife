@@ -42,9 +42,9 @@ public interface JpaStaffRepository extends JpaRepository<Staff, String>, JpaSpe
                     SELECT t FROM Team t
                     JOIN t.training tr
                     WHERE t MEMBER OF s.teams
-                    WHERE (
-                        (:startDate BETWEEN tr.startDate.value AND tr.endDate.value) 
-                        OR (:endDate BETWEEN tr.startDate.value AND tr.endDate.value) 
+                    AND (
+                        (:startDate BETWEEN tr.startDate.value AND tr.endDate.value)
+                        OR (:endDate BETWEEN tr.startDate.value AND tr.endDate.value)
                         OR (tr.startDate.value BETWEEN :startDate AND :endDate)
                         OR (tr.endDate.value BETWEEN :startDate AND :endDate)
                     )

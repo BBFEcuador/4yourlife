@@ -236,6 +236,14 @@ public class CommandTeamService {
         }
         _teamRepository.removeMastersLife(teamId, userId);
     }
+    public void removeStaffs(String teamId, String userId) {
+        if (this._teamRepository.findById(teamId).isEmpty()) {
+            throw new BaseException("Team not found", List.of(""));
+        } else if (staffRepository.findById(userId).isEmpty()) {
+            throw new BaseException("Staff not found", List.of(""));
+        }
+        _teamRepository.removeStaffs(teamId, userId);
+    }
 
     public void assignTeams(String teamId, String trainingId) {
         var team = this._teamRepository.findById(teamId).orElseThrow(() ->
@@ -322,5 +330,14 @@ public class CommandTeamService {
                 masterLife
         );
         _teamRepository.save(n);
+    }
+
+    public void removeVisionaries(String teamId, String id) {
+        if (this._teamRepository.findById(teamId).isEmpty()) {
+            throw new BaseException("Team not found", List.of(""));
+        } else if (visionaryRepository.findById(id).isEmpty()) {
+            throw new BaseException("Staff not found", List.of(""));
+        }
+        _teamRepository.removeVisionaries(teamId, id);
     }
 }

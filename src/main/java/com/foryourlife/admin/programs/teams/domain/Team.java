@@ -54,6 +54,7 @@ public class Team extends AggregateRoot implements Serializable {
             name = "team_staff",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "staff_id", referencedColumnName = "id"))
+    @JsonIgnoreProperties("teams")
     private List<Staff> staffs = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.MERGE})
@@ -61,6 +62,7 @@ public class Team extends AggregateRoot implements Serializable {
             name = "team_visionary",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "visionary_id", referencedColumnName = "id"))
+    @JsonIgnoreProperties("teams")
     private List<Visionary> visionaries = new ArrayList<>();
 
     protected Team() {
@@ -120,6 +122,14 @@ public class Team extends AggregateRoot implements Serializable {
 
     public void setMasterLife(List<Participant> masterLife) {
         this.masterLife = masterLife;
+    }
+
+    public void setStaffs(List<Staff> staffs) {
+        this.staffs = staffs;
+    }
+
+    public void setVisionaries(List<Visionary> visionaries) {
+        this.visionaries = visionaries;
     }
 
     public void setTraining(Training newTraining) {

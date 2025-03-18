@@ -18,5 +18,7 @@ public interface TeamRepository {
     void assignMastersLife(String teamId, String userId);
     void removeParticipants(String teamId, String userId);
     void removeMastersLife(String teamId, String userId);
+    void removeStaffs(String teamId, String userId);
 
+    void removeVisionaries(String teamId, String id);
 }

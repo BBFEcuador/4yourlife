@@ -1,15 +1,14 @@
 package com.foryourlife.admin.programs.training.application;
 
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
-import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.shared.domain.bus.DomainEventSubscriber;
 import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
-import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @DomainEventSubscriber({TeamToTrainingAssigned.class})
@@ -28,6 +27,9 @@ public class AddOriginalTeamOnTeamAssigned {
     public void on(TeamToTrainingAssigned event) {
         var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow(() -> new RuntimeException(""));
         var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException(""));
+        Hibernate.initialize(team.getStaffs());
+        Hibernate.initialize(team.getVisionaries());
+        Hibernate.initialize(team.getMasterLife());
         training.setOriginalTeam(team);
         trainingRepository.save(training);
     }

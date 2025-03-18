@@ -4,9 +4,11 @@ import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,10 +21,14 @@ public class QueryTeamService {
     public QueryTeamService(TeamRepository _teamRepository) {
         this._teamRepository = _teamRepository;
     }
-
+    @Transactional
     public Team getTeamById(String id) {
-        return this._teamRepository.findById(id).orElseThrow(
+        var team =  this._teamRepository.findById(id).orElseThrow(
                 () -> new BaseException("Not found", List.of("The team with id " + id + " does not exist")));
+        Hibernate.initialize(team.getStaffs());
+        Hibernate.initialize(team.getMasterLife());
+        Hibernate.initialize(team.getVisionaries());
+        return team;
     }
 
     public List<Team> getAllTeams() {

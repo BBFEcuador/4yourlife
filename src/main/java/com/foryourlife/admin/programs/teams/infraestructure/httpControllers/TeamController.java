@@ -106,7 +106,7 @@ public class TeamController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/removeParticipants")
+    @PutMapping("/removeParticipants")
     public ResponseEntity<?> removeParticipants(@RequestBody AssignParticipantsRequest request) {
         for (var user : request.getUsers()) {
             commandTeamService.removeParticipants(request.getTeamId(), user.getId());
@@ -114,10 +114,25 @@ public class TeamController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/removeMasterlife")
+    @PutMapping("/removeMasterlife")
     public ResponseEntity<?> removeMasterlife(@RequestBody AssignParticipantsRequest request) {
         for (var user : request.getUsers()) {
             commandTeamService.removeMastersLife(request.getTeamId(), user.getId());
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/removeStaffs")
+    public ResponseEntity<?> removeStaffs(@RequestBody AssignParticipantsRequest request) {
+        for (var user : request.getUsers()) {
+            commandTeamService.removeStaffs(request.getTeamId(), user.getId());
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PutMapping("/removeVisionaries")
+    public ResponseEntity<?> removeVisionaries(@RequestBody AssignParticipantsRequest request) {
+        for (var user : request.getUsers()) {
+            commandTeamService.removeVisionaries(request.getTeamId(), user.getId());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }

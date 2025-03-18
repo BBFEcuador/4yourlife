@@ -8,12 +8,21 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
-    LoginResponse login(String username,String password) throws BaseException;
+    LoginResponse login(String username, String password) throws BaseException;
+
     Optional<Participant> findByEmail(String email);
+
     Optional<Participant> findById(String id);
+
     List<Participant> getAll();
+
     List<Participant> match(Criteria criteria);
+
     void save(Participant user);
+
     Participant findByUserId(String userId);
+
     boolean isMasterLifeAvailable(String participantId, LocalDate startDate, LocalDate endDate, String newTrainingId);
+
+    List<Participant> findAvailableMasterLife(LocalDate startDate, LocalDate endDate);
 }

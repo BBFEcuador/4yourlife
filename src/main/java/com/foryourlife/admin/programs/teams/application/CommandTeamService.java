@@ -308,7 +308,7 @@ public class CommandTeamService {
         var training = team.getTraining().getNextLevel();
         var users = request.users.stream().map(participant -> {
             var p = _userRepository.findById(participant.getId()).orElseThrow();
-            if (p.getTeam().getId() != team.getId()) {
+            if (p.getTeam() != null && !Objects.equals(p.getTeam().getId(), team.getId())) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
             return p;

@@ -24,7 +24,7 @@ public interface JpaVisionaryRepository extends JpaRepository<Visionary, String>
                     WHERE t MEMBER OF s.teams
                 )
                 OR s.id NOT IN (
-                    SELECT DISTINCT s2.id FROM Staff s2
+                    SELECT DISTINCT s2.id FROM Visionary s2
                     JOIN s2.teams t2
                     JOIN t2.training tr
                     WHERE (
@@ -43,7 +43,12 @@ public interface JpaVisionaryRepository extends JpaRepository<Visionary, String>
                     SELECT t FROM Team t
                     JOIN t.training tr
                     WHERE t MEMBER OF s.teams
-                    AND tr.startDate BETWEEN :startDate AND :endDate
+                    AND (
+                        (:startDate BETWEEN tr.startDate.value AND tr.endDate.value)
+                        OR (:endDate BETWEEN tr.startDate.value AND tr.endDate.value)
+                        OR (tr.startDate.value BETWEEN :startDate AND :endDate)
+                        OR (tr.endDate.value BETWEEN :startDate AND :endDate)
+                    )
                     AND tr.id <> :newTrainingId
                 )
             """)

@@ -1,19 +1,16 @@
 package com.foryourlife.clients.account.user.application;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.clients.account.user.domain.UserNotFoundException;
 import com.foryourlife.clients.account.user.domain.UserRepository;
 import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.criteria.Criteria;
-import io.swagger.v3.core.util.Json;
-import org.apache.tomcat.util.json.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class QueryUsersService {
@@ -38,5 +35,9 @@ public class QueryUsersService {
     }
     public List<Participant> matchers(Criteria criteria) {
         return this._userRepository.match(criteria);
+    }
+
+    public List<Participant> findAvailableMasterLife(LocalDate startDate, LocalDate endDate) {
+        return this._userRepository.findAvailableMasterLife(startDate,endDate);
     }
 }

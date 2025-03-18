@@ -43,7 +43,7 @@ public class Team extends AggregateRoot implements Serializable {
             name = "team_master_life",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "masterlife_id", referencedColumnName = "id"))
-    @JsonIgnoreProperties("team")
+    @JsonIgnoreProperties(value = {"teams", "masterLifeTeams"})
     private List<Participant> masterLife = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")

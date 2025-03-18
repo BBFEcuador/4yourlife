@@ -1,11 +1,13 @@
 package com.foryourlife.clients.account.user.infrastructure.httpControllers;
 
+import com.foryourlife.admin.programs.trainer.infrastructure.httpControllers.AvailableTrainerRequest;
 import com.foryourlife.clients.account.user.application.CommandUsersService;
 import com.foryourlife.clients.account.user.application.QueryUsersService;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -119,5 +121,10 @@ public class UserController {
     public ResponseEntity<?> createFromAdmin(@RequestBody ParticipantRequest participant) {
         commandUsersService.createFromAdmin(participant.toDomain());
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/master-life-available")
+    public ResponseEntity<?> getForTeam(@Valid @RequestBody AvailableTrainerRequest request) {
+        return new ResponseEntity<>(queryUsersService.findAvailableMasterLife(request.startDate, request.endDate), HttpStatus.OK);
     }
 }

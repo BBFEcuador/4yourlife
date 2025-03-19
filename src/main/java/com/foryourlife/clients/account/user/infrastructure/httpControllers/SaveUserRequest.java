@@ -37,13 +37,23 @@ public class SaveUserRequest {
     @NotNull
     @Valid
     public ProfileDetailRequest profile;
+    @NotNull
+    @Valid
+    public MedicalRecordSaveRequest medicalRecord;
 
-    public SaveUserRequest(String phone, String name, String password, String email, String id) {
+    public SaveUserRequest(String id, String email, String password, String token, String name, String phone, ProfileDetailRequest profile, MedicalRecordSaveRequest medicalRecord) {
         this.id = id;
-        this.phone = phone;
-        this.name = name;
-        this.password = password;
         this.email = email;
+        this.password = password;
+        this.token = token;
+        this.name = name;
+        this.phone = phone;
+        this.profile = profile;
+        this.medicalRecord = medicalRecord;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getEmail() {
@@ -54,6 +64,10 @@ public class SaveUserRequest {
         return password;
     }
 
+    public String getToken() {
+        return token;
+    }
+
     public String getName() {
         return name;
     }
@@ -62,8 +76,12 @@ public class SaveUserRequest {
         return phone;
     }
 
-    public String getId() {
-        return id;
+    public ProfileDetailRequest getProfile() {
+        return profile;
+    }
+
+    public MedicalRecordSaveRequest getMedicalRecord() {
+        return medicalRecord;
     }
 
     public Participant toDomain() {

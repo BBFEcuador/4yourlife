@@ -7,13 +7,13 @@ import jakarta.validation.constraints.NotNull;
 public class MedicalRecordRequest {
     @NotNull
     public String id;
-
+    @NotNull
     public String  psychiatric_history_detail;
-
+    @NotNull
     public String  medical_history_detail;
-
+    @NotNull
     public String  medication_history_detail;
-
+    @NotNull
     public Participant participant;
 
     public MedicalRecordRequest(String id, String psychiatric_history_detail, String medical_history_detail, String medication_history_detail, Participant participant) {

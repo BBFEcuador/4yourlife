@@ -2,11 +2,15 @@ package com.foryourlife.clients.account.user.application;
 
 import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
+import com.foryourlife.clients.account.medicalRecord.application.MedicalRecordCreatorService;
+import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
+import com.foryourlife.clients.account.medicalRecord.infrastructure.httpcontrollers.MedicalRecordRequest;
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
 import com.foryourlife.clients.account.user.domain.*;
+import com.foryourlife.clients.account.user.infrastructure.httpControllers.MedicalRecordSaveRequest;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -33,8 +37,9 @@ public class CommandUsersService {
     private final EventBus bus;
     private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
     private final AdminRepository _adminRepository;
+    private final MedicalRecordCreatorService medicalRecordCreatorService;
 
-    public CommandUsersService(UserRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ParticipantLevelService participantLevelService, EventBus bus, AdminRepository _adminRepository) {
+    public CommandUsersService(UserRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ParticipantLevelService participantLevelService, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService) {
         this._participantRepository = _participantRepository;
         this._userRepository = _userRepository;
         this.commandGeneralUserService = commandGeneralUserService;
@@ -44,10 +49,11 @@ public class CommandUsersService {
         this.participantLevelService = participantLevelService;
         this.bus = bus;
         this._adminRepository = _adminRepository;
+        this.medicalRecordCreatorService = medicalRecordCreatorService;
     }
 
     @Transactional
-    public void createInitUser(Participant user) {
+    public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest) {
         var token = queryInvitationServices.findInvitationByToken(user.getInvitationToken());
         if (token.getUsed())
             throw new BaseException("Token expired", List.of("The token " + user.getInvitationToken() + " was used"));
@@ -57,6 +63,14 @@ public class CommandUsersService {
         user.setParticipantLevel(role);
         this._participantRepository.save(user);
         this._clientModuleRepository.createClientModule(ClientModule.create(UUID.randomUUID().toString(), false, false, false, user));
+        var medicalRecord = MedicalRecord.create(
+                UUID.randomUUID().toString(),
+                medicalRecordRequest.psychiatric_history_detail,
+                medicalRecordRequest.medical_history_detail,
+                medicalRecordRequest.medication_history_detail,
+                user
+        );
+        medicalRecordCreatorService.createMedicalRecord(medicalRecord);
         this.bus.publish(user.pullDomainEvents());
     }
 
@@ -74,10 +88,8 @@ public class CommandUsersService {
     }
 
     public void update(Participant user) {
-        if (this._participantRepository.findByEmail(user.getId()).isEmpty())
-            throw new UserNotFoundException("The Id: " + user.getId() + " doesn't exist.");
         try {
-            var auxUser = this._participantRepository.findById(user.getId()).get();
+            var auxUser = this._participantRepository.findById(user.getId()).orElseThrow(() -> new BaseException("Participant not found",List.of()));
             this._participantRepository.save(auxUser);
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);

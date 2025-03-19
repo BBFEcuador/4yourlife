@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
-@Table(name = "MedicalRecords")
+@Table(name = "medical_records")
 public class MedicalRecord {
     @Id
     public String id;

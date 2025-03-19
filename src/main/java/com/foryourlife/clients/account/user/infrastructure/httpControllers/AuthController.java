@@ -28,7 +28,7 @@ public class AuthController {
     @PostMapping("/save")
     public ResponseEntity<?> saveUser(@Valid @RequestBody SaveUserRequest request) {
         request.password = passwordEncoder.encode((request.password));
-        userService.createInitUser(request.toDomain());
+        userService.createInitUser(request.toDomain(),request.getMedicalRecord());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

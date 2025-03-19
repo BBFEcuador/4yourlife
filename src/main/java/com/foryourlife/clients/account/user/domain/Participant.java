@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.clients.account.contact.domain.Contact;
+import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
 import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
@@ -44,6 +45,9 @@ public class Participant extends AggregateRoot implements Serializable {
     private Set<Team> teams = new HashSet<>();
     @ManyToMany(mappedBy = "masterLife", targetEntity = Team.class, fetch = FetchType.EAGER)
     private Set<Team> masterLife = new HashSet<>();
+    @OneToOne(mappedBy = "participant",targetEntity = MedicalRecord.class,fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("participant")
+    private MedicalRecord medicalRecord;
 
     public Team getTeam() {
         if (teams != null && !teams.isEmpty()) {
@@ -142,5 +146,8 @@ public class Participant extends AggregateRoot implements Serializable {
     }
     public Set<Team> getMasterLife() {
         return masterLife;
+    }
+    public MedicalRecord getMedicalRecord() {
+        return medicalRecord;
     }
 }

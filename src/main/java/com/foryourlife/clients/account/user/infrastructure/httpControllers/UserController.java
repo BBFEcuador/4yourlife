@@ -10,6 +10,7 @@ import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -126,5 +127,10 @@ public class UserController {
     @PostMapping("/master-life-available")
     public ResponseEntity<?> getForTeam(@Valid @RequestBody AvailableTrainerRequest request) {
         return new ResponseEntity<>(queryUsersService.findAvailableMasterLife(request.startDate, request.endDate), HttpStatus.OK);
+    }
+    @PostMapping("/promotion-master/{id}")
+    public ResponseEntity<?> promotionMasterLife(@PathVariable String id) {
+        commandUsersService.promotionToMasterLife(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

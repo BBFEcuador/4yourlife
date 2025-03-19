@@ -150,6 +150,8 @@ public class CommandTeamService {
                 new ArrayList<>(),
                 new ArrayList<>()
         );
+        this._teamRepository.save(team);
+        this.bus.publish(team.pullDomainEvents());
     }
 
     public void promotionYourTeam(PromotionYourRequest request) {
@@ -183,6 +185,7 @@ public class CommandTeamService {
                 new ArrayList<>()
         );
         _teamRepository.save(n);
+        bus.publish(n.pullDomainEvents());
     }
 
     public void update(Team team) {
@@ -333,6 +336,7 @@ public class CommandTeamService {
                 masterLife
         );
         _teamRepository.save(n);
+        bus.publish(n.pullDomainEvents());
     }
 
     public void removeVisionaries(String teamId, String id) {

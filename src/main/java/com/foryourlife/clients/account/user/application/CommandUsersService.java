@@ -9,6 +9,7 @@ import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelR
 import com.foryourlife.clients.account.user.domain.*;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.UserEntities;
 import com.foryourlife.shared.domain.user.UserType;
 import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
@@ -107,5 +108,12 @@ public class CommandUsersService {
         var user = admin.getUser();
         _userRepository.save(user);
         _participantRepository.save(participant);
+    }
+
+    public void promotionToMasterLife(String id){
+        var user = this._participantRepository.findById(id).orElseThrow(() -> new BaseException("User not found",List.of()));
+        var role = this._rolRepository.getRolByLevel(CourseLevel.MASTER_LIFE);
+        user.setParticipantLevel(role);
+        this._participantRepository.save(user);
     }
 }

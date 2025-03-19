@@ -5,6 +5,7 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.UserEntities;
 import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.UserType;
+import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,12 +17,14 @@ import java.util.List;
 public class StaffCreatorService {
     private final StaffRepository _repository;
     private final UserRepository _userRepository;
+    private final CommandGeneralUserService userRepositoryCreator;
     private final PasswordEncoder passwordEncoder;
     private final AdminRepository _adminRepository;
 
-    public StaffCreatorService(StaffRepository _repository, UserRepository userRepository, PasswordEncoder passwordEncoder, AdminRepository adminRepository) {
+    public StaffCreatorService(StaffRepository _repository, UserRepository userRepository, CommandGeneralUserService userRepositoryCreator, PasswordEncoder passwordEncoder, AdminRepository adminRepository) {
         this._repository = _repository;
         this._userRepository = userRepository;
+        this.userRepositoryCreator = userRepositoryCreator;
         this.passwordEncoder = passwordEncoder;
         this._adminRepository = adminRepository;
     }
@@ -32,7 +35,7 @@ public class StaffCreatorService {
             user.setPassword(user.getEmail());
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        _userRepository.save(user);
+        userRepositoryCreator.save(user);
         if (staff.getActive() == null)
             staff.setActive(true);
         _repository.save(staff);

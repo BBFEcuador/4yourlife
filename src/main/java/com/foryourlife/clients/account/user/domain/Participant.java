@@ -1,5 +1,7 @@
 package com.foryourlife.clients.account.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.clients.account.contact.domain.Contact;
 import com.foryourlife.clients.account.module.domain.ClientModule;
@@ -19,6 +21,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "participants")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Participant extends AggregateRoot implements Serializable {
     @Id
     private String id;
@@ -39,7 +42,6 @@ public class Participant extends AggregateRoot implements Serializable {
     private List<Contact> contacts = new ArrayList<>();
     @ManyToMany(mappedBy = "users", targetEntity = Team.class, fetch = FetchType.EAGER)
     private Set<Team> teams = new HashSet<>();
-
     @ManyToMany(mappedBy = "masterLife", targetEntity = Team.class, fetch = FetchType.EAGER)
     private Set<Team> masterLife = new HashSet<>();
 

@@ -5,6 +5,7 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.UserEntities;
 import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.UserType;
+import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
 import com.foryourlife.visionary.domain.Visionary;
 import com.foryourlife.visionary.domain.VisionaryRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,12 +19,14 @@ public class VisionaryCreatorService {
     private final VisionaryRepository repository;
     private final AdminRepository _adminRepository;
     private final UserRepository userRepository;
+    private final CommandGeneralUserService userRepositoryCreator;
     private final PasswordEncoder passwordEncoder;
 
-    public VisionaryCreatorService(VisionaryRepository repository, AdminRepository adminRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public VisionaryCreatorService(VisionaryRepository repository, AdminRepository adminRepository, UserRepository userRepository, CommandGeneralUserService userRepositoryCreator, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         _adminRepository = adminRepository;
         this.userRepository = userRepository;
+        this.userRepositoryCreator = userRepositoryCreator;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -34,7 +37,7 @@ public class VisionaryCreatorService {
             user.setPassword(user.getEmail());
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        userRepositoryCreator.save(user);
         if (visionary.getActive() == null)
             visionary.setActive(true);
         repository.save(visionary);

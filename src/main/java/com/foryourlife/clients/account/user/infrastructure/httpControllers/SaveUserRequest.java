@@ -5,6 +5,7 @@ import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDeta
 import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserEntities;
+import com.foryourlife.shared.domain.user.UserType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -69,7 +70,7 @@ public class SaveUserRequest {
         var newId = id != null ? id : UUID.randomUUID().toString();
         return Participant.create(
                 newId,
-                new User(UUID.randomUUID().toString(), email, password, name, phone, List.of(new UserEntities(newId, "Participant"))),
+                new User(UUID.randomUUID().toString(), email, password, name, phone, List.of(new UserEntities(newId, UserType.PARTICIPANT.toString()))),
                 null,
                 profile.toDomain(),
                 token

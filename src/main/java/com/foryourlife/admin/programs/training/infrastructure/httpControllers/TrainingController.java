@@ -56,6 +56,7 @@ public class TrainingController {
     //@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'USER')")
     @GetMapping("/calendar-event")
     public ResponseEntity<?> getAllCalendarEvent() {
+        System.out.println("entroooooo");
         var trainings = queryTrainingService.getAllTrainings();
         List<TrainingResponse> trainingResponse = new ArrayList<>();
         trainings.forEach(training -> {
@@ -78,6 +79,7 @@ public class TrainingController {
                     new TrainingResponse(training.getId(), name, training.getStartDate(), training.getEndDate().atTime(23, 59), false, color, new TrainingResponse.ExtendedProps("Epic description", "Nice location", new String[]{"clave", "valor"}))
             );
         });
+        System.out.println("terminoooo");
         return new ResponseEntity<>(trainingResponse, HttpStatus.OK);
     }
 

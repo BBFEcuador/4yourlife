@@ -108,11 +108,11 @@ public class AdminSeeder {
     }
 
     private void mock(){
-//        makeTrainer();
-//        makePrograms();
-//        makeStaffs();
-//        makeVisionaries();
-//        makeParticipants();
+        makeTrainer();
+        makePrograms();
+        makeStaffs();
+        makeVisionaries();
+        makeParticipants();
     }
     private void makeTrainer() {
         for (int i = 0; i < 250; i++) {
@@ -133,7 +133,7 @@ public class AdminSeeder {
         request.firstFocus = 100;
         request.startDate = LocalDate.of(2025, 3, 21);
         request.campusId = "61d88b2a-a22e-4cb0-8e43-e036483039d6";
-        request.numberOfFocus = 10;
+        request.numberOfFocus = 3;
         commandTrainingService.autoGenerateTraining(request);
     }
 

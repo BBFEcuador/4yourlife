@@ -101,7 +101,7 @@ public class CommandTrainingService {
                 ), Optional.empty(), Optional.empty()
         );
         repository.findByStartDate(new StartDate(date)).forEach(training -> {
-            if (training.getCourseLevel() != LIFE) {
+            if (training.getCourseLevel() == FOCUS || training.getCourseLevel() == YOUR) {
                 throw new BaseException("Error al actualizar la fecha", List.of("Entrenamientos Focus o Your no pueden coincidir"));
             }
         });

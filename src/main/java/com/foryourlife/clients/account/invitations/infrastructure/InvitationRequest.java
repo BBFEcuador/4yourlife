@@ -9,4 +9,9 @@ public class InvitationRequest {
     @NotNull
     @Pattern(regexp = "\\d+")
     public String quantity;
+
+    public InvitationRequest(String id, String quantity) {
+        this.id = id;
+        this.quantity = quantity;
+    }
 }

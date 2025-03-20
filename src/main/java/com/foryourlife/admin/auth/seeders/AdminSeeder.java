@@ -108,11 +108,11 @@ public class AdminSeeder {
     }
 
     private void mock(){
-        makeTrainer();
-        makePrograms();
-        makeStaffs();
-        makeVisionaries();
-        makeParticipants();
+//        makeTrainer();
+//        makePrograms();
+//        makeStaffs();
+//        makeVisionaries();
+//        makeParticipants();
     }
     private void makeTrainer() {
         for (int i = 0; i < 250; i++) {

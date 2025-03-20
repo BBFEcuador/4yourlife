@@ -21,7 +21,7 @@ public class Admin extends AggregateRoot {
     @Id
     private String id;
 
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.ALL )
     @JoinColumn(referencedColumnName = "id", name = "user_id")
     private User user;
 

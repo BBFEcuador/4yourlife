@@ -112,7 +112,7 @@ public class AdminSeeder {
 //        makePrograms();
 //        makeStaffs();
 //        makeVisionaries();
-        makeParticipants();
+//        makeParticipants();
     }
     private void makeTrainer() {
         for (int i = 0; i < 250; i++) {

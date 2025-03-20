@@ -108,14 +108,14 @@ public class AdminSeeder {
     }
 
     private void mock(){
-//        makeTrainer();
-//        makePrograms();
-//        makeStaffs();
-//        makeVisionaries();
+        makeTrainer();
+        makePrograms();
+        makeStaffs();
+        makeVisionaries();
         makeParticipants();
     }
     private void makeTrainer() {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 250; i++) {
             var trainer = Trainer.create(
                     UUID.randomUUID().toString(),
                     faker.name().fullName(),

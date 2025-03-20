@@ -108,10 +108,10 @@ public class AdminSeeder {
     }
 
     private void mock(){
-        makeTrainer();
-        makePrograms();
-        makeStaffs();
-        makeVisionaries();
+//        makeTrainer();
+//        makePrograms();
+//        makeStaffs();
+//        makeVisionaries();
         makeParticipants();
     }
     private void makeTrainer() {
@@ -181,7 +181,7 @@ public class AdminSeeder {
 
     private void makeParticipants() {
         var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600"));
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 50; i++) {
             var staffId = UUID.randomUUID().toString();
             var user = new User(
                     UUID.randomUUID().toString(),

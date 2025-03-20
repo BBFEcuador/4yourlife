@@ -76,7 +76,7 @@ public class TrainingController {
                 default -> training.getName() + " " + training.getCourseLevel().name();
             };
             trainingResponse.add(
-                    new TrainingResponse(training.getId(), name, training.getStartDate(), training.getEndDate().atTime(23, 59), false, color, new TrainingResponse.ExtendedProps("Epic description", "Nice location", new String[]{"clave", "valor"}))
+                    new TrainingResponse(training.getId(), name, training.getStartDate(), training.getEndDate().atTime(23, 59).plusDays(1), true, color, new TrainingResponse.ExtendedProps("Epic description", "Nice location", new String[]{"clave", "valor"}))
             );
         });
         System.out.println("terminoooo");

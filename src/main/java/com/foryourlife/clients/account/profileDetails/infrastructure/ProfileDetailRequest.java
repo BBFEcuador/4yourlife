@@ -33,4 +33,15 @@ public class ProfileDetailRequest {
     public ProfileDetails toDomain(){
         return new ProfileDetails(id != null ? id : UUID.randomUUID().toString(),birthday,address,occupation,gender,civilStatus,dni,city);
     }
+
+    public ProfileDetailRequest(String id, Date birthday, String address, String occupation, String gender, String civilStatus, String dni, String city) {
+        this.id = id;
+        this.birthday = birthday;
+        this.address = address;
+        this.occupation = occupation;
+        this.gender = gender;
+        this.civilStatus = civilStatus;
+        this.dni = dni;
+        this.city = city;
+    }
 }

@@ -95,14 +95,4 @@ public class UserRepositoryImpl implements UserRepository {
     public Participant findByUserId(String userId) {
         return repository.findByUser_Id(userId);
     }
-
-    @Override
-    public boolean isMasterLifeAvailable(String participantId, LocalDate startDate, LocalDate endDate, String newTrainingId) {
-        return repository.isMasterLifeAvailable(participantId, startDate, endDate, newTrainingId);
-    }
-
-    @Override
-    public List<Participant> findAvailableMasterLife(LocalDate startDate, LocalDate endDate) {
-        return repository.findAvailableMasterLife(startDate,endDate);
-    }
 }

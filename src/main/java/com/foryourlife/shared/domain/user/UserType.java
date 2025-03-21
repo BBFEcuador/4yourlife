@@ -1,5 +1,5 @@
 package com.foryourlife.shared.domain.user;
 
 public enum UserType {
-    STAFF,PARTICIPANT,ADMIN,VISIONARY
+    STAFF,PARTICIPANT,ADMIN,VISIONARY,MASTER_LIFE
 }

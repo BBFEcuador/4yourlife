@@ -124,8 +124,8 @@ public class CommandUsersService {
 
     public void promotionToMasterLife(String id){
         var user = this._participantRepository.findById(id).orElseThrow(() -> new BaseException("User not found",List.of()));
-        var role = this._rolRepository.getRolByLevel(CourseLevel.MASTER_LIFE);
-        user.setParticipantLevel(role);
+//        var role = this._rolRepository.getRolByLevel(CourseLevel.MASTER_LIFE);
+//        user.setParticipantLevel(role);
         this._participantRepository.save(user);
     }
 }

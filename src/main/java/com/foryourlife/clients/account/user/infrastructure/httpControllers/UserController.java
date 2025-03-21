@@ -124,10 +124,6 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/master-life-available")
-    public ResponseEntity<?> getForTeam(@Valid @RequestBody AvailableTrainerRequest request) {
-        return new ResponseEntity<>(queryUsersService.findAvailableMasterLife(request.startDate, request.endDate), HttpStatus.OK);
-    }
     @PostMapping("/promotion-master/{id}")
     public ResponseEntity<?> promotionMasterLife(@PathVariable String id) {
         commandUsersService.promotionToMasterLife(id);

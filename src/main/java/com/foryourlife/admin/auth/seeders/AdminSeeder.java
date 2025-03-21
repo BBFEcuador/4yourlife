@@ -17,6 +17,8 @@ import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDeta
 import com.foryourlife.clients.account.user.application.CommandUsersService;
 import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.clients.account.user.infrastructure.httpControllers.MedicalRecordSaveRequest;
+import com.foryourlife.masterLife.application.CommandMasterLifeService;
+import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserEntities;
@@ -50,11 +52,12 @@ public class AdminSeeder {
     private final StaffCreatorService staffCreatorService;
     private final VisionaryCreatorService visionaryCreatorService;
     private final CommandUsersService commandUsersService;
+    private final CommandMasterLifeService commandMasterLifeService;
     private final CommandInvitationService commandInvitationService;
     private final ParticipantLevelRepository participantLevelRepository;
     private final Faker faker = new Faker();
 
-    public AdminSeeder(AdminRepository repository, PasswordEncoder passwordEncoder, CampusRepository campusRepository, TrainerCreatorService trainerCreatorService, CommandTrainingService commandTrainingService, StaffCreatorService staffCreatorService, VisionaryCreatorService visionaryCreatorService, CommandUsersService commandUsersService, CommandInvitationService commandInvitationService, ParticipantLevelRepository participantLevelRepository) {
+    public AdminSeeder(AdminRepository repository, PasswordEncoder passwordEncoder, CampusRepository campusRepository, TrainerCreatorService trainerCreatorService, CommandTrainingService commandTrainingService, StaffCreatorService staffCreatorService, VisionaryCreatorService visionaryCreatorService, CommandUsersService commandUsersService, CommandMasterLifeService commandMasterLifeService, CommandInvitationService commandInvitationService, ParticipantLevelRepository participantLevelRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.campusRepository = campusRepository;
@@ -63,6 +66,7 @@ public class AdminSeeder {
         this.staffCreatorService = staffCreatorService;
         this.visionaryCreatorService = visionaryCreatorService;
         this.commandUsersService = commandUsersService;
+        this.commandMasterLifeService = commandMasterLifeService;
         this.commandInvitationService = commandInvitationService;
         this.participantLevelRepository = participantLevelRepository;
     }
@@ -99,11 +103,10 @@ public class AdminSeeder {
                     ParticipantLevel.create("3024c8f1-d603-47fc-8369-0e90cd2e703e","ROLE_FOCUS",false, CourseLevel.FOCUS),
                     ParticipantLevel.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0","ROLE_YOUR",false, CourseLevel.YOUR),
                     ParticipantLevel.create("5b2da953-9791-47e6-a5b8-3442b52b8ebc","ROLE_LIFE",false, CourseLevel.LIFE),
-                    ParticipantLevel.create("c762743d-2fea-4c7f-9d4b-3a0715039c4b","ROLE_MASTER_LIFE",false, CourseLevel.MASTER_LIFE),
                     ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9","ROLE_GRADUATE",false, CourseLevel.LIFE_GRADUATE)
             );
             this.participantLevelRepository.saveAll(roles);
-            mock();
+//            mock();
         };
     }
 
@@ -112,6 +115,7 @@ public class AdminSeeder {
         makePrograms();
         makeStaffs();
         makeVisionaries();
+        makeMasterLife();
         makeParticipants();
     }
     private void makeTrainer() {
@@ -158,6 +162,26 @@ public class AdminSeeder {
         }
     }
 
+    private void makeMasterLife() {
+        for (int i = 0; i < 100; i++) {
+            var staffId = UUID.randomUUID().toString();
+            var user = new User(
+                    UUID.randomUUID().toString(),
+                    faker.name().fullName(),
+                    faker.internet().emailAddress(),
+                    faker.phoneNumber().phoneNumber(),
+                    faker.internet().password(),
+                    List.of(new UserEntities(staffId, UserType.STAFF.toString()))
+            );
+            var trainer = MasterLife.create(
+                    staffId,
+                    true,
+                    user
+            );
+            commandMasterLifeService.save(trainer);
+        }
+    }
+
     private void makeVisionaries() {
         for (int i = 0; i < 100; i++) {
             var staffId = UUID.randomUUID().toString();
@@ -181,7 +205,7 @@ public class AdminSeeder {
 
     private void makeParticipants() {
         var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600"));
-        for (int i = 0; i < 450; i++) {
+        for (int i = 0; i < 350; i++) {
             var staffId = UUID.randomUUID().toString();
             var user = new User(
                     UUID.randomUUID().toString(),

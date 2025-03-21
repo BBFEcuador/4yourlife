@@ -37,7 +37,4 @@ public class QueryUsersService {
         return this._userRepository.match(criteria);
     }
 
-    public List<Participant> findAvailableMasterLife(LocalDate startDate, LocalDate endDate) {
-        return this._userRepository.findAvailableMasterLife(startDate,endDate);
-    }
 }

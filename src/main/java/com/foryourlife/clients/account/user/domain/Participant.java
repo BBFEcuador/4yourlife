@@ -43,8 +43,6 @@ public class Participant extends AggregateRoot implements Serializable {
     private List<Contact> contacts = new ArrayList<>();
     @ManyToMany(mappedBy = "users", targetEntity = Team.class, fetch = FetchType.EAGER)
     private Set<Team> teams = new HashSet<>();
-    @ManyToMany(mappedBy = "masterLife", targetEntity = Team.class, fetch = FetchType.EAGER)
-    private Set<Team> masterLife = new HashSet<>();
     @OneToOne(mappedBy = "participant",targetEntity = MedicalRecord.class,fetch = FetchType.EAGER)
     @JsonIgnoreProperties("participant")
     private MedicalRecord medicalRecord;
@@ -143,9 +141,6 @@ public class Participant extends AggregateRoot implements Serializable {
 
     public void updateLvl(ParticipantLevel newLvl){
         this.participantLevel = newLvl;
-    }
-    public Set<Team> getMasterLife() {
-        return masterLife;
     }
     public MedicalRecord getMedicalRecord() {
         return medicalRecord;

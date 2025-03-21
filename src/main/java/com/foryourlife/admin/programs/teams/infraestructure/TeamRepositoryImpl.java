@@ -3,6 +3,7 @@ package com.foryourlife.admin.programs.teams.infraestructure;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.clients.account.user.infrastructure.JPAUserRepository;
+import com.foryourlife.masterLife.infrastructure.JPAMasterLifeRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
@@ -18,11 +19,13 @@ public class TeamRepositoryImpl implements TeamRepository {
 
     private final JPATeamRepository _jpaTeamRepository;
     private final JPAUserRepository _jpaUserRepository;
+    private final JPAMasterLifeRepository jpaMasterLifeRepository;
     private final JPACriteriaConverter<Team> criteriaConverter;
 
-    public TeamRepositoryImpl(JPATeamRepository _jpaTeamRepository, JPAUserRepository jpaUserRepository, JPACriteriaConverter<Team> criteriaConverter) {
+    public TeamRepositoryImpl(JPATeamRepository _jpaTeamRepository, JPAUserRepository jpaUserRepository, JPAMasterLifeRepository jpaMasterLifeRepository, JPACriteriaConverter<Team> criteriaConverter) {
         this._jpaTeamRepository = _jpaTeamRepository;
         _jpaUserRepository = jpaUserRepository;
+        this.jpaMasterLifeRepository = jpaMasterLifeRepository;
         this.criteriaConverter = criteriaConverter;
     }
 
@@ -52,7 +55,7 @@ public class TeamRepositoryImpl implements TeamRepository {
     public void assignMastersLife(String teamId, String userId) {
         var team = _jpaTeamRepository.findById(teamId).orElseThrow(() -> new BaseException("Team not found", List.of("")));
         var masterlife = team.getMasterLife();
-        masterlife.add(_jpaUserRepository.findById(userId).orElseThrow(() -> new BaseException("MasterLife not found", List.of(""))));
+        masterlife.add(jpaMasterLifeRepository.findById(userId).orElseThrow(() -> new BaseException("MasterLife not found", List.of(""))));
         team.setMasterLife(masterlife);
         _jpaTeamRepository.save(team);
     }

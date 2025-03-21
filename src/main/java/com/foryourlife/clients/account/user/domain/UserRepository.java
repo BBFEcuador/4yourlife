@@ -21,8 +21,4 @@ public interface UserRepository {
     void save(Participant user);
 
     Participant findByUserId(String userId);
-
-    boolean isMasterLifeAvailable(String participantId, LocalDate startDate, LocalDate endDate, String newTrainingId);
-
-    List<Participant> findAvailableMasterLife(LocalDate startDate, LocalDate endDate);
 }

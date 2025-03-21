@@ -7,6 +7,8 @@ import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
 import com.foryourlife.clients.account.user.domain.UserRepository;
 import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.masterLife.application.QueryMasterLifeService;
+import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -37,11 +39,12 @@ public class CommandTeamService {
     private final VisionaryRepository visionaryRepository;
     private final QueryTrainingService queryTrainingService;
     private final TrainerFinderService trainerFinderService;
+    private final QueryMasterLifeService queryMasterLifeService;
     private final QueryTeamService queryTeamService;
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
 
 
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, UserRepository _userRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerFinderService trainerFinderService, QueryTeamService queryTeamService) {
+    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, UserRepository _userRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerFinderService trainerFinderService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService) {
         this._teamRepository = _teamRepository;
         this.bus = bus;
         this._userRepository = _userRepository;
@@ -49,6 +52,7 @@ public class CommandTeamService {
         this.visionaryRepository = visionaryRepository;
         this.queryTrainingService = queryTrainingService;
         this.trainerFinderService = trainerFinderService;
+        this.queryMasterLifeService = queryMasterLifeService;
         this.queryTeamService = queryTeamService;
     }
 
@@ -68,10 +72,7 @@ public class CommandTeamService {
             return p;
         }).toList();
         var masterLife = request.masterLife.stream().map(participant -> {
-            var p = _userRepository.findById(participant.getId()).orElseThrow();
-            if (p.getParticipantLevel().getCourseLevel() != CourseLevel.MASTER_LIFE) {
-                throw new BaseException("User not available", List.of("The user " + p.getName() + " is not master life"));
-            }
+            var p = queryMasterLifeService.findById(participant.getId());
             return p;
         }).toList();
         var team = Team.create(
@@ -213,15 +214,9 @@ public class CommandTeamService {
     public void assignMastersLife(String teamId, String userId) {
         if (this._teamRepository.findById(teamId).isEmpty()) {
             throw new BaseException("Team not found", List.of(""));
-        } else if (_userRepository.findById(userId).isEmpty()) {
-            throw new BaseException("User not found", List.of(""));
         }
-        Participant user = _userRepository.findById(userId).get();
-        if (user.getParticipantLevel().getCourseLevel() == CourseLevel.MASTER_LIFE) {
-            _teamRepository.assignMastersLife(teamId, userId);
-        } else {
-            throw new BaseException("User is not MasterLife", List.of(""));
-        }
+        MasterLife user = queryMasterLifeService.findById(userId);
+        _teamRepository.assignMastersLife(teamId, userId);
     }
 
     public void removeParticipants(String teamId, String userId) {
@@ -317,8 +312,8 @@ public class CommandTeamService {
             return p;
         }).toList();
         var masterLife = request.masterLife.stream().map(participant -> {
-            var p = _userRepository.findById(participant.getId()).orElseThrow();
-            if (!_userRepository.isMasterLifeAvailable(p.getId(), training.getStartDate(), training.getEndDate(), training.getId())) {
+            var p = queryMasterLifeService.findById(participant.getId());
+            if (!queryMasterLifeService.isMasterLifeAvailable(p.getId(), training.getStartDate(), training.getEndDate(), training.getId())) {
                 throw new BaseException("Master life not available", List.of("The user " + p.getUser().getName() + " has team"));
             }
             return p;

@@ -1,5 +1,6 @@
 package com.foryourlife.masterLife.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
@@ -9,6 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "master_life")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterLife {
     @Id
     private String id;
@@ -19,7 +21,8 @@ public class MasterLife {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToMany(mappedBy = "staffs", targetEntity = Team.class, fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "masterLife", targetEntity = Team.class, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties(value = {"teams", "masterLife"})
     private Set<Team> teams = new HashSet<>();
 
 
@@ -30,6 +33,14 @@ public class MasterLife {
         this.id = id;
         this.isActive = isActive;
         this.user = user;
+    }
+
+    public static MasterLife create(String id, Boolean isActive, User user) {
+        return new MasterLife(
+                id,
+                isActive,
+                user
+        );
     }
 
     public String getId() {
@@ -46,5 +57,9 @@ public class MasterLife {
 
     public Set<Team> getTeams() {
         return teams;
+    }
+
+    public void changeStatus() {
+        this.isActive = !this.isActive;
     }
 }

@@ -1,4 +1,4 @@
-CREATE TYPE course_level AS ENUM ('INIT','FOCUS', 'YOUR', 'LIFE','MASTER_LIFE','LIFE_2','LIFE_3','LIFE_GRADUATE');
+CREATE TYPE course_level AS ENUM ('INIT','FOCUS', 'YOUR', 'LIFE','LIFE_2','LIFE_3','LIFE_GRADUATE');
 CREATE TABLE IF NOT EXISTS participant_level(
     id text not null,
     roleName text not null,

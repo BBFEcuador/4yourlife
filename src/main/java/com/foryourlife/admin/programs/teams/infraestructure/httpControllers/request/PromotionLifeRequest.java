@@ -1,6 +1,7 @@
 package com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request;
 
 import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.masterLife.domain.MasterLife;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -14,7 +15,7 @@ public class PromotionLifeRequest {
     public List<Participant> users;
     @NotNull
     @Size(min = 1,message = "Minimo 1 master life")
-    public List<Participant> masterLife;
+    public List<MasterLife> masterLife;
     @NotNull(message = "Debe seleccionar un entrenador")
     public String trainer;
 }

@@ -1,6 +1,7 @@
 package com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request;
 
 import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.masterLife.domain.MasterLife;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -17,7 +18,7 @@ public class SaveLifeTeamRequest {
     public List<Participant> users;
     @NotNull
     @Size(min = 1)
-    public List<Participant> masterLife;
+    public List<MasterLife> masterLife;
     @NotNull
     public String trainer;
 }

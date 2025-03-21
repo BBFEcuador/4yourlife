@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.TeamCreated;
 import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
@@ -44,7 +45,7 @@ public class Team extends AggregateRoot implements Serializable {
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "masterlife_id", referencedColumnName = "id"))
     @JsonIgnoreProperties(value = {"teams", "masterLife","team"})
-    private List<Participant> masterLife = new ArrayList<>();
+    private List<MasterLife> masterLife = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
     private Trainer trainer;
@@ -68,7 +69,7 @@ public class Team extends AggregateRoot implements Serializable {
     protected Team() {
     }
 
-    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users, Trainer trainer, List<Staff> staffs, List<Visionary> visionaries, List<Participant> masterLife) {
+    private Team(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users, Trainer trainer, List<Staff> staffs, List<Visionary> visionaries, List<MasterLife> masterLife) {
         this.id = id;
         this.name = name;
         this.photo = photo;
@@ -81,7 +82,7 @@ public class Team extends AggregateRoot implements Serializable {
         this.masterLife = masterLife;
     }
 
-    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users, Trainer trainer, List<Staff> staffs, List<Visionary> visionaries, List<Participant> masterLife) {
+    public static Team create(String id, String name, String photo, Training trainingId, Integer trainingNumber, List<Participant> users, Trainer trainer, List<Staff> staffs, List<Visionary> visionaries, List<MasterLife> masterLife) {
         var team = new Team(id, name, photo, trainingId, trainingNumber, users, trainer, staffs, visionaries, masterLife);
         team.setTraining(trainingId);
         team.record(new TeamCreated(id, team));
@@ -112,7 +113,7 @@ public class Team extends AggregateRoot implements Serializable {
         return users;
     }
 
-    public List<Participant> getMasterLife() {
+    public List<MasterLife> getMasterLife() {
         return masterLife;
     }
 
@@ -120,7 +121,7 @@ public class Team extends AggregateRoot implements Serializable {
         this.users = users;
     }
 
-    public void setMasterLife(List<Participant> masterLife) {
+    public void setMasterLife(List<MasterLife> masterLife) {
         this.masterLife = masterLife;
     }
 

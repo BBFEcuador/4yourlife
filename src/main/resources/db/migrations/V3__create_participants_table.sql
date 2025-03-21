@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS participants
         participant_level_id text,
         profile_id text,
         isLingerer BOOLEAN,
+        isDesertor BOOLEAN,
         CONSTRAINT fk_users_on_rol FOREIGN KEY (participant_level_id) REFERENCES participant_level (id),
         CONSTRAINT fk_participant_on_user FOREIGN KEY (user_id) REFERENCES users (id),
         CONSTRAINT fk_users_on_profile_details FOREIGN KEY (profile_id) REFERENCES profile_details (id),

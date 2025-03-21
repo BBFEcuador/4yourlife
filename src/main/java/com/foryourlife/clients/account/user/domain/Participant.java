@@ -37,6 +37,7 @@ public class Participant extends AggregateRoot implements Serializable {
     private ProfileDetails profile;
     private String invitationToken;
     private Boolean isLingerer = false;
+    private Boolean isDesertor = false;
     @OneToOne(mappedBy = "user", targetEntity = ClientModule.class)
     private ClientModule modules;
     @OneToMany(mappedBy = "user", targetEntity = Contact.class, fetch = FetchType.EAGER)
@@ -61,6 +62,19 @@ public class Participant extends AggregateRoot implements Serializable {
     }
 
     protected Participant() {
+    }
+
+    public void setLingerer(Boolean lingerer) {
+        isLingerer = lingerer;
+    }
+
+
+    public Boolean getDesertor() {
+        return isDesertor;
+    }
+
+    public void setDesertor(Boolean desertor) {
+        isDesertor = desertor;
     }
 
     public ClientModule getModules() {

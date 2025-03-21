@@ -19,8 +19,8 @@ public class MasterLife {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToMany(mappedBy = "staffs", targetEntity = Team.class, fetch = FetchType.EAGER)
-    private Set<Team> teams = new HashSet<>();
+//    @ManyToMany(mappedBy = "staffs", targetEntity = Team.class, fetch = FetchType.EAGER)
+//    private Set<Team> teams = new HashSet<>();
 
 
     protected MasterLife() {
@@ -44,7 +44,7 @@ public class MasterLife {
         return user;
     }
 
-    public Set<Team> getTeams() {
+    /*public Set<Team> getTeams() {
         return teams;
-    }
+    }*/
 }

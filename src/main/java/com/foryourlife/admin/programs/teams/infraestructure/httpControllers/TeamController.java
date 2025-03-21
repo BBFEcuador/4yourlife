@@ -109,7 +109,7 @@ public class TeamController {
     @PutMapping("/removeParticipants")
     public ResponseEntity<?> removeParticipants(@RequestBody AssignParticipantsRequest request) {
         for (var user : request.getUsers()) {
-            commandTeamService.removeParticipants(request.getTeamId(), user.getId());
+            commandTeamService.removeParticipants(request.getTeamId(), user.getId(), user.getLingerer(), user.getDesertor());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }

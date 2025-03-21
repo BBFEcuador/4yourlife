@@ -219,12 +219,17 @@ public class CommandTeamService {
         _teamRepository.assignMastersLife(teamId, userId);
     }
 
-    public void removeParticipants(String teamId, String userId) {
+    public void removeParticipants(String teamId, String userId, Boolean lingerer, Boolean desertor) {
         if (this._teamRepository.findById(teamId).isEmpty()) {
             throw new BaseException("Team not found", List.of(""));
         } else if (_userRepository.findById(userId).isEmpty()) {
             throw new BaseException("User not found", List.of(""));
         }
+
+        var user = _userRepository.findById(userId).get();
+        user.setLingerer(lingerer);
+        user.setDesertor(desertor);
+        _userRepository.save(user);
         _teamRepository.removeParticipants(teamId, userId);
     }
 

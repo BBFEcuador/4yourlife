@@ -79,7 +79,7 @@ public class VisionaryCreatorService {
         );
 
         var visionary = Visionary.create(userId, role, true, user);
-        user.getEntityMap().add(new UserEntities(visionary.getId(), UserType.STAFF.name()));
+        user.getEntityMap().add(new UserEntities(visionary.getId(), UserType.VISIONARY.name()));
         userRepository.save(user);
         repository.save(visionary);
     }

@@ -27,6 +27,6 @@ public class GeneralUserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findById(String id) {
-        return Optional.empty();
+        return repository.findById(id);
     }
 }

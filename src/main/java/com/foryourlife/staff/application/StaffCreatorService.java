@@ -29,9 +29,9 @@ public class StaffCreatorService {
         this._adminRepository = adminRepository;
     }
 
-    public void create(Staff staff){
+    public void create(Staff staff) {
         var user = staff.getUser();
-        if (user.getPassword() == null){
+        if (user.getPassword() == null) {
             user.setPassword(user.getEmail());
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -41,7 +41,7 @@ public class StaffCreatorService {
         _repository.save(staff);
     }
 
-    public void changeStatus(String visionaryId){
+    public void changeStatus(String visionaryId) {
         var staff = _repository.findById(visionaryId).orElseThrow(() -> new BaseException("Not Found", List.of()));
         staff.changeStatus();
         _repository.save(staff);
@@ -62,14 +62,16 @@ public class StaffCreatorService {
         _repository.save(staff);
     }
 
-    public void createFromParticipant(Staff staff) {
-        if (_repository.findByUserId(staff.getUser().getId()) != null) {
+    public void createFromParticipant(String userId, String role) {
+        if (_repository.findByUserId(userId) != null) {
             throw new BaseException("The user is already a Staff", List.of("Already exist as staff"));
         }
 
-        var user = _userRepository.findById(staff.getUser().getId()).orElseThrow(() ->
-                new BaseException("User not found", List.of("User does not exist"))
+        var user = _userRepository.findById(userId).orElseThrow(() ->
+                new BaseException("User not found", List.of("User with id: " + userId +" does not exist"))
         );
+
+        var staff = Staff.create(userId, role, true, user);
 
         user.getEntityMap().add(new UserEntities(staff.getId(), UserType.STAFF.name()));
         _userRepository.save(user);

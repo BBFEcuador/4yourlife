@@ -69,15 +69,16 @@ public class VisionaryCreatorService {
         repository.save(visionary);
     }
 
-    public void createFromParticipant(Visionary visionary) {
-        if (repository.findByUserId(visionary.getUser().getId()).isPresent()) {
+    public void createFromParticipant(String userId, String role) {
+        if (repository.findByUserId(userId).isPresent()) {
             throw new BaseException("The user is already a Visionary", List.of("Already exist as visionary"));
         }
 
-        var user = userRepository.findById(visionary.getUser().getId()).orElseThrow(() ->
+        var user = userRepository.findById(userId).orElseThrow(() ->
                 new BaseException("User not found", List.of("User does not exist"))
         );
 
+        var visionary = Visionary.create(userId, role, true, user);
         user.getEntityMap().add(new UserEntities(visionary.getId(), UserType.STAFF.name()));
         userRepository.save(user);
         repository.save(visionary);

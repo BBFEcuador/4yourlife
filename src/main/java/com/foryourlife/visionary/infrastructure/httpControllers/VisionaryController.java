@@ -5,6 +5,7 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.staff.infrastructure.httpControllers.ParticipantTypeRequest;
 import com.foryourlife.visionary.application.VisionaryCreatorService;
 import com.foryourlife.visionary.application.VisionaryFinderService;
 import jakarta.validation.Valid;
@@ -80,8 +81,8 @@ public class VisionaryController {
     }
 
     @PostMapping("/visionary-participant")
-    public ResponseEntity<?> createFromParticipant(@Valid @RequestBody VisionaryUserRequest request) {
-        creatorService.createFromParticipant(request.toDomain());
+    public ResponseEntity<?> createFromParticipant(@Valid @RequestBody ParticipantTypeRequest request) {
+        creatorService.createFromParticipant(request.userId, request.role);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

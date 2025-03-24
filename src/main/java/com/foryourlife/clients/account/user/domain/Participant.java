@@ -67,7 +67,7 @@ public class Participant extends AggregateRoot implements Serializable {
     }
 
 
-    public Boolean getDesertor() {
+    public Boolean getIsDesertor() {
         return isDesertor;
     }
 
@@ -137,7 +137,7 @@ public class Participant extends AggregateRoot implements Serializable {
         return invitationToken;
     }
 
-    public Boolean getLingerer() {
+    public Boolean getIsLingerer() {
         return isLingerer;
     }
 

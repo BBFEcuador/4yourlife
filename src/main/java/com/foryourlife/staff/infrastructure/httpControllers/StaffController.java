@@ -54,8 +54,8 @@ public class StaffController {
     }
 
     @PostMapping("/staff-participant")
-    public ResponseEntity<?> createFromParticipant(@Valid @RequestBody StaffUserRequest request){
-            staffService.createFromAdmin(request.toDomain());
+    public ResponseEntity<?> createFromParticipant(@Valid @RequestBody ParticipantTypeRequest request){
+            staffService.createFromParticipant(request.userId, request.role);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

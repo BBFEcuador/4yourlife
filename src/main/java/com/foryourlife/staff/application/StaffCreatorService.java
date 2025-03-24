@@ -61,4 +61,18 @@ public class StaffCreatorService {
         _userRepository.save(user);
         _repository.save(staff);
     }
+
+    public void createFromParticipant(Staff staff) {
+        if (_repository.findByUserId(staff.getUser().getId()) != null) {
+            throw new BaseException("The user is already a Staff", List.of("Already exist as staff"));
+        }
+
+        var user = _userRepository.findById(staff.getUser().getId()).orElseThrow(() ->
+                new BaseException("User not found", List.of("User does not exist"))
+        );
+
+        user.getEntityMap().add(new UserEntities(staff.getId(), UserType.STAFF.name()));
+        _userRepository.save(user);
+        _repository.save(staff);
+    }
 }

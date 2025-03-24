@@ -74,8 +74,14 @@ public class VisionaryController {
     }
 
     @PostMapping("/visionary-admin")
-    public ResponseEntity<?> createFromAdmin(@Valid @RequestBody VisionaryAdminRequest request) {
+    public ResponseEntity<?> createFromAdmin(@Valid @RequestBody VisionaryUserRequest request) {
         creatorService.createFromAdmin(request.toDomain());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/visionary-participant")
+    public ResponseEntity<?> createFromParticipant(@Valid @RequestBody VisionaryUserRequest request) {
+        creatorService.createFromParticipant(request.toDomain());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

@@ -1,10 +1,6 @@
 package com.foryourlife.staff.infrastructure.httpControllers;
 
 import com.foryourlife.admin.programs.trainer.infrastructure.httpControllers.AvailableTrainerRequest;
-import com.foryourlife.shared.domain.criteria.Criteria;
-import com.foryourlife.shared.domain.criteria.Filter;
-import com.foryourlife.shared.domain.exception.BaseException;
-import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.staff.application.StaffCreatorService;
 import com.foryourlife.staff.application.StaffFinderService;
 import jakarta.validation.Valid;
@@ -13,9 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("staff")
@@ -55,7 +48,13 @@ public class StaffController {
     }
 
     @PostMapping("/staff-admin")
-    public ResponseEntity<?> createFromAdmin(@Valid @RequestBody StaffAdminRequest request){
+    public ResponseEntity<?> createFromAdmin(@Valid @RequestBody StaffUserRequest request){
+            staffService.createFromAdmin(request.toDomain());
+            return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/staff-participant")
+    public ResponseEntity<?> createFromParticipant(@Valid @RequestBody StaffUserRequest request){
             staffService.createFromAdmin(request.toDomain());
             return new ResponseEntity<>(HttpStatus.CREATED);
     }

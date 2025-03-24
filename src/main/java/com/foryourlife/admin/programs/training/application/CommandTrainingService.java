@@ -63,11 +63,13 @@ public class CommandTrainingService {
                         )
                 ), Optional.empty(), Optional.empty()
         );
+
         repository.findByStartDate(new StartDate(request.startDate)).forEach(training -> {
             if (training.getCourseLevel() != LIFE) {
                 throw new BaseException("Error al actualizar la fecha", List.of("Entrenamientos Focus o Your no pueden coincidir"));
             }
         });
+
         var focus = Training.create(
                 UUID.randomUUID().toString(),
                 request.firstFocus != null ? request.firstFocus : nextNumber,

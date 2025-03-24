@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public class StaffAdminRequest {
+public class StaffUserRequest {
     public String id;
     @NotNull
     public String rol;

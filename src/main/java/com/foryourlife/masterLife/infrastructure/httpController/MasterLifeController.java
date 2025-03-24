@@ -36,6 +36,12 @@ public class MasterLifeController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PostMapping("masterlife-participant")
+    public ResponseEntity<?> createMasterlifeFromParticipant(@RequestBody MasterlifeParticipantRequest request) {
+        commandMasterLifeService.saveFromParticipant(request.toDomain());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
 
     @GetMapping("")
     public ResponseEntity<?> findStaffByUserId() {

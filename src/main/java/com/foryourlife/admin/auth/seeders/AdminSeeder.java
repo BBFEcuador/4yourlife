@@ -106,7 +106,7 @@ public class AdminSeeder {
                     ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9","ROLE_GRADUATE",false, CourseLevel.LIFE_GRADUATE)
             );
             this.participantLevelRepository.saveAll(roles);
-//            mock();
+            mock();
         };
     }
 

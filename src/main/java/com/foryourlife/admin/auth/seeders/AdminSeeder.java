@@ -106,7 +106,7 @@ public class AdminSeeder {
                     ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9","ROLE_GRADUATE",false, CourseLevel.LIFE_GRADUATE)
             );
             this.participantLevelRepository.saveAll(roles);
-//            mock();
+            mock();
         };
     }
 
@@ -146,10 +146,10 @@ public class AdminSeeder {
             var staffId = UUID.randomUUID().toString();
             var user = new User(
                     UUID.randomUUID().toString(),
-                    faker.name().fullName(),
                     faker.internet().emailAddress(),
-                    faker.phoneNumber().phoneNumber(),
                     faker.internet().password(),
+                    faker.name().fullName(),
+                    faker.phoneNumber().phoneNumber(),
                     List.of(new UserEntities(staffId, UserType.STAFF.toString()))
             );
             var trainer = Staff.create(
@@ -167,10 +167,10 @@ public class AdminSeeder {
             var staffId = UUID.randomUUID().toString();
             var user = new User(
                     UUID.randomUUID().toString(),
-                    faker.name().fullName(),
                     faker.internet().emailAddress(),
-                    faker.phoneNumber().phoneNumber(),
                     faker.internet().password(),
+                    faker.name().fullName(),
+                    faker.phoneNumber().phoneNumber(),
                     List.of(new UserEntities(staffId, UserType.STAFF.toString()))
             );
             var trainer = MasterLife.create(
@@ -187,10 +187,10 @@ public class AdminSeeder {
             var staffId = UUID.randomUUID().toString();
             var user = new User(
                     UUID.randomUUID().toString(),
-                    faker.name().fullName(),
                     faker.internet().emailAddress(),
-                    faker.phoneNumber().phoneNumber(),
                     faker.internet().password(),
+                    faker.name().fullName(),
+                    faker.phoneNumber().phoneNumber(),
                     List.of(new UserEntities(staffId, UserType.STAFF.toString()))
             );
             var trainer = Visionary.create(

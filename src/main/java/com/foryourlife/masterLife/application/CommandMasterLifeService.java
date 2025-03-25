@@ -43,7 +43,7 @@ public class CommandMasterLifeService {
     @Transactional
     public void saveFromParticipant(String id) {
         repository.findByUserId(id).ifPresent(masterLife -> {
-            throw new BaseException("Masterlife already created with the user id", List.of());
+            throw new BaseException("Masterlife already created with the user "+masterLife.getUser().getName(), List.of());
         });
         var user = userRepository.findById(id).orElseThrow(
                 () -> new BaseException("User not found", List.of())
@@ -55,7 +55,7 @@ public class CommandMasterLifeService {
                 user
         );
         user.getEntityMap().add(new UserEntities(masterLifeId, UserType.MASTER_LIFE.name()));
-        userRepositoryCreator.save(user);
+        userRepository.save(user);
         repository.save(masterLife);
     }
 

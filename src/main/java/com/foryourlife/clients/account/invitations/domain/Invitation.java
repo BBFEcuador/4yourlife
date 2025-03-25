@@ -87,4 +87,8 @@ public class Invitation extends AggregateRoot {
     public void setUsers(Participant users) {
         this.users = users;
     }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
 }

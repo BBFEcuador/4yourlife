@@ -22,4 +22,8 @@ public class QueryInvitationServices {
     public Invitation findInvitationByToken(String token) {
         return repository.findByToken(token).orElseThrow(() -> new BaseException("Invalid invitation token", List.of("The token " + token + " does not exist")));
     }
+
+    public Invitation findActiveUserInvitation(String userId) {
+        return repository.findTopBySenderIdOrderByQuantityDesc(userId).orElseThrow(() -> new BaseException("No tiene invitacion activa", List.of()));
+    }
 }

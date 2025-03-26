@@ -36,7 +36,11 @@ public class CommandMasterLifeService {
             user.setPassword(user.getEmail());
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepositoryCreator.save(user);
+        if (userRepository.findById(user.getId()).isPresent()) {
+            userRepository.save(user);
+        } else {
+            userRepositoryCreator.save(user);
+        }
         repository.save(masterLife);
     }
 

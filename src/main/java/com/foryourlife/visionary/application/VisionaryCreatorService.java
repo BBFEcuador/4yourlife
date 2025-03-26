@@ -32,17 +32,16 @@ public class VisionaryCreatorService {
 
     @Transactional
     public void create(Visionary visionary) {
-
-        if (repository.findByUserId(visionary.getUser().getId()).isPresent()){
-            throw new BaseException("The user is already a Visionary", List.of("Already exist as visionary"));
-        }
-
         var user = visionary.getUser();
         if (user.getPassword() == null) {
             user.setPassword(user.getEmail());
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepositoryCreator.save(user);
+        if (userRepository.findById(user.getId()).isPresent()) {
+            userRepository.save(user);
+        } else {
+            userRepositoryCreator.save(user);
+        }
         if (visionary.getActive() == null)
             visionary.setActive(true);
         repository.save(visionary);

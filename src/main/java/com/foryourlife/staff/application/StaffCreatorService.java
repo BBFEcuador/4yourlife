@@ -35,7 +35,23 @@ public class StaffCreatorService {
             user.setPassword(user.getEmail());
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepositoryCreator.save(user);
+        if (_userRepository.findById(user.getId()).isPresent()) {
+            _userRepository.save(user);
+        } else {
+            userRepositoryCreator.save(user);
+        }
+        if (staff.getActive() == null)
+            staff.setActive(true);
+        _repository.save(staff);
+    }
+
+    public void update(Staff staff) {
+        var user = staff.getUser();
+        if (user.getPassword() == null) {
+            user.setPassword(user.getEmail());
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        _userRepository.save(user);
         if (staff.getActive() == null)
             staff.setActive(true);
         _repository.save(staff);
@@ -68,7 +84,7 @@ public class StaffCreatorService {
         }
 
         var user = _userRepository.findById(userId).orElseThrow(() ->
-                new BaseException("User not found", List.of("User with id: " + userId +" does not exist"))
+                new BaseException("User not found", List.of("User with id: " + userId + " does not exist"))
         );
 
         var staff = Staff.create(userId, role, true, user);

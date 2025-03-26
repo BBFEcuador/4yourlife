@@ -52,17 +52,6 @@ public class CommandTrainingService {
 
             nextNumber = lastTraining.getNumber() + 1;
         }
-        Criteria ctriCriteria = new Criteria(
-                List.of(
-                        new Filter(
-                                "startDate",
-                                request.startDate.toString(),
-                                null,
-                                Filter.Operation.EQUAL,
-                                Filter.LogicalOperator.AND
-                        )
-                ), Optional.empty(), Optional.empty()
-        );
 
         repository.findByStartDate(new StartDate(request.startDate)).forEach(training -> {
             if (training.getCourseLevel() != LIFE) {

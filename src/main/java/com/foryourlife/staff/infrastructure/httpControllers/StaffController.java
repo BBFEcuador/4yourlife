@@ -25,6 +25,12 @@ public class StaffController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PutMapping("add")
+    public ResponseEntity<?> updateStaff(@RequestBody StaffRequest staff) {
+        staffService.update(staff.toDomain());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
 
     @GetMapping("")
     public ResponseEntity<?> findStaffByUserId() {

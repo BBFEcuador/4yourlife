@@ -14,4 +14,5 @@ import java.util.List;
 @Repository
 public interface JPATrainingRepository extends JpaRepository<Training, String> , JpaSpecificationExecutor<Training> {
     List<Training> findByStartDate(StartDate startDate);
+    List<Training> findByStartDateAndCampus_id(StartDate startDate,String campusId);
 }

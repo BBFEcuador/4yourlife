@@ -13,5 +13,6 @@ public interface TrainingRepository {
     List<Training> match(Criteria criteria);
     Training matchOne(Criteria criteria);
     List<Training> findByStartDate(StartDate date);
+    List<Training> findByStartDateAndCampus_id(StartDate date,String campusId);
     Optional<Training> findById(String id);
 }

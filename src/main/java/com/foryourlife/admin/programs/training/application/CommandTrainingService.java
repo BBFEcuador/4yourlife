@@ -33,14 +33,17 @@ public class CommandTrainingService {
     public void autoGenerateTraining(TrainingAutoGenerateRequest request) {
         var campus = campusService.findById(request.campusId);
         Integer nextNumber = 1;
-        if (request.firstFocus != null){
+        if (request.firstFocus != null) {
             nextNumber = request.firstFocus;
-        }else{
+        } else {
             Training lastTraining = repository.matchOne(
                     new Criteria(
                             List.of(
                                     new Filter(
-                                            "number", null, null, Filter.Operation.GET_LAST, null
+                                            "number", null, null, Filter.Operation.GET_LAST, Filter.LogicalOperator.AND
+                                    ),
+                                    new Filter(
+                                            "id", request.campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND
                                     )
                             ), Optional.empty(), Optional.empty()
                     )
@@ -53,7 +56,7 @@ public class CommandTrainingService {
             nextNumber = lastTraining.getNumber() + 1;
         }
 
-        repository.findByStartDate(new StartDate(request.startDate)).forEach(training -> {
+        repository.findByStartDateAndCampus_id(new StartDate(request.startDate), request.campusId).forEach(training -> {
             if (training.getCourseLevel() != LIFE) {
                 throw new BaseException("Error al actualizar la fecha", List.of("Entrenamientos Focus o Your no pueden coincidir"));
             }
@@ -80,23 +83,14 @@ public class CommandTrainingService {
     }
 
     public void updateStartDate(String id, LocalDate date) {
-        Criteria ctriCriteria = new Criteria(
-                List.of(
-                        new Filter(
-                                "startDate",
-                                date.toString(),
-                                null,
-                                Filter.Operation.EQUAL,
-                                Filter.LogicalOperator.AND
-                        )
-                ), Optional.empty(), Optional.empty()
+        var training = this.repository.findById(id).orElseThrow(() ->
+                new BaseException("Entrenammiento no encontrado", List.of())
         );
-        repository.findByStartDate(new StartDate(date)).forEach(training -> {
-            if (training.getCourseLevel() == FOCUS || training.getCourseLevel() == YOUR) {
+        repository.findByStartDateAndCampus_id(new StartDate(date), training.getCampus().getId()).forEach(t -> {
+            if (t.getCourseLevel() == FOCUS || t.getCourseLevel() == YOUR) {
                 throw new BaseException("Error al actualizar la fecha", List.of("Entrenamientos Focus o Your no pueden coincidir"));
             }
         });
-        var training = this.repository.findById(id).get();
         training.setStartDate(new StartDate(date));
         training.setEndDate(new EndDate(date.plusDays(2)));
         this.repository.save(training);

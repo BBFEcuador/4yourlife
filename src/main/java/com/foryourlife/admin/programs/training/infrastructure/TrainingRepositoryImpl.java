@@ -56,6 +56,11 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     }
 
     @Override
+    public List<Training> findByStartDateAndCampus_id(StartDate date,String campusId) {
+        return repository.findByStartDateAndCampus_id(date,campusId);
+    }
+
+    @Override
     public Optional<Training> findById(String id) {
         return this.repository.findById(id);
     }

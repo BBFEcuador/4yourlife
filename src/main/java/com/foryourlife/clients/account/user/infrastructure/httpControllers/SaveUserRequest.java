@@ -88,7 +88,7 @@ public class SaveUserRequest {
         var newId = id != null ? id : UUID.randomUUID().toString();
         return Participant.create(
                 newId,
-                new User(UUID.randomUUID().toString(), email, password, name, phone, List.of(new UserEntities(newId, UserType.PARTICIPANT.toString()))),
+                new User(UUID.randomUUID().toString(), email.toLowerCase().trim(), password.trim(), name, phone, List.of(new UserEntities(newId, UserType.PARTICIPANT.toString()))),
                 null,
                 profile.toDomain(),
                 token

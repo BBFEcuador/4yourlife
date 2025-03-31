@@ -22,7 +22,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequest request) throws BaseException {
-        return new ResponseEntity<>(this.userService.login(request.getUsername(), request.getPassword()), HttpStatus.OK);
+        return new ResponseEntity<>(this.userService.login(request.getUsername().toLowerCase(), request.getPassword()), HttpStatus.OK);
     }
 
     @PostMapping("/save")

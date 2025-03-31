@@ -99,18 +99,19 @@ public class AdminSeeder {
                     true
             ));
             List<ParticipantLevel> roles = Arrays.asList(
-                    ParticipantLevel.create("6642e863-7f6f-40a3-80e2-934388ade735","ROLE_INIT",true, CourseLevel.INIT),
-                    ParticipantLevel.create("3024c8f1-d603-47fc-8369-0e90cd2e703e","ROLE_FOCUS",false, CourseLevel.FOCUS),
-                    ParticipantLevel.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0","ROLE_YOUR",false, CourseLevel.YOUR),
-                    ParticipantLevel.create("5b2da953-9791-47e6-a5b8-3442b52b8ebc","ROLE_LIFE",false, CourseLevel.LIFE),
-                    ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9","ROLE_GRADUATE",false, CourseLevel.LIFE_GRADUATE)
+                    ParticipantLevel.create("6642e863-7f6f-40a3-80e2-934388ade735", "ROLE_INIT", true, CourseLevel.INIT),
+                    ParticipantLevel.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "ROLE_FOCUS", false, CourseLevel.FOCUS),
+                    ParticipantLevel.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "ROLE_YOUR", false, CourseLevel.YOUR),
+                    ParticipantLevel.create("5b2da953-9791-47e6-a5b8-3442b52b8ebc", "ROLE_LIFE", false, CourseLevel.LIFE),
+                    ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9", "ROLE_GRADUATE", false, CourseLevel.LIFE_GRADUATE)
             );
             this.participantLevelRepository.saveAll(roles);
+            createAdminTestUser();
 //            mock();
         };
     }
 
-    private void mock(){
+    private void mock() {
         makeTrainer();
         makePrograms();
         makeStaffs();
@@ -118,6 +119,22 @@ public class AdminSeeder {
         makeMasterLife();
         makeParticipants();
     }
+
+    private void createAdminTestUser() {
+        for (int i = 1; i < 21; i++) {
+            var email = "adminuser" + i + "@admin.com";
+            if (repository.findByEmail(email).isEmpty()) {
+                repository.save(new Admin(
+                        UUID.randomUUID().toString(),
+                        new User(UUID.randomUUID().toString(), email, passwordEncoder.encode("FocusYourLife2025--"), "Usuario test" + i, "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))),
+                        new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"),
+                        new HashSet<>(campusRepository.getAll()),
+                        true
+                ));
+            }
+        }
+    }
+
     private void makeTrainer() {
         for (int i = 0; i < 250; i++) {
             var trainer = Trainer.create(

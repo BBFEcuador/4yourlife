@@ -10,9 +10,9 @@ public class SaveContactRequest {
     private String name;
     private String relationship;
     private String phone;
-    private Participant userId;
+    private String userId;
 
-    public SaveContactRequest(String id, String name, String relationship, String phone, Participant userId) {
+    public SaveContactRequest(String id, String name, String relationship, String phone, String userId) {
         this.id = id;
         this.name = name;
         this.relationship = relationship;
@@ -21,7 +21,7 @@ public class SaveContactRequest {
     }
 
     public Contact toDomain() {
-        return Contact.create(id != null ? id: UUID.randomUUID().toString(), name, relationship, phone, userId);
+        return Contact.create(id != null ? id: UUID.randomUUID().toString(), name, relationship, phone, null);
     }
 
     public String getId() {
@@ -40,7 +40,7 @@ public class SaveContactRequest {
         return phone;
     }
 
-    public Participant getUserId() {
+    public String getUserId() {
         return userId;
     }
 }

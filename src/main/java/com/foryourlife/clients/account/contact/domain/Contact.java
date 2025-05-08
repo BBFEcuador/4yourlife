@@ -53,4 +53,8 @@ public class Contact {
     public static Contact create(String id, String name, String relationship, String phone, Participant user) {
         return new Contact(id, name, relationship, phone, user);
     }
+
+    public void setUser(Participant user) {
+        this.user = user;
+    }
 }

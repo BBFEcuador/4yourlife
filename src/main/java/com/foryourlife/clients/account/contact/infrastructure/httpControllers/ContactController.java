@@ -20,27 +20,27 @@ public class ContactController {
         this.queryContactService = queryContactService;
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<?> getByUserId(@PathVariable String userId) {
         return new ResponseEntity<>(queryContactService.findAllByUser(userId), HttpStatus.OK);
     }
 
-    @PostMapping("/save")
+    @PostMapping("")
     public ResponseEntity<?> saveContact(@RequestBody SaveContactRequest request) {
-        commandContactService.save(request.toDomain());
+        commandContactService.save(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PutMapping("/udpate")
+    @PutMapping("")
     public ResponseEntity<?> updateContact(@RequestBody SaveContactRequest request) {
         if(!queryContactService.findById(request.getId()).isPresent()){
             throw new BaseException("Contact not found", List.of(request.getId()));
         }
-            commandContactService.save(request.toDomain());
+            commandContactService.save(request);
             return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteContact(@PathVariable String id) {
         commandContactService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);

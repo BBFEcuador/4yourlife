@@ -77,34 +77,10 @@ public class AdminSeeder {
             campusRepository.save(Campus.create("61d88b2a-a22e-4cb0-8e43-e036483039d6", "Ecuador", "Quito", "De los Cedros OE1-13 y Real Audiencia", "094456123"));
             campusRepository.save(Campus.create("01a680a4-3bf6-4caf-98b8-f3d5c7a8811b", "Ecuador", "Guayaquil", "Alborada etapa 14 manzana 5", "094456123"));
             campusRepository.save(Campus.create("a35d480e-f17a-4b5c-887e-2ba9ddd3b696", "Ecuador", "Cuenca", "Por definir", "094456123"));
-            repository.save(new Admin(
-                    "3936ae5e-0cc1-4375-abc7-520d16999110",
-                    new User("72efe963-52b5-439a-ada2-3ea7b0258b89", "diegofyl@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "Diego FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))),
-                    new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"),
-                    new HashSet<>(campusRepository.getAll()),
-                    true
-            ));
-            repository.save(new Admin(
-                    "1a34e4df-33fa-4078-9acd-df7d04dde5f4",
-                    new User("93030dda-f43f-44bb-a500-991cda675aa7", "jairo@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "Jairo FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))),
-                    new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"),
-                    new HashSet<>(campusRepository.getAll()),
-                    true
-            ));
-            repository.save(new Admin(
-                    "b85430d1-e9fc-4c8d-8dd0-6c483511f0b8",
-                    new User("4f158ff7-3584-4c1b-abce-d1cbee0ced26", "katy@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "Katy FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))),
-                    new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"),
-                    new HashSet<>(campusRepository.getAll()),
-                    true
-            ));
-            List<ParticipantLevel> roles = Arrays.asList(
-                    ParticipantLevel.create("6642e863-7f6f-40a3-80e2-934388ade735", "ROLE_INIT", true, CourseLevel.INIT),
-                    ParticipantLevel.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "ROLE_FOCUS", false, CourseLevel.FOCUS),
-                    ParticipantLevel.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "ROLE_YOUR", false, CourseLevel.YOUR),
-                    ParticipantLevel.create("5b2da953-9791-47e6-a5b8-3442b52b8ebc", "ROLE_LIFE", false, CourseLevel.LIFE),
-                    ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9", "ROLE_GRADUATE", false, CourseLevel.LIFE_GRADUATE)
-            );
+            repository.save(new Admin("3936ae5e-0cc1-4375-abc7-520d16999110", new User("72efe963-52b5-439a-ada2-3ea7b0258b89", "diegofyl@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "DIEGO", "", "FYL", "", "Diego FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))), new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"), new HashSet<>(campusRepository.getAll()), true));
+            repository.save(new Admin("1a34e4df-33fa-4078-9acd-df7d04dde5f4", new User("93030dda-f43f-44bb-a500-991cda675aa7", "jairo@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "JAIRO", "", "FYL", "", "Jairo FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))), new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"), new HashSet<>(campusRepository.getAll()), true));
+            repository.save(new Admin("b85430d1-e9fc-4c8d-8dd0-6c483511f0b8", new User("4f158ff7-3584-4c1b-abce-d1cbee0ced26", "katy@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "KATY", "", "FYL", "", "Katy FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))), new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"), new HashSet<>(campusRepository.getAll()), true));
+            List<ParticipantLevel> roles = Arrays.asList(ParticipantLevel.create("6642e863-7f6f-40a3-80e2-934388ade735", "ROLE_INIT", true, CourseLevel.INIT), ParticipantLevel.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "ROLE_FOCUS", false, CourseLevel.FOCUS), ParticipantLevel.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "ROLE_YOUR", false, CourseLevel.YOUR), ParticipantLevel.create("5b2da953-9791-47e6-a5b8-3442b52b8ebc", "ROLE_LIFE", false, CourseLevel.LIFE), ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9", "ROLE_GRADUATE", false, CourseLevel.LIFE_GRADUATE));
             this.participantLevelRepository.saveAll(roles);
             createAdminTestUser();
 //            mock();
@@ -124,27 +100,14 @@ public class AdminSeeder {
         for (int i = 1; i < 21; i++) {
             var email = "adminuser" + i + "@admin.com";
             if (repository.findByEmail(email).isEmpty()) {
-                repository.save(new Admin(
-                        UUID.randomUUID().toString(),
-                        new User(UUID.randomUUID().toString(), email, passwordEncoder.encode("FocusYourLife2025--"), "Usuario test" + i, "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))),
-                        new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"),
-                        new HashSet<>(campusRepository.getAll()),
-                        true
-                ));
+                repository.save(new Admin(UUID.randomUUID().toString(), new User(UUID.randomUUID().toString(), email, passwordEncoder.encode("FocusYourLife2025--"), "Usuario", "", "Test", "", "Usuario test" + i, "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))), new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"), new HashSet<>(campusRepository.getAll()), true));
             }
         }
     }
 
     private void makeTrainer() {
         for (int i = 0; i < 250; i++) {
-            var trainer = Trainer.create(
-                    UUID.randomUUID().toString(),
-                    faker.name().fullName(),
-                    faker.internet().emailAddress(),
-                    faker.phoneNumber().phoneNumber(),
-                    faker.internet().password(),
-                    true
-            );
+            var trainer = Trainer.create(UUID.randomUUID().toString(), faker.name().fullName(), faker.internet().emailAddress(), faker.phoneNumber().phoneNumber(), faker.internet().password(), true);
             trainerCreatorService.createTrainer(trainer);
         }
     }
@@ -161,20 +124,8 @@ public class AdminSeeder {
     private void makeStaffs() {
         for (int i = 0; i < 100; i++) {
             var staffId = UUID.randomUUID().toString();
-            var user = new User(
-                    UUID.randomUUID().toString(),
-                    faker.internet().emailAddress(),
-                    faker.internet().password(),
-                    faker.name().fullName(),
-                    faker.phoneNumber().phoneNumber(),
-                    List.of(new UserEntities(staffId, UserType.STAFF.toString()))
-            );
-            var trainer = Staff.create(
-                    staffId,
-                    "STAFF",
-                    true,
-                    user
-            );
+            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), faker.internet().password(), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
+            var trainer = Staff.create(staffId, "STAFF", true, user);
             staffCreatorService.create(trainer);
         }
     }
@@ -182,19 +133,8 @@ public class AdminSeeder {
     private void makeMasterLife() {
         for (int i = 0; i < 100; i++) {
             var staffId = UUID.randomUUID().toString();
-            var user = new User(
-                    UUID.randomUUID().toString(),
-                    faker.internet().emailAddress(),
-                    faker.internet().password(),
-                    faker.name().fullName(),
-                    faker.phoneNumber().phoneNumber(),
-                    List.of(new UserEntities(staffId, UserType.STAFF.toString()))
-            );
-            var trainer = MasterLife.create(
-                    staffId,
-                    true,
-                    user
-            );
+            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), faker.internet().password(), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
+            var trainer = MasterLife.create(staffId, true, user);
             commandMasterLifeService.save(trainer);
         }
     }
@@ -202,20 +142,8 @@ public class AdminSeeder {
     private void makeVisionaries() {
         for (int i = 0; i < 100; i++) {
             var staffId = UUID.randomUUID().toString();
-            var user = new User(
-                    UUID.randomUUID().toString(),
-                    faker.internet().emailAddress(),
-                    faker.internet().password(),
-                    faker.name().fullName(),
-                    faker.phoneNumber().phoneNumber(),
-                    List.of(new UserEntities(staffId, UserType.STAFF.toString()))
-            );
-            var trainer = Visionary.create(
-                    staffId,
-                    "VISIONARIO",
-                    true,
-                    user
-            );
+            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), faker.internet().password(), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
+            var trainer = Visionary.create(staffId, "VISIONARIO", true, user);
             visionaryCreatorService.create(trainer);
         }
     }
@@ -224,38 +152,16 @@ public class AdminSeeder {
         var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600"));
         for (int i = 0; i < 350; i++) {
             var staffId = UUID.randomUUID().toString();
-            var user = new User(
-                    UUID.randomUUID().toString(),
-                    faker.internet().emailAddress(),
-                    faker.internet().password(),
-                    faker.name().fullName(),
-                    faker.phoneNumber().phoneNumber(),
-                    List.of(new UserEntities(staffId, UserType.STAFF.toString()))
-            );
+            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), faker.internet().password(), faker.name().firstName(),
+                    faker.name().firstName(),
+                    faker.name().lastName(),
+                    faker.name().lastName(),
+                    faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
             var bd = faker.date().birthday().toInstant();
             System.out.println(bd + "==================");
-            var profile = new ProfileDetailRequest(
-                    null,
-                    Date.from(bd),
-                    faker.address().fullAddress(),
-                    faker.job().position(),
-                    faker.gender().shortBinaryTypes(),
-                    "SOLTERO",
-                    faker.idNumber().inValidEnZaSsn(),
-                    faker.address().city()
-            ).toDomain();
-            var trainer = Participant.create(
-                    staffId,
-                    user,
-                    null,
-                    profile,
-                    invitationToken
-            );
-            var medicalRecord = new MedicalRecordSaveRequest(
-                    "N/A",
-                    "N/A",
-                    "N/A"
-            );
+            var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();
+            var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false);
+            var medicalRecord = new MedicalRecordSaveRequest("N/A", "N/A", "N/A");
             commandUsersService.createInitUser(trainer, medicalRecord);
 
         }

@@ -9,6 +9,7 @@ import com.foryourlife.clients.account.module.application.ClientModuleCreatorSer
 import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
+import com.foryourlife.clients.account.profileDetails.domain.ProfileDetailsRepository;
 import com.foryourlife.clients.account.user.domain.*;
 import com.foryourlife.clients.account.user.infrastructure.httpControllers.MedicalRecordSaveRequest;
 import com.foryourlife.shared.domain.bus.EventBus;
@@ -33,19 +34,21 @@ public class CommandUsersService {
     private final QueryInvitationServices queryInvitationServices;
     private final ParticipantLevelService _rolRepository;
     private final ClientModuleCreatorService _clientModuleRepository;
+    private final ProfileDetailsRepository _profileDetailsRepository;
     private final ParticipantLevelService participantLevelService;
     private final EventBus bus;
     private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
     private final AdminRepository _adminRepository;
     private final MedicalRecordCreatorService medicalRecordCreatorService;
 
-    public CommandUsersService(UserRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ParticipantLevelService participantLevelService, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService) {
+    public CommandUsersService(UserRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService) {
         this._participantRepository = _participantRepository;
         this._userRepository = _userRepository;
         this.commandGeneralUserService = commandGeneralUserService;
         this.queryInvitationServices = queryInvitationServices;
         this._rolRepository = _rolRepository;
         this._clientModuleRepository = _clientModuleRepository;
+        _profileDetailsRepository = profileDetailsRepository;
         this.participantLevelService = participantLevelService;
         this.bus = bus;
         this._adminRepository = _adminRepository;
@@ -87,10 +90,13 @@ public class CommandUsersService {
         }
     }
 
-    public void update(Participant user) {
+    public void update(Participant participant) {
         try {
-            var auxUser = this._participantRepository.findById(user.getId()).orElseThrow(() -> new BaseException("Participant not found",List.of()));
-            this._participantRepository.save(auxUser);
+            _userRepository.findById(participant.getUser().getId()).orElseThrow(() -> new BaseException("User related to participant not found", List.of()));
+            _userRepository.save(participant.getUser());
+            _profileDetailsRepository.findById(participant.getProfile().getId()).orElseThrow(() -> new BaseException("Profile related to participant not found", List.of()));
+            _profileDetailsRepository.save(participant.getProfile());
+            this._participantRepository.save(participant);
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);
         }
@@ -122,8 +128,8 @@ public class CommandUsersService {
         _participantRepository.save(participant);
     }
 
-    public void promotionToMasterLife(String id){
-        var user = this._participantRepository.findById(id).orElseThrow(() -> new BaseException("User not found",List.of()));
+    public void promotionToMasterLife(String id) {
+        var user = this._participantRepository.findById(id).orElseThrow(() -> new BaseException("User not found", List.of()));
 //        var role = this._rolRepository.getRolByLevel(CourseLevel.MASTER_LIFE);
 //        user.setParticipantLevel(role);
         this._participantRepository.save(user);

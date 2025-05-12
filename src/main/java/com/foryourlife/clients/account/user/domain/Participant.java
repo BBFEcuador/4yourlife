@@ -44,7 +44,7 @@ public class Participant extends AggregateRoot implements Serializable {
     private List<Contact> contacts = new ArrayList<>();
     @ManyToMany(mappedBy = "users", targetEntity = Team.class, fetch = FetchType.EAGER)
     private Set<Team> teams = new HashSet<>();
-    @OneToOne(mappedBy = "participant",targetEntity = MedicalRecord.class,fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "participant", targetEntity = MedicalRecord.class, fetch = FetchType.EAGER)
     @JsonIgnoreProperties("participant")
     private MedicalRecord medicalRecord;
 
@@ -83,16 +83,18 @@ public class Participant extends AggregateRoot implements Serializable {
         return contacts;
     }
 
-    private Participant(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
+    private Participant(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken, Boolean isLingerer, Boolean isDesertor) {
         this.id = id;
         this.user = user;
         this.participantLevel = role;
         this.profile = profile;
         this.invitationToken = invitationToken;
+        this.isLingerer = isLingerer;
+        this.isDesertor = isDesertor;
     }
 
-    public static Participant create(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken) {
-        var participant = new Participant(id, user, role, profile, invitationToken);
+    public static Participant create(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken, Boolean isLingerer, Boolean isDesertor) {
+        var participant = new Participant(id, user, role, profile, invitationToken, isLingerer, isDesertor);
         participant.record(new UserCreated(id, participant));
         return participant;
     }
@@ -153,9 +155,10 @@ public class Participant extends AggregateRoot implements Serializable {
         return user;
     }
 
-    public void updateLvl(ParticipantLevel newLvl){
+    public void updateLvl(ParticipantLevel newLvl) {
         this.participantLevel = newLvl;
     }
+
     public MedicalRecord getMedicalRecord() {
         return medicalRecord;
     }

@@ -164,6 +164,7 @@ public class CommandTeamService {
             if (p.getTeam() != null && !Objects.equals(p.getTeam().getId(), team.getId())) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
+            //if(p.get)
             return p;
         }).toList();
         var staff = request.staffs.stream().map(participant -> {

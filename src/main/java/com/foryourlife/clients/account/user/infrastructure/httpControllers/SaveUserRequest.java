@@ -28,8 +28,17 @@ public class SaveUserRequest {
     @NotBlank(message = "The token field is required")
     public String token;
     @NotNull
-    @NotBlank(message = "The name field is required")
-    public String name;
+    @NotBlank(message = "The name1 field is required")
+    public String name1;
+    @NotNull
+    @NotBlank(message = "The name2 field is required")
+    public String name2;
+    @NotNull
+    @NotBlank(message = "The lastname1 field is required")
+    public String lastname1;
+    @NotNull
+    @NotBlank(message = "The lastname2 field is required")
+    public String lastname2;
     @NotNull
     @NotBlank(message = "The phone field is required")
     @Pattern(regexp = "^[0-9]*$", message = "The phone field only accept digits")
@@ -40,17 +49,6 @@ public class SaveUserRequest {
     @NotNull
     @Valid
     public MedicalRecordSaveRequest medicalRecord;
-
-    public SaveUserRequest(String id, String email, String password, String token, String name, String phone, ProfileDetailRequest profile, MedicalRecordSaveRequest medicalRecord) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.token = token;
-        this.name = name;
-        this.phone = phone;
-        this.profile = profile;
-        this.medicalRecord = medicalRecord;
-    }
 
     public String getId() {
         return id;
@@ -68,8 +66,20 @@ public class SaveUserRequest {
         return token;
     }
 
-    public String getName() {
-        return name;
+    public String getName1() {
+        return name1;
+    }
+
+    public String getName2() {
+        return name2;
+    }
+
+    public String getLastname1() {
+        return lastname1;
+    }
+
+    public String getLastname2() {
+        return lastname2;
     }
 
     public String getPhone() {
@@ -88,10 +98,22 @@ public class SaveUserRequest {
         var newId = id != null ? id : UUID.randomUUID().toString();
         return Participant.create(
                 newId,
-                new User(UUID.randomUUID().toString(), email.toLowerCase().trim(), password.trim(), name, phone, List.of(new UserEntities(newId, UserType.PARTICIPANT.toString()))),
+                new User(
+                        UUID.randomUUID().toString(),
+                        email.toLowerCase().trim(),
+                        password.trim(),
+                        name1,
+                        name2,
+                        lastname1,
+                        lastname2,
+                        name1 + " " + name2 + " " + lastname1 + " " + lastname2,
+                        phone,
+                        List.of(new UserEntities(newId, UserType.PARTICIPANT.toString()))),
                 null,
                 profile.toDomain(),
-                token
+                token,
+                false,
+                false
         );
     }
 }

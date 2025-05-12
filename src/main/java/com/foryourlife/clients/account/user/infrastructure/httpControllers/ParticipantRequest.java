@@ -6,6 +6,7 @@ import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+import net.datafaker.providers.base.Bool;
 
 public class ParticipantRequest {
 
@@ -19,6 +20,10 @@ public class ParticipantRequest {
     private ProfileDetails profile;
     @NotNull
     private String invitationToken;
+    @NotNull
+    private Boolean isLingerer;
+    @NotNull
+    private Boolean isDesertor;
 
     public String getId() {
         return id;
@@ -40,7 +45,15 @@ public class ParticipantRequest {
         return invitationToken;
     }
 
+    public Boolean getIsLingerer() {
+        return isLingerer;
+    }
+
+    public Boolean getIsDesertor() {
+        return isDesertor;
+    }
+
     public Participant toDomain() {
-        return Participant.create(id, user, participantLevel, profile, invitationToken);
+        return Participant.create(id, user, participantLevel, profile, invitationToken, isLingerer, isDesertor);
     }
 }

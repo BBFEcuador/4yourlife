@@ -51,8 +51,12 @@ public class AdminCreateService {
                 UUID.randomUUID().toString(),
                 admin.email,
                 passwordEncoder.encode(password),
-                admin.name,
-                admin.name,
+                admin.name1,
+                admin.name2,
+                admin.lastname1,
+                admin.lastname2,
+                admin.name1 + " " + admin.name2 + " " + admin.lastname1 + " " + admin.lastname2,
+                admin.phone,
                 List.of(new UserEntities(adminId, UserType.ADMIN.toString()))
         );
         commandGeneralUserService.save(user);

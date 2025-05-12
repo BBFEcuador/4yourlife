@@ -17,8 +17,17 @@ public class UpdateUserRequest {
     @NotBlank(message = "The User/Email field is required")
     public String email;
     @NotNull
-    @NotBlank(message = "The name field is required")
-    public String name;
+    @NotBlank(message = "The name1 field is required")
+    public String name1;
+    @NotNull
+    @NotBlank(message = "The name2 field is required")
+    public String name2;
+    @NotNull
+    @NotBlank(message = "The lastname1 field is required")
+    public String lastname1;
+    @NotNull
+    @NotBlank(message = "The lastname2 field is required")
+    public String lastname2;
     @NotNull
     @NotBlank(message = "The phone field is required")
     @Pattern(regexp = "^[0-9]*$", message = "The phone field only accept digits")
@@ -27,19 +36,8 @@ public class UpdateUserRequest {
     @Valid
     public ProfileDetailRequest profile;
 
-    public UpdateUserRequest(String phone, String name, String email, String id) {
-        this.id = id;
-        this.phone = phone;
-        this.name = name;
-        this.email = email;
-    }
-
     public String getEmail() {
         return email;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPhone() {

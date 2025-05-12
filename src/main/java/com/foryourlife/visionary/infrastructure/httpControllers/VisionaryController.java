@@ -27,7 +27,7 @@ public class VisionaryController {
     private VisionaryCreatorService creatorService;
 
     @PostMapping("add")
-    public ResponseEntity<?> createVisionary(@Valid @RequestBody VisionaryRequest visionaryRequest) {
+    public ResponseEntity<?> createVisionary( @RequestBody VisionaryRequest visionaryRequest) {
         creatorService.create(visionaryRequest.toDomain());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

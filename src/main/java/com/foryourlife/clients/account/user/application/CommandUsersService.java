@@ -2,6 +2,8 @@ package com.foryourlife.clients.account.user.application;
 
 import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
+import com.foryourlife.clients.account.invoiceData.application.InvoiceDataCommandService;
+import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
 import com.foryourlife.clients.account.medicalRecord.application.MedicalRecordCreatorService;
 import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
 import com.foryourlife.clients.account.medicalRecord.infrastructure.httpcontrollers.MedicalRecordRequest;
@@ -40,8 +42,9 @@ public class CommandUsersService {
     private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
     private final AdminRepository _adminRepository;
     private final MedicalRecordCreatorService medicalRecordCreatorService;
+    private final InvoiceDataCommandService invoiceDataCommandService;
 
-    public CommandUsersService(UserRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService) {
+    public CommandUsersService(UserRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService) {
         this._participantRepository = _participantRepository;
         this._userRepository = _userRepository;
         this.commandGeneralUserService = commandGeneralUserService;
@@ -53,19 +56,30 @@ public class CommandUsersService {
         this.bus = bus;
         this._adminRepository = _adminRepository;
         this.medicalRecordCreatorService = medicalRecordCreatorService;
+        this.invoiceDataCommandService = invoiceDataCommandService;
     }
 
     @Transactional
     public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest) {
+        createInitUser(user, medicalRecordRequest, null);
+    }
+
+    @Transactional
+    public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest, DataInvoice dataInvoice) {
         var token = queryInvitationServices.findInvitationByToken(user.getInvitationToken());
         if (token.getUsed())
             throw new BaseException("Token expired", List.of("The token " + user.getInvitationToken() + " was used"));
+
         commandGeneralUserService.save(user.getUser());
 
         var role = this._rolRepository.getInitRole();
         user.setParticipantLevel(role);
         this._participantRepository.save(user);
-        this._clientModuleRepository.createClientModule(ClientModule.create(UUID.randomUUID().toString(), false, false, false, user));
+
+        this._clientModuleRepository.createClientModule(
+                ClientModule.create(UUID.randomUUID().toString(), false, false, false, user)
+        );
+
         var medicalRecord = MedicalRecord.create(
                 UUID.randomUUID().toString(),
                 medicalRecordRequest.psychiatric_history_detail,
@@ -74,8 +88,15 @@ public class CommandUsersService {
                 user
         );
         medicalRecordCreatorService.createMedicalRecord(medicalRecord);
+
+        if (dataInvoice != null) {
+            dataInvoice.setUser(user.getUser());
+            invoiceDataCommandService.create(dataInvoice);
+        }
+
         this.bus.publish(user.pullDomainEvents());
     }
+
 
     public void save(Participant user) {
         if (this._participantRepository.findByEmail(user.getEmail()).isPresent())

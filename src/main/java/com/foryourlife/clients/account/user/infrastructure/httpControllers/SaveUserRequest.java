@@ -1,5 +1,6 @@
 package com.foryourlife.clients.account.user.infrastructure.httpControllers;
 
+import com.foryourlife.clients.account.invoiceData.infrastructure.httpControllers.InvoiceDataRequest;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
 import com.foryourlife.clients.account.user.domain.Participant;
@@ -50,6 +51,9 @@ public class SaveUserRequest {
     @Valid
     public MedicalRecordSaveRequest medicalRecord;
 
+    @Valid
+    public InvoiceDataRequest dataInvoice;
+
     public String getId() {
         return id;
     }
@@ -88,6 +92,10 @@ public class SaveUserRequest {
 
     public ProfileDetailRequest getProfile() {
         return profile;
+    }
+
+    public InvoiceDataRequest getDataInvoice() {
+        return dataInvoice;
     }
 
     public MedicalRecordSaveRequest getMedicalRecord() {

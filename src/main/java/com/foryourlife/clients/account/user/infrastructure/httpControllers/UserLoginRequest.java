@@ -23,7 +23,7 @@ public class UserLoginRequest {
     }
 
     public String getUsername() {
-        return username;
+        return username.toLowerCase();
     }
 
     public String getPassword() {

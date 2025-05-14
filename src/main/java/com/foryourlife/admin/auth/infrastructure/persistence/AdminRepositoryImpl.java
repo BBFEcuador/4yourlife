@@ -36,7 +36,7 @@ public class AdminRepositoryImpl implements AdminRepository {
 
     @Override
     public AdminLoginResponse login(String username, String password) {
-        Authentication authentication = this.authenticate(username, password);
+        Authentication authentication = this.authenticate(username.toLowerCase(), password);
         var token = jwtUtils.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return new AdminLoginResponse(this.loadAdmin, token);

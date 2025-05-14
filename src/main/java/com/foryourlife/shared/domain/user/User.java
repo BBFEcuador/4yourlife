@@ -34,7 +34,7 @@ public class User {
     }
 
     public String getEmail() {
-        return email;
+        return email.toLowerCase();
     }
 
     public String getPassword() {
@@ -55,7 +55,7 @@ public class User {
 
     public User(String id, String email, String password, String name1, String name2, String lastname1, String lastname2, String name, String phone, List<UserEntities> entityMap) {
         this.id = id;
-        this.email = email;
+        this.email = email.toLowerCase();
         this.password = password;
         this.name1 = name1;
         this.name2 = name2;

@@ -69,7 +69,8 @@ public class CommandTeamService {
             if (p.getTeam() != null) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
-            return p;
+            if (p.getModules().getHasLife()) return p;
+            return null;
         }).toList();
         var masterLife = request.masterLife.stream().map(participant -> {
             var p = queryMasterLifeService.findById(participant.getId());
@@ -133,7 +134,8 @@ public class CommandTeamService {
             if (p.getTeam() != null) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
-            return p;
+            if (p.getModules().getHasYour()) return p;
+            return null;
         }).toList();
         var staff = request.staffs.stream().map(participant -> {
             var p = staffRepository.findById(participant.getId()).orElseThrow();
@@ -164,8 +166,11 @@ public class CommandTeamService {
             if (p.getTeam() != null && !Objects.equals(p.getTeam().getId(), team.getId())) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
-            //if(p.get)
-            return p;
+            if (p.getModules().getHasYour()) return p;
+            p.setLingerer(true);
+            p.setDesertor(true);
+            _userRepository.save(p);
+            return null;
         }).toList();
         var staff = request.staffs.stream().map(participant -> {
             var p = staffRepository.findById(participant.getId()).orElseThrow();
@@ -315,7 +320,11 @@ public class CommandTeamService {
             if (p.getTeam() != null && !Objects.equals(p.getTeam().getId(), team.getId())) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
-            return p;
+            if (p.getModules().getHasLife()) return p;
+            p.setLingerer(true);
+            p.setDesertor(true);
+            _userRepository.save(p);
+            return null;
         }).toList();
         var masterLife = request.masterLife.stream().map(participant -> {
             var p = queryMasterLifeService.findById(participant.getId());

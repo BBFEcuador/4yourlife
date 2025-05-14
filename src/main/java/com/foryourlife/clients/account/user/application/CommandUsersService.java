@@ -122,7 +122,9 @@ public class CommandUsersService {
     public void update(Participant participant) {
         try {
             _userRepository.findById(participant.getUser().getId()).orElseThrow(() -> new BaseException("User related to participant not found", List.of()));
-            _userRepository.save(participant.getUser());
+            var newUser = participant.getUser();
+            newUser.setName(newUser.getName1() + " " + newUser.getName2()+ " " + newUser.getLastname1() + " " + newUser.getLastname2());
+            _userRepository.save(newUser);
             _profileDetailsRepository.findById(participant.getProfile().getId()).orElseThrow(() -> new BaseException("Profile related to participant not found", List.of()));
             _profileDetailsRepository.save(participant.getProfile());
             this._participantRepository.save(participant);

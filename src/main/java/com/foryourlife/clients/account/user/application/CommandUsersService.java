@@ -1,6 +1,8 @@
 package com.foryourlife.clients.account.user.application;
 
 import com.foryourlife.admin.auth.domain.AdminRepository;
+import com.foryourlife.clients.account.contact.domain.ContactRepository;
+import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
 import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
 import com.foryourlife.clients.account.invoiceData.application.InvoiceDataCommandService;
 import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
@@ -38,13 +40,14 @@ public class CommandUsersService {
     private final ClientModuleCreatorService _clientModuleRepository;
     private final ProfileDetailsRepository _profileDetailsRepository;
     private final ParticipantLevelService participantLevelService;
+    private final ContactRepository _contactRepository;
     private final EventBus bus;
     private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
     private final AdminRepository _adminRepository;
     private final MedicalRecordCreatorService medicalRecordCreatorService;
     private final InvoiceDataCommandService invoiceDataCommandService;
 
-    public CommandUsersService(UserRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService) {
+    public CommandUsersService(UserRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, ContactRepository contactRepository, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService) {
         this._participantRepository = _participantRepository;
         this._userRepository = _userRepository;
         this.commandGeneralUserService = commandGeneralUserService;
@@ -53,6 +56,7 @@ public class CommandUsersService {
         this._clientModuleRepository = _clientModuleRepository;
         _profileDetailsRepository = profileDetailsRepository;
         this.participantLevelService = participantLevelService;
+        _contactRepository = contactRepository;
         this.bus = bus;
         this._adminRepository = _adminRepository;
         this.medicalRecordCreatorService = medicalRecordCreatorService;
@@ -61,11 +65,11 @@ public class CommandUsersService {
 
     @Transactional
     public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest) {
-        createInitUser(user, medicalRecordRequest, null);
+        createInitUser(user, medicalRecordRequest, null, null);
     }
 
     @Transactional
-    public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest, DataInvoice dataInvoice) {
+    public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest, SaveContactRequest contact, DataInvoice dataInvoice) {
         var token = queryInvitationServices.findInvitationByToken(user.getInvitationToken());
         if (token.getUsed())
             throw new BaseException("Token expired", List.of("The token " + user.getInvitationToken() + " was used"));
@@ -88,6 +92,10 @@ public class CommandUsersService {
                 user
         );
         medicalRecordCreatorService.createMedicalRecord(medicalRecord);
+
+        var newContact = contact.toDomain();
+        newContact.setUser(user);
+        _contactRepository.save(newContact);
 
         if (dataInvoice != null) {
             dataInvoice.setUser(user.getUser());

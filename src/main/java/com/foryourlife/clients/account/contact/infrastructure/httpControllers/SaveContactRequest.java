@@ -2,13 +2,17 @@ package com.foryourlife.clients.account.contact.infrastructure.httpControllers;
 
 import com.foryourlife.clients.account.contact.domain.Contact;
 import com.foryourlife.clients.account.user.domain.Participant;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
 public class SaveContactRequest {
     private String id;
+    @NotNull
     private String name;
+    @NotNull
     private String relationship;
+    @NotNull
     private String phone;
     private String userId;
 

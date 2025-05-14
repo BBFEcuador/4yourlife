@@ -1,5 +1,7 @@
 package com.foryourlife.clients.account.user.infrastructure.httpControllers;
 
+import com.foryourlife.clients.account.contact.domain.Contact;
+import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
 import com.foryourlife.clients.account.invoiceData.infrastructure.httpControllers.InvoiceDataRequest;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
@@ -48,6 +50,10 @@ public class SaveUserRequest {
     @NotNull
     @Valid
     public MedicalRecordSaveRequest medicalRecord;
+
+    @NotNull
+    @Valid
+    public SaveContactRequest contact;
 
     @Valid
     public InvoiceDataRequest dataInvoice;
@@ -99,6 +105,8 @@ public class SaveUserRequest {
     public MedicalRecordSaveRequest getMedicalRecord() {
         return medicalRecord;
     }
+
+
 
     public Participant toDomain() {
         var newId = id != null ? id : UUID.randomUUID().toString();

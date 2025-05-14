@@ -32,6 +32,7 @@ public class AuthController {
         userService.createInitUser(
                 request.toDomain(),
                 request.getMedicalRecord(),
+                request.contact,
                 request.getDataInvoice() != null ? request.getDataInvoice().toDomain() : null
         );
 

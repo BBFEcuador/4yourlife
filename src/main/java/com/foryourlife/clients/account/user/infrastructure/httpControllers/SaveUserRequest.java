@@ -31,14 +31,12 @@ public class SaveUserRequest {
     @NotNull
     @NotBlank(message = "The name1 field is required")
     public String name1;
-    @NotNull
-    @NotBlank(message = "The name2 field is required")
+
     public String name2;
     @NotNull
     @NotBlank(message = "The lastname1 field is required")
     public String lastname1;
-    @NotNull
-    @NotBlank(message = "The lastname2 field is required")
+
     public String lastname2;
     @NotNull
     @NotBlank(message = "The phone field is required")

@@ -2,6 +2,7 @@ package com.foryourlife.admin.programs.campus.infrastructure.httpControllers;
 
 import com.foryourlife.admin.programs.campus.application.CommandCampusService;
 import com.foryourlife.admin.programs.campus.application.QueryCampusService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ public class CampusController {
 //    }
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestBody CampusRequest request) {
+    public ResponseEntity<?> save(@Valid @RequestBody CampusRequest request) {
         this.commandCampusService.save(request.toDomain());
         return new ResponseEntity<>( HttpStatus.CREATED);
     }

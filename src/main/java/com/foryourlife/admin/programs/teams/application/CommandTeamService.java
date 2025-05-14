@@ -181,7 +181,7 @@ public class CommandTeamService {
         }).toList();
         var n = Team.create(
                 team.getId(),
-                team.getName(),
+                training.getCourseLevel().name()+"-" + training.getNumber(),
                 team.getPhoto(),
                 training,
                 training.getNumber(),
@@ -335,7 +335,7 @@ public class CommandTeamService {
         }).toList();
         var n = Team.create(
                 team.getId(),
-                team.getName(),
+                request.name != null ? request.name : training.getCourseLevel().name() + "-" + training.getNumber(),
                 team.getPhoto(),
                 training,
                 training.getNumber(),

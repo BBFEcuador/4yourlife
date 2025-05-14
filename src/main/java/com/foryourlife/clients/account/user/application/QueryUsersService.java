@@ -7,6 +7,8 @@ import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,6 +34,9 @@ public class QueryUsersService {
 
     public List<Participant> getAll() {
         return this._userRepository.getAll();
+    }
+    public Page<Participant> getAll(Pageable pageable) {
+        return this._userRepository.getAll(pageable);
     }
     public List<Participant> matchers(Criteria criteria) {
         return this._userRepository.match(criteria);

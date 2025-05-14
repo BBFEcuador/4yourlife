@@ -7,6 +7,8 @@ import com.foryourlife.shared.JWTUtils;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -78,6 +80,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<Participant> getAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public Page<Participant> getAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override

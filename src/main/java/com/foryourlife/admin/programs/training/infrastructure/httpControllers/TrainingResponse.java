@@ -1,5 +1,7 @@
 package com.foryourlife.admin.programs.training.infrastructure.httpControllers;
 
+import com.foryourlife.admin.programs.training.domain.Training;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -10,6 +12,7 @@ public class TrainingResponse {
         private LocalDateTime end;
         private boolean allDay;
         private String color;
+        private Training embedded;
 
         public static class ExtendedProps {
             private String description;
@@ -50,7 +53,7 @@ public class TrainingResponse {
 
         private ExtendedProps extendedProps;
 
-    public TrainingResponse(String id, String title, LocalDate start, LocalDateTime end, boolean allDay, String color, ExtendedProps extendedProps) {
+    public TrainingResponse(String id, String title, LocalDate start, LocalDateTime end, boolean allDay, String color, ExtendedProps extendedProps, Training embedded) {
         this.id = id;
         this.title = title;
         this.start = start;
@@ -58,6 +61,7 @@ public class TrainingResponse {
         this.allDay = allDay;
         this.color = color;
         this.extendedProps = extendedProps;
+        this.embedded = embedded;
     }
 
     public String getId() {
@@ -118,5 +122,9 @@ public class TrainingResponse {
 
     public ExtendedProps createExtendedProps(String description, String location, String[] guests) {
         return new ExtendedProps(description, location, guests);
+    }
+
+    public Training getEmbedded() {
+        return embedded;
     }
 }

@@ -1,16 +1,14 @@
 package com.foryourlife.clients.account.user.infrastructure.httpControllers;
 
-import com.foryourlife.admin.programs.trainer.infrastructure.httpControllers.AvailableTrainerRequest;
 import com.foryourlife.clients.account.user.application.CommandUsersService;
 import com.foryourlife.clients.account.user.application.QueryUsersService;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
-import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

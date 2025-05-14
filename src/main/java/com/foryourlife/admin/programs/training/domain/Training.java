@@ -1,6 +1,7 @@
 package com.foryourlife.admin.programs.training.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.shared.domain.AggregateRoot;
@@ -40,7 +41,7 @@ public class Training extends AggregateRoot implements Serializable {
     @ManyToOne
     private Campus campus;
     private Boolean state;
-    @JsonIgnore
+    @JsonIgnoreProperties(value = {"training"})
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Team originalTeam;

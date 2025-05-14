@@ -63,10 +63,10 @@ public class CommandUsersService {
         this.invoiceDataCommandService = invoiceDataCommandService;
     }
 
-    @Transactional
-    public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest) {
-        createInitUser(user, medicalRecordRequest, null, null);
-    }
+//    @Transactional
+//    public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest) {
+//        createInitUser(user, medicalRecordRequest, null, null);
+//    }
 
     @Transactional
     public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest, SaveContactRequest contact, DataInvoice dataInvoice) {

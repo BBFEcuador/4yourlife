@@ -9,6 +9,7 @@ import com.foryourlife.admin.programs.trainer.application.TrainerCreatorService;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.application.CommandTrainingService;
 import com.foryourlife.admin.programs.training.infrastructure.httpControllers.TrainingAutoGenerateRequest;
+import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
 import com.foryourlife.clients.account.invitations.applications.CommandInvitationService;
 import com.foryourlife.clients.account.invitations.infrastructure.InvitationRequest;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
@@ -83,7 +84,7 @@ public class AdminSeeder {
             List<ParticipantLevel> roles = Arrays.asList(ParticipantLevel.create("6642e863-7f6f-40a3-80e2-934388ade735", "ROLE_INIT", true, CourseLevel.INIT), ParticipantLevel.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "ROLE_FOCUS", false, CourseLevel.FOCUS), ParticipantLevel.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "ROLE_YOUR", false, CourseLevel.YOUR), ParticipantLevel.create("5b2da953-9791-47e6-a5b8-3442b52b8ebc", "ROLE_LIFE", false, CourseLevel.LIFE), ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9", "ROLE_GRADUATE", false, CourseLevel.LIFE_GRADUATE));
             this.participantLevelRepository.saveAll(roles);
             createAdminTestUser();
-            //mock();
+//            mock();
         };
     }
 
@@ -152,7 +153,11 @@ public class AdminSeeder {
         var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600"));
         for (int i = 0; i < 350; i++) {
             var staffId = UUID.randomUUID().toString();
-            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), faker.internet().password(), faker.name().firstName(),
+            var user = new User(
+                    UUID.randomUUID().toString(),
+                    faker.internet().emailAddress(),
+                    faker.internet().password(),
+                    faker.name().firstName(),
                     faker.name().firstName(),
                     faker.name().lastName(),
                     faker.name().lastName(),
@@ -162,7 +167,7 @@ public class AdminSeeder {
             var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();
             var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false);
             var medicalRecord = new MedicalRecordSaveRequest("N/A", "N/A", "N/A");
-            commandUsersService.createInitUser(trainer, medicalRecord);
+            commandUsersService.createInitUser(trainer, medicalRecord, new SaveContactRequest(null,faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(),null), null);
 
         }
     }

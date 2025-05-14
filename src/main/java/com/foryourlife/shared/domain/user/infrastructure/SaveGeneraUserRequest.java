@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class SaveGeneraUserRequest {
@@ -22,14 +24,10 @@ public class SaveGeneraUserRequest {
     @NotNull
     @NotBlank(message = "The name1 field is required")
     public String name1;
-    @NotNull
-    @NotBlank(message = "The name2 field is required")
     public String name2;
     @NotNull
     @NotBlank(message = "The lastname1 field is required")
     public String lastname1;
-    @NotNull
-    @NotBlank(message = "The lastname2 field is required")
     public String lastname2;
     @NotNull
     public String name;
@@ -45,7 +43,9 @@ public class SaveGeneraUserRequest {
                 name2,
                 lastname1,
                 lastname2,
-                name,
+                name = Stream.of(name1, name2, lastname1, lastname2)
+                        .filter(s -> s != null && !s.trim().isEmpty())
+                        .collect(Collectors.joining(" ")),
                 phone,
                 entity
         );

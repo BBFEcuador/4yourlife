@@ -18,4 +18,5 @@ public class PromotionLifeRequest {
     public List<MasterLife> masterLife;
     @NotNull(message = "Debe seleccionar un entrenador")
     public String trainer;
+    public String name;
 }

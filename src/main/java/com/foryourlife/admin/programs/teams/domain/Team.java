@@ -28,6 +28,7 @@ public class Team extends AggregateRoot implements Serializable {
     private String photo;
     @ManyToOne()
     @JoinColumn(name = "training_id", referencedColumnName = "id")
+    @JsonIgnoreProperties(value = {"originalTeam"}, allowSetters = true)
     private Training training;
     @Column(name = "training_number")
     private Integer trainingNumber;

@@ -1,9 +1,7 @@
 package com.foryourlife.clients.account.user.infrastructure.httpControllers;
 
-import com.foryourlife.clients.account.contact.domain.Contact;
 import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
 import com.foryourlife.clients.account.invoiceData.infrastructure.httpControllers.InvoiceDataRequest;
-import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
 import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.user.User;
@@ -13,10 +11,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SaveUserRequest {
     public String id;
@@ -42,7 +41,6 @@ public class SaveUserRequest {
     public String lastname2;
     @NotNull
     @NotBlank(message = "The phone field is required")
-    @Pattern(regexp = "^[0-9]*$", message = "The phone field only accept digits")
     public String phone;
     @NotNull
     @Valid
@@ -120,7 +118,9 @@ public class SaveUserRequest {
                         name2,
                         lastname1,
                         lastname2,
-                        name1 + " " + name2 + " " + lastname1 + " " + lastname2,
+                        Stream.of(name1, name2, lastname1, lastname2)
+                                .filter(s -> s != null && !s.trim().isEmpty())
+                                .collect(Collectors.joining(" ")),
                         phone,
                         List.of(new UserEntities(newId, UserType.PARTICIPANT.toString()))),
                 null,

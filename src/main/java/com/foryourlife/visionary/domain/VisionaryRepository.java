@@ -18,6 +18,7 @@ public interface VisionaryRepository {
 
     List<Visionary> findAll();
     Page<Visionary> findAll(Pageable pageable);
+    Page<Visionary> findAll(Pageable pageable,Criteria criteria);
 
     List<Visionary> findAvailableVisionaries(LocalDate startDate, LocalDate endDate);
 

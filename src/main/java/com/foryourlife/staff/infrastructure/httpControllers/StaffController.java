@@ -9,6 +9,7 @@ import com.foryourlife.staff.application.StaffFinderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -45,7 +46,7 @@ public class StaffController {
             @RequestParam(value = "perPage", defaultValue = "10") int perPage,
             @RequestParam(value = "search", defaultValue = "") String search
     ) {
-        var p = PageRequest.of(page, perPage);
+        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
         if (search.isEmpty()) {
             return new ResponseEntity<>(staffFinderService.getAll(p), HttpStatus.OK);
         } else {

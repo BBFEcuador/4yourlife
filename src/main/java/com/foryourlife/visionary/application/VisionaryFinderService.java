@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Service
 public class VisionaryFinderService {
-    private static VisionaryRepository repository;
+    private final VisionaryRepository repository;
 
     public VisionaryFinderService(VisionaryRepository repository) {
         this.repository = repository;
@@ -28,6 +28,9 @@ public class VisionaryFinderService {
     }
     public Page<Visionary> getAll(Pageable pageable){
         return repository.findAll(pageable);
+    }
+    public Page<Visionary> getAll(Pageable pageable, Criteria criteria){
+        return repository.findAll(pageable,criteria);
     }
 
     public List<Visionary> match(Criteria criteria){

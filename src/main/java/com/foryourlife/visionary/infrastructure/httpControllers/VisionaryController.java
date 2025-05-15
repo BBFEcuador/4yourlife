@@ -11,6 +11,7 @@ import com.foryourlife.visionary.application.VisionaryFinderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,14 +29,48 @@ public class VisionaryController {
     private VisionaryCreatorService creatorService;
 
     @PostMapping("add")
-    public ResponseEntity<?> createVisionary( @RequestBody VisionaryRequest visionaryRequest) {
+    public ResponseEntity<?> createVisionary(@RequestBody VisionaryRequest visionaryRequest) {
         creatorService.create(visionaryRequest.toDomain());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getVisionaries() {
-        return new ResponseEntity<>(finderService.getAll(), HttpStatus.OK);
+    public ResponseEntity<?> getVisionaries(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(value = "search", defaultValue = "") String search
+    ) {
+        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+        if (search.isEmpty()) {
+            return new ResponseEntity<>(finderService.getAll(p), HttpStatus.OK);
+        }else{
+            Criteria criteria = new Criteria(
+                    List.of(
+                            new Filter(
+                                    "name",
+                                    search,
+                                    "user",
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            ),
+                            new Filter(
+                                    "email",
+                                    search,
+                                    "user",
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            ),
+                            new Filter(
+                                    "phone",
+                                    search,
+                                    "user",
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            )
+                    ), Optional.empty(), Optional.empty()
+            );
+            return new ResponseEntity<>(finderService.getAll(p,criteria), HttpStatus.OK);
+        }
     }
 
     @GetMapping("{userId}")

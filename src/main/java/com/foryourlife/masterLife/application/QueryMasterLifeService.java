@@ -4,6 +4,8 @@ import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.masterLife.domain.MasterLifeRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,6 +27,9 @@ public class QueryMasterLifeService {
 
     public List<MasterLife> getAll() {
         return repository.findAll();
+    }
+    public Page<MasterLife> getAll(Pageable pageable, Criteria criteria) {
+        return repository.findAll(pageable,criteria);
     }
 
     public List<MasterLife> match(Criteria criteria) {

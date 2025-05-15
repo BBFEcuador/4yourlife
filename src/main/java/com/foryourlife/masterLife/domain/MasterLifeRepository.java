@@ -1,6 +1,8 @@
 package com.foryourlife.masterLife.domain;
 
 import com.foryourlife.shared.domain.criteria.Criteria;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +12,7 @@ public interface MasterLifeRepository {
     void save(MasterLife staff);
     Optional<MasterLife> findById(String id);
     List<MasterLife> findAll();
+    Page<MasterLife> findAll(Pageable pageable, Criteria criteria);
     List<MasterLife> findAvailableMasterLife(LocalDate startDate, LocalDate endDate);
 
     List<MasterLife> match(Criteria criteria);

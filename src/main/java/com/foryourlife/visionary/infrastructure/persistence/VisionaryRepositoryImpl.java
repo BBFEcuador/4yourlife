@@ -14,12 +14,12 @@ import java.util.Optional;
 
 @Service
 public class VisionaryRepositoryImpl implements VisionaryRepository {
-    private static JpaVisionaryRepository repository;
-    private static JPACriteriaConverter<Visionary> converter;
+    private final JpaVisionaryRepository repository;
+    private final JPACriteriaConverter<Visionary> converter;
 
     public VisionaryRepositoryImpl(JpaVisionaryRepository repository, JPACriteriaConverter<Visionary> converter) {
-        VisionaryRepositoryImpl.repository = repository;
-        VisionaryRepositoryImpl.converter = converter;
+        this.repository = repository;
+        this.converter = converter;
     }
 
     @Override
@@ -45,6 +45,11 @@ public class VisionaryRepositoryImpl implements VisionaryRepository {
     @Override
     public Page<Visionary> findAll(Pageable pageable) {
         return repository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Visionary> findAll(Pageable pageable, Criteria criteria) {
+        return repository.findAll(converter.getJpaSpecifications(criteria),pageable);
     }
 
     @Override

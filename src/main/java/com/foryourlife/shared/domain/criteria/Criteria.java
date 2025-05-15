@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class Criteria {
-    public final List<Filter> filters;
+    public List<Filter> filters;
     public final Optional<Integer> limit;
     public final Optional<Integer> offset;
 

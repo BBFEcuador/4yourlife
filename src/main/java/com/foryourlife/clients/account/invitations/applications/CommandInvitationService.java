@@ -1,6 +1,7 @@
 package com.foryourlife.clients.account.invitations.applications;
 
 import com.foryourlife.admin.auth.application.AdminFinderService;
+import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.clients.account.invitations.domain.Invitation;
 import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
 import com.foryourlife.clients.account.invitations.domain.Sender;
@@ -19,20 +20,23 @@ import java.util.UUID;
 public class CommandInvitationService {
     private final InvitationRepository repository;
     private final QueryUsersService queryUsersService;
+    private final QueryCampusService campusService;
     private final AdminFinderService adminFinderService;
     private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
 
-    public CommandInvitationService(InvitationRepository repository, QueryUsersService queryUsersService, AdminFinderService adminFinderService) {
+    public CommandInvitationService(InvitationRepository repository, QueryUsersService queryUsersService, QueryCampusService campusService, AdminFinderService adminFinderService) {
         this.repository = repository;
         this.queryUsersService = queryUsersService;
+        this.campusService = campusService;
         this.adminFinderService = adminFinderService;
     }
 
-    public String createInvitationByUser(String id) {
+    public String createInvitationByUser(String id, String campusId) {
         try {
             var user = queryUsersService.getUserById(id);
             var token = UUID.randomUUID().toString();
-            var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, id, new Sender(user.getName(), user.getPhone()), 1);
+            var campus = campusService.findById(campusId);
+            var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, id, new Sender(user.getName(), user.getPhone()), 1, campus);
             this.repository.save(invitation);
             return token;
         } catch (Exception e) {
@@ -41,10 +45,11 @@ public class CommandInvitationService {
         return null;
     }
 
-    public String createInvitationByAdmin(String id) {
+    public String createInvitationByAdmin(String id, String campusId) {
         var user = adminFinderService.findById(id);
         var token = UUID.randomUUID().toString();
-        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getName(), user.getEmail()), 1);
+        var campus = campusService.findById(campusId);
+        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getName(), user.getEmail()), 1, campus);
         this.repository.save(invitation);
         return token;
     }
@@ -52,7 +57,8 @@ public class CommandInvitationService {
     public String createInvitationByAdminWithQuantity(InvitationRequest request) {
         var user = adminFinderService.findById(request.id);
         var token = UUID.randomUUID().toString();
-        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, request.id, new Sender(user.getName(), user.getEmail()), Integer.parseInt(request.quantity));
+        var campus = campusService.findById(request.campusId);
+        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, request.id, new Sender(user.getName(), user.getEmail()), Integer.parseInt(request.quantity), campus);
         this.repository.save(invitation);
         return token;
     }
@@ -66,7 +72,8 @@ public class CommandInvitationService {
         }
         var user = queryUsersService.getUserById(request.id);
         var token = UUID.randomUUID().toString();
-        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, request.id, new Sender(user.getName(), user.getPhone()), Integer.parseInt(request.quantity));
+        var campus = campusService.findById(request.campusId);
+        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, request.id, new Sender(user.getName(), user.getPhone()), Integer.parseInt(request.quantity),campus);
         this.repository.save(invitation);
         return token;
     }

@@ -78,6 +78,7 @@ public class CommandUsersService {
 
         var role = this._rolRepository.getInitRole();
         user.setParticipantLevel(role);
+        user.setCampus(token.getCampus());
         this._participantRepository.save(user);
 
         this._clientModuleRepository.createClientModule(
@@ -121,10 +122,10 @@ public class CommandUsersService {
 
     public void update(Participant participant) {
         try {
-            _userRepository.findById(participant.getUser().getId()).orElseThrow(() -> new BaseException("User related to participant not found", List.of()));
-            var newUser = participant.getUser();
-            newUser.setName(newUser.getName1() + " " + newUser.getName2()+ " " + newUser.getLastname1() + " " + newUser.getLastname2());
+            var newUser = _userRepository.findById(participant.getUser().getId()).orElseThrow(() -> new BaseException("User related to participant not found", List.of()));
+            newUser.setName(newUser.getName1() + " " + newUser.getName2() + " " + newUser.getLastname1() + " " + newUser.getLastname2());
             _userRepository.save(newUser);
+            participant.setCampus(participant.getCampus() != null ? participant.getCampus() : queryInvitationServices.findInvitationByToken(participant.getInvitationToken()).getCampus());
             _profileDetailsRepository.findById(participant.getProfile().getId()).orElseThrow(() -> new BaseException("Profile related to participant not found", List.of()));
             _profileDetailsRepository.save(participant.getProfile());
             this._participantRepository.save(participant);
@@ -153,8 +154,9 @@ public class CommandUsersService {
         }
 
         var admin = _adminRepository.findByUserId(participant.getUser().getId()).orElseThrow(() -> new BaseException("User not found", List.of("User does not exist")));
-
+        var invitation = queryInvitationServices.findInvitationByToken(participant.getInvitationToken());
         var user = admin.getUser();
+        participant.setCampus(invitation.getCampus());
         _userRepository.save(user);
         _participantRepository.save(participant);
     }

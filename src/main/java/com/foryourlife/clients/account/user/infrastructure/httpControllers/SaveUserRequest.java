@@ -127,7 +127,8 @@ public class SaveUserRequest {
                 profile.toDomain(),
                 token,
                 false,
-                false
+                false,
+                null
         );
     }
 }

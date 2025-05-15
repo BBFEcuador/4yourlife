@@ -2,6 +2,7 @@ package com.foryourlife.clients.account.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.clients.account.contact.domain.Contact;
 import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
@@ -35,6 +36,9 @@ public class Participant extends AggregateRoot implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id", name = "profile_id")
     private ProfileDetails profile;
+    @ManyToOne()
+    @JoinColumn(referencedColumnName = "id", name = "campus_id")
+    private Campus campus;
     private String invitationToken;
     private Boolean isLingerer = false;
     private Boolean isDesertor = false;
@@ -66,6 +70,13 @@ public class Participant extends AggregateRoot implements Serializable {
         isLingerer = lingerer;
     }
 
+    public Campus getCampus() {
+        return campus;
+    }
+
+    public void setCampus(Campus campus) {
+        this.campus = campus;
+    }
 
     public Boolean getIsDesertor() {
         return isDesertor;
@@ -83,7 +94,7 @@ public class Participant extends AggregateRoot implements Serializable {
         return contacts;
     }
 
-    private Participant(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken, Boolean isLingerer, Boolean isDesertor) {
+    private Participant(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken, Boolean isLingerer, Boolean isDesertor,Campus campus) {
         this.id = id;
         this.user = user;
         this.participantLevel = role;
@@ -91,10 +102,12 @@ public class Participant extends AggregateRoot implements Serializable {
         this.invitationToken = invitationToken;
         this.isLingerer = isLingerer;
         this.isDesertor = isDesertor;
+        this.campus = campus;
     }
 
-    public static Participant create(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken, Boolean isLingerer, Boolean isDesertor) {
-        var participant = new Participant(id, user, role, profile, invitationToken, isLingerer, isDesertor);
+    public static Participant create(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken, Boolean isLingerer, Boolean isDesertor, Campus campus) {
+
+        var participant = new Participant(id, user, role, profile, invitationToken, isLingerer, isDesertor, campus);
         participant.record(new UserCreated(id, participant));
         return participant;
     }

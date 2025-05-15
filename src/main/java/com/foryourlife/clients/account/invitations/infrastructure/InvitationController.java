@@ -20,8 +20,10 @@ public class InvitationController {
     }
 
     @PostMapping("/create-by-admin/{id}")
-    public ResponseEntity<String> adminInvitation(@PathVariable String id) {
-        return new ResponseEntity<>(this.service.createInvitationByAdmin(id), HttpStatus.CREATED);
+    public ResponseEntity<String> adminInvitation(
+            @PathVariable String id,
+            @RequestParam String campusId) {
+        return new ResponseEntity<>(this.service.createInvitationByAdmin(id, campusId), HttpStatus.CREATED);
     }
 
     @PostMapping("/create-by-admin-quantity")

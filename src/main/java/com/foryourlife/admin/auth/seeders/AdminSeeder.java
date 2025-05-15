@@ -11,6 +11,7 @@ import com.foryourlife.admin.programs.training.application.CommandTrainingServic
 import com.foryourlife.admin.programs.training.infrastructure.httpControllers.TrainingAutoGenerateRequest;
 import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
 import com.foryourlife.clients.account.invitations.applications.CommandInvitationService;
+import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
 import com.foryourlife.clients.account.invitations.infrastructure.InvitationRequest;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
@@ -55,10 +56,11 @@ public class AdminSeeder {
     private final CommandUsersService commandUsersService;
     private final CommandMasterLifeService commandMasterLifeService;
     private final CommandInvitationService commandInvitationService;
+    private final QueryInvitationServices queryInvitationServices;
     private final ParticipantLevelRepository participantLevelRepository;
     private final Faker faker = new Faker();
 
-    public AdminSeeder(AdminRepository repository, PasswordEncoder passwordEncoder, CampusRepository campusRepository, TrainerCreatorService trainerCreatorService, CommandTrainingService commandTrainingService, StaffCreatorService staffCreatorService, VisionaryCreatorService visionaryCreatorService, CommandUsersService commandUsersService, CommandMasterLifeService commandMasterLifeService, CommandInvitationService commandInvitationService, ParticipantLevelRepository participantLevelRepository) {
+    public AdminSeeder(AdminRepository repository, PasswordEncoder passwordEncoder, CampusRepository campusRepository, TrainerCreatorService trainerCreatorService, CommandTrainingService commandTrainingService, StaffCreatorService staffCreatorService, VisionaryCreatorService visionaryCreatorService, CommandUsersService commandUsersService, CommandMasterLifeService commandMasterLifeService, CommandInvitationService commandInvitationService, QueryInvitationServices queryInvitationServices, ParticipantLevelRepository participantLevelRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.campusRepository = campusRepository;
@@ -69,6 +71,7 @@ public class AdminSeeder {
         this.commandUsersService = commandUsersService;
         this.commandMasterLifeService = commandMasterLifeService;
         this.commandInvitationService = commandInvitationService;
+        this.queryInvitationServices = queryInvitationServices;
         this.participantLevelRepository = participantLevelRepository;
     }
 
@@ -150,7 +153,7 @@ public class AdminSeeder {
     }
 
     private void makeParticipants() {
-        var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600"));
+        var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600", "61d88b2a-a22e-4cb0-8e43-e036483039d6"));
         for (int i = 0; i < 350; i++) {
             var staffId = UUID.randomUUID().toString();
             var user = new User(
@@ -165,7 +168,7 @@ public class AdminSeeder {
             var bd = faker.date().birthday().toInstant();
             System.out.println(bd + "==================");
             var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();
-            var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false);
+            var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false, queryInvitationServices.findInvitationByToken(invitationToken).getCampus());
             var medicalRecord = new MedicalRecordSaveRequest("N/A", "N/A", "N/A");
             commandUsersService.createInitUser(trainer, medicalRecord, new SaveContactRequest(null,faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(),null), null);
 

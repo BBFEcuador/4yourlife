@@ -1,5 +1,6 @@
 package com.foryourlife.clients.account.user.infrastructure.httpControllers;
 
+import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
 import com.foryourlife.clients.account.user.domain.Participant;
@@ -24,6 +25,8 @@ public class ParticipantRequest {
     private Boolean isLingerer;
     @NotNull
     private Boolean isDesertor;
+
+    private Campus campus;
 
     public String getId() {
         return id;
@@ -53,7 +56,15 @@ public class ParticipantRequest {
         return isDesertor;
     }
 
+    public Campus getCampus() {
+        return campus;
+    }
+
+    public void setCampus(Campus campus) {
+        this.campus = campus;
+    }
+
     public Participant toDomain() {
-        return Participant.create(id, user, participantLevel, profile, invitationToken, isLingerer, isDesertor);
+        return Participant.create(id, user, participantLevel, profile, invitationToken, isLingerer, isDesertor, campus != null ? campus : null);
     }
 }

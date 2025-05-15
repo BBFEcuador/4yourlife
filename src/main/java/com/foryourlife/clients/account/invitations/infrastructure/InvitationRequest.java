@@ -7,11 +7,14 @@ public class InvitationRequest {
     @NotNull
     public String id;
     @NotNull
+    public String campusId;
+    @NotNull
     @Pattern(regexp = "\\d+")
     public String quantity;
 
-    public InvitationRequest(String id, String quantity) {
+    public InvitationRequest(String id, String quantity, String campusId) {
         this.id = id;
         this.quantity = quantity;
+        this.campusId = campusId;
     }
 }

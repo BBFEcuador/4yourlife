@@ -15,3 +15,11 @@ CREATE TABLE IF NOT EXISTS campus_admins
     CONSTRAINT fk_admin FOREIGN KEY (admin_id) REFERENCES admins_users (id),
     CONSTRAINT pk_campus_admins PRIMARY KEY (campus_id, admin_id)
 );
+
+ALTER TABLE participants
+    ADD COLUMN campus_id text,
+    ADD CONSTRAINT fk_participant_on_campus FOREIGN KEY (campus_id) REFERENCES campus (id);
+
+ALTER TABLE invitation
+    ADD COLUMN campus_id text,
+    ADD CONSTRAINT fk_invitation_on_campus FOREIGN KEY (campus_id) REFERENCES campus (id);

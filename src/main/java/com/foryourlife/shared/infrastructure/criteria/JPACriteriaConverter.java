@@ -39,7 +39,10 @@ public class JPACriteriaConverter<T> {
                     case EQUAL ->
                             criteriaBuilder.equal(join.get(filter.getColumn()), criteriaBuilder.literal(filter.getValue()));
                     case LIKE ->
-                            criteriaBuilder.like(join.get(filter.getColumn()), criteriaBuilder.literal("%" + filter.getValue() + "%"));
+                            criteriaBuilder.like(
+                                    criteriaBuilder.lower(join.get(filter.getColumn())),
+                                    criteriaBuilder.literal("%" + filter.getValue().toLowerCase() + "%")
+                            );
                     case IN -> {
                         String[] split = filter.getValue().split(",");
                         yield join.get(filter.getColumn()).in(Arrays.asList(split));

@@ -7,6 +7,8 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,9 @@ public class QueryTeamService {
 
     public List<Team> getAllTeams() {
         return this._teamRepository.findAll();
+    }
+    public Page<Team> getAllTeams(Pageable pageable, Criteria criteria) {
+        return this._teamRepository.findAll(pageable,criteria);
     }
     public List<Team> match(Criteria criteria) {
         return this._teamRepository.match(criteria);

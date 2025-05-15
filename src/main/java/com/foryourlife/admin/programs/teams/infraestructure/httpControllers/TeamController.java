@@ -4,8 +4,11 @@ import com.foryourlife.admin.programs.teams.application.CommandTeamService;
 import com.foryourlife.admin.programs.teams.application.QueryTeamService;
 import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.*;
 import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/teams")
@@ -27,8 +31,41 @@ public class TeamController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAll() {
-        return new ResponseEntity<>(this.queryTeamService.getAllTeams(), HttpStatus.OK);
+    public ResponseEntity<?> getAll(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(value = "search", defaultValue = "") String search
+    ) {
+        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+        Criteria criteria = new Criteria(
+                List.of(), Optional.empty(), Optional.empty()
+        );
+        if (!search.isEmpty()){
+            criteria.filters = List.of(
+                    new Filter(
+                            "name",
+                            search,
+                            null,
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),
+                    new Filter(
+                            "courseLevel",
+                            search,
+                            "training",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),
+                    new Filter(
+                            "name",
+                            search,
+                            "trainer",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    )
+            );
+        }
+        return new ResponseEntity<>(this.queryTeamService.getAllTeams(p,criteria), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

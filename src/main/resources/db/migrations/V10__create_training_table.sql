@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS training(
     name text not null,
     startDate DATE not null,
     endDate DATE not null,
-    courseLevel course_level not null,
+    courseLevel text not null,
     nextLevel text,
     campus_id text not null,
     originalTeam jsonb,

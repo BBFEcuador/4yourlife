@@ -5,6 +5,7 @@ import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.persistence.criteria.From;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,7 @@ public class JPACriteriaConverter<T> {
                 From<?, ?> join = root;
                 if (filter.getJoinTable() != null && !filter.getJoinTable().isEmpty()) {
                     for (String table : filter.getJoinTable().split("\\.")) {
-                        join = join.join(table);
+                        join = join.join(table, JoinType.LEFT);
                     }
                 }
                 Predicate predicate = switch (filter.getOperation()) {

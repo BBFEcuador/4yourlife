@@ -7,6 +7,7 @@ import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,68 @@ public class UserController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getUsers() {
-        return new ResponseEntity<>(queryUsersService.getAll(), HttpStatus.OK);
+    public ResponseEntity<?> getUsers(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(value = "search", defaultValue = "") String search
+    ) {
+        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+        Criteria criteria = new Criteria(
+                List.of(), Optional.empty(), Optional.empty()
+        );
+        if (!search.isEmpty()){
+            criteria.filters = List.of(
+                    new Filter(
+                            "name",
+                            search,
+                            "user",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),
+                    new Filter(
+                            "email",
+                            search,
+                            "user",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),
+                    new Filter(
+                            "phone",
+                            search,
+                            "user",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),
+                    new Filter(
+                            "city",
+                            search,
+                            "campus",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),
+                    new Filter(
+                            "dni",
+                            search,
+                            "profile",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),
+                    new Filter(
+                            "name",
+                            search,
+                            "teams",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),new Filter(
+                            "courseLevel",
+                            search,
+                            "participantLevel",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    )
+            );
+        }
+        return new ResponseEntity<>(queryUsersService.getAll(p,criteria), HttpStatus.OK);
     }
 
     @GetMapping("{id}")

@@ -83,8 +83,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Page<Participant> getAll(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Page<Participant> getAll(Pageable pageable,Criteria criteria) {
+        return repository.findAll(criteriaConverter.getJpaSpecifications(criteria),pageable);
     }
 
     @Override

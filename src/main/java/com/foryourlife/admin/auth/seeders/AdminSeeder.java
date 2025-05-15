@@ -170,7 +170,12 @@ public class AdminSeeder {
             var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();
             var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false, queryInvitationServices.findInvitationByToken(invitationToken).getCampus());
             var medicalRecord = new MedicalRecordSaveRequest("N/A", "N/A", "N/A");
-            commandUsersService.createInitUser(trainer, medicalRecord, new SaveContactRequest(null,faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(),null), null);
+            commandUsersService.createInitUser(
+                    trainer,
+                    medicalRecord,
+                    new SaveContactRequest(null,faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(),null),
+                    null
+            );
 
         }
     }

@@ -35,8 +35,8 @@ public class QueryUsersService {
     public List<Participant> getAll() {
         return this._userRepository.getAll();
     }
-    public Page<Participant> getAll(Pageable pageable) {
-        return this._userRepository.getAll(pageable);
+    public Page<Participant> getAll(Pageable pageable,Criteria criteria) {
+        return this._userRepository.getAll(pageable,criteria);
     }
     public List<Participant> matchers(Criteria criteria) {
         return this._userRepository.match(criteria);

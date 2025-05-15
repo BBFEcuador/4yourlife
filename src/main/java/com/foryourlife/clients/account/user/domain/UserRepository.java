@@ -17,7 +17,7 @@ public interface UserRepository {
     Optional<Participant> findById(String id);
 
     List<Participant> getAll();
-    Page<Participant> getAll(Pageable pageable);
+    Page<Participant> getAll(Pageable pageable,Criteria criteria);
 
     List<Participant> match(Criteria criteria);
 

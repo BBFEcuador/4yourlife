@@ -4,6 +4,7 @@ import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.EndDate;
 import com.foryourlife.admin.programs.training.domain.StartDate;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface JPATrainerRepository extends JpaRepository<Trainer, String> {
+public interface JPATrainerRepository extends JpaRepository<Trainer, String>, JpaSpecificationExecutor<Trainer> {
     @Query("""
                 SELECT t FROM Trainer t
                 WHERE NOT EXISTS (

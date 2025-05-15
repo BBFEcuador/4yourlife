@@ -2,6 +2,9 @@ package com.foryourlife.admin.programs.trainer.application;
 
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.trainer.domain.TrainerRepository;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,6 +22,9 @@ public class TrainerFinderService {
 
     public List<Trainer> findTrainers(){
         return repository.getTrainers();
+    }
+    public Page<Trainer> findTrainers(Pageable pageable, Criteria criteria){
+        return repository.getTrainers(pageable,criteria);
     }
     public List<Trainer> findTrainersAvailable(LocalDate startDate, LocalDate endDate){
         return repository.getAvailableTrainers(startDate,endDate);

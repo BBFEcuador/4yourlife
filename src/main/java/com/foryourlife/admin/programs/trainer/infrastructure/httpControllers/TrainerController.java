@@ -4,10 +4,14 @@ import com.foryourlife.admin.auth.infrastructure.httpControllers.DisableAdminReq
 import com.foryourlife.admin.programs.trainer.application.TrainerCreatorService;
 import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +42,48 @@ public class TrainerController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Trainer>> getAllTrainers() {
-        return new ResponseEntity<>(trainerFinderService.findTrainers(), HttpStatus.OK);
+    public ResponseEntity<?> getAllTrainers(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(value = "search", defaultValue = "") String search
+    ) {
+        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+        Criteria criteria = new Criteria(
+                List.of(), Optional.empty(), Optional.empty()
+        );
+        if (!search.isEmpty()){
+            criteria.filters = List.of(
+                    new Filter(
+                            "name",
+                            search,
+                            null,
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),
+                    new Filter(
+                            "email",
+                            search,
+                            null,
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),
+                    new Filter(
+                            "phone",
+                            search,
+                            null,
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    ),
+                    new Filter(
+                            "name",
+                            search,
+                            "teams",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.OR
+                    )
+            );
+        }
+        return new ResponseEntity<>(trainerFinderService.findTrainers(p,criteria), HttpStatus.OK);
     }
     @PostMapping("/available")
     public ResponseEntity<List<Trainer>> getTrainers(@Valid @RequestBody AvailableTrainerRequest request) {

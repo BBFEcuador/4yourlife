@@ -4,6 +4,8 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import com.foryourlife.visionary.domain.Visionary;
 import com.foryourlife.visionary.domain.VisionaryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -38,6 +40,11 @@ public class VisionaryRepositoryImpl implements VisionaryRepository {
     @Override
     public List<Visionary> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public Page<Visionary> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override

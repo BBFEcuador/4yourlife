@@ -4,6 +4,8 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -12,12 +14,14 @@ import java.util.Optional;
 
 @Service
 public class StaffRepositoryImpl implements StaffRepository {
-    private static JpaStaffRepository repository;
-    private static JPACriteriaConverter<Staff> criteriaConverter;
+    private final JpaStaffRepository repository;
+    private final JPACriteriaConverter<Staff> criteriaConverter;
 
-    public StaffRepositoryImpl(JpaStaffRepository repository) {
-        StaffRepositoryImpl.repository = repository;
+    public StaffRepositoryImpl(JpaStaffRepository repository, JPACriteriaConverter<Staff> criteriaConverter) {
+        this.repository = repository;
+        this.criteriaConverter = criteriaConverter;
     }
+
 
     @Override
     public void save(Staff staff) {
@@ -32,6 +36,16 @@ public class StaffRepositoryImpl implements StaffRepository {
     @Override
     public List<Staff> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public Page<Staff> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Staff> findAll(Pageable pageable, Criteria criteria) {
+        return repository.findAll(criteriaConverter.getJpaSpecifications(criteria),pageable);
     }
 
     @Override

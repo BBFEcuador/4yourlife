@@ -3,6 +3,8 @@ package com.foryourlife.visionary.application;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.visionary.domain.Visionary;
 import com.foryourlife.visionary.domain.VisionaryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,6 +25,9 @@ public class VisionaryFinderService {
 
     public List<Visionary> getAll(){
         return repository.findAll();
+    }
+    public Page<Visionary> getAll(Pageable pageable){
+        return repository.findAll(pageable);
     }
 
     public List<Visionary> match(Criteria criteria){

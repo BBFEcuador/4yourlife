@@ -8,6 +8,9 @@ import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.UserType;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -31,6 +34,12 @@ public class StaffFinderService {
 
     public List<Staff> getAll() {
         return _repository.findAll();
+    }
+    public Page<Staff> getAll(Pageable pageable) {
+        return _repository.findAll(pageable);
+    }
+    public Page<Staff> getAll(Pageable pageable, Criteria criteria) {
+        return _repository.findAll(pageable,criteria);
     }
 
     public List<Staff> match(Criteria criteria) {

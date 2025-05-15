@@ -1,14 +1,21 @@
 package com.foryourlife.staff.infrastructure.httpControllers;
 
 import com.foryourlife.admin.programs.trainer.infrastructure.httpControllers.AvailableTrainerRequest;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.criteria.Filter;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.staff.application.StaffCreatorService;
 import com.foryourlife.staff.application.StaffFinderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("staff")
@@ -33,8 +40,42 @@ public class StaffController {
 
 
     @GetMapping("")
-    public ResponseEntity<?> findStaffByUserId() {
-        return new ResponseEntity<>(staffFinderService.getAll(), HttpStatus.OK);
+    public ResponseEntity<?> findStaffByUserId(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(value = "search", defaultValue = "") String search
+    ) {
+        var p = PageRequest.of(page, perPage);
+        if (search.isEmpty()) {
+            return new ResponseEntity<>(staffFinderService.getAll(p), HttpStatus.OK);
+        } else {
+            Criteria criteria = new Criteria(
+                    List.of(
+                            new Filter(
+                                    "name",
+                                    search,
+                                    "user",
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            ),
+                            new Filter(
+                                    "email",
+                                    search,
+                                    "user",
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            ),
+                            new Filter(
+                                    "phone",
+                                    search,
+                                    "user",
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            )
+                    ), Optional.empty(), Optional.empty()
+            );
+            return new ResponseEntity<>(staffFinderService.getAll(p,criteria), HttpStatus.OK);
+        }
     }
 
     @GetMapping("/{id}")
@@ -54,14 +95,14 @@ public class StaffController {
     }
 
     @PostMapping("/staff-admin")
-    public ResponseEntity<?> createFromAdmin(@Valid @RequestBody StaffUserRequest request){
-            staffService.createFromAdmin(request.toDomain());
-            return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<?> createFromAdmin(@Valid @RequestBody StaffUserRequest request) {
+        staffService.createFromAdmin(request.toDomain());
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/staff-participant")
-    public ResponseEntity<?> createFromParticipant(@Valid @RequestBody ParticipantTypeRequest request){
-            staffService.createFromParticipant(request.userId, request.role);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<?> createFromParticipant(@Valid @RequestBody ParticipantTypeRequest request) {
+        staffService.createFromParticipant(request.userId, request.role);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

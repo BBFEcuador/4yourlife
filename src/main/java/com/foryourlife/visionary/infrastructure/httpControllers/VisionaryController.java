@@ -10,6 +10,7 @@ import com.foryourlife.visionary.application.VisionaryCreatorService;
 import com.foryourlife.visionary.application.VisionaryFinderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

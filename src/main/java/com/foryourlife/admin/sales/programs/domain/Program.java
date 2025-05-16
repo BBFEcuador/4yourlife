@@ -1,7 +1,9 @@
 package com.foryourlife.admin.sales.programs.domain;
 
-import com.foryourlife.admin.sales.product.domain.Product;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "programs")
@@ -11,56 +13,31 @@ public class Program {
 
     private String name;
 
-    private int level;
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private CourseLevel courseLevel;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
-    private Product product;
+    protected Program(){}
 
-    protected Program(){
-
-    }
-
-    public Program(String id, String name, int level) {
+    private Program(String id, String name, CourseLevel courseLevel) {
         this.id = id;
         this.name = name;
-        this.level = level;
+        this.courseLevel = courseLevel;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public CourseLevel getCourseLevel() {
+        return courseLevel;
     }
 
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    @Override
-    public String toString() {
-        return "Program{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", level=" + level +
-                '}';
-    }
-
-    public static Program create(String id, String name, int level) {
-        return new Program(id, name, level);
+    public static Program create(String id, String name, CourseLevel courseLevel) {
+        return new Program(id, name, courseLevel);
     }
 }

@@ -29,7 +29,11 @@ public class Product {
     @OneToMany(mappedBy = "product", targetEntity = Rule.class)
     private List<Rule> rules;
 
-    @OneToMany(mappedBy = "product", targetEntity = Program.class)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "product_programs",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "program_id")
+    )
     private List<Program> programs;
 
     protected Product() {

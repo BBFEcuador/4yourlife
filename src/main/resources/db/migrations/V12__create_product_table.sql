@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS products (
   description TEXT,
   CONSTRAINT pk_products PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS rules (
+CREATE TABLE IF NOT EXISTS rules(
   id TEXT NOT NULL,
   description TEXT NOT NULL,
   value FLOAT NOT NULL,
@@ -20,8 +20,14 @@ CREATE TABLE IF NOT EXISTS programs
 (
     id varchar not null,
     name varchar not null,
-    level integer not null,
-    product_id TEXT not null,
-    CONSTRAINT fk_products_on_programs FOREIGN KEY (product_id) REFERENCES products (id),
+    courseLevel text not null,
     CONSTRAINT pk_admin_programs PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS programs_products
+(
+    program_id text not null,
+    product_id text not null,
+    CONSTRAINT fk_programs_on_programs_products FOREIGN KEY (program_id) REFERENCES programs (id),
+    CONSTRAINT fk_products_on_programs_products FOREIGN KEY (product_id) REFERENCES products (id)
 );

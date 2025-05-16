@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -156,7 +157,7 @@ public class CommandTeamService {
         this._teamRepository.save(team);
         this.bus.publish(team.pullDomainEvents());
     }
-
+    @Transactional
     public void promotionYourTeam(PromotionYourRequest request) {
         var team = _teamRepository.findById(request.id).orElseThrow(() -> new BaseException("Team not found", List.of()));
         var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow(() -> new BaseException("Trainer not found", List.of()));
@@ -172,6 +173,9 @@ public class CommandTeamService {
             _userRepository.save(p);
             return null;
         }).toList();
+        if (users.stream().filter(Objects::nonNull).toList().isEmpty()) {
+            throw new BaseException("No hay usuarios suficientes", List.of());
+        }
         var staff = request.staffs.stream().map(participant -> {
             var p = staffRepository.findById(participant.getId()).orElseThrow();
             if (!staffRepository.isStaffAvailable(p.getId(), training.getStartDate(), training.getEndDate(), training.getId())) {
@@ -310,7 +314,7 @@ public class CommandTeamService {
 
         return relativeFilePath;
     }
-
+    @Transactional
     public void promotionLifeTeam(PromotionLifeRequest request) {
         var team = _teamRepository.findById(request.id).orElseThrow();
         var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
@@ -326,6 +330,9 @@ public class CommandTeamService {
             _userRepository.save(p);
             return null;
         }).toList();
+        if (users.stream().filter(Objects::nonNull).toList().isEmpty()) {
+            throw new BaseException("No hay usuarios suficientes", List.of());
+        }
         var masterLife = request.masterLife.stream().map(participant -> {
             var p = queryMasterLifeService.findById(participant.getId());
             if (!queryMasterLifeService.isMasterLifeAvailable(p.getId(), training.getStartDate(), training.getEndDate(), training.getId())) {

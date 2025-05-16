@@ -8,6 +8,8 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -131,6 +133,11 @@ public class TeamRepositoryImpl implements TeamRepository {
     @Override
     public List<Team> findAll() {
         return _jpaTeamRepository.findAll();
+    }
+
+    @Override
+    public Page<Team> findAll(Pageable pageable, Criteria criteria) {
+        return _jpaTeamRepository.findAll(criteriaConverter.getJpaSpecifications(criteria),pageable);
     }
 
     @Override

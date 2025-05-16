@@ -19,7 +19,7 @@ public class ProductSeeder {
         this.repository = repository;
     }
 
-    @Bean
+    /*@Bean
     CommandLineRunner initProducts() {
         return args -> {
             List<Product> products = Arrays.asList(
@@ -33,5 +33,5 @@ public class ProductSeeder {
             );
             this.repository.saveAll(products);
         };
-    }
+    }*/
 }

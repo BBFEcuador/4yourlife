@@ -17,7 +17,7 @@ public class ProgramSeeder {
         this.repository = repository;
     }
 
-    @Bean
+    /*@Bean
     CommandLineRunner initPrograms(){
         return args -> {
             List<Program> programs = Arrays.asList(
@@ -27,5 +27,5 @@ public class ProgramSeeder {
             );
             this.repository.saveAll(programs);
         };
-    }
+    }*/
 }

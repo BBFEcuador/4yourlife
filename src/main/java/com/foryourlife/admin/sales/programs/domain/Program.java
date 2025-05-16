@@ -1,8 +1,7 @@
 package com.foryourlife.admin.sales.programs.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.foryourlife.admin.sales.product.domain.Product;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "programs")
@@ -13,6 +12,10 @@ public class Program {
     private String name;
 
     private int level;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    private Product product;
 
     protected Program(){
 

@@ -13,6 +13,8 @@ public class Rule {
 
     private Double value;
 
+    private Boolean enabled;
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Product product;
@@ -21,14 +23,16 @@ public class Rule {
     protected Rule() {
     }
 
-    private Rule(String id, String description, Double value) {
+    private Rule(String id, String description, Double value, Boolean enabled, Product product) {
         this.id = id;
         this.description = description;
         this.value = value;
+        this.enabled = enabled;
+        this.product = product;
     }
 
-    public Rule create(String id, String description, Double value){
-        return new Rule(id, description, value);
+    public Rule create(String id, String description, Double value,Boolean enabled, Product product){
+        return new Rule(id, description, value, enabled, product );
     }
 
     public String getId() {
@@ -53,5 +57,21 @@ public class Rule {
 
     public void setValue(Double value) {
         this.value = value;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

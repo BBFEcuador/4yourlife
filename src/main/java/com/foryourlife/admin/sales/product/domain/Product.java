@@ -30,7 +30,7 @@ public class Product {
     private List<Rule> rules;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "product_programs",
+    @JoinTable(name = "programs_products",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "program_id")
     )

@@ -2,6 +2,10 @@ package com.foryourlife.admin.sales.product.infrastructure.persistence;
 
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
+import com.foryourlife.masterLife.domain.MasterLife;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +38,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public List<Product> findAll() {
         return this.impl.findAll();
+    }
+
+    @Override
+    public Page<Product> findAll(Pageable pageable) {
+        return this.impl.findAll(pageable);
     }
 
     @Override

@@ -4,7 +4,9 @@ import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.sales.discounts.domain.ProductDiscount;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.clients.account.user.domain.Participant;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Type;
 
 import java.util.List;
 
@@ -14,9 +16,10 @@ public class Payment {
     @Id
     private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
-    private Product product;
+    @Column(columnDefinition = "jsonb")
+    @Type(JsonType.class)
+    private List<Product> products;
+
     @ManyToOne
     @JoinColumn(name = "discount_id", referencedColumnName = "id")
     private ProductDiscount discount;
@@ -27,8 +30,9 @@ public class Payment {
     @JoinColumn(name = "campus_id", referencedColumnName = "id")
     private Campus campus;
 
-    @Convert(converter = PaymentHistoryConverter.class)
+    //    @Convert(converter = PaymentHistoryConverter.class)
     @Column(columnDefinition = "jsonb", name = "payments_history")
+    @Type(JsonType.class)
     private List<PaymentHistory> paymentshistory;
 
     private Double total;
@@ -37,18 +41,18 @@ public class Payment {
     protected Payment() {
     }
 
-    private Payment(String id, Product product, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, Double total, String status) {
+    private Payment(String id, List<Product> products, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, Double total, String status) {
         this.id = id;
-        this.product = product;
+        this.products = products;
         this.discount = discount;
         this.participant = participant;
-        //this.campus = campus;
+        this.campus = campus;
         this.paymentshistory = paymentshistory;
         this.total = total;
         this.status = status;
     }
 
-    public Payment create(String id, Product product, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, Double total, String status){
+    public static Payment create(String id, List<Product> product, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, Double total, String status) {
         return new Payment(id, product, discount, participant, campus, paymentshistory, total, status);
     }
 
@@ -60,12 +64,12 @@ public class Payment {
         this.id = id;
     }
 
-    public Product getProduct() {
-        return product;
+    public List<Product> getProduct() {
+        return products;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProduct(List<Product> product) {
+        this.products = product;
     }
 
     public ProductDiscount getDiscount() {
@@ -84,13 +88,13 @@ public class Payment {
         this.participant = participant;
     }
 
-   /* public Campus getCampus() {
+    public Campus getCampus() {
         return campus;
     }
 
     public void setCampus(Campus campus) {
         this.campus = campus;
-    }*/
+    }
 
     public List<PaymentHistory> getPaymentshistory() {
         return paymentshistory;

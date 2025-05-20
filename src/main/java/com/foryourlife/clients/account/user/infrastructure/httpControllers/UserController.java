@@ -94,7 +94,7 @@ public class UserController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> getUser(@PathVariable String id) {
-        return new ResponseEntity<>(queryUsersService.getUserTrainerById(id), HttpStatus.OK);
+        return new ResponseEntity<>(queryUsersService.getUserById(id), HttpStatus.OK);
     }
 
     @PutMapping("")

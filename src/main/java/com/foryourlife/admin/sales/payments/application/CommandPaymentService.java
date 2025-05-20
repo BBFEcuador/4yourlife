@@ -25,7 +25,7 @@ public class CommandPaymentService {
                 paymentReq.campus,
                 paymentReq.paymentshistory,
                 paymentReq.total,
-                paymentReq.status
+                paymentReq.status != null ? paymentReq.status : "PENDING"
         );
         _paymentRepository.save(payment);
     }

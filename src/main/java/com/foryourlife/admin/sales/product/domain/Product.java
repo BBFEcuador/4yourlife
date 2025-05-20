@@ -39,16 +39,20 @@ public class Product {
     protected Product() {
     }
 
-    public Product(String id, String name, String code, Boolean isActive, String description) {
+    public Product(String id, String name, String code, Double basePrice, String currency, Boolean isActive, String description, List<Rule> rules, List<Program> programs) {
         this.id = id;
         this.name = name;
         this.code = code;
+        this.basePrice = basePrice;
+        this.currency = currency;
         this.isActive = isActive;
         this.description = description;
+        this.rules = rules;
+        this.programs = programs;
     }
 
-    public static Product create(String id, String name, String code, Boolean isActive, String description) {
-        return new Product(id, name, code, isActive, description);
+    public static Product create(String id, String name, String code, Double basePrice, String currency, Boolean isActive, String description, List<Rule> rules, List<Program> programs) {
+        return new Product(id, name, code,basePrice,currency, isActive, description, rules, programs);
     }
 
     public String getId() {
@@ -105,5 +109,21 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Rule> getRules() {
+        return rules;
+    }
+
+    public void setRules(List<Rule> rules) {
+        this.rules = rules;
+    }
+
+    public List<Program> getPrograms() {
+        return programs;
+    }
+
+    public void setPrograms(List<Program> programs) {
+        this.programs = programs;
     }
 }

@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS payments(
     campus_id text not null,
     payments_history jsonb,
     total float not null,
-    status BOOLEAN not null DEFAULT FALSE,
+    status text not null,
     CONSTRAINT fk_discount_on_payment FOREIGN KEY (discount_id) REFERENCES product_discounts (id),
     CONSTRAINT fk_participant_on_payment FOREIGN KEY (participant_id) REFERENCES participants (id),
     CONSTRAINT fk_campus_on_payment FOREIGN KEY (campus_id) REFERENCES campus (id)

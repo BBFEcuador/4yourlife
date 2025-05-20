@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS invoices
     dataInvoice_id text not null,
     products jsonb not null,
     payment_id text not null,
+    sent_sri boolean not null default false,
+    created_at timestamp not null default now(),
     constraint fk_dataInvoice_on_invoices foreign key (dataInvoice_id) references data_invoices(id),
     constraint fk_payment_on_invoices foreign key (payment_id) references payments(id)
 );

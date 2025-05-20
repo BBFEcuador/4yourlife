@@ -16,7 +16,6 @@ public class Campus {
     private String address;
     private String phone;
 
-
     protected Campus() {
     }
 

@@ -1,5 +1,6 @@
 package com.foryourlife.admin.sales.product.domain;
 
+import com.foryourlife.shared.domain.criteria.Criteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,10 +12,9 @@ public interface ProductRepository {
 
     Optional<Product> findById(String id);
 
-    void deleteById(String id);
-
-    List<Product> findAll();
+    Page<Product> findAll(Pageable pageable, Criteria criteria);
     Page<Product> findAll(Pageable pageable);
+    Page<Product> findAllAvailable(Pageable pageable);
 
     void saveAll(List<Product> products);
 }

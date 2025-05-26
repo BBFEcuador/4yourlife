@@ -4,6 +4,7 @@ import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,11 @@ import java.util.Optional;
 public class ProductRepositoryImpl implements ProductRepository {
 
     private final JpaProductRepository impl;
+    private final JPACriteriaConverter<Product> criteriaConverter;
 
-    public ProductRepositoryImpl(JpaProductRepository impl) {
+    public ProductRepositoryImpl(JpaProductRepository impl, JPACriteriaConverter<Product> criteriaConverter) {
         this.impl = impl;
+        this.criteriaConverter = criteriaConverter;
     }
 
     @Override
@@ -31,18 +34,18 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public void deleteById(String id) {
-        this.impl.deleteById(id);
-    }
-
-    @Override
-    public List<Product> findAll() {
-        return this.impl.findAll();
+    public Page<Product> findAll(Pageable pageable, Criteria criteria) {
+        return this.impl.findAll(criteriaConverter.getJpaSpecifications(criteria), pageable);
     }
 
     @Override
     public Page<Product> findAll(Pageable pageable) {
         return this.impl.findAll(pageable);
+    }
+
+    @Override
+    public Page<Product> findAllAvailable(Pageable pageable) {
+        return impl.findAllByIsActiveTrue(pageable);
     }
 
     @Override

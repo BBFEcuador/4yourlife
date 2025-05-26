@@ -3,6 +3,8 @@ package com.foryourlife.admin.sales.product.infrastructure.httpControllers;
 import com.foryourlife.admin.sales.product.application.ProductCreateService;
 import com.foryourlife.admin.sales.product.application.ProductFinderService;
 import com.foryourlife.admin.sales.product.domain.Product;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.criteria.Filter;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +12,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/product")
@@ -24,10 +29,49 @@ public class ProductController {
     @GetMapping("")
     public ResponseEntity<?> getAllProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(value = "search", defaultValue = "") String search
+    ) {
+        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+
+        if (search.isEmpty()) {
+            return new ResponseEntity<>(finderService.findAll(p), HttpStatus.OK);
+        } else {
+            Criteria criteria = new Criteria(
+                    List.of(
+                            new Filter(
+                                    "name",
+                                    search,
+                                    null,
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            ),
+                            new Filter(
+                                    "code",
+                                    search,
+                                    null,
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            ),new Filter(
+                                    "description",
+                                    search,
+                                    null,
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            )
+                    ), Optional.empty(), Optional.empty()
+            );
+            return new ResponseEntity<>(finderService.findAll(p, criteria), HttpStatus.OK);
+        }
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<?> getAllProducts(
+            @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "perPage", defaultValue = "10") int perPage
     ) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-        return new ResponseEntity<>(finderService.findAll(p), HttpStatus.OK);
+        return new ResponseEntity<>(finderService.findAllAvailable(p), HttpStatus.OK);
     }
 
     @PutMapping("")
@@ -42,8 +86,14 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> disableProduct(@PathVariable String id) {
+        createService.disableProductById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable String id) {
-      return new ResponseEntity<>(finderService.findById(id), HttpStatus.OK);
+        return new ResponseEntity<>(finderService.findById(id), HttpStatus.OK);
     }
 }

@@ -20,8 +20,12 @@ public class ProductCreateService {
         repository.save(product);
     }
 
-    public void deleteProductById(String id) {
-        repository.deleteById(id);
+    public void disableProductById(String id) {
+        var product = repository.findById(id).orElseThrow(() -> {;
+            return new IllegalArgumentException("Product doesn't exist with id: " + id);
+        });
+        product.setActive(!product.getActive());
+        repository.save(product);
     }
 
     public void updateProduct(Product product) {
@@ -29,13 +33,5 @@ public class ProductCreateService {
             return new IllegalArgumentException("Product doesn't exist with id: " + product.getId());
         });
         repository.save(product);
-    }
-
-    public Optional<Product> findProductById(String id) {
-        return repository.findById(id);
-    }
-
-    public List<Product> findAllProducts() {
-        return repository.findAll();
     }
 }

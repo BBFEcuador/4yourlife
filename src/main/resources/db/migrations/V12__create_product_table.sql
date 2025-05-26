@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS rules(
   description TEXT NOT NULL,
   value FLOAT NOT NULL,
   enabled BOOLEAN NOT NULL,
+  ruleType text NOT NULL,
   product_id TEXT NOT NULL,
   CONSTRAINT fk_products_on_rules FOREIGN KEY (product_id) REFERENCES products (id),
   CONSTRAINT pk_rules PRIMARY KEY (id)

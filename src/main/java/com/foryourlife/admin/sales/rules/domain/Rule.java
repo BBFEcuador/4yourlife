@@ -9,8 +9,6 @@ public class Rule {
     @Id
     private String id;
 
-    //type : enum jornadaDia, dia, curso, cursoweek, regalo
-
     private String description;
 
     private Double value;
@@ -21,20 +19,19 @@ public class Rule {
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
     //and many more
+    @Enumerated(EnumType.STRING)
+    private RuleType ruleType;
 
     protected Rule() {
     }
 
-    private Rule(String id, String description, Double value, Boolean enabled, Product product) {
+    protected Rule(String id, String description, Double value, Boolean enabled, Product product, RuleType ruleType) {
         this.id = id;
         this.description = description;
         this.value = value;
         this.enabled = enabled;
         this.product = product;
-    }
-
-    public Rule create(String id, String description, Double value,Boolean enabled, Product product){
-        return new Rule(id, description, value, enabled, product );
+        this.ruleType = ruleType;
     }
 
     public String getId() {
@@ -75,5 +72,17 @@ public class Rule {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public RuleType getRuleType() {
+        return ruleType;
+    }
+
+    public void setRuleType(RuleType ruleType) {
+        this.ruleType = ruleType;
+    }
+
+    public static Rule create(String id, String description, Double value, Boolean enabled, Product product, RuleType ruleType) {
+        return new Rule(id, description, value, enabled, product, ruleType);
     }
 }

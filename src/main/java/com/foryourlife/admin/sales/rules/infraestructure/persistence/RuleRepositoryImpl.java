@@ -3,6 +3,7 @@ package com.foryourlife.admin.sales.rules.infraestructure.persistence;
 import com.foryourlife.admin.sales.rules.domain.Rule;
 import com.foryourlife.admin.sales.rules.domain.RuleRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,5 +34,11 @@ public class RuleRepositoryImpl implements RuleRepository {
 
     public List<Rule> findAllByProduct(String productId) {
         return this.impl.findAllByProductId(productId);
+    }
+
+    @Override
+    public List<Rule> findAllApplicableRule(String productId, CourseLevel courseLevel) {
+
+        return this.impl.findAllApplicableRules(productId,courseLevel);
     }
 }

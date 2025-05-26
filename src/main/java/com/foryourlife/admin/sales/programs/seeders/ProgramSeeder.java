@@ -33,8 +33,7 @@ public class ProgramSeeder {
             );
             this.programRepository.saveAll(programs);
 
-            this.productRepository.save(Product.create(UUID.randomUUID().toString(), "Focus + Your","elweso-code",700.5,"DOLAR",true,"Focus + Your",null,List.of(programs.get(0), programs.get(1))));
-
+            this.productRepository.save(Product.create("1a9f5420-a08d-4b66-99ed-616a7a50864a", "Focus + Your","elweso-code",700.5,"DOLAR",true,"Focus + Your",null,List.of(programs.get(0), programs.get(1))));
         };
     }
 }

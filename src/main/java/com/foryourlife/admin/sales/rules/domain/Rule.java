@@ -9,6 +9,8 @@ public class Rule {
     @Id
     private String id;
 
+    //type : enum jornadaDia, dia, curso, cursoweek, regalo
+
     private String description;
 
     private Double value;
@@ -16,7 +18,7 @@ public class Rule {
     private Boolean enabled;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
     //and many more
 

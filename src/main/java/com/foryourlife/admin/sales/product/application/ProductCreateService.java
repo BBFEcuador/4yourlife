@@ -25,6 +25,9 @@ public class ProductCreateService {
     }
 
     public void updateProduct(Product product) {
+        repository.findById(product.getId()).orElseThrow(()->{
+            return new IllegalArgumentException("Product doesn't exist with id: " + product.getId());
+        });
         repository.save(product);
     }
 

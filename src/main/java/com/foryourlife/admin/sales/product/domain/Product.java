@@ -1,5 +1,6 @@
 package com.foryourlife.admin.sales.product.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.sales.programs.domain.Program;
 import com.foryourlife.admin.sales.rules.domain.Rule;
 import jakarta.persistence.*;
@@ -95,6 +96,7 @@ public class Product {
         this.currency = currency;
     }
 
+    @JsonProperty(value = "isActive")
     public Boolean getActive() {
         return isActive;
     }

@@ -38,7 +38,11 @@ public class RuleRepositoryImpl implements RuleRepository {
 
     @Override
     public List<Rule> findAllApplicableRule(String productId, CourseLevel courseLevel) {
+        return this.impl.findAllApplicableRules(productId, courseLevel);
+    }
 
-        return this.impl.findAllApplicableRules(productId,courseLevel);
+    @Override
+    public List<Rule> findAllByProductIdAndEnabledTrue(String productId) {
+        return this.impl.findAllByProductIdAndEnabledTrue(productId);
     }
 }

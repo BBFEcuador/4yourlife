@@ -14,5 +14,6 @@ public interface JPARuleRepository extends JpaRepository<Rule,String> {
     List<Rule> findAllByProductId(String productId);
     @Query("SELECT r FROM Rule r WHERE r.product.id = :productId AND r.ruleType = :courseLevel AND r.enabled = TRUE ORDER BY r.value ASC")
     List<Rule> findAllApplicableRules(@Param("productId") String productId, @Param("courseLevel") CourseLevel courseLevel);
-
+    @Query("SELECT r FROM Rule r WHERE r.product.id = :productId AND r.enabled = TRUE")
+    List<Rule> findAllByProductIdAndEnabledTrue(@Param("productId") String productId);
 }

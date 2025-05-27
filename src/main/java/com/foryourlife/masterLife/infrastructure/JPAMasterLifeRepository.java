@@ -52,4 +52,6 @@ public interface JPAMasterLifeRepository extends JpaRepository<MasterLife,String
                 )
             """)
     boolean isMasterLifeAvailable(String staffId, LocalDate startDate, LocalDate endDate, String newTrainingId);
+
+    boolean existsByUser_IdAndIsActiveIsTrue(String userId);
 }

@@ -10,4 +10,5 @@ public interface RuleRepository {
     void disable(String id);
     List<Rule> findAllByProduct(String productId);
     List<Rule> findAllApplicableRule(String productId, CourseLevel courseLevel);
+    List<Rule> findAllByProductIdAndEnabledTrue(String productId);
 }

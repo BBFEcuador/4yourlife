@@ -3,7 +3,7 @@ package com.foryourlife.admin.programs.teams.infraestructure.httpControllers.req
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 
 import java.util.List;
 

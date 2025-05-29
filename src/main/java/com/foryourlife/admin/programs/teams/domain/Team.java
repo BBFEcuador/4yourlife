@@ -1,10 +1,9 @@
 package com.foryourlife.admin.programs.teams.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.TeamCreated;

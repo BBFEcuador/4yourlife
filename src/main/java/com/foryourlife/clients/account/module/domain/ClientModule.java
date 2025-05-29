@@ -2,7 +2,7 @@ package com.foryourlife.clients.account.module.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.ClientModulesUpdated;
 import jakarta.persistence.*;

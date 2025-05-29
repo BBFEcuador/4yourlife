@@ -1,6 +1,6 @@
 package com.foryourlife.clients.account.phone.domain;
 
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import jakarta.persistence.*;
 
 @Entity

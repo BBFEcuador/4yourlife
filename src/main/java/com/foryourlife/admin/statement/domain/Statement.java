@@ -1,7 +1,7 @@
 package com.foryourlife.admin.statement.domain;
 
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import jakarta.persistence.*;
 
 @Entity

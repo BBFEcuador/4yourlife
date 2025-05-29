@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class InvitationCreated extends DomainEvent {
 
-    private Invitation invitation;
+    private final Invitation invitation;
 
     public InvitationCreated(String aggregateId, Invitation invitation) {
         super(aggregateId, UUID.randomUUID().toString(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));

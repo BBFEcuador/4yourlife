@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InvoiceRepositoryImpl implements InvoiceRepository {
@@ -36,5 +37,15 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     @Override
     public Page<Invoice> findAll(Pageable pageable) {
         return jpaInvoiceRepository.findAll(pageable);
+    }
+
+    @Override
+    public Optional<Invoice> findLastInvoice() {
+        return jpaInvoiceRepository.findTopBySentSriIsTrueOrderByInvoiceDateDesc();
+    }
+
+    @Override
+    public Optional<Invoice> findInvoiceByPaymentId(String paymentId) {
+        return jpaInvoiceRepository.findByPayment_Id(paymentId);
     }
 }

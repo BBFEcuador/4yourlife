@@ -3,13 +3,11 @@ package com.foryourlife.admin.programs.training.infrastructure;
 import com.foryourlife.admin.programs.training.domain.StartDate;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
-import com.foryourlife.clients.account.user.domain.Participant;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 

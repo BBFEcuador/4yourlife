@@ -22,7 +22,7 @@ public class InvoiceController {
 
     @PostMapping("")
     public ResponseEntity<?> saveInvoice(@RequestBody InvoiceRequest request) {
-        commandInvoiceService.save(request);
+        commandInvoiceService.save(request.toDomain());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

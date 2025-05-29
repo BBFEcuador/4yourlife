@@ -1,7 +1,7 @@
 package com.foryourlife.clients.account.medicalRecord.infrastructure.httpcontrollers;
 
 import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import jakarta.validation.constraints.NotNull;
 
 public class MedicalRecordRequest {

@@ -1,6 +1,6 @@
 package com.foryourlife.admin.sales.invoices.domain;
 
-import com.foryourlife.admin.sales.payments.domain.Payment;
+import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -17,6 +17,7 @@ public class Invoice {
     private String id;
     @Column(name = "invoice_number")
     private String invoiceNumber;
+    @Column(name = "invoice_date")
     private LocalDate invoiceDate;
 
     @ManyToOne

@@ -6,8 +6,8 @@ import com.foryourlife.clients.account.invitations.domain.Invitation;
 import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
 import com.foryourlife.clients.account.invitations.domain.Sender;
 import com.foryourlife.clients.account.invitations.infrastructure.InvitationRequest;
-import com.foryourlife.clients.account.user.application.CommandUsersService;
-import com.foryourlife.clients.account.user.application.QueryUsersService;
+import com.foryourlife.clients.account.participant.application.ParticipantCommandService;
+import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,21 +19,21 @@ import java.util.UUID;
 @Service
 public class CommandInvitationService {
     private final InvitationRepository repository;
-    private final QueryUsersService queryUsersService;
+    private final ParticipantQueryService participantQueryService;
     private final QueryCampusService campusService;
     private final AdminFinderService adminFinderService;
-    private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
+    private final Logger logger = LoggerFactory.getLogger(ParticipantCommandService.class);
 
-    public CommandInvitationService(InvitationRepository repository, QueryUsersService queryUsersService, QueryCampusService campusService, AdminFinderService adminFinderService) {
+    public CommandInvitationService(InvitationRepository repository, ParticipantQueryService participantQueryService, QueryCampusService campusService, AdminFinderService adminFinderService) {
         this.repository = repository;
-        this.queryUsersService = queryUsersService;
+        this.participantQueryService = participantQueryService;
         this.campusService = campusService;
         this.adminFinderService = adminFinderService;
     }
 
     public String createInvitationByUser(String id, String campusId) {
         try {
-            var user = queryUsersService.getUserById(id);
+            var user = participantQueryService.getUserById(id);
             var token = UUID.randomUUID().toString();
             var campus = campusService.findById(campusId);
             var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, id, new Sender(user.getName(), user.getPhone()), 1, campus);
@@ -70,7 +70,7 @@ public class CommandInvitationService {
         if (invitations) {
             throw new BaseException("Tiene invitacion activa", List.of());
         }
-        var user = queryUsersService.getUserById(request.id);
+        var user = participantQueryService.getUserById(request.id);
         var token = UUID.randomUUID().toString();
         var campus = campusService.findById(request.campusId);
         var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, request.id, new Sender(user.getName(), user.getPhone()), Integer.parseInt(request.quantity),campus);

@@ -1,7 +1,7 @@
 package com.foryourlife.clients.account.phone.infrastructure.httpControllers;
 
 import com.foryourlife.clients.account.phone.domain.Phone;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 
 public class SavePhoneRequest {
     private String id;

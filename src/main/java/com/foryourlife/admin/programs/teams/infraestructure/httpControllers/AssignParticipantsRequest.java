@@ -1,6 +1,6 @@
 package com.foryourlife.admin.programs.teams.infraestructure.httpControllers;
 
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 
 import java.util.Set;
 

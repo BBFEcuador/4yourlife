@@ -3,8 +3,8 @@ package com.foryourlife.admin.sales.rules.application;
 import com.foryourlife.admin.sales.rules.domain.Rule;
 import com.foryourlife.admin.sales.rules.domain.RuleContext;
 import com.foryourlife.admin.sales.rules.domain.RuleRepository;
-import com.foryourlife.clients.account.user.domain.Participant;
-import com.foryourlife.clients.account.user.domain.UserRepository;
+import com.foryourlife.clients.account.participant.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.masterLife.infrastructure.JPAMasterLifeRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 public class CommandRuleService {
     @Autowired
-    private UserRepository participantRepository;
+    private ParticipantRepository participantRepository;
     @Autowired
     private JPAMasterLifeRepository masterLifeRepository;
 

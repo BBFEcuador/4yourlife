@@ -1,10 +1,8 @@
 package com.foryourlife.shared.infrastructure.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foryourlife.admin.programs.campus.domain.CampusNotFoundException;
-import com.foryourlife.clients.account.user.domain.UserAlreadyCreatedException;
-import com.foryourlife.clients.account.user.domain.UserNotFoundException;
+import com.foryourlife.clients.account.participant.domain.UserAlreadyCreatedException;
+import com.foryourlife.clients.account.participant.domain.UserNotFoundException;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.exception.DomainExceptionsWrapper;
 import jakarta.annotation.Nullable;

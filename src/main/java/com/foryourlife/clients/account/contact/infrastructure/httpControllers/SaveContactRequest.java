@@ -1,7 +1,6 @@
 package com.foryourlife.clients.account.contact.infrastructure.httpControllers;
 
 import com.foryourlife.clients.account.contact.domain.Contact;
-import com.foryourlife.clients.account.user.domain.Participant;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;

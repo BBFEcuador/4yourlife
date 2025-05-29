@@ -2,7 +2,7 @@ package com.foryourlife.clients.account.participantLevel.application;
 
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
-import com.foryourlife.clients.account.user.domain.UserRepository;
+import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.shared.domain.bus.DomainEventSubscriber;
 import com.foryourlife.shared.domain.events.ClientModulesUpdated;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -19,10 +19,10 @@ import java.util.List;
 @Service
 public class UpdateParticipantLevelOnClientModuleUpdate {
 
-    private final UserRepository participantRepository;
+    private final ParticipantRepository participantRepository;
     private final ParticipantLevelRepository participantLevelRepository;
 
-    public UpdateParticipantLevelOnClientModuleUpdate(UserRepository participantRepository, ParticipantLevelRepository participantLevelRepository) {
+    public UpdateParticipantLevelOnClientModuleUpdate(ParticipantRepository participantRepository, ParticipantLevelRepository participantLevelRepository) {
         this.participantRepository = participantRepository;
         this.participantLevelRepository = participantLevelRepository;
     }

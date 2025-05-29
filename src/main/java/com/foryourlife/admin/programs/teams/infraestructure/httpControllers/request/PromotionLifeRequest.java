@@ -1,6 +1,6 @@
 package com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request;
 
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.masterLife.domain.MasterLife;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

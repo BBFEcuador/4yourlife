@@ -1,7 +1,7 @@
 package com.foryourlife.clients.account.invitations.domain;
 
-import com.foryourlife.clients.account.user.domain.Participant;
-import com.foryourlife.clients.account.user.domain.UsersMother;
+import com.foryourlife.clients.account.participant.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.UsersMother;
 
 import java.util.UUID;
 

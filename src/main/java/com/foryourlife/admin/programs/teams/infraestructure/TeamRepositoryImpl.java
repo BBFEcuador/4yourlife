@@ -2,7 +2,7 @@ package com.foryourlife.admin.programs.teams.infraestructure;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
-import com.foryourlife.clients.account.user.infrastructure.JPAUserRepository;
+import com.foryourlife.clients.account.participant.infrastructure.JPAParticipantRepository;
 import com.foryourlife.masterLife.infrastructure.JPAMasterLifeRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -20,13 +20,13 @@ import java.util.Optional;
 public class TeamRepositoryImpl implements TeamRepository {
 
     private final JPATeamRepository _jpaTeamRepository;
-    private final JPAUserRepository _jpaUserRepository;
+    private final JPAParticipantRepository _jpaParticipantRepository;
     private final JPAMasterLifeRepository jpaMasterLifeRepository;
     private final JPACriteriaConverter<Team> criteriaConverter;
 
-    public TeamRepositoryImpl(JPATeamRepository _jpaTeamRepository, JPAUserRepository jpaUserRepository, JPAMasterLifeRepository jpaMasterLifeRepository, JPACriteriaConverter<Team> criteriaConverter) {
+    public TeamRepositoryImpl(JPATeamRepository _jpaTeamRepository, JPAParticipantRepository jpaParticipantRepository, JPAMasterLifeRepository jpaMasterLifeRepository, JPACriteriaConverter<Team> criteriaConverter) {
         this._jpaTeamRepository = _jpaTeamRepository;
-        _jpaUserRepository = jpaUserRepository;
+        _jpaParticipantRepository = jpaParticipantRepository;
         this.jpaMasterLifeRepository = jpaMasterLifeRepository;
         this.criteriaConverter = criteriaConverter;
     }
@@ -48,7 +48,7 @@ public class TeamRepositoryImpl implements TeamRepository {
     public void assignParticipants(String teamId, String userId) {
         var team = _jpaTeamRepository.findById(teamId).orElseThrow(() -> new BaseException("Team not found", List.of("")));
         var users = team.getUsers();
-        users.add(_jpaUserRepository.findById(userId).orElseThrow(() -> new BaseException("User not found", List.of(""))));
+        users.add(_jpaParticipantRepository.findById(userId).orElseThrow(() -> new BaseException("User not found", List.of(""))));
         team.setUsers(users);
         _jpaTeamRepository.save(team);
     }

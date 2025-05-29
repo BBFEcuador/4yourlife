@@ -1,6 +1,6 @@
 package com.foryourlife.shared.domain.events;
 
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.bus.DomainEvent;
 
 import java.io.Serializable;

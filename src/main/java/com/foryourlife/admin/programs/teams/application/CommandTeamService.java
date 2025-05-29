@@ -5,13 +5,11 @@ import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.*;
 import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
-import com.foryourlife.clients.account.user.domain.UserRepository;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.masterLife.application.QueryMasterLifeService;
 import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
-import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.staff.domain.StaffRepository;
 import com.foryourlife.visionary.domain.VisionaryRepository;
 import org.slf4j.Logger;
@@ -35,7 +33,7 @@ public class CommandTeamService {
     private String baseUrl;
     private final TeamRepository _teamRepository;
     private final EventBus bus;
-    private final UserRepository _userRepository;
+    private final ParticipantRepository _participantRepository;
     private final StaffRepository staffRepository;
     private final VisionaryRepository visionaryRepository;
     private final QueryTrainingService queryTrainingService;
@@ -45,10 +43,10 @@ public class CommandTeamService {
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
 
 
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, UserRepository _userRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerFinderService trainerFinderService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService) {
+    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerFinderService trainerFinderService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService) {
         this._teamRepository = _teamRepository;
         this.bus = bus;
-        this._userRepository = _userRepository;
+        this._participantRepository = _participantRepository;
         this.staffRepository = staffRepository;
         this.visionaryRepository = visionaryRepository;
         this.queryTrainingService = queryTrainingService;
@@ -66,7 +64,7 @@ public class CommandTeamService {
         var training = queryTrainingService.getTrainingById(request.training);
         var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
         var users = request.users.stream().map(participant -> {
-            var p = _userRepository.findById(participant.getId()).orElseThrow();
+            var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
@@ -97,7 +95,7 @@ public class CommandTeamService {
         var training = queryTrainingService.getTrainingById(request.training);
         var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
         var users = request.users.stream().map(participant -> {
-            var p = _userRepository.findById(participant.getId()).orElseThrow();
+            var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
@@ -131,7 +129,7 @@ public class CommandTeamService {
         var training = queryTrainingService.getTrainingById(request.training);
         var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
         var users = request.users.stream().map(participant -> {
-            var p = _userRepository.findById(participant.getId()).orElseThrow();
+            var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
@@ -163,14 +161,14 @@ public class CommandTeamService {
         var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow(() -> new BaseException("Trainer not found", List.of()));
         var training = team.getTraining().getNextLevel();
         var users = request.users.stream().map(participant -> {
-            var p = _userRepository.findById(participant.getId()).orElseThrow();
+            var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null && !Objects.equals(p.getTeam().getId(), team.getId())) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
             if (p.getModules().getHasYour()) return p;
             p.setLingerer(true);
             p.setDesertor(true);
-            _userRepository.save(p);
+            _participantRepository.save(p);
             return null;
         }).toList();
         if (users.stream().filter(Objects::nonNull).toList().isEmpty()) {
@@ -209,7 +207,7 @@ public class CommandTeamService {
         var team = _teamRepository.findById(teamId);
         if (team.isEmpty()) {
             throw new BaseException("Team not found", List.of(""));
-        } else if (_userRepository.findById(userId).isEmpty()) {
+        } else if (_participantRepository.findById(userId).isEmpty()) {
             throw new BaseException("User not found", List.of(""));
         }
         team.orElseThrow().getUsers().forEach(user -> {
@@ -232,21 +230,21 @@ public class CommandTeamService {
     public void removeParticipants(String teamId, String userId, Boolean lingerer, Boolean desertor) {
         if (this._teamRepository.findById(teamId).isEmpty()) {
             throw new BaseException("Team not found", List.of(""));
-        } else if (_userRepository.findById(userId).isEmpty()) {
+        } else if (_participantRepository.findById(userId).isEmpty()) {
             throw new BaseException("User not found", List.of(""));
         }
 
-        var user = _userRepository.findById(userId).get();
+        var user = _participantRepository.findById(userId).get();
         user.setLingerer(lingerer);
         user.setDesertor(desertor);
-        _userRepository.save(user);
+        _participantRepository.save(user);
         _teamRepository.removeParticipants(teamId, userId);
     }
 
     public void removeMastersLife(String teamId, String userId) {
         if (this._teamRepository.findById(teamId).isEmpty()) {
             throw new BaseException("Team not found", List.of(""));
-        } else if (_userRepository.findById(userId).isEmpty()) {
+        } else if (_participantRepository.findById(userId).isEmpty()) {
             throw new BaseException("User not found", List.of(""));
         }
         _teamRepository.removeMastersLife(teamId, userId);
@@ -320,14 +318,14 @@ public class CommandTeamService {
         var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
         var training = team.getTraining().getNextLevel();
         var users = request.users.stream().map(participant -> {
-            var p = _userRepository.findById(participant.getId()).orElseThrow();
+            var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null && !Objects.equals(p.getTeam().getId(), team.getId())) {
                 throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
             }
             if (p.getModules().getHasLife()) return p;
             p.setLingerer(true);
             p.setDesertor(true);
-            _userRepository.save(p);
+            _participantRepository.save(p);
             return null;
         }).toList();
         if (users.stream().filter(Objects::nonNull).toList().isEmpty()) {

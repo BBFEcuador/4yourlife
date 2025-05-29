@@ -2,7 +2,7 @@ package com.foryourlife.admin.statement.infrastructure.httpControllers;
 
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.statement.domain.Statement;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

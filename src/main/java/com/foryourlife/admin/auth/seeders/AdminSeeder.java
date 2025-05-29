@@ -16,15 +16,14 @@ import com.foryourlife.clients.account.invitations.infrastructure.InvitationRequ
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
 import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
-import com.foryourlife.clients.account.user.application.CommandUsersService;
-import com.foryourlife.clients.account.user.domain.Participant;
-import com.foryourlife.clients.account.user.infrastructure.httpControllers.MedicalRecordSaveRequest;
+import com.foryourlife.clients.account.participant.application.ParticipantCommandService;
+import com.foryourlife.clients.account.participant.domain.Participant;
+import com.foryourlife.clients.account.participant.infrastructure.httpControllers.MedicalRecordSaveRequest;
 import com.foryourlife.masterLife.application.CommandMasterLifeService;
 import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserEntities;
-import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.UserType;
 import com.foryourlife.staff.application.StaffCreatorService;
 import com.foryourlife.staff.domain.Staff;
@@ -42,7 +41,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Configuration
 public class AdminSeeder {
@@ -53,14 +51,14 @@ public class AdminSeeder {
     private final CommandTrainingService commandTrainingService;
     private final StaffCreatorService staffCreatorService;
     private final VisionaryCreatorService visionaryCreatorService;
-    private final CommandUsersService commandUsersService;
+    private final ParticipantCommandService participantCommandService;
     private final CommandMasterLifeService commandMasterLifeService;
     private final CommandInvitationService commandInvitationService;
     private final QueryInvitationServices queryInvitationServices;
     private final ParticipantLevelRepository participantLevelRepository;
     private final Faker faker = new Faker();
 
-    public AdminSeeder(AdminRepository repository, PasswordEncoder passwordEncoder, CampusRepository campusRepository, TrainerCreatorService trainerCreatorService, CommandTrainingService commandTrainingService, StaffCreatorService staffCreatorService, VisionaryCreatorService visionaryCreatorService, CommandUsersService commandUsersService, CommandMasterLifeService commandMasterLifeService, CommandInvitationService commandInvitationService, QueryInvitationServices queryInvitationServices, ParticipantLevelRepository participantLevelRepository) {
+    public AdminSeeder(AdminRepository repository, PasswordEncoder passwordEncoder, CampusRepository campusRepository, TrainerCreatorService trainerCreatorService, CommandTrainingService commandTrainingService, StaffCreatorService staffCreatorService, VisionaryCreatorService visionaryCreatorService, ParticipantCommandService participantCommandService, CommandMasterLifeService commandMasterLifeService, CommandInvitationService commandInvitationService, QueryInvitationServices queryInvitationServices, ParticipantLevelRepository participantLevelRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.campusRepository = campusRepository;
@@ -68,7 +66,7 @@ public class AdminSeeder {
         this.commandTrainingService = commandTrainingService;
         this.staffCreatorService = staffCreatorService;
         this.visionaryCreatorService = visionaryCreatorService;
-        this.commandUsersService = commandUsersService;
+        this.participantCommandService = participantCommandService;
         this.commandMasterLifeService = commandMasterLifeService;
         this.commandInvitationService = commandInvitationService;
         this.queryInvitationServices = queryInvitationServices;
@@ -87,7 +85,7 @@ public class AdminSeeder {
             List<ParticipantLevel> roles = Arrays.asList(ParticipantLevel.create("6642e863-7f6f-40a3-80e2-934388ade735", "ROLE_INIT", true, CourseLevel.INIT), ParticipantLevel.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "ROLE_FOCUS", false, CourseLevel.FOCUS), ParticipantLevel.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "ROLE_YOUR", false, CourseLevel.YOUR), ParticipantLevel.create("5b2da953-9791-47e6-a5b8-3442b52b8ebc", "ROLE_LIFE", false, CourseLevel.LIFE), ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9", "ROLE_GRADUATE", false, CourseLevel.LIFE_GRADUATE));
             this.participantLevelRepository.saveAll(roles);
             createAdminTestUser();
-            mock();
+//            mock();
         };
     }
 
@@ -170,7 +168,7 @@ public class AdminSeeder {
             var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();
             var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false, queryInvitationServices.findInvitationByToken(invitationToken).getCampus());
             var medicalRecord = new MedicalRecordSaveRequest("N/A", "N/A", "N/A");
-            commandUsersService.createInitUser(
+            participantCommandService.createInitUser(
                     trainer,
                     medicalRecord,
                     new SaveContactRequest(null,faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(),null),

@@ -15,16 +15,7 @@ public class CommandInvoiceService {
         this.invoiceRepository = invoiceRepository;
     }
 
-    public void save(InvoiceRequest invoiceReq) {
-        var invoice = Invoice.create(
-                invoiceReq.id != null ? invoiceReq.id : UUID.randomUUID().toString(),
-                invoiceReq.invoiceNumber,
-                invoiceReq.invoiceDate,
-                invoiceReq.dataInvoice,
-                invoiceReq.products,
-                invoiceReq.payment,
-                invoiceReq.sentSri
-        );
+    public void save(Invoice invoice) {
         invoiceRepository.save(invoice);
     }
 

@@ -11,6 +11,7 @@ public class ProductDiscountRequest {
     public String name;
     @NotNull(message = "El tipo de descuento es requerido")
     @NotEmpty(message = "El tipo de descuento no puede estar vacío")
+    @Pattern(regexp = "^[PE]$", message = "el tipo debe ser P (porcentaje) o E (efectivo)")
     public String discountType;
     @NotNull(message = "El valor del descuento es requerido")
     @NotEmpty(message = "El valor del descuento no puede estar vacío")

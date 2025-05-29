@@ -1,18 +1,17 @@
 package com.foryourlife.admin.sales.invoices.infraestructure.http;
 
-import com.foryourlife.admin.sales.payments.domain.Payment;
+import com.foryourlife.admin.sales.invoices.domain.Invoice;
+import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public class InvoiceRequest {
-    
+
     public String id;
     @NotNull(message = "El numero de factura es requerido")
     public String invoiceNumber;
@@ -25,4 +24,16 @@ public class InvoiceRequest {
     @NotNull(message = "El pago es requerido")
     public Payment payment;
     public Boolean sentSri;
+
+    public Invoice toDomain() {
+        return Invoice.create(
+                id != null ? id : UUID.randomUUID().toString(),
+                invoiceNumber,
+                invoiceDate,
+                dataInvoice,
+                products,
+                payment,
+                sentSri
+        );
+    }
 }

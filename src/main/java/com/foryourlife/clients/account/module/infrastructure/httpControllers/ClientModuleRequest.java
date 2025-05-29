@@ -1,7 +1,7 @@
 package com.foryourlife.clients.account.module.infrastructure.httpControllers;
 
 import com.foryourlife.clients.account.module.domain.ClientModule;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

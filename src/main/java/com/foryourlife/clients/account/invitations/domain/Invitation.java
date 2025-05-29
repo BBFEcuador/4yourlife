@@ -1,7 +1,7 @@
 package com.foryourlife.clients.account.invitations.domain;
 
 import com.foryourlife.admin.programs.campus.domain.Campus;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.InvitationCreated;
 import io.hypersistence.utils.hibernate.type.json.JsonType;

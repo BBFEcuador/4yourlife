@@ -7,7 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface JPAInvoiceRepository extends JpaRepository<Invoice, String>, JpaSpecificationExecutor<Invoice> {
     Page<Invoice> findAllByDataInvoiceUserId(String id, Pageable pageable);
+    Optional<Invoice> findTopBySentSriIsTrueOrderByInvoiceDateDesc();
+
+    Optional<Invoice> findByPayment_Id(String paymentId);
 }

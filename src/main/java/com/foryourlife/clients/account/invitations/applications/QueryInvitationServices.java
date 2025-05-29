@@ -2,7 +2,7 @@ package com.foryourlife.clients.account.invitations.applications;
 
 import com.foryourlife.clients.account.invitations.domain.Invitation;
 import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
-import com.foryourlife.clients.account.user.application.CommandUsersService;
+import com.foryourlife.clients.account.participant.application.ParticipantCommandService;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class QueryInvitationServices {
     private final InvitationRepository repository;
-    private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
+    private final Logger logger = LoggerFactory.getLogger(ParticipantCommandService.class);
 
     public QueryInvitationServices(InvitationRepository repository) {
         this.repository = repository;

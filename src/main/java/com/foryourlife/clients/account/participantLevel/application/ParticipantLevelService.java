@@ -2,7 +2,7 @@ package com.foryourlife.clients.account.participantLevel.application;
 
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
-import com.foryourlife.clients.account.user.application.CommandUsersService;
+import com.foryourlife.clients.account.participant.application.ParticipantCommandService;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 public class ParticipantLevelService {
     private final ParticipantLevelRepository repository;
-    private final Logger logger = LoggerFactory.getLogger(CommandUsersService.class);
+    private final Logger logger = LoggerFactory.getLogger(ParticipantCommandService.class);
 
     public ParticipantLevelService(ParticipantLevelRepository repository) {
         this.repository = repository;

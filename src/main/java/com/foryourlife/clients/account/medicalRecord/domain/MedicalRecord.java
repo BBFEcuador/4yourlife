@@ -1,8 +1,7 @@
 package com.foryourlife.clients.account.medicalRecord.domain;
 
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import jakarta.persistence.*;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Table(name = "medical_records")

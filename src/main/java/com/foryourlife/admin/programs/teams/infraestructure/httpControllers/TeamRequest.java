@@ -1,8 +1,7 @@
 package com.foryourlife.admin.programs.teams.infraestructure.httpControllers;
 
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 
-import javax.sql.rowset.serial.SerialStruct;
 import java.util.Set;
 
 public class TeamRequest {

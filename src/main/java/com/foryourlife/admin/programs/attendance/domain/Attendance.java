@@ -1,7 +1,7 @@
 package com.foryourlife.admin.programs.attendance.domain;
 
 import com.foryourlife.admin.programs.training.domain.Training;
-import com.foryourlife.clients.account.user.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.OnNullDesistedAttend;
 import jakarta.persistence.*;

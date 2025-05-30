@@ -15,8 +15,7 @@ public class PaymentRequest {
     public String id;
     
     @NotNull(message = "Los productos son requeridos")
-    public List<Product> product;
-    
+    public List<String> products;
     public ProductDiscount discount;
     @NotNull(message = "El Participante es requerido")
     public Participant participant;
@@ -29,4 +28,5 @@ public class PaymentRequest {
     public PaymentStatus status;
     @NotNull(message = "Los datos de facturación son requeridos")
     public DataInvoice dataInvoice;
+    public String note;
 }

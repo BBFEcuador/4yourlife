@@ -41,10 +41,12 @@ public class Payment extends AggregateRoot {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
+    private String  note;
+
     protected Payment() {
     }
 
-    private Payment(String id, List<Product> products, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, Double total, PaymentStatus status) {
+    public Payment(String id, List<Product> products, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, Double total, PaymentStatus status, String note) {
         this.id = id;
         this.products = products;
         this.discount = discount;
@@ -53,10 +55,11 @@ public class Payment extends AggregateRoot {
         this.paymentshistory = paymentshistory;
         this.total = total;
         this.status = status;
+        this.note = note;
     }
 
-    public static Payment create(String id, List<Product> product, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, Double total, PaymentStatus status) {
-        return new Payment(id, product, discount, participant, campus, paymentshistory, total, status);
+    public static Payment create(String id, List<Product> product, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, Double total, PaymentStatus status, String note) {
+        return new Payment(id, product, discount, participant, campus, paymentshistory, total, status, note);
     }
 
     public String getId() {
@@ -121,5 +124,21 @@ public class Payment extends AggregateRoot {
 
     public void setStatus(PaymentStatus status) {
         this.status = status;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

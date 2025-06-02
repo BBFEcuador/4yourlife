@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS payments(
     id text not null primary key,
     products jsonb not null,
     discount_id text,
+    note text,
     participant_id text not null,
     campus_id text not null,
     payments_history jsonb,

@@ -9,9 +9,12 @@ import com.foryourlife.clients.account.invoiceData.domain.InvoiceDataRepository;
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
+import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
+import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
 import com.foryourlife.shared.domain.bus.DomainEventSubscriber;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.transaction.Transactional;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -31,14 +34,16 @@ public class OnPaymentCreated {
     private final QueryInvoiceService queryInvoiceService;
     private final ParticipantRepository participantRepository;
     private final InvoiceDataRepository dataInvoiceRepository;
+    private final ParticipantLevelService participantLevelRepository;
 
-    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, InvoiceDataRepository dataInvoiceRepository) {
+    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, InvoiceDataRepository dataInvoiceRepository, ParticipantLevelRepository participantLevelRepository, ParticipantLevelService participantLevelRepository1) {
         this.productFinderService = productFinderService;
         this.clientModuleCreatorService = clientModuleCreatorService;
         this.commandInvoiceService = commandInvoiceService;
         this.queryInvoiceService = queryInvoiceService;
         this.participantRepository = participantRepository;
         this.dataInvoiceRepository = dataInvoiceRepository;
+        this.participantLevelRepository = participantLevelRepository1;
     }
 
     @Async
@@ -46,8 +51,7 @@ public class OnPaymentCreated {
     @Transactional
     public void on(PaymentCreated event) {
         Participant participant = participantRepository.findById(event.getPayment().getParticipant().getId()).orElseThrow(NullPointerException::new);
-
-        event.getPayment().getProduct().forEach(product -> {
+        event.getPayment().getProducts().forEach(product -> {
             var prod = productFinderService.findById(product.getId());
 
             prod.getPrograms().forEach(program -> {
@@ -58,8 +62,15 @@ public class OnPaymentCreated {
                     default -> throw new BaseException("Invalid course level", List.of(""));
                 }
             });
+            if (event.getPayment().getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.INIT){
+                var p = event.getPayment().getParticipant();
+                var pl = participantLevelRepository.getRolByLevel(CourseLevel.FOCUS);
+                p.setParticipantLevel(pl);
+                participantRepository.save(p);
+            }
         });
         clientModuleCreatorService.createClientModule(participant.getModules());
+
         createInvoice(event);
     }
 
@@ -92,7 +103,7 @@ public class OnPaymentCreated {
                     String.valueOf(invoiceNumber),
                     LocalDate.now(),
                     dataInvoice,
-                    event.getPayment().getProduct(),
+                    event.getPayment().getProducts(),
                     event.getPayment(),
                     false
             );

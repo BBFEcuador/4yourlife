@@ -1,5 +1,6 @@
 package com.foryourlife.admin.sales.payments.payment.application;
 
+import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
@@ -10,6 +11,7 @@ import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethod;
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethodRepository;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
+import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -26,19 +28,24 @@ public class CommandPaymentService {
     private final QueryInvoiceService _queryInvoiceService;
     private final PaymentMethodRepository _paymentMethodRepository;
     private final ProductRepository _productRepository;
+    private final ParticipantQueryService participantQueryService;
+    private final QueryCampusService queryCampusService;
     private final EventBus eventBus;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, QueryInvoiceService _queryInvoiceService, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, EventBus eventBus) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, QueryInvoiceService _queryInvoiceService, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, EventBus eventBus) {
         this._paymentRepository = _paymentRepository;
         this._queryInvoiceService = _queryInvoiceService;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
+        this.participantQueryService = participantQueryService;
+        this.queryCampusService = queryCampusService;
         this.eventBus = eventBus;
     }
 
     public void save(PaymentRequest paymentReq) {
 
-        boolean hasPendingPayments = _paymentRepository.existsByParticipantIdAndStatus(paymentReq.participant.getId(), PaymentStatus.PENDING);
+        boolean hasPendingPayments = _paymentRepository.existsByParticipantIdAndStatus(paymentReq.participant, PaymentStatus.PENDING);
+        var participant = participantQueryService.getUserById(paymentReq.participant);
 
         if (hasPendingPayments) {
             throw new BaseException("No se puede adquirir el servicio, existen pagos pendientes", List.of(""));
@@ -61,8 +68,8 @@ public class CommandPaymentService {
                 paymentReq.id = UUID.randomUUID().toString(),
                 products,
                 paymentReq.discount,
-                paymentReq.participant,
-                paymentReq.campus,
+                participant,
+                queryCampusService.findById(paymentReq.campus),
                 paymentReq.paymentshistory,
                 paymentReq.total,
                 paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING,
@@ -81,6 +88,7 @@ public class CommandPaymentService {
         if (paymentReq.id == null || paymentReq.id.isEmpty()) {
             throw new IllegalArgumentException("No se puede actualizar, el id de pago es requerido");
         }
+        var participant = participantQueryService.getUserById(paymentReq.participant);
         List<Product> products = List.of();
         paymentReq.products.forEach(
                 productId -> {
@@ -96,8 +104,8 @@ public class CommandPaymentService {
                 paymentReq.id,
                 products,
                 paymentReq.discount,
-                paymentReq.participant,
-                paymentReq.campus,
+                participant,
+                queryCampusService.findById(paymentReq.campus),
                 paymentReq.paymentshistory,
                 paymentReq.total,
                 paymentReq.status,

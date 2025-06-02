@@ -66,79 +66,39 @@ public class Payment extends AggregateRoot {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public List<Product> getProduct() {
+    public List<Product> getProducts() {
         return products;
-    }
-
-    public void setProduct(List<Product> product) {
-        this.products = product;
     }
 
     public ProductDiscount getDiscount() {
         return discount;
     }
 
-    public void setDiscount(ProductDiscount discount) {
-        this.discount = discount;
-    }
-
     public Participant getParticipant() {
         return participant;
-    }
-
-    public void setParticipant(Participant participant) {
-        this.participant = participant;
     }
 
     public Campus getCampus() {
         return campus;
     }
 
-    public void setCampus(Campus campus) {
-        this.campus = campus;
-    }
-
     public List<PaymentHistory> getPaymentshistory() {
         return paymentshistory;
-    }
-
-    public void setPaymentshistory(List<PaymentHistory> paymentshistory) {
-        this.paymentshistory = paymentshistory;
     }
 
     public Double getTotal() {
         return total;
     }
 
-    public void setTotal(Double total) {
-        this.total = total;
-    }
-
     public PaymentStatus getStatus() {
         return status;
-    }
-
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
     }
 
     public String getNote() {
         return note;
     }
 
-    public void setNote(String note) {
-        this.note = note;
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
     }
 }

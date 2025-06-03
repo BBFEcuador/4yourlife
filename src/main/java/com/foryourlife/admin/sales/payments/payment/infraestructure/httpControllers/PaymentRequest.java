@@ -1,6 +1,8 @@
 package com.foryourlife.admin.sales.payments.payment.infraestructure.httpControllers;
 
 import com.foryourlife.admin.sales.discounts.domain.ProductDiscount;
+import com.foryourlife.admin.sales.invoices.domain.Invoice;
+import com.foryourlife.admin.sales.invoices.infraestructure.http.InvoiceRequest;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
@@ -10,7 +12,7 @@ import java.util.List;
 
 public class PaymentRequest {
     public String id;
-    
+
     @NotNull(message = "Los productos son requeridos")
     public List<String> products;
     public ProductDiscount discount;
@@ -24,6 +26,7 @@ public class PaymentRequest {
     public Double total;
     public PaymentStatus status;
     @NotNull(message = "Los datos de facturación son requeridos")
-    public String dataInvoice;
+    public InvoiceRequest invoice;
     public String note;
+
 }

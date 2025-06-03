@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.payments.payment.application;
 
 import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
+import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
@@ -18,6 +19,7 @@ import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,17 +31,15 @@ public class CommandPaymentService {
     private final QueryInvoiceService _queryInvoiceService;
     private final PaymentMethodRepository _paymentMethodRepository;
     private final ProductRepository _productRepository;
-    private final InvoiceDataRepository dataInvoiceRepository;
     private final ParticipantQueryService participantQueryService;
     private final QueryCampusService queryCampusService;
     private final EventBus eventBus;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, QueryInvoiceService _queryInvoiceService, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, InvoiceDataRepository dataInvoiceRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, EventBus eventBus) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, QueryInvoiceService _queryInvoiceService, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, EventBus eventBus) {
         this._paymentRepository = _paymentRepository;
         this._queryInvoiceService = _queryInvoiceService;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
-        this.dataInvoiceRepository = dataInvoiceRepository;
         this.participantQueryService = participantQueryService;
         this.queryCampusService = queryCampusService;
         this.eventBus = eventBus;
@@ -49,8 +49,7 @@ public class CommandPaymentService {
 
         boolean hasPendingPayments = _paymentRepository.existsByParticipantIdAndStatus(paymentReq.participant, PaymentStatus.PENDING);
         var participant = participantQueryService.getUserById(paymentReq.participant);
-        var dataInvoice = dataInvoiceRepository.findById(paymentReq.dataInvoice)
-                .orElseThrow(() -> new BaseException("Los datos de facturacion no existen", List.of()));
+
         if (hasPendingPayments) {
             throw new BaseException("No se puede adquirir el servicio, existen pagos pendientes", List.of(""));
         }
@@ -91,8 +90,21 @@ public class CommandPaymentService {
                 paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING,
                 paymentReq.note
         );
+        var invoice = Invoice.create(
+                UUID.randomUUID().toString(),
+                paymentReq.invoice.fullName,
+                paymentReq.invoice.address,
+                paymentReq.invoice.document,
+                paymentReq.invoice.phone,
+                paymentReq.invoice.email,
+                paymentReq.invoice.invoiceNumber,
+                LocalDate.now(),
+                products,
+                payment,
+                false
+        );
 
-        payment.record(new PaymentCreated(payment, dataInvoice));
+        payment.record(new PaymentCreated(payment, invoice));
         var events = payment.pullDomainEvents();
         eventBus.publish(events);
         _paymentRepository.save(payment);
@@ -151,7 +163,7 @@ public class CommandPaymentService {
 
         var originalInvoice = _queryInvoiceService.findByPaymentId(paymentId).getFirst();
 
-        payment.record(new PaymentCreated(payment, originalInvoice.getDataInvoice()));
+        payment.record(new PaymentCreated(payment, originalInvoice));
 
         var events = payment.pullDomainEvents();
         eventBus.publish(events);

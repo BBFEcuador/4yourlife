@@ -72,7 +72,7 @@ public class OnPaymentCreated {
 
     public void createInvoice(PaymentCreated event) {
         try {
-            if (event.getDataInvoice() == null) {
+            if (event.getInvoice() == null) {
                 System.err.println("No se puede crear factura: el campo dataInvoice está vacío.");
                 return;
             }
@@ -88,16 +88,8 @@ public class OnPaymentCreated {
                     ? Integer.parseInt(lastInvoice.getInvoiceNumber()) + 1
                     : 1;
 //            String invoiceNumberStr = String.valueOf(invoiceNumber);
-            Invoice invoice = Invoice.create(
-                    UUID.randomUUID().toString(),
-                    String.valueOf(invoiceNumber),
-                    LocalDate.now(),
-                    event.getDataInvoice(),
-                    event.getPayment().getProducts(),
-                    event.getPayment(),
-                    false
-            );
-            commandInvoiceService.save(invoice);
+            event.getInvoice().setInvoiceNumber(String.valueOf(invoiceNumber));
+            commandInvoiceService.save(event.getInvoice());
             System.out.println("Invoice created and saved successfully.");
         } catch (Exception e) {
             System.err.println("Error creating or saving invoice: " + e.getMessage());

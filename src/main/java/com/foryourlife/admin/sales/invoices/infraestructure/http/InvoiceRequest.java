@@ -13,25 +13,34 @@ import java.util.UUID;
 public class InvoiceRequest {
 
     public String id;
-    @NotNull(message = "El numero de factura es requerido")
-    public String invoiceNumber;
-    @NotNull(message = "La fecha de la factura es requerida")
-    public LocalDate invoiceDate;
-    @NotNull(message = "Los datos de la factura son requeridos")
-    public DataInvoice dataInvoice;
-    @NotNull(message = "Los productos son requeridos")
+    @NotNull(message = "El nombre completo es requerido")
+    public String fullName;
+    @NotNull(message = "La dirección es requerida")
+    public String address;
+    @NotNull(message = "El número de documento es requerido")
+    public String document;
+    @NotNull(message = "El número de teléfono es requerido")
+    public String phone;
+    @NotNull(message = "El email es requerido")
+    public String email;
+
     public List<Product> products;
-    @NotNull(message = "El pago es requerido")
     public Payment payment;
     public Boolean sentSri;
+    public String invoiceNumber;
+    public LocalDate invoiceDate;
 
     public Invoice toDomain() {
         return Invoice.create(
                 id != null ? id : UUID.randomUUID().toString(),
+                fullName,
+                address,
+                document,
+                phone,
+                email,
                 invoiceNumber,
-                invoiceDate,
-                dataInvoice,
-                products,
+                invoiceDate != null ? invoiceDate : LocalDate.now(),
+                products != null ? products : List.of(),
                 payment,
                 sentSri
         );

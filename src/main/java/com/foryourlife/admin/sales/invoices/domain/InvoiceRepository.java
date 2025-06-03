@@ -3,6 +3,7 @@ package com.foryourlife.admin.sales.invoices.domain;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface InvoiceRepository {
@@ -11,5 +12,5 @@ public interface InvoiceRepository {
     Page<Invoice> findByUserId(String id, Pageable pageable);
     Page<Invoice> findAll(Pageable pageable);
     Optional<Invoice> findLastInvoice();
-    Optional<Invoice> findInvoiceByPaymentId(String paymentId);
+    List<Invoice> findAllInvoiceByPaymentId(String paymentId);
 }

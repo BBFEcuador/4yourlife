@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,4 +16,6 @@ public interface JPAInvoiceRepository extends JpaRepository<Invoice, String>, Jp
     Optional<Invoice> findTopBySentSriIsTrueOrderByInvoiceDateDesc();
 
     Optional<Invoice> findByPayment_Id(String paymentId);
+
+    List<Invoice> findAllByPayment_Id(String paymentId);
 }

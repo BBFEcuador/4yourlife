@@ -4,8 +4,6 @@ import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.product.application.ProductFinderService;
-import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
-import com.foryourlife.clients.account.invoiceData.domain.InvoiceDataRepository;
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
@@ -33,16 +31,14 @@ public class OnPaymentCreated {
     private final CommandInvoiceService commandInvoiceService;
     private final QueryInvoiceService queryInvoiceService;
     private final ParticipantRepository participantRepository;
-    private final InvoiceDataRepository dataInvoiceRepository;
     private final ParticipantLevelService participantLevelRepository;
 
-    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, InvoiceDataRepository dataInvoiceRepository, ParticipantLevelRepository participantLevelRepository, ParticipantLevelService participantLevelRepository1) {
+    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelRepository participantLevelRepository, ParticipantLevelService participantLevelRepository1) {
         this.productFinderService = productFinderService;
         this.clientModuleCreatorService = clientModuleCreatorService;
         this.commandInvoiceService = commandInvoiceService;
         this.queryInvoiceService = queryInvoiceService;
         this.participantRepository = participantRepository;
-        this.dataInvoiceRepository = dataInvoiceRepository;
         this.participantLevelRepository = participantLevelRepository1;
     }
 
@@ -91,23 +87,16 @@ public class OnPaymentCreated {
             int invoiceNumber = (lastInvoice != null)
                     ? Integer.parseInt(lastInvoice.getInvoiceNumber()) + 1
                     : 1;
-
-            String invoiceNumberStr = String.valueOf(invoiceNumber);
-
-
-            var dataInvoice = dataInvoiceRepository.findById(event.getDataInvoice().getId())
-                    .orElseThrow(() -> new BaseException("Data invoice not found", List.of()));
-
+//            String invoiceNumberStr = String.valueOf(invoiceNumber);
             Invoice invoice = Invoice.create(
                     UUID.randomUUID().toString(),
                     String.valueOf(invoiceNumber),
                     LocalDate.now(),
-                    dataInvoice,
+                    event.getDataInvoice(),
                     event.getPayment().getProducts(),
                     event.getPayment(),
                     false
             );
-
             commandInvoiceService.save(invoice);
             System.out.println("Invoice created and saved successfully.");
         } catch (Exception e) {

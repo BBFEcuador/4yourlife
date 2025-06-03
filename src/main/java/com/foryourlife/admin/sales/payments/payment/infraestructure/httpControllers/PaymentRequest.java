@@ -24,6 +24,6 @@ public class PaymentRequest {
     public Double total;
     public PaymentStatus status;
     @NotNull(message = "Los datos de facturación son requeridos")
-    public DataInvoice dataInvoice;
+    public String dataInvoice;
     public String note;
 }

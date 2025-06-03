@@ -18,25 +18,24 @@ public class QueryInvoiceService {
         this.invoiceRepository = invoiceRepository;
     }
 
-    public Invoice findById(String id){
+    public Invoice findById(String id) {
         return invoiceRepository.findById(id);
     }
 
-    public Page<Invoice> findAll(Pageable pageable){
+    public Page<Invoice> findAll(Pageable pageable) {
         return invoiceRepository.findAll(pageable);
     }
 
-    public Page<Invoice> findByUserId(String id, Pageable pageable){
+    public Page<Invoice> findByUserId(String id, Pageable pageable) {
         return invoiceRepository.findByUserId(id, pageable);
     }
 
-    public Invoice findLastInvoice(){
+    public Invoice findLastInvoice() {
         return invoiceRepository.findLastInvoice().orElseThrow(() -> new BaseException("Not found", List.of("Last invoice not found")));
     }
 
-    public Invoice findByPaymentId(String paymentId){
-        return invoiceRepository.findInvoiceByPaymentId(paymentId).orElseThrow(
-                () -> new BaseException("Not found", List.of("Invoice not found with payment id " + paymentId))
-        );
+    public List<Invoice> findByPaymentId(String paymentId) {
+        return invoiceRepository.findAllInvoiceByPaymentId(paymentId);
+
     }
 }

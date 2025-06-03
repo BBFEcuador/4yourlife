@@ -3,6 +3,7 @@ package com.foryourlife.admin.sales.payments.payment.infraestructure.httpControl
 import com.foryourlife.admin.sales.payments.payment.application.CommandPaymentService;
 import com.foryourlife.admin.sales.payments.payment.application.QueryPaymentService;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class PaymentController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> savePayment(@RequestBody PaymentRequest request) {
+    public ResponseEntity<?> savePayment(@RequestBody @Valid PaymentRequest request) {
         commandPaymentService.save(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -56,7 +57,7 @@ public class PaymentController {
     }
 
     @PutMapping("add/payment-history/{paymentId}")
-    public ResponseEntity<?> addPaymentHistory(@RequestBody PaymentHistory paymentHistory, @PathVariable String paymentId) {
+    public ResponseEntity<?> addPaymentHistory(@RequestBody @Valid PaymentHistory paymentHistory, @PathVariable String paymentId) {
         commandPaymentService.updatePaymentsHistory(paymentHistory, paymentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -104,12 +104,10 @@ public class CommandPaymentService {
                 false
         );
 
+        _paymentRepository.save(payment);
         payment.record(new PaymentCreated(payment, invoice));
         var events = payment.pullDomainEvents();
         eventBus.publish(events);
-        _paymentRepository.save(payment);
-
-
     }
 
     public void update(PaymentRequest paymentReq) {
@@ -163,11 +161,11 @@ public class CommandPaymentService {
 
         var originalInvoice = _queryInvoiceService.findByPaymentId(paymentId).getFirst();
 
+        _paymentRepository.save(payment);
         payment.record(new PaymentCreated(payment, originalInvoice));
 
         var events = payment.pullDomainEvents();
         eventBus.publish(events);
-        _paymentRepository.save(payment);
     }
 
 }

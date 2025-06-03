@@ -80,7 +80,7 @@ public class CommandPaymentService {
                 }).collect(Collectors.toList());
 
         var payment = Payment.create(
-                paymentReq.id = UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 products,
                 paymentReq.discount,
                 participant,

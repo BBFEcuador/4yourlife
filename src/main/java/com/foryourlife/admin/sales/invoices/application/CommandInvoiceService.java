@@ -27,12 +27,17 @@ public class CommandInvoiceService {
             throw new IllegalArgumentException("No se puede actualizar, ya fue enviada al SRI");
         var invoice = Invoice.create(
                 invoiceReq.id,
+                invoiceReq.fullName,
+                invoiceReq.address,
+                invoiceReq.document,
+                invoiceReq.phone,
+                invoiceReq.email,
                 invoiceReq.invoiceNumber,
                 invoiceReq.invoiceDate,
-                invoiceReq.dataInvoice,
                 invoiceReq.products,
                 invoiceReq.payment,
                 invoiceReq.sentSri
+
         );
         invoiceRepository.save(invoice);
     }

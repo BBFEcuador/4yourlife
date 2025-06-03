@@ -1,5 +1,6 @@
 package com.foryourlife.shared.domain.events;
 
+import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
 import com.foryourlife.shared.domain.bus.DomainEvent;
@@ -9,19 +10,19 @@ import java.util.HashMap;
 
 public class PaymentCreated extends DomainEvent {
     private final Payment payment;
-    private final DataInvoice dataInvoice;
+    private final Invoice invoice;
 
-    public PaymentCreated(Payment payment, DataInvoice dataInvoice) {
+    public PaymentCreated(Payment payment, Invoice invoice) {
         this.payment = payment;
-        this.dataInvoice = dataInvoice;
+        this.invoice = invoice;
     }
 
     public Payment getPayment() {
         return payment;
     }
 
-    public DataInvoice getDataInvoice() {
-        return dataInvoice;
+    public Invoice getInvoice() {
+        return invoice;
     }
 
     @Override

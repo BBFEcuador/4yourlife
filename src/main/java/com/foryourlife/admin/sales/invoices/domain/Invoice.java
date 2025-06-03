@@ -15,14 +15,15 @@ import java.util.List;
 public class Invoice {
     @Id
     private String id;
+    private String fullName;
+    private String address;
+    private String document;
+    private String phone;
+    private String email;
     @Column(name = "invoice_number")
     private String invoiceNumber;
     @Column(name = "invoice_date")
     private LocalDate invoiceDate;
-
-    @ManyToOne
-    @JoinColumn(name = "dataInvoice_id", referencedColumnName = "id")
-    private DataInvoice dataInvoice;
 
     @Column( columnDefinition = "jsonb")
     @Type(JsonType.class)
@@ -38,18 +39,22 @@ public class Invoice {
     protected Invoice() {
     }
 
-    private Invoice(String id, String invoiceNumber, LocalDate invoiceDate, DataInvoice dataInvoice, List<Product> products, Payment payment, Boolean sentSri) {
+    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri) {
         this.id = id;
+        this.fullName = fullName;
+        this.address = address;
+        this.document = document;
+        this.phone = phone;
+        this.email = email;
         this.invoiceNumber = invoiceNumber;
         this.invoiceDate = invoiceDate;
-        this.dataInvoice = dataInvoice;
         this.products = products;
         this.payment = payment;
         this.sentSri = sentSri;
     }
 
-    public static Invoice create(String id, String invoiceNumber, LocalDate invoiceDate, DataInvoice dataInvoice, List<Product> products, Payment payment, Boolean sentSri) {
-        return new Invoice(id, invoiceNumber, invoiceDate, dataInvoice, products, payment, sentSri);
+    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri) {
+        return new Invoice(id, fullName, address, document, phone, email, invoiceNumber, invoiceDate, products, payment, sentSri);
     }
 
     public String getId() {
@@ -76,14 +81,6 @@ public class Invoice {
         this.invoiceDate = invoiceDate;
     }
 
-    public DataInvoice getDataInvoice() {
-        return dataInvoice;
-    }
-
-    public void setDataInvoice(DataInvoice dataInvoice) {
-        this.dataInvoice = dataInvoice;
-    }
-
     public List<Product> getProducts() {
         return products;
     }
@@ -106,5 +103,45 @@ public class Invoice {
 
     public void setSentSri(Boolean sentSri) {
         this.sentSri = sentSri;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getDocument() {
+        return document;
+    }
+
+    public void setDocument(String document) {
+        this.document = document;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

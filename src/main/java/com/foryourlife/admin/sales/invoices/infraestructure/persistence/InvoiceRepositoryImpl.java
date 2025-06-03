@@ -31,7 +31,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
 
     @Override
     public Page<Invoice> findByUserId(String id, Pageable pageable) {
-        return jpaInvoiceRepository.findAllByDataInvoiceUserId(id,pageable);
+        return jpaInvoiceRepository.findAllByPayment_Participant_Id(id,pageable);
     }
 
     @Override

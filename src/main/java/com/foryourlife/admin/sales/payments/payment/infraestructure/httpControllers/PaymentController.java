@@ -61,4 +61,10 @@ public class PaymentController {
         commandPaymentService.updatePaymentsHistory(paymentHistory, paymentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PatchMapping("/change-status/{id}")
+    public ResponseEntity<?> changePaymentStatus(@PathVariable String id, @RequestParam(name = "status",defaultValue = "") String status) {
+        commandPaymentService.changeStatus(id, status);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

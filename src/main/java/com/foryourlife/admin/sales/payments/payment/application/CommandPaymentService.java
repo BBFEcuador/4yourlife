@@ -168,4 +168,23 @@ public class CommandPaymentService {
 //        eventBus.publish(events);
     }
 
+    public void changeStatus(String id, String status) {
+        var payment = _paymentRepository.findById(id);
+        if (payment == null) {
+            throw new BaseException("Pago no encontrado", List.of(""));
+        }
+        PaymentStatus paymentStatus;
+        try {
+            paymentStatus = PaymentStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BaseException("Estado de pago inválido", List.of(""));
+        }
+
+        if (payment.getStatus() == PaymentStatus.COMPLETED && paymentStatus != PaymentStatus.CANCELLED) {
+            throw new BaseException("No se puede cambiar el estado de un pago completado", List.of(""));
+        }
+
+        payment.setStatus(paymentStatus);
+        _paymentRepository.save(payment);
+    }
 }

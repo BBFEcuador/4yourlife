@@ -1,5 +1,6 @@
 package com.foryourlife.admin.sales.payments.paymentMethod.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -38,6 +39,7 @@ public class PaymentMethod {
         this.type = type;
     }
 
+    @JsonProperty(value = "isActive")
     public Boolean getActive() {
         return isActive;
     }

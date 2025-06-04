@@ -157,13 +157,13 @@ public class CommandPaymentService {
 
         payment.getPaymentshistory().add(paymentHistory);
 
-        var originalInvoice = _queryInvoiceService.findByPaymentId(paymentId).getFirst();
+//        var originalInvoice = _queryInvoiceService.findByPaymentId(paymentId).getFirst();
 
         _paymentRepository.save(payment);
-        payment.record(new PaymentCreated(payment, originalInvoice));
-
-        var events = payment.pullDomainEvents();
-        eventBus.publish(events);
+//        payment.record(new PaymentCreated(payment, originalInvoice));
+//
+//        var events = payment.pullDomainEvents();
+//        eventBus.publish(events);
     }
 
 }

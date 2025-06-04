@@ -63,17 +63,17 @@ public class CommandInvitationService {
         return token;
     }
 
-    public String createInvitationByUserWithQuantity(InvitationRequest request) {
-        var invitations = this.repository.findBySenderId(request.id)
+    public String createInvitationByUserWithQuantity(String userId, String quantity) {
+        var invitations = this.repository.findBySenderId(userId)
                 .stream()
                 .anyMatch(invitation -> invitation.getQuantity() > 0);
         if (invitations) {
             throw new BaseException("Tiene invitacion activa", List.of());
         }
-        var user = participantQueryService.getUserById(request.id);
+        var user = participantQueryService.getUserById(userId);
         var token = UUID.randomUUID().toString();
-        var campus = campusService.findById(request.campusId);
-        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, request.id, new Sender(user.getName(), user.getPhone()), Integer.parseInt(request.quantity),campus);
+        var campus = campusService.findById(user.getCampus().getId());
+        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, userId, new Sender(user.getName(), user.getPhone()), Integer.parseInt(quantity),campus);
         this.repository.save(invitation);
         return token;
     }

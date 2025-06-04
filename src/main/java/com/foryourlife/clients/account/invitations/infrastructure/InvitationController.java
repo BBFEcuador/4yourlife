@@ -19,11 +19,11 @@ public class InvitationController {
         this.queryInvitationServices = queryInvitationServices;
     }
 
-    @PostMapping("/create-by-admin/{id}")
+    @PostMapping("/create-by-admin")
     public ResponseEntity<String> adminInvitation(
-            @PathVariable String id,
+            @RequestParam String userId,
             @RequestParam String campusId) {
-        return new ResponseEntity<>(this.service.createInvitationByAdmin(id, campusId), HttpStatus.CREATED);
+        return new ResponseEntity<>(this.service.createInvitationByAdmin(userId, campusId), HttpStatus.CREATED);
     }
 
     @PostMapping("/create-by-admin-quantity")
@@ -32,8 +32,8 @@ public class InvitationController {
     }
 
     @PostMapping("/create-by-user-quantity")
-    public ResponseEntity<String> userInvitation(@Valid @RequestBody InvitationRequest request) {
-        return new ResponseEntity<>(this.service.createInvitationByUserWithQuantity(request), HttpStatus.CREATED);
+    public ResponseEntity<String> userInvitation(@RequestParam String id, @RequestParam String quantity) {
+        return new ResponseEntity<>(this.service.createInvitationByUserWithQuantity(id,quantity), HttpStatus.CREATED);
     }
 
     @GetMapping("/user/invitation/{id}")

@@ -8,11 +8,9 @@ import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.admin.sales.payments.payment.infraestructure.httpControllers.PaymentRequest;
-import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethod;
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethodRepository;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
-import com.foryourlife.clients.account.invoiceData.domain.InvoiceDataRepository;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
@@ -115,7 +113,7 @@ public class CommandPaymentService {
             throw new IllegalArgumentException("No se puede actualizar, el id de pago es requerido");
         }
         var participant = participantQueryService.getUserById(paymentReq.participant);
-        List<Product> products = List.of();
+        List<Product> products = new java.util.ArrayList<>(List.of());
         paymentReq.products.forEach(
                 productId -> {
                     var product = _productRepository.findById(productId).orElseThrow(

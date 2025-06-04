@@ -4,6 +4,7 @@ import com.foryourlife.admin.sales.payments.paymentMethod.application.PaymentMet
 import com.foryourlife.admin.sales.payments.paymentMethod.application.PaymentMethodQueryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,6 @@ public class PaymentMethodController {
     @PostMapping("")
     public ResponseEntity<?> createPaymentMethod(@RequestBody @Valid PaymentMethodRequest paymentMethod) {
         paymentMethodCommandService.createPaymentMethod(paymentMethod.toDomain());
-        return ResponseEntity.ok(paymentMethod);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

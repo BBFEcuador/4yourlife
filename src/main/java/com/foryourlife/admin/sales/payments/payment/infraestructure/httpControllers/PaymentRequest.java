@@ -6,6 +6,7 @@ import com.foryourlife.admin.sales.invoices.infraestructure.http.InvoiceRequest;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;

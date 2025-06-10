@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.payments.payment.domain;
 
 public class PaymentHistory {
+    private String id;
     private String paymentMethod;
     private double amount;
     private String date;
@@ -43,5 +44,13 @@ public class PaymentHistory {
 
     public void setPaymentMethodId(String paymentMethodId) {
         this.paymentMethodId = paymentMethodId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -4,6 +4,7 @@ import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -14,14 +15,19 @@ public class InvoiceRequest {
 
     public String id;
     @NotNull(message = "El nombre completo es requerido")
+    @NotBlank(message = "El nombre completo es requerido")
     public String fullName;
     @NotNull(message = "La dirección es requerida")
+    @NotBlank(message = "La dirección es requerida")
     public String address;
     @NotNull(message = "El número de documento es requerido")
+    @NotBlank(message = "El número de documento es requerido")
     public String document;
     @NotNull(message = "El número de teléfono es requerido")
+    @NotBlank(message = "El número de teléfono es requerido")
     public String phone;
     @NotNull(message = "El email es requerido")
+    @NotBlank(message = "El email es requerido")
     public String email;
 
     public List<Product> products;

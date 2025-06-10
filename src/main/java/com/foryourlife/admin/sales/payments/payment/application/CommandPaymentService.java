@@ -157,13 +157,16 @@ public class CommandPaymentService {
 
         payment.getPaymentshistory().add(paymentHistory);
 
-//        var originalInvoice = _queryInvoiceService.findByPaymentId(paymentId).getFirst();
+        var originalInvoice = _queryInvoiceService.findByPaymentId(paymentId)
+                .stream()
+                .findFirst();
 
         _paymentRepository.save(payment);
 //        payment.record(new PaymentCreated(payment, originalInvoice));
 //
 //        var events = payment.pullDomainEvents();
 //        eventBus.publish(events);
+
     }
 
     public void changeStatus(String id, String status) {

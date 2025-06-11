@@ -7,7 +7,7 @@ import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
-import com.foryourlife.admin.sales.payments.payment.infraestructure.httpControllers.PaymentRequest;
+import com.foryourlife.admin.sales.payments.payment.infrastructure.httpControllers.PaymentRequest;
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethodRepository;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;

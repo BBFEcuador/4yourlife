@@ -2,7 +2,7 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
-import com.foryourlife.admin.programs.teams.infraestructure.httpControllers.request.*;
+import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.*;
 import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;

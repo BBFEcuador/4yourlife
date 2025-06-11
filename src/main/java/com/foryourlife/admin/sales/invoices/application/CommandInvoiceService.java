@@ -2,10 +2,8 @@ package com.foryourlife.admin.sales.invoices.application;
 
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
-import com.foryourlife.admin.sales.invoices.infraestructure.http.InvoiceRequest;
+import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class CommandInvoiceService {

@@ -3,6 +3,7 @@ package com.foryourlife.admin.sales.payments.cashDrawer.infrastructure.httpContr
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerCommandService;
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerQueryService;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,9 +51,9 @@ public class CashDrawerController {
         return ResponseEntity.ok(queryService.getCashDrawersByClosedByUserId(userId));
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<?> saveCashDrawer(@RequestBody CashDrawer cashDrawer) {
-        commandService.save(cashDrawer);
+    @PostMapping("")
+    public ResponseEntity<?> saveCashDrawer(@RequestBody @Valid CashDrawerRequest cashDrawer) {
+        commandService.save(cashDrawer.toDomain());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

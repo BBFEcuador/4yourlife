@@ -5,6 +5,7 @@ import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerReposito
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class JPACashDrawerRepository implements CashDrawerRepository {
@@ -20,8 +21,8 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     }
 
     @Override
-    public CashDrawer getById(String id) {
-        return this.repository.getById(id);
+    public Optional<CashDrawer> getById(String id) {
+        return this.repository.findById(id);
     }
 
     @Override
@@ -42,5 +43,15 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     @Override
     public List<CashDrawer> getByClosedByUserId(String userId) {
         return this.repository.findAllByClosedByUser_Id(userId);
+    }
+
+    @Override
+    public Boolean findByNumber(String number) {
+        return this.repository.existsCashDrawerByNumber(number);
+    }
+
+    @Override
+    public Boolean getByIsOpenAndByUserId(String userId) {
+        return this.repository.existsByIsOpenIsTrueAndOpenedByUser_Id(userId);
     }
 }

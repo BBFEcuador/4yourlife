@@ -3,6 +3,9 @@ package com.foryourlife.admin.sales.payments.payment.application;
 import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerDetail;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
 import com.foryourlife.admin.sales.product.application.ProductFinderService;
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.participant.domain.Participant;
@@ -32,14 +35,16 @@ public class OnPaymentCreated {
     private final QueryInvoiceService queryInvoiceService;
     private final ParticipantRepository participantRepository;
     private final ParticipantLevelService participantLevelRepository;
+    private final CashDrawerRepository cashDrawerRepository;
 
-    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelRepository participantLevelRepository, ParticipantLevelService participantLevelRepository1) {
+    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, CashDrawerRepository cashDrawerRepository) {
         this.productFinderService = productFinderService;
         this.clientModuleCreatorService = clientModuleCreatorService;
         this.commandInvoiceService = commandInvoiceService;
         this.queryInvoiceService = queryInvoiceService;
         this.participantRepository = participantRepository;
-        this.participantLevelRepository = participantLevelRepository1;
+        this.participantLevelRepository = participantLevelRepository;
+        this.cashDrawerRepository = cashDrawerRepository;
     }
 
     @Async
@@ -96,6 +101,4 @@ public class OnPaymentCreated {
             e.printStackTrace();
         }
     }
-
-
 }

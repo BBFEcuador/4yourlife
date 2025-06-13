@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Service
 public class JPACashDrawerRepository implements CashDrawerRepository {
-  private JPAImplCashDrawerRepository repository;
+    private final JPAImplCashDrawerRepository repository;
 
     public JPACashDrawerRepository(JPAImplCashDrawerRepository repository) {
         this.repository = repository;

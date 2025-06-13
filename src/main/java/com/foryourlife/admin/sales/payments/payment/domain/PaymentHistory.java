@@ -6,6 +6,8 @@ public class PaymentHistory {
     private double amount;
     private String date;
     private String paymentMethodId;
+    private String cashDrawerId;
+    private String createdById;
 
     public PaymentHistory(String paymentMethod, double amount, String date, String paymentMethodId) {
         this.paymentMethod = paymentMethod;
@@ -52,5 +54,17 @@ public class PaymentHistory {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getCashDrawerId() {
+        return cashDrawerId;
+    }
+
+    public String getCreatedById() {
+        return createdById;
+    }
+
+    public void setCashDrawerId(String cashDrawerId) {
+        this.cashDrawerId = cashDrawerId;
     }
 }

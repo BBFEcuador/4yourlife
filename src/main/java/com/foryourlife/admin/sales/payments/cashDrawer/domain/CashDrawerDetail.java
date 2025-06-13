@@ -8,10 +8,11 @@ public class CashDrawerDetail {
     private String id;
     private String paymentId;
     private String paymentHistoryId;
+    private String userId;
 
     protected CashDrawerDetail() {}
 
-    public CashDrawerDetail(String id, String paymentId, String paymentHistoryId) {
+    public  CashDrawerDetail(String id, String paymentId, String paymentHistoryId) {
         this.id = id;
         this.paymentId = paymentId;
         this.paymentHistoryId = paymentHistoryId;
@@ -39,5 +40,13 @@ public class CashDrawerDetail {
 
     public void setPaymentHistoryId(String paymentHistoryId) {
         this.paymentHistoryId = paymentHistoryId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

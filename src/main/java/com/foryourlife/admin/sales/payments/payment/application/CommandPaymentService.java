@@ -3,6 +3,7 @@ package com.foryourlife.admin.sales.payments.payment.application;
 import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
+import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerCommandService;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
@@ -15,6 +16,7 @@ import com.foryourlife.clients.account.participant.application.ParticipantQueryS
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,8 +34,9 @@ public class CommandPaymentService {
     private final ParticipantQueryService participantQueryService;
     private final QueryCampusService queryCampusService;
     private final EventBus eventBus;
+    private final CashDrawerCommandService cashDrawerCommandService;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, QueryInvoiceService _queryInvoiceService, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, EventBus eventBus) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, QueryInvoiceService _queryInvoiceService, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, EventBus eventBus, CashDrawerCommandService cashDrawerCommandService) {
         this._paymentRepository = _paymentRepository;
         this._queryInvoiceService = _queryInvoiceService;
         this._paymentMethodRepository = _paymentMethodRepository;
@@ -41,6 +44,7 @@ public class CommandPaymentService {
         this.participantQueryService = participantQueryService;
         this.queryCampusService = queryCampusService;
         this.eventBus = eventBus;
+        this.cashDrawerCommandService = cashDrawerCommandService;
     }
 
     public void save(PaymentRequest paymentReq) {
@@ -77,6 +81,7 @@ public class CommandPaymentService {
                     );
                 }).collect(Collectors.toList());
 
+        paymentReq.id = UUID.randomUUID().toString();
         var payment = Payment.create(
                 UUID.randomUUID().toString(),
                 products,
@@ -102,7 +107,15 @@ public class CommandPaymentService {
                 false
         );
 
+        if (!paymentReq.paymentshistory.isEmpty()) {
+            payment.getPaymentshistory().getFirst().setCashDrawerId(paymentReq.cashDrawerId);
+            payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
+
+            System.out.println(paymentReq.cashDrawerId);
+            cashDrawerCommandService.addPaymentHistoryInCashDrawer(paymentReq.paymentshistory.getFirst().getId(), paymentReq.cashDrawerId, payment.getId());
+        }
         _paymentRepository.save(payment);
+
         payment.record(new PaymentCreated(payment, invoice));
         var events = payment.pullDomainEvents();
         eventBus.publish(events);
@@ -162,11 +175,15 @@ public class CommandPaymentService {
                 .findFirst();
 
         _paymentRepository.save(payment);
+
+        if (paymentHistory.getCashDrawerId() == null) {
+            cashDrawerCommandService.addPaymentHistoryInCashDrawer(paymentHistory.getId(), paymentHistory.getCashDrawerId(), payment.getId());
+        }
+
 //        payment.record(new PaymentCreated(payment, originalInvoice));
 //
 //        var events = payment.pullDomainEvents();
 //        eventBus.publish(events);
-
     }
 
     public void changeStatus(String id, String status) {

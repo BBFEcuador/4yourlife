@@ -26,5 +26,6 @@ public class PaymentRequest {
     @NotNull(message = "Los datos de facturación son requeridos")
     public InvoiceRequest invoice;
     public String note;
-
+    public String cashDrawerId;
+    public String userId;
 }

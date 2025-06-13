@@ -25,15 +25,13 @@ public class CashDrawer {
     @ManyToOne
     @JoinColumn(
             name = "opened_by_user_id",
-            referencedColumnName = "id",
-            nullable = false
+            referencedColumnName = "id"
     )
     private User openedByUser;
     @ManyToOne
     @JoinColumn(
             name = "closed_by_user_id",
-            referencedColumnName = "id",
-            nullable = false
+            referencedColumnName = "id"
     )
     private User closedByUser;
     private LocalDateTime startDate;
@@ -184,5 +182,13 @@ public class CashDrawer {
 
     public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public List<CashDrawerDetail> getCashDrawerDetail() {
+        return cashDrawerDetail;
+    }
+
+    public void setCashDrawerDetail(List<CashDrawerDetail> cashDrawerDetail) {
+        this.cashDrawerDetail = cashDrawerDetail;
     }
 }

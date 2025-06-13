@@ -1,11 +1,14 @@
 package com.foryourlife.admin.sales.payments.cashDrawer.application;
 
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerDetail;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CashDrawerCommandService {
@@ -41,6 +44,25 @@ public class CashDrawerCommandService {
             throw new BaseException("La caja ya fue cerrada", List.of(""));
         }
         cashDrawer.setOpen(true);
+        repository.save(cashDrawer);
+    }
+
+    public void addPaymentHistoryInCashDrawer(String paymentHistoryId, String cashDrawerId, String paymentId) {
+        var cashDrawer = repository.getById(cashDrawerId).orElseThrow(
+                () -> new BaseException("Cash drawer not found", List.of(""))
+        );
+
+        var detail = new CashDrawerDetail(UUID.randomUUID().toString(), paymentId, paymentHistoryId);
+
+        if (cashDrawer.getOpen()) {
+            throw new BaseException("La caja está abierta", List.of(""));
+        }
+
+        if (cashDrawer.getCashDrawerDetail() == null) {
+            cashDrawer.setCashDrawerDetail(new ArrayList<>());
+        }
+
+        cashDrawer.getCashDrawerDetail().add(detail);
         repository.save(cashDrawer);
     }
 }

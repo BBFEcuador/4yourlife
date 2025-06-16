@@ -35,16 +35,14 @@ public class OnPaymentCreated {
     private final QueryInvoiceService queryInvoiceService;
     private final ParticipantRepository participantRepository;
     private final ParticipantLevelService participantLevelRepository;
-    private final CashDrawerRepository cashDrawerRepository;
 
-    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, CashDrawerRepository cashDrawerRepository) {
+    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository) {
         this.productFinderService = productFinderService;
         this.clientModuleCreatorService = clientModuleCreatorService;
         this.commandInvoiceService = commandInvoiceService;
         this.queryInvoiceService = queryInvoiceService;
         this.participantRepository = participantRepository;
         this.participantLevelRepository = participantLevelRepository;
-        this.cashDrawerRepository = cashDrawerRepository;
     }
 
     @Async

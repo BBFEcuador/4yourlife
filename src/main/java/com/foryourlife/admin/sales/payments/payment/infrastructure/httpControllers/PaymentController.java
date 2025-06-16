@@ -57,13 +57,13 @@ public class PaymentController {
     }
 
     @PutMapping("add/payment-history/{paymentId}")
-    public ResponseEntity<?> addPaymentHistory(@RequestBody @Valid PaymentHistory paymentHistory, @PathVariable String paymentId) {
-        commandPaymentService.updatePaymentsHistory(paymentHistory, paymentId);
+    public ResponseEntity<?> addPaymentHistory(@RequestBody @Valid PaymentHistoryRequest paymentHistory, @PathVariable String paymentId) {
+        commandPaymentService.updatePaymentsHistory(paymentHistory.paymentHistory, paymentHistory.invoiceRequest, paymentId, paymentHistory.cashDrawerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping("/change-status/{id}")
-    public ResponseEntity<?> changePaymentStatus(@PathVariable String id, @RequestParam(name = "status",defaultValue = "") String status) {
+    public ResponseEntity<?> changePaymentStatus(@PathVariable String id, @RequestParam(name = "status", defaultValue = "") String status) {
         commandPaymentService.changeStatus(id, status);
         return new ResponseEntity<>(HttpStatus.OK);
     }

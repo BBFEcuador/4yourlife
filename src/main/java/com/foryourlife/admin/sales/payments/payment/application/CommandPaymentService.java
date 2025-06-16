@@ -3,7 +3,9 @@ package com.foryourlife.admin.sales.payments.payment.application;
 import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
+import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerCommandService;
+import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerQueryService;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -35,8 +38,9 @@ public class CommandPaymentService {
     private final QueryCampusService queryCampusService;
     private final EventBus eventBus;
     private final CashDrawerCommandService cashDrawerCommandService;
+    private final CashDrawerQueryService cashDrawerQueryService;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, QueryInvoiceService _queryInvoiceService, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, EventBus eventBus, CashDrawerCommandService cashDrawerCommandService) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, QueryInvoiceService _queryInvoiceService, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, EventBus eventBus, CashDrawerCommandService cashDrawerCommandService, CashDrawerQueryService cashDrawerQueryService) {
         this._paymentRepository = _paymentRepository;
         this._queryInvoiceService = _queryInvoiceService;
         this._paymentMethodRepository = _paymentMethodRepository;
@@ -45,6 +49,7 @@ public class CommandPaymentService {
         this.queryCampusService = queryCampusService;
         this.eventBus = eventBus;
         this.cashDrawerCommandService = cashDrawerCommandService;
+        this.cashDrawerQueryService = cashDrawerQueryService;
     }
 
     public void save(PaymentRequest paymentReq) {
@@ -111,7 +116,6 @@ public class CommandPaymentService {
             payment.getPaymentshistory().getFirst().setCashDrawerId(paymentReq.cashDrawerId);
             payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
 
-            System.out.println(paymentReq.cashDrawerId);
             cashDrawerCommandService.addPaymentHistoryInCashDrawer(paymentReq.paymentshistory.getFirst().getId(), paymentReq.cashDrawerId, payment.getId());
         }
         _paymentRepository.save(payment);
@@ -151,7 +155,7 @@ public class CommandPaymentService {
         _paymentRepository.save(payment);
     }
 
-    public void updatePaymentsHistory(PaymentHistory paymentHistory, String paymentId) {
+    public void updatePaymentsHistory(PaymentHistory paymentHistory, InvoiceRequest invoiceRequest, String paymentId, String cashDrawerId) {
         var payment = _paymentRepository.findById(paymentId);
         if (!_paymentMethodRepository.exist(paymentHistory.getPaymentMethodId())) {
             throw new BaseException("El método de pago no existe", List.of(""));
@@ -170,20 +174,32 @@ public class CommandPaymentService {
 
         payment.getPaymentshistory().add(paymentHistory);
 
-        var originalInvoice = _queryInvoiceService.findByPaymentId(paymentId)
+        var originalInvoiceOptional = _queryInvoiceService.findByPaymentId(paymentId)
                 .stream()
                 .findFirst();
 
-        _paymentRepository.save(payment);
-
-        if (paymentHistory.getCashDrawerId() == null) {
-            cashDrawerCommandService.addPaymentHistoryInCashDrawer(paymentHistory.getId(), paymentHistory.getCashDrawerId(), payment.getId());
+        Invoice originalInvoice;
+        if (originalInvoiceOptional.isEmpty()) {
+            if (invoiceRequest == null) {
+                throw new BaseException("Los datos de facturacion son requeridos", List.of(""));
+            }
+            originalInvoice = invoiceRequest.toDomain();
+        } else {
+            originalInvoice = originalInvoiceOptional.get();
         }
 
-//        payment.record(new PaymentCreated(payment, originalInvoice));
-//
-//        var events = payment.pullDomainEvents();
-//        eventBus.publish(events);
+        var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);
+
+        if (paymentHistory.getCashDrawerId() == null) {
+            cashDrawerCommandService.addPaymentHistoryInCashDrawer(paymentHistory.getId(), cashDrawer.getId(), payment.getId());
+        }
+
+        _paymentRepository.save(payment);
+
+        payment.record(new PaymentCreated(payment, originalInvoice));
+
+        var events = payment.pullDomainEvents();
+        eventBus.publish(events);
     }
 
     public void changeStatus(String id, String status) {

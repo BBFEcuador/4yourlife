@@ -22,6 +22,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -98,21 +99,25 @@ public class CommandPaymentService {
                 paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING,
                 paymentReq.note
         );
-        var invoice = Invoice.create(
-                UUID.randomUUID().toString(),
-                paymentReq.invoice.fullName,
-                paymentReq.invoice.address,
-                paymentReq.invoice.document,
-                paymentReq.invoice.phone,
-                paymentReq.invoice.email,
-                paymentReq.invoice.invoiceNumber,
-                LocalDate.now(),
-                products,
-                payment,
-                false
-        );
 
+        Invoice invoice = null;
         if (!paymentReq.paymentshistory.isEmpty()) {
+             invoice = Invoice.create(
+                    UUID.randomUUID().toString(),
+                    paymentReq.invoice.fullName,
+                    paymentReq.invoice.address,
+                    paymentReq.invoice.document,
+                    paymentReq.invoice.phone,
+                    paymentReq.invoice.email,
+                    paymentReq.invoice.invoiceNumber,
+                    LocalDate.now(),
+                    products,
+                    payment,
+                    false,
+                    (paymentReq.paymentshistory.getFirst().getAmount()*0.15),
+                    15.0,
+                    paymentReq.paymentshistory.getFirst().getAmount()
+            );
             payment.getPaymentshistory().getFirst().setCashDrawerId(paymentReq.cashDrawerId);
             payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
 
@@ -130,7 +135,7 @@ public class CommandPaymentService {
             throw new IllegalArgumentException("No se puede actualizar, el id de pago es requerido");
         }
         var participant = participantQueryService.getUserById(paymentReq.participant);
-        List<Product> products = new java.util.ArrayList<>(List.of());
+        List<Product> products = new ArrayList<>(List.of());
         paymentReq.products.forEach(
                 productId -> {
                     var product = _productRepository.findById(productId).orElseThrow(

@@ -34,7 +34,11 @@ public class CommandInvoiceService {
                 invoiceReq.invoiceDate,
                 invoiceReq.products,
                 invoiceReq.payment,
-                invoiceReq.sentSri
+                invoiceReq.sentSri,
+                invoiceReq.amount,
+                15.0,
+                invoiceReq.amount
+
 
         );
         invoiceRepository.save(invoice);

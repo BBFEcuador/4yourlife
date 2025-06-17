@@ -34,6 +34,8 @@ public class InvoiceRequest {
     public Boolean sentSri;
     public String invoiceNumber;
     public LocalDate invoiceDate;
+    public Double amount;
+
 
     public Invoice toDomain() {
         return Invoice.create(
@@ -47,7 +49,10 @@ public class InvoiceRequest {
                 invoiceDate != null ? invoiceDate : LocalDate.now(),
                 products != null ? products : List.of(),
                 payment,
-                sentSri
+                sentSri,
+                (amount*0.15),
+                15.0,
+                amount
         );
     }
 }

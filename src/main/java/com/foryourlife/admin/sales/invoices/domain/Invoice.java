@@ -36,10 +36,17 @@ public class Invoice {
     @Column(name = "sent_sri")
     private Boolean sentSri;
 
+    @Column(
+            name = "tax_amount"
+    )
+    private Double taxAmount;
+    private Double tax;
+    private Double amount;
+
     protected Invoice() {
     }
 
-    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri) {
+    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount) {
         this.id = id;
         this.fullName = fullName;
         this.address = address;
@@ -51,10 +58,13 @@ public class Invoice {
         this.products = products;
         this.payment = payment;
         this.sentSri = sentSri;
+        this.taxAmount = taxAmount;
+        this.tax = tax;
+        this.amount = amount;
     }
 
-    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri) {
-        return new Invoice(id, fullName, address, document, phone, email, invoiceNumber, invoiceDate, products, payment, sentSri);
+    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount) {
+        return new Invoice(id, fullName, address, document, phone, email, invoiceNumber, invoiceDate, products, payment, sentSri, taxAmount, tax, amount);
     }
 
     public String getId() {
@@ -143,5 +153,29 @@ public class Invoice {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Double getTaxAmount() {
+        return taxAmount;
+    }
+
+    public void setTaxAmount(Double taxAmount) {
+        this.taxAmount = taxAmount;
+    }
+
+    public Double getTax() {
+        return tax;
+    }
+
+    public void setTax(Double tax) {
+        this.tax = tax;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
     }
 }

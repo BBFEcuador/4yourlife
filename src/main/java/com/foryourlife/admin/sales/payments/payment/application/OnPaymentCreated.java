@@ -61,7 +61,7 @@ public class OnPaymentCreated {
                     default -> throw new BaseException("Invalid course level", List.of(""));
                 }
             });
-            if (event.getPayment().getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.INIT){
+            if (event.getPayment().getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.INIT) {
                 var p = event.getPayment().getParticipant();
                 var pl = participantLevelRepository.getRolByLevel(CourseLevel.FOCUS);
                 p.setParticipantLevel(pl);
@@ -90,8 +90,8 @@ public class OnPaymentCreated {
             int invoiceNumber = (lastInvoice != null)
                     ? Integer.parseInt(lastInvoice.getInvoiceNumber()) + 1
                     : 1;
-//            String invoiceNumberStr = String.valueOf(invoiceNumber);
             event.getInvoice().setInvoiceNumber(String.valueOf(invoiceNumber));
+            event.getInvoice().setId(UUID.randomUUID().toString());
             commandInvoiceService.save(event.getInvoice());
             System.out.println("Invoice created and saved successfully.");
         } catch (Exception e) {

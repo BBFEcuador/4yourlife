@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.payments.cashDrawer.infrastructure.persistence;
 
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
 import com.foryourlife.shared.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,7 +14,5 @@ interface JPAImplCashDrawerRepository extends JpaRepository<CashDrawer, String> 
 
     Boolean existsCashDrawerByNumber(String number);
 
-    Boolean existsByIsOpenIsTrueAndOpenedByUser(User openedByUser);
-
-    Boolean existsByIsOpenIsTrueAndOpenedByUser_Id(String userId);
+    Boolean existsByStatusAndOpenedByUser_Id(CashDrawerStatus status, String openedByUserId);
 }

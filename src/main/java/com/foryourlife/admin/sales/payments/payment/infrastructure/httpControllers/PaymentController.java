@@ -2,7 +2,6 @@ package com.foryourlife.admin.sales.payments.payment.infrastructure.httpControll
 
 import com.foryourlife.admin.sales.payments.payment.application.CommandPaymentService;
 import com.foryourlife.admin.sales.payments.payment.application.QueryPaymentService;
-import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -58,7 +57,7 @@ public class PaymentController {
 
     @PutMapping("add/payment-history/{paymentId}")
     public ResponseEntity<?> addPaymentHistory(@RequestBody @Valid PaymentHistoryRequest paymentHistory, @PathVariable String paymentId) {
-        commandPaymentService.updatePaymentsHistory(paymentHistory.paymentHistory, paymentHistory.invoiceRequest, paymentId, paymentHistory.cashDrawerId);
+        commandPaymentService.updatePaymentsHistory(paymentHistory.paymentHistory, paymentHistory.invoice, paymentId, paymentHistory.cashDrawerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

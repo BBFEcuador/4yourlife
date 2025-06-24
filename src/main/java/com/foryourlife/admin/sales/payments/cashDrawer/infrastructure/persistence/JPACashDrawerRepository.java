@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.payments.cashDrawer.infrastructure.persisten
 
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,6 +53,6 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
 
     @Override
     public Boolean getByIsOpenAndByUserId(String userId) {
-        return this.repository.existsByIsOpenIsTrueAndOpenedByUser_Id(userId);
+        return this.repository.existsByStatusAndOpenedByUser_Id(CashDrawerStatus.OPEN, userId);
     }
 }

@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.payments.cashDrawer.infrastructure.httpControllers;
 
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
 import com.foryourlife.shared.domain.user.User;
 import io.swagger.v3.oas.models.media.EmailSchema;
 import jakarta.persistence.Id;
@@ -67,6 +68,6 @@ public class CashDrawerRequest {
     }
 
     public CashDrawer toDomain() {
-        return CashDrawer.create(id != null ? id : UUID.randomUUID().toString(), number, true, false, openedByUser, closedByUser, LocalDateTime.now(), closeDate, openingBalance, closedBalance, detail, user);
+        return CashDrawer.create(id != null ? id : UUID.randomUUID().toString(), number, true, CashDrawerStatus.NEW, openedByUser, closedByUser, LocalDateTime.now(), closeDate, openingBalance, closedBalance, detail, user);
     }
 }

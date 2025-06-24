@@ -1,18 +1,12 @@
 package com.foryourlife.admin.sales.payments.cashDrawer.domain;
 
-import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.shared.domain.user.User;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Type;
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "cash_drawers")
@@ -21,7 +15,8 @@ public class CashDrawer {
     private String id;
     private String number;
     private Boolean isActive;
-    private Boolean isOpen;
+    @Enumerated(EnumType.STRING)
+    private CashDrawerStatus status;
     @ManyToOne
     @JoinColumn(
             name = "opened_by_user_id",
@@ -63,17 +58,14 @@ public class CashDrawer {
             nullable = false
     )
     private User createdBy;
-    @Column(columnDefinition = "jsonb", name = "cash_drawer_detail")
-    @Type(JsonType.class)
-    private List<CashDrawerDetail> cashDrawerDetail;
 
     protected CashDrawer() {}
 
-    public CashDrawer(String id, String number, Boolean isActive, Boolean isOpen, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, User createdBy) {
+    public CashDrawer(String id, String number, Boolean isActive, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, User createdBy) {
         this.id = id;
         this.number = number;
         this.isActive = isActive;
-        this.isOpen = isOpen;
+        this.status = status;
         this.openedByUser = openedByUser;
         this.closedByUser = closedByUser;
         this.startDate = startDate;
@@ -84,8 +76,8 @@ public class CashDrawer {
         this.createdBy = createdBy;
     }
 
-    public static CashDrawer create(String id, String number, Boolean isActive, Boolean isOpen, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, User createdBy) {
-        return new CashDrawer(id, number, isActive, isOpen, openedByUser, closedByUser, startDate, closeDate, openingBalance, closedBalance, detail, createdBy);
+    public static CashDrawer create(String id, String number, Boolean isActive, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, User createdBy) {
+        return new CashDrawer(id, number, isActive, status, openedByUser, closedByUser, startDate, closeDate, openingBalance, closedBalance, detail, createdBy);
     }
 
     public String getId() {
@@ -112,12 +104,16 @@ public class CashDrawer {
         isActive = active;
     }
 
-    public Boolean getOpen() {
-        return isOpen;
+    public CashDrawerStatus getStatus() {
+        return status;
     }
 
-    public void setOpen(Boolean open) {
-        isOpen = open;
+    public void setStatus(CashDrawerStatus status) {
+        this.status = status;
+    }
+
+    public Instant getCreated_at() {
+        return created_at;
     }
 
     public User getOpenedByUser() {
@@ -182,13 +178,5 @@ public class CashDrawer {
 
     public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
-    }
-
-    public List<CashDrawerDetail> getCashDrawerDetail() {
-        return cashDrawerDetail;
-    }
-
-    public void setCashDrawerDetail(List<CashDrawerDetail> cashDrawerDetail) {
-        this.cashDrawerDetail = cashDrawerDetail;
     }
 }

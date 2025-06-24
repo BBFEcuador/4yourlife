@@ -3,15 +3,11 @@ package com.foryourlife.admin.sales.payments.payment.application;
 import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
-import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
-import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerDetail;
-import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
 import com.foryourlife.admin.sales.product.application.ProductFinderService;
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
-import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
 import com.foryourlife.shared.domain.bus.DomainEventSubscriber;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -21,7 +17,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 

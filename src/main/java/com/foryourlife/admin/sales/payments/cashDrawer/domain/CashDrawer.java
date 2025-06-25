@@ -1,20 +1,27 @@
 package com.foryourlife.admin.sales.payments.cashDrawer.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.foryourlife.admin.sales.payments.cashBox.domain.CashBox;
+import com.foryourlife.admin.sales.payments.cashDrawerDetail.application.CashDrawerDetailQueryService;
+import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
+import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "cash_drawers")
 public class CashDrawer {
     @Id
     private String id;
-    private String number;
-    private Boolean isActive;
     @Enumerated(EnumType.STRING)
     private CashDrawerStatus status;
     @ManyToOne
@@ -43,28 +50,29 @@ public class CashDrawer {
             name = "details"
     )
     private String detail;
+    @JsonIgnoreProperties(
+            "cashDrawer"
+    )
+    @ManyToOne
+    @JoinColumn(
+            name = "cash_box_id",
+            referencedColumnName = "id"
+    )
+    private CashBox cashBox;
     @CreatedDate
     @Column(name = "created_at", updatable = false)
-    private Instant created_at = Instant.now();
+    private LocalDate created_at = LocalDate.now();
 
     @LastModifiedDate
     @Column(name = "updated_at")
     private Instant updated_at;
-
-    @ManyToOne
-    @JoinColumn(
-            name = "created_by_user",
-            referencedColumnName = "id",
-            nullable = false
-    )
-    private User createdBy;
+    @OneToMany(mappedBy = "cashDrawer", fetch = FetchType.EAGER)
+    private List<CashDrawerDetail> cashDrawerDetails;
 
     protected CashDrawer() {}
 
-    public CashDrawer(String id, String number, Boolean isActive, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, User createdBy) {
+    public CashDrawer(String id, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, CashBox cashBox) {
         this.id = id;
-        this.number = number;
-        this.isActive = isActive;
         this.status = status;
         this.openedByUser = openedByUser;
         this.closedByUser = closedByUser;
@@ -73,11 +81,11 @@ public class CashDrawer {
         this.openingBalance = openingBalance;
         this.closedBalance = closedBalance;
         this.detail = detail;
-        this.createdBy = createdBy;
+        this.cashBox = cashBox;
     }
 
-    public static CashDrawer create(String id, String number, Boolean isActive, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, User createdBy) {
-        return new CashDrawer(id, number, isActive, status, openedByUser, closedByUser, startDate, closeDate, openingBalance, closedBalance, detail, createdBy);
+    public static CashDrawer create(String id, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, CashBox cashBox) {
+        return new CashDrawer(id, status, openedByUser, closedByUser, startDate, closeDate, openingBalance, closedBalance, detail, cashBox);
     }
 
     public String getId() {
@@ -88,22 +96,6 @@ public class CashDrawer {
         this.id = id;
     }
 
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public Boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(Boolean active) {
-        isActive = active;
-    }
-
     public CashDrawerStatus getStatus() {
         return status;
     }
@@ -112,7 +104,7 @@ public class CashDrawer {
         this.status = status;
     }
 
-    public Instant getCreated_at() {
+    public LocalDate getCreated_at() {
         return created_at;
     }
 
@@ -172,11 +164,29 @@ public class CashDrawer {
         this.detail = detail;
     }
 
-    public User getCreatedBy() {
-        return createdBy;
+    public CashBox getCashBox() {
+        return cashBox;
     }
 
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
+    public void setCashBox(CashBox cashBox) {
+        this.cashBox = cashBox;
+    }
+
+    public Double getActualBalance() {
+        Double totalPayments = 0.0;
+        if (this.cashDrawerDetails==null || this.cashDrawerDetails.isEmpty()){
+            return this.openingBalance;
+        }
+        for (CashDrawerDetail detail : this.cashDrawerDetails) {
+            Payment payment = detail.getPayment();
+            if (payment != null) {
+                for (PaymentHistory paymentHistory : payment.getPaymentshistory()) {
+                    if (paymentHistory.getId().equals(detail.getPaymentHistoryId())) {
+                        totalPayments += paymentHistory.getAmount();
+                    }
+                }
+            }
+        }
+        return this.openingBalance + totalPayments;
     }
 }

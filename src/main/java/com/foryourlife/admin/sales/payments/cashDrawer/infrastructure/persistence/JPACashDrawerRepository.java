@@ -17,8 +17,8 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     }
 
     @Override
-    public void save(CashDrawer cashDrawer) {
-        this.repository.save(cashDrawer);
+    public CashDrawer save(CashDrawer cashDrawer) {
+        return this.repository.save(cashDrawer);
     }
 
     @Override
@@ -37,22 +37,22 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     }
 
     @Override
-    public List<CashDrawer> getByOpenedByUserId(String userId) {
-        return this.repository.findAllByOpenedByUser_Id(userId);
+    public List<CashDrawer> getByUserIdAndStatusOpen(String userid) {
+        return this.repository.findAllByStatusAndOpenedByUser_Id(CashDrawerStatus.OPEN,userid);
     }
 
     @Override
-    public List<CashDrawer> getByClosedByUserId(String userId) {
-        return this.repository.findAllByClosedByUser_Id(userId);
+    public Optional<CashDrawer> getByIsOpenAndByUserId(String userId) {
+        return this.repository.findByStatusAndOpenedByUser_Id(CashDrawerStatus.OPEN, userId);
     }
 
     @Override
-    public Boolean findByNumber(String number) {
-        return this.repository.existsCashDrawerByNumber(number);
+    public Optional<CashDrawer> findByCashBoxIdAndStatus(String id, CashDrawerStatus status) {
+        return repository.findByStatusIsAndCashBox_Id(status, id);
     }
 
     @Override
-    public Boolean getByIsOpenAndByUserId(String userId) {
-        return this.repository.existsByStatusAndOpenedByUser_Id(CashDrawerStatus.OPEN, userId);
+    public List<CashDrawer> getByCashBoxId(String id) {
+        return this.repository.findAllByCashBox_Id(id);
     }
 }

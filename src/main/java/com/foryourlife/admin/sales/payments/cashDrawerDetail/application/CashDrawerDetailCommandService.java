@@ -24,7 +24,7 @@ public class CashDrawerDetailCommandService {
         this.userRepository = userRepository;
     }
 
-    public void save(String paymentHistoryId, String cashDrawerId, Payment payment, String userId) {
+    public void save(String paymentHistoryId, String cashDrawerId, Payment payment) {
         var cashDrawer = cashDrawerRepository.getById(cashDrawerId).orElseThrow(
                 () -> new BaseException("Cash drawer not found", List.of(""))
         );
@@ -33,10 +33,7 @@ public class CashDrawerDetailCommandService {
             throw new BaseException("La caja no está abierta", List.of(""));
         }
 
-        var user = userRepository.findById(userId).orElseThrow(
-                () -> new BaseException("User not found", List.of(""))
-        );
-        var detail = new CashDrawerDetail(UUID.randomUUID().toString(), payment, paymentHistoryId,cashDrawer,user);
+        var detail = new CashDrawerDetail(UUID.randomUUID().toString(), payment, paymentHistoryId,cashDrawer);
 
         repository.save(detail);
     }

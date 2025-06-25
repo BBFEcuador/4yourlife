@@ -25,11 +25,7 @@ public class CashDrawerQueryService {
         );
     }
 
-    public List<CashDrawer> getCashDrawersByOpenedByUserId(String userId) {
-        return repository.getByOpenedByUserId(userId);
-    }
-
-    public List<CashDrawer> getCashDrawersByClosedByUserId(String userId) {
-        return repository.getByClosedByUserId(userId);
+    public List<CashDrawer> getCashDrawersByCashBoxId(String id) {
+        return repository.getByCashBoxId(id);
     }
 }

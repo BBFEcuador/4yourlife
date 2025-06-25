@@ -120,7 +120,7 @@ public class CommandPaymentService {
             payment.getPaymentshistory().getFirst().setCashDrawerId(paymentReq.cashDrawerId);
             payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
 
-            cashDrawerDetailCommandService.save(paymentReq.paymentshistory.getFirst().getId(), paymentReq.cashDrawerId, payment, paymentReq.paymentshistory.getFirst().getCreatedById());
+            cashDrawerDetailCommandService.save(paymentReq.paymentshistory.getFirst().getId(), paymentReq.cashDrawerId, payment);
         }
         _paymentRepository.save(payment);
 
@@ -211,7 +211,7 @@ public class CommandPaymentService {
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);
 
         if (paymentHistory.getCashDrawerId() == null) {
-            cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment, paymentHistory.getCreatedById());
+            cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
         }
 
         _paymentRepository.save(payment);

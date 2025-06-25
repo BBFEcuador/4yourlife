@@ -1,15 +1,16 @@
 package com.foryourlife.admin.sales.payments.cashDrawer.application;
 
+import com.foryourlife.admin.sales.payments.cashBox.domain.CashBox;
+import com.foryourlife.admin.sales.payments.cashBox.domain.CashBoxRepository;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
-import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
-import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
-import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,47 +18,51 @@ import java.util.UUID;
 public class CashDrawerCommandService {
     private final CashDrawerRepository repository;
     private final UserRepository userRepository;
+    private final CashBoxRepository cashBoxRepository;
 
-    public CashDrawerCommandService(CashDrawerRepository repository, UserRepository userRepository) {
+    public CashDrawerCommandService(CashDrawerRepository repository, UserRepository userRepository, CashBoxRepository cashBoxRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
+        this.cashBoxRepository = cashBoxRepository;
     }
 
-    public void save(CashDrawer cashDrawer) {
-        if (repository.findByNumber(cashDrawer.getNumber())) {
-            throw new BaseException("Cash drawer with number " + cashDrawer.getNumber() + " already exists", List.of(""));
-        }
-        repository.save(cashDrawer);
+    public CashDrawer save(CashDrawer cashDrawer) {
+        return repository.save(cashDrawer);
     }
 
     public void closeDrawer(String id, String userId) {
-        var cashDrawer = repository.getById(id).orElseThrow(
-                () -> new BaseException("Cash drawer not found", List.of(""))
+        var existingDrawer = repository.findByCashBoxIdAndStatus(id, CashDrawerStatus.OPEN).orElseThrow(
+                () -> new BaseException("No hay cajas abiertas para el cash box", List.of(""))
         );
-        cashDrawer.setStatus(CashDrawerStatus.CLOSED);
+
+        if (existingDrawer.getStatus() == CashDrawerStatus.CLOSED) {
+            throw new BaseException("La caja esta cerrada", List.of(""));
+        }
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new BaseException("User not found", List.of(""))
         );
-        cashDrawer.setClosedByUser(user);
-        repository.save(cashDrawer);
+
+        existingDrawer.setStatus(CashDrawerStatus.CLOSED);
+        existingDrawer.setCloseDate(LocalDateTime.now());
+        existingDrawer.setClosedByUser(user);
+        existingDrawer.setClosedBalance(existingDrawer.getActualBalance());
+        repository.save(existingDrawer);
     }
 
-    public void openDrawer(String id, String userId) {
-        var cashDrawer = repository.getById(id).orElseThrow(
-                () -> new BaseException("Cash drawer not found", List.of(""))
+    public CashDrawer openDrawer(String cashBoxId, String userId, Double openingBalance) {
+        var cashBox = cashBoxRepository.findById(cashBoxId).orElseThrow(
+                () -> new BaseException("Cash box not found", List.of(""))
         );
-
-        if (repository.getByIsOpenAndByUserId(userId)) {
-            throw new BaseException("El usuario ya tiene una caja abierta", List.of(""));
-        }
-        if (cashDrawer.getStatus() == CashDrawerStatus.CLOSED) {
-            throw new BaseException("La caja ya fue cerrada", List.of(""));
-        }
-        cashDrawer.setStatus(CashDrawerStatus.OPEN);
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new BaseException("User not found", List.of(""))
         );
-        cashDrawer.setClosedByUser(user);
-        repository.save(cashDrawer);
+
+        var existingDrawer = repository.getByIsOpenAndByUserId(userId);
+
+        if (existingDrawer.isPresent()) {
+            throw new BaseException("La caja ya esta abierta", List.of(""));
+        }
+
+        return save(new CashDrawer(UUID.randomUUID().toString(), CashDrawerStatus.OPEN, user, null, LocalDateTime.now(), null, openingBalance, null, null, cashBox));
     }
 }

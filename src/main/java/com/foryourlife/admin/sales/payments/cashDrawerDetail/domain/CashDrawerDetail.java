@@ -24,22 +24,15 @@ public class CashDrawerDetail {
             referencedColumnName = "id"
     )
     private CashDrawer cashDrawer;
-    @ManyToOne
-    @JoinColumn(
-            name = "created_by_user_id",
-            referencedColumnName = "id"
-    )
-    private User createdBy;
 
+    protected CashDrawerDetail() {
+    }
 
-    protected CashDrawerDetail() {}
-
-    public CashDrawerDetail(String id, Payment payment, String paymentHistoryId, CashDrawer cashDrawer, User createdBy) {
+    public CashDrawerDetail(String id, Payment payment, String paymentHistoryId, CashDrawer cashDrawer) {
         this.id = id;
         this.payment = payment;
         this.paymentHistoryId = paymentHistoryId;
         this.cashDrawer = cashDrawer;
-        this.createdBy = createdBy;
     }
 
     public String getId() {
@@ -72,13 +65,5 @@ public class CashDrawerDetail {
 
     public void setCashDrawer(CashDrawer cashDrawer) {
         this.cashDrawer = cashDrawer;
-    }
-
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
     }
 }

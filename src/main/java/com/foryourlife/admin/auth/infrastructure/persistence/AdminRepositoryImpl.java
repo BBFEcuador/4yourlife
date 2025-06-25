@@ -3,6 +3,8 @@ package com.foryourlife.admin.auth.infrastructure.persistence;
 import com.foryourlife.admin.auth.domain.Admin;
 import com.foryourlife.admin.auth.domain.AdminLoginResponse;
 import com.foryourlife.admin.auth.domain.AdminRepository;
+import com.foryourlife.admin.sales.payments.cashBox.domain.CashBoxRepository;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
 import com.foryourlife.shared.JWTUtils;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.infrastructure.JpaUserRepository;
@@ -26,12 +28,14 @@ public class AdminRepositoryImpl implements AdminRepository {
     private final PasswordEncoder passwordEncoder;
     private final JWTUtils jwtUtils;
     private Admin loadAdmin;
+    private final CashDrawerRepository cashDrawerRepository;
 
-    public AdminRepositoryImpl(JPAAdminRepository repository, JpaUserRepository userRepository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils) {
+    public AdminRepositoryImpl(JPAAdminRepository repository, JpaUserRepository userRepository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils, CashDrawerRepository cashDrawerRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
+        this.cashDrawerRepository = cashDrawerRepository;
     }
 
     @Override
@@ -39,7 +43,8 @@ public class AdminRepositoryImpl implements AdminRepository {
         Authentication authentication = this.authenticate(username.toLowerCase(), password);
         var token = jwtUtils.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new AdminLoginResponse(this.loadAdmin, token);
+        var cashDrawer = cashDrawerRepository.getByUserIdAndStatusOpen(this.loadAdmin.getUser().getId());
+        return new AdminLoginResponse(this.loadAdmin, token, cashDrawer);
     }
 
     @Override

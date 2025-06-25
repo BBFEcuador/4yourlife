@@ -3,13 +3,10 @@ package com.foryourlife.admin.sales.payments.cashDrawer.infrastructure.httpContr
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerCommandService;
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerQueryService;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/cash-drawer")
@@ -29,31 +26,19 @@ public class CashDrawerController {
         return ResponseEntity.ok(queryService.getCashDrawerById(id));
     }
 
-    @PutMapping("/open/{id}")
-    public ResponseEntity<?> openDrawer(@PathVariable String id, @RequestParam String userId) {
-        commandService.openDrawer(id,userId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @GetMapping("cash-box/{id}")
+    public ResponseEntity<?> getCashDrawersByCashBoxId(@PathVariable String id) {
+        return ResponseEntity.ok(queryService.getCashDrawersByCashBoxId(id));
+    }
+
+    @PutMapping("/open/{cashBoxId}")
+    public ResponseEntity<CashDrawer> openDrawer(@PathVariable String cashBoxId, @RequestParam String userId, @RequestParam Double openingBalance) {
+        return new ResponseEntity<>(commandService.openDrawer(cashBoxId,userId, openingBalance),HttpStatus.OK);
     }
 
     @PutMapping("/close/{id}")
     public ResponseEntity<?> closeDrawer(@PathVariable String id, @RequestParam String userId) {
         commandService.closeDrawer(id, userId);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @GetMapping("/opened-by-user/{userId}")
-    public ResponseEntity<?> getCashDrawersOpenedByUser(@PathVariable String userId) {
-        return ResponseEntity.ok(queryService.getCashDrawersByOpenedByUserId(userId));
-    }
-
-    @GetMapping("/closed-by-user/{userId}")
-    public ResponseEntity<?> getCashDrawersClosedByUser(@PathVariable String userId) {
-        return ResponseEntity.ok(queryService.getCashDrawersByClosedByUserId(userId));
-    }
-
-    @PostMapping("")
-    public ResponseEntity<?> saveCashDrawer(@RequestBody @Valid CashDrawerRequest cashDrawer) {
-        commandService.save(cashDrawer.toDomain());
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

@@ -19,7 +19,7 @@ public class PaymentRequest {
     @NotNull(message = "El campus es requerido")
     public String campus;
     @NotNull(message = "Pago es requerido")
-    public List<PaymentHistory> paymentshistory = List.of();
+    public List<PaymentHistory> paymentsHistory = List.of();
     @NotNull(message = "El valor total es requerido")
     public Double total;
     public PaymentStatus status;

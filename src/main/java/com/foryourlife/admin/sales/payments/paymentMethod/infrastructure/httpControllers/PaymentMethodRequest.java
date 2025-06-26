@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.payments.paymentMethod.infrastructure.httpControllers;
 
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethod;
+import com.foryourlife.admin.sales.payments.paymentMethod.domain.SriPaymentMethod;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
@@ -11,6 +12,8 @@ public class PaymentMethodRequest {
     public String type;
     @NotNull(message = "El campo estado es requerido")
     public Boolean isActive;
+    @NotNull(message = "El campo código es requerido")
+    public String code;
 
     public String getId() {
         return id;
@@ -25,6 +28,6 @@ public class PaymentMethodRequest {
     }
 
     public PaymentMethod toDomain() {
-        return PaymentMethod.create(id != null ? id: UUID.randomUUID().toString(), type, isActive);
+        return PaymentMethod.create(id != null ? id: UUID.randomUUID().toString(), type, isActive, SriPaymentMethod.valueOf(code));
     }
 }

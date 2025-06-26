@@ -4,7 +4,6 @@ import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
-import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerCommandService;
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerQueryService;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.application.CashDrawerDetailCommandService;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
@@ -31,7 +30,6 @@ import java.util.stream.Collectors;
 public class CommandPaymentService {
 
     private final PaymentRepository _paymentRepository;
-    private final QueryInvoiceService _queryInvoiceService;
     private final PaymentMethodRepository _paymentMethodRepository;
     private final ProductRepository _productRepository;
     private final ParticipantQueryService participantQueryService;
@@ -40,9 +38,8 @@ public class CommandPaymentService {
     private final CashDrawerDetailCommandService cashDrawerDetailCommandService;
     private final CashDrawerQueryService cashDrawerQueryService;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, QueryInvoiceService _queryInvoiceService, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService) {
         this._paymentRepository = _paymentRepository;
-        this._queryInvoiceService = _queryInvoiceService;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
         this.participantQueryService = participantQueryService;
@@ -61,7 +58,7 @@ public class CommandPaymentService {
             throw new BaseException("No se puede adquirir el servicio, existen pagos pendientes", List.of(""));
         }
 
-        paymentReq.paymentshistory.forEach(paymentHistory -> {
+        paymentReq.paymentsHistory.forEach(paymentHistory -> {
             if (!_paymentMethodRepository.exist(paymentHistory.getPaymentMethodId())) {
                 throw new BaseException("El método de pago no existe", List.of(""));
             }
@@ -70,7 +67,7 @@ public class CommandPaymentService {
         if (participant.getModules().getHasFocus() || participant.getModules().getHasYour() || participant.getModules().getHasLife()) {
             throw new BaseException("El participante ya tiene un módulo activo", List.of(""));
         }
-        var total = paymentReq.paymentshistory.stream().mapToDouble(PaymentHistory::getAmount).sum();
+        var total = paymentReq.paymentsHistory.stream().mapToDouble(PaymentHistory::getAmount).sum();
 
         if (total > paymentReq.total) {
             throw new BaseException("El pago no puede superar el total de la compra", List.of(""));
@@ -86,47 +83,50 @@ public class CommandPaymentService {
                     );
                 }).collect(Collectors.toList());
 
-        paymentReq.id = UUID.randomUUID().toString();
         var payment = Payment.create(
                 UUID.randomUUID().toString(),
                 products,
                 paymentReq.discount,
                 participant,
                 queryCampusService.findById(paymentReq.campus),
-                paymentReq.paymentshistory,
+                paymentReq.paymentsHistory,
                 paymentReq.total,
                 paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING,
                 paymentReq.note
         );
 
-        Invoice invoice = null;
-        if (!paymentReq.paymentshistory.isEmpty()) {
-             invoice = Invoice.create(
-                    UUID.randomUUID().toString(),
-                    paymentReq.invoice.fullName,
-                    paymentReq.invoice.address,
-                    paymentReq.invoice.document,
-                    paymentReq.invoice.phone,
-                    paymentReq.invoice.email,
-                    paymentReq.invoice.invoiceNumber,
-                    LocalDate.now(),
-                    products,
-                    payment,
-                    false,
-                    (paymentReq.paymentshistory.getFirst().getAmount()*0.15),
-                    15.0,
-                    paymentReq.paymentshistory.getFirst().getAmount()
-            );
-            payment.getPaymentshistory().getFirst().setCashDrawerId(paymentReq.cashDrawerId);
+        var invoice = Invoice.create(
+                UUID.randomUUID().toString(),
+                paymentReq.invoice.fullName,
+                paymentReq.invoice.address,
+                paymentReq.invoice.document,
+                paymentReq.invoice.phone,
+                paymentReq.invoice.email,
+                paymentReq.invoice.invoiceNumber,
+                LocalDate.now(),
+                products,
+                payment,
+                false,
+                (paymentReq.total * 0.15),
+                15.0,
+                paymentReq.total
+        );
+
+        String paymentHistoryId = null;
+        if (!payment.getPaymentshistory().isEmpty()) {
+
+            payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
+            paymentHistoryId = payment.getPaymentshistory().getFirst().getId();
             payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
 
-            cashDrawerDetailCommandService.save(paymentReq.paymentshistory.getFirst().getId(), paymentReq.cashDrawerId, payment);
         }
-        _paymentRepository.save(payment);
 
+        _paymentRepository.save(payment);
         payment.record(new PaymentCreated(payment, invoice));
         var events = payment.pullDomainEvents();
         eventBus.publish(events);
+
+        cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
     }
 
     public void update(PaymentRequest paymentReq) {
@@ -151,7 +151,7 @@ public class CommandPaymentService {
                 paymentReq.discount,
                 participant,
                 queryCampusService.findById(paymentReq.campus),
-                paymentReq.paymentshistory,
+                paymentReq.paymentsHistory,
                 paymentReq.total,
                 paymentReq.status,
                 paymentReq.note
@@ -175,51 +175,15 @@ public class CommandPaymentService {
         } else if (total == payment.getTotal() && payment.getStatus() != PaymentStatus.COMPLETED) {
             payment.setStatus(PaymentStatus.COMPLETED);
         }
-
+        paymentHistory.setId(UUID.randomUUID().toString());
         payment.getPaymentshistory().add(paymentHistory);
 
-        var originalInvoiceOptional = _queryInvoiceService.findByPaymentId(paymentId)
-                .stream()
-                .findFirst();
 
-        Invoice originalInvoice;
-        if (originalInvoiceOptional.isEmpty()) {
-            if (invoiceRequest == null) {
-                throw new BaseException("Los datos de facturacion son requeridos", List.of(""));
-            }
-            originalInvoice =  Invoice.create(
-                    UUID.randomUUID().toString(),
-                    invoiceRequest.fullName,
-                    invoiceRequest.address,
-                    invoiceRequest.document,
-                    invoiceRequest.phone,
-                    invoiceRequest.email,
-                    invoiceRequest.invoiceNumber,
-                    LocalDate.now(),
-                    payment.getProducts(),
-                    payment,
-                    false,
-                    (paymentHistory.getAmount()*0.15),
-                    15.0,
-                    paymentHistory.getAmount()
-            );
-            originalInvoice.setAmount(paymentHistory.getAmount());
-        } else {
-            originalInvoice = originalInvoiceOptional.get();
-        }
-        System.out.println("paso");
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);
 
-        if (paymentHistory.getCashDrawerId() == null) {
-            cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
-        }
+        cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
 
         _paymentRepository.save(payment);
-
-        payment.record(new PaymentCreated(payment, originalInvoice));
-
-        var events = payment.pullDomainEvents();
-        eventBus.publish(events);
     }
 
     public void changeStatus(String id, String status) {

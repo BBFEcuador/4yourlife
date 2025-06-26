@@ -2,9 +2,7 @@ package com.foryourlife.admin.sales.payments.paymentMethod.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "payment_methods")
@@ -13,14 +11,17 @@ public class PaymentMethod {
     private String id;
     private String type;
     private Boolean isActive;
+    @Enumerated(EnumType.STRING)
+    private SriPaymentMethod code;
 
     protected PaymentMethod() {
     }
 
-    public PaymentMethod(String id, String type, Boolean isActive) {
+    public PaymentMethod(String id, String type, Boolean isActive, SriPaymentMethod code) {
         this.id = id;
         this.type = type;
         this.isActive = isActive;
+        this.code = code;
     }
 
     public String getId() {
@@ -48,7 +49,15 @@ public class PaymentMethod {
         isActive = active;
     }
 
-    public static PaymentMethod create(String id, String type, Boolean isActive){
-        return new PaymentMethod(id, type, isActive);
+    public SriPaymentMethod getCode() {
+        return code;
+    }
+
+    public void setCode(SriPaymentMethod code) {
+        this.code = code;
+    }
+
+    public static PaymentMethod create(String id, String type, Boolean isActive, SriPaymentMethod code) {
+        return new PaymentMethod(id, type, isActive, code);
     }
 }

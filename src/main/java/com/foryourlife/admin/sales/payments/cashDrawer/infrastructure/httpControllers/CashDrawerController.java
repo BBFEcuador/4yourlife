@@ -32,8 +32,8 @@ public class CashDrawerController {
     }
 
     @PutMapping("/open/{cashBoxId}")
-    public ResponseEntity<CashDrawer> openDrawer(@PathVariable String cashBoxId, @RequestParam String userId, @RequestParam Double openingBalance) {
-        return new ResponseEntity<>(commandService.openDrawer(cashBoxId,userId, openingBalance),HttpStatus.OK);
+    public ResponseEntity<CashDrawer> openDrawer(@PathVariable String cashBoxId, @RequestParam String userId, @RequestParam Double openingBalance, @RequestParam String detail) {
+        return new ResponseEntity<>(commandService.openDrawer(cashBoxId,userId, openingBalance, detail),HttpStatus.OK);
     }
 
     @PutMapping("/close/{id}")

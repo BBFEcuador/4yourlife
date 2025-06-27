@@ -9,7 +9,7 @@ public class PaymentHistoryRequest {
     @NotNull(message = "Payment History is required")
     public PaymentHistory paymentHistory;
     public InvoiceRequest invoice;
-    @NotNull(message = "Invoice is required")
-    @NotBlank(message = "Invoice ID is required")
+    @NotNull(message = "Cash Drawer ID is required")
+    @NotBlank(message = "Cash Drawer ID is required")
     public String cashDrawerId;
 }

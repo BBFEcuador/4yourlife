@@ -5,6 +5,9 @@ import com.foryourlife.admin.sales.payments.cashBox.domain.CashBoxRepository;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
+import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
+import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -45,11 +48,11 @@ public class CashDrawerCommandService {
         existingDrawer.setStatus(CashDrawerStatus.CLOSED);
         existingDrawer.setCloseDate(LocalDateTime.now());
         existingDrawer.setClosedByUser(user);
-        existingDrawer.setClosedBalance(existingDrawer.getActualBalance());
+        existingDrawer.setClosedBalance(getActualBalance(existingDrawer));
         repository.save(existingDrawer);
     }
 
-    public CashDrawer openDrawer(String cashBoxId, String userId, Double openingBalance) {
+    public CashDrawer openDrawer(String cashBoxId, String userId, Double openingBalance,String detail) {
         var cashBox = cashBoxRepository.findById(cashBoxId).orElseThrow(
                 () -> new BaseException("Cash box not found", List.of(""))
         );
@@ -63,6 +66,25 @@ public class CashDrawerCommandService {
             throw new BaseException("La caja ya esta abierta", List.of(""));
         }
 
-        return save(new CashDrawer(UUID.randomUUID().toString(), CashDrawerStatus.OPEN, user, null, LocalDateTime.now(), null, openingBalance, null, null, cashBox));
+        return save(new CashDrawer(UUID.randomUUID().toString(), CashDrawerStatus.OPEN, user, null, LocalDateTime.now(), null, openingBalance, null, detail, cashBox));
+    }
+
+
+    public Double getActualBalance(CashDrawer cashDrawer) {
+        Double totalPayments = 0.0;
+        if (cashDrawer.getCashDrawerDetails()==null || cashDrawer.getCashDrawerDetails().isEmpty()){
+            return cashDrawer.getOpeningBalance();
+        }
+        for (CashDrawerDetail detail : cashDrawer.getCashDrawerDetails()) {
+            Payment payment = detail.getPayment();
+            if (payment != null) {
+                for (PaymentHistory paymentHistory : payment.getPaymentshistory()) {
+                    if (paymentHistory.getId().equals(detail.getPaymentHistoryId())) {
+                        totalPayments += paymentHistory.getAmount();
+                    }
+                }
+            }
+        }
+        return cashDrawer.getOpeningBalance() + totalPayments;
     }
 }

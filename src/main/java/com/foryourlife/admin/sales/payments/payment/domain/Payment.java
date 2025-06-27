@@ -1,7 +1,9 @@
 package com.foryourlife.admin.sales.payments.payment.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.sales.discounts.domain.ProductDiscount;
+import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.AggregateRoot;
@@ -42,6 +44,12 @@ public class Payment extends AggregateRoot {
     private PaymentStatus status;
 
     private String  note;
+
+    @OneToMany(
+            mappedBy = "payment"
+    )
+    @JsonIgnoreProperties("payment")
+    private List<CashDrawerDetail> cashDrawerDetail;
 
     protected Payment() {
     }

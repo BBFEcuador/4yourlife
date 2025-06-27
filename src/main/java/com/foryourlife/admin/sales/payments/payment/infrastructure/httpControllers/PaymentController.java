@@ -2,12 +2,17 @@ package com.foryourlife.admin.sales.payments.payment.infrastructure.httpControll
 
 import com.foryourlife.admin.sales.payments.payment.application.CommandPaymentService;
 import com.foryourlife.admin.sales.payments.payment.application.QueryPaymentService;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.criteria.Filter;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/payments")
@@ -32,14 +37,14 @@ public class PaymentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getAllPayments(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "perPage", defaultValue = "10") int perPage
-    ) {
-        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-        return new ResponseEntity<>(queryPaymentService.findAll(p), HttpStatus.OK);
-    }
+//    @GetMapping("")
+//    public ResponseEntity<?> getAllPayments(
+//            @RequestParam(value = "page", defaultValue = "0") int page,
+//            @RequestParam(value = "perPage", defaultValue = "10") int perPage
+//    ) {
+//        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+//        return new ResponseEntity<>(queryPaymentService.findAll(p), HttpStatus.OK);
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPaymentById(@PathVariable String id) {
@@ -53,6 +58,31 @@ public class PaymentController {
             @RequestParam(value = "perPage", defaultValue = "10") int perPage) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
         return new ResponseEntity<>(queryPaymentService.findByParticipantId(id, p), HttpStatus.OK);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getAllPayments(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(value = "search", defaultValue = "") String search
+
+    ) {
+        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+        Criteria criteria = new Criteria(
+                List.of(), Optional.empty(), Optional.empty()
+        );
+        if(!search.isEmpty()){
+            criteria.filters = List.of(
+                    new Filter(
+                            "number",
+                            search,
+                            "cashDrawerDetail.cashDrawer.cashBox",
+                            Filter.Operation.LIKE,
+                            Filter.LogicalOperator.AND
+                    )
+            );
+        }
+        return new ResponseEntity<>(queryPaymentService.findAll(p, criteria), HttpStatus.OK);
     }
 
     @PutMapping("add/payment-history/{paymentId}")

@@ -4,6 +4,8 @@ import com.foryourlife.admin.sales.payments.sriPaymentMethod.domain.SriPaymentMe
 import com.foryourlife.admin.sales.payments.sriPaymentMethod.domain.SriPaymentMethodRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class JPASriPaymentMethodRepository implements SriPaymentMethodRepository {
     private final JPAImplSriPaymentMethodRepository repository;
@@ -15,5 +17,10 @@ public class JPASriPaymentMethodRepository implements SriPaymentMethodRepository
     @Override
     public void save(SriPaymentMethod sriPaymentMethod) {
         repository.save(sriPaymentMethod);
+    }
+
+    @Override
+    public List<SriPaymentMethod> findAll() {
+        return repository.findAll();
     }
 }

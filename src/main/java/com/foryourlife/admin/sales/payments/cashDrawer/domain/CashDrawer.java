@@ -67,6 +67,7 @@ public class CashDrawer {
     @Column(name = "updated_at")
     private Instant updated_at;
     @OneToMany(mappedBy = "cashDrawer", fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("cashDrawer")
     private List<CashDrawerDetail> cashDrawerDetails;
 
     protected CashDrawer() {}
@@ -170,6 +171,10 @@ public class CashDrawer {
 
     public void setCashBox(CashBox cashBox) {
         this.cashBox = cashBox;
+    }
+
+    public List<CashDrawerDetail> getCashDrawerDetails() {
+        return cashDrawerDetails;
     }
 
     public Double getActualBalance() {

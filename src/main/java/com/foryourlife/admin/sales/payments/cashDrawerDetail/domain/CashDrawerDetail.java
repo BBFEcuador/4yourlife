@@ -1,5 +1,6 @@
 package com.foryourlife.admin.sales.payments.cashDrawerDetail.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.shared.domain.user.User;
@@ -23,6 +24,7 @@ public class CashDrawerDetail {
             name = "cash_drawer_id",
             referencedColumnName = "id"
     )
+    @JsonIgnoreProperties("cashDrawerDetails")
     private CashDrawer cashDrawer;
 
     protected CashDrawerDetail() {

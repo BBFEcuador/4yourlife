@@ -42,7 +42,6 @@ public class SriPaymentMethodSeeder {
                     createSriPaymentMethod("08eb2234-9df1-4b89-9c15-75511f28518c" ,"TARJETA PREPAGO", "18", "Tarjeta prepago"),
                     createSriPaymentMethod("3a18cf7c-cca4-4c0e-8151-efd616174989" ,"TARJETA DE CRÉDITO", "19", "Tarjeta de crédito"),
                     createSriPaymentMethod("cfa6ab0b-2372-4f5c-981f-60058625d209" ,"OTROS CON UTILIZACION DEL SISTEMA FINANCIERO", "20", "Transferencia"),
-                    createSriPaymentMethod("36ad34f1-1c49-4a85-af08-cbc0da98764c" ,"OTROS CON UTILIZACION DEL SISTEMA FINANCIERO", "20", "Cheque"),
                     createSriPaymentMethod("36f1fcb5-c127-4390-8386-dc174ced8d61" ,"ENDOSO DE TÍTULOS", "21", "Endoso de títulos")
             );
 

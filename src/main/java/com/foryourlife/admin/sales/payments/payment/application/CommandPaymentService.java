@@ -117,8 +117,6 @@ public class CommandPaymentService {
 
             payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
             paymentHistoryId = payment.getPaymentshistory().getFirst().getId();
-            payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
-
         }
 
         _paymentRepository.save(payment);

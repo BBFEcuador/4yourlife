@@ -1,8 +1,8 @@
 package com.foryourlife.admin.sales.payments.paymentMethod.infrastructure.httpControllers;
 
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethod;
-import com.foryourlife.admin.sales.payments.paymentMethod.domain.SriPaymentMethod;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.UUID;
 
@@ -13,6 +13,7 @@ public class PaymentMethodRequest {
     @NotNull(message = "El campo estado es requerido")
     public Boolean isActive;
     @NotNull(message = "El campo código es requerido")
+    @Pattern(regexp = "^(0[1-9]|1[0-9]|2[0-1])$", message = "El código debe ser un número del 01 al 21")
     public String code;
 
     public String getId() {

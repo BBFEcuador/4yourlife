@@ -28,6 +28,6 @@ public class PaymentMethodRequest {
     }
 
     public PaymentMethod toDomain() {
-        return PaymentMethod.create(id != null ? id: UUID.randomUUID().toString(), type, isActive, SriPaymentMethod.valueOf(code));
+        return PaymentMethod.create(id != null ? id: UUID.randomUUID().toString(), type, isActive, code);
     }
 }

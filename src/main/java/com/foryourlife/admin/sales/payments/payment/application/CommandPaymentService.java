@@ -59,7 +59,7 @@ public class CommandPaymentService {
         }
 
         paymentReq.paymentsHistory.forEach(paymentHistory -> {
-            if (!_paymentMethodRepository.exist(paymentHistory.getPaymentMethodId())) {
+            if (!_paymentMethodRepository.exist(paymentHistory.getPaymentMethod().getId())) {
                 throw new BaseException("El método de pago no existe", List.of(""));
             }
         });
@@ -161,7 +161,7 @@ public class CommandPaymentService {
 
     public void updatePaymentsHistory(PaymentHistory paymentHistory, InvoiceRequest invoiceRequest, String paymentId, String cashDrawerId) {
         var payment = _paymentRepository.findById(paymentId);
-        if (!_paymentMethodRepository.exist(paymentHistory.getPaymentMethodId())) {
+        if (!_paymentMethodRepository.exist(paymentHistory.getPaymentMethod().getId())) {
             throw new BaseException("El método de pago no existe", List.of(""));
         }
         var total = payment.getPaymentshistory().stream().mapToDouble(PaymentHistory::getAmount).sum() + paymentHistory.getAmount();

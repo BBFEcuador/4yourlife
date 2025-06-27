@@ -11,13 +11,12 @@ public class PaymentMethod {
     private String id;
     private String type;
     private Boolean isActive;
-    @Enumerated(EnumType.STRING)
-    private SriPaymentMethod code;
+    private String code;
 
     protected PaymentMethod() {
     }
 
-    public PaymentMethod(String id, String type, Boolean isActive, SriPaymentMethod code) {
+    public PaymentMethod(String id, String type, Boolean isActive, String code) {
         this.id = id;
         this.type = type;
         this.isActive = isActive;
@@ -49,15 +48,15 @@ public class PaymentMethod {
         isActive = active;
     }
 
-    public SriPaymentMethod getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(SriPaymentMethod code) {
+    public void setCode(String code) {
         this.code = code;
     }
 
-    public static PaymentMethod create(String id, String type, Boolean isActive, SriPaymentMethod code) {
+    public static PaymentMethod create(String id, String type, Boolean isActive, String code) {
         return new PaymentMethod(id, type, isActive, code);
     }
 }

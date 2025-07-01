@@ -7,10 +7,13 @@ import com.foryourlife.shared.domain.criteria.Filter;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,6 +97,17 @@ public class PaymentController {
     @PatchMapping("/change-status/{id}")
     public ResponseEntity<?> changePaymentStatus(@PathVariable String id, @RequestParam(name = "status", defaultValue = "") String status) {
         commandPaymentService.changeStatus(id, status);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/generate-pdf/{paymentId}")
+    public ResponseEntity<ByteArrayOutputStream> generateInvoice(@PathVariable String paymentId) {
+        ByteArrayOutputStream pdfBytes = commandPaymentService.generateInvoice(paymentId);
+
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_PDF);
+//        headers.setContentDispositionFormData("filename", "payment.pdf");
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

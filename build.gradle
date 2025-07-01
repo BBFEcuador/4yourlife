@@ -1,8 +1,8 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.1'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'java'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'org.jetbrains.kotlin.jvm'
 }
 
@@ -11,54 +11,58 @@ version = '0.0.1-SNAPSHOT'
 
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 ext {
-	set('snippetsDir', file("build/generated-snippets"))
+    set('snippetsDir', file("build/generated-snippets"))
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.flywaydb:flyway-database-postgresql'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'org.postgresql:postgresql'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation 'org.testcontainers:junit-jupiter'
-	testImplementation 'org.testcontainers:postgresql'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.postgresql:postgresql'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.3'
-	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.15.0-rc3'
-	implementation 'net.datafaker:datafaker:2.1.0'
-	implementation 'com.github.loki4j:loki-logback-appender:1.5.1'
-	implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-	implementation 'com.auth0:java-jwt:4.4.0'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.3'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.15.0-rc3'
+    implementation 'net.datafaker:datafaker:2.1.0'
+    implementation 'com.github.loki4j:loki-logback-appender:1.5.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.auth0:java-jwt:4.4.0'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.5.3'
+    implementation 'org.xhtmlrenderer:flying-saucer-pdf:9.13.0'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'ognl:ognl:3.4.7'
+
 }
 
 tasks.named('test') {
-	outputs.dir snippetsDir
-	useJUnitPlatform()
+    outputs.dir snippetsDir
+    useJUnitPlatform()
 }
 
 tasks.named('asciidoctor') {
-	inputs.dir snippetsDir
-	dependsOn test
+    inputs.dir snippetsDir
+    dependsOn test
 }

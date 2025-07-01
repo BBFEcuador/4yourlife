@@ -9,6 +9,10 @@ import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.util.List;
 
@@ -52,5 +56,28 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public boolean existsByParticipantIdAndStatus(String participantId, PaymentStatus status) {
         return _jpaPaymentRepository.existsByParticipant_IdAndStatus(participantId,status);
+    }
+
+    @Override
+    public String generatePdf(Payment payment) {
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+
+        Context context = new Context();
+        context.setVariable("payment", payment);
+        context.setVariable("date", payment.getCreated_at());
+        context.setVariable("subtotal", payment.getTotal() - (payment.getTotal() * 0.15));
+        context.setVariable("iva", payment.getTotal() * 0.15);
+        if (payment.getDiscount()!= null) {
+            context.setVariable("discount", payment.getDiscount().getDiscountValue());
+        }else {
+            context.setVariable("discount", 0.0);
+        }
+
+        return templateEngine.process("templates/Payment-pdf", context);
     }
 }

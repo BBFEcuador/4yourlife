@@ -10,6 +10,6 @@ public interface PaymentRepository {
     Page<Payment> findByParticipantId(String id, Pageable pageable);
     Page<Payment> findAll(Pageable pageable);
     Page<Payment> findAll(Pageable pageable, Criteria criteria);
-
+    String generatePdf(Payment payment);
     boolean existsByParticipantIdAndStatus(String participantId, PaymentStatus status);
 }

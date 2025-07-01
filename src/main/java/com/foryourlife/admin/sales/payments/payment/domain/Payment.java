@@ -1,8 +1,10 @@
 package com.foryourlife.admin.sales.payments.payment.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.sales.discounts.domain.ProductDiscount;
+import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.clients.account.participant.domain.Participant;
@@ -11,8 +13,12 @@ import com.foryourlife.shared.domain.events.PaymentCreated;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDateTime;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 
 @Entity
 @Table(name = "payments")
@@ -43,13 +49,25 @@ public class Payment extends AggregateRoot {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
-    private String  note;
+    private String note;
 
     @OneToMany(
             mappedBy = "payment"
     )
     @JsonIgnoreProperties("payment")
     private List<CashDrawerDetail> cashDrawerDetail;
+    @JsonIgnore
+    @OneToOne(
+            mappedBy = "payment",
+            fetch = FetchType.EAGER
+    )
+    private Invoice invoice;
+    @CreatedDate
+    @Column(
+            name = "created_at",
+            updatable = false
+    )
+    private LocalDateTime created_at = LocalDateTime.now();
 
     protected Payment() {
     }
@@ -108,5 +126,13 @@ public class Payment extends AggregateRoot {
 
     public void setStatus(PaymentStatus status) {
         this.status = status;
+    }
+
+    public String getCreated_at() {
+        return created_at.getDayOfMonth() + "/" + created_at.getMonthValue() + "/" + created_at.getYear();
+    }
+
+    public Invoice getInvoice() {
+        return invoice;
     }
 }

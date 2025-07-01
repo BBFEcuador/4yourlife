@@ -19,7 +19,10 @@ import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import java.io.*;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -202,5 +205,26 @@ public class CommandPaymentService {
 
         payment.setStatus(paymentStatus);
         _paymentRepository.save(payment);
+    }
+
+    public ByteArrayOutputStream generateInvoice(String paymentId) {
+        var payment = _paymentRepository.findById(paymentId);
+        ByteArrayOutputStream pdf = new ByteArrayOutputStream();
+
+        try {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(_paymentRepository.generatePdf(payment));
+            renderer.layout();
+            renderer.createPDF(pdf);
+            String fileName = "invoice_" + paymentId + ".pdf";
+            String filePath = Paths.get("").toAbsolutePath().toString() + File.separator + fileName;
+
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                fos.write(pdf.toByteArray());
+            }
+            return pdf;
+        } catch (Exception e) {
+            throw new BaseException("Error generating invoice", List.of(e.getMessage()));
+        }
     }
 }

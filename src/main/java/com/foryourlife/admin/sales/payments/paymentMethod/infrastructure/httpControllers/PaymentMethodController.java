@@ -28,7 +28,7 @@ public class PaymentMethodController {
 
     @PostMapping("")
     public ResponseEntity<?> createPaymentMethod(@RequestBody @Valid PaymentMethodRequest paymentMethod) {
-        paymentMethodCommandService.createPaymentMethod(paymentMethod.toDomain());
+        paymentMethodCommandService.createPaymentMethod(paymentMethod);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

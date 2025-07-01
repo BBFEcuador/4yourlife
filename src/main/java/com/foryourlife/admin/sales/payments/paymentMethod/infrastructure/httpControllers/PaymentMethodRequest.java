@@ -11,10 +11,12 @@ public class PaymentMethodRequest {
     @NotNull(message = "El campo tipo es requerido")
     public String type;
     @NotNull(message = "El campo estado es requerido")
-    public Boolean isActive;
     @NotNull(message = "El campo código es requerido")
     @Pattern(regexp = "^(0[1-9]|1[0-9]|2[0-1])$", message = "El código debe ser un número del 01 al 21")
     public String code;
+    public Boolean isActive;
+    @NotNull(message = "El id del campus es requerido")
+    public String campusId;
 
     public String getId() {
         return id;
@@ -29,6 +31,6 @@ public class PaymentMethodRequest {
     }
 
     public PaymentMethod toDomain() {
-        return PaymentMethod.create(id != null ? id: UUID.randomUUID().toString(), type, isActive, code);
+        return PaymentMethod.create(id != null ? id: UUID.randomUUID().toString(), type, isActive, code, null);
     }
 }

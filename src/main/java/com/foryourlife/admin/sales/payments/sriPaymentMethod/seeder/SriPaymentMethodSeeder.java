@@ -57,8 +57,8 @@ public class SriPaymentMethodSeeder {
         return new SriPaymentMethod(
                 id,
                 method,
-                code,
-                name != null ? name : method
+                name != null ? name : method,
+                code
         );
     }
 }

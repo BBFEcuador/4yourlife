@@ -2,29 +2,33 @@ package com.foryourlife.admin.sales.product.application;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foryourlife.admin.contifico.config.domain.ConfigContificoRepository;
+import com.foryourlife.admin.programs.campus.domain.CampusRepository;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.shared.domain.bus.EventBus;
+import com.foryourlife.shared.domain.exception.BaseException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class ProductCreateService {
     private final EventBus eventBus;
-    private final HttpClient client;
+    private final RestClient client;
     private final ProductRepository repository;
+    private final ConfigContificoRepository configContificoRepository;
 
-    public ProductCreateService(EventBus eventBus, HttpClient client, ProductRepository repository) {
+    public ProductCreateService(EventBus eventBus, RestClient client, ProductRepository repository, ConfigContificoRepository configContificoRepository) {
         this.eventBus = eventBus;
         this.client = client;
         this.repository = repository;
+        this.configContificoRepository = configContificoRepository;
     }
 
     public void saveProduct(Product product) {
@@ -48,21 +52,23 @@ public class ProductCreateService {
         repository.save(product);
     }
 
-    public List<Product> syncProducts() {
+    public List<Product> syncProducts(String campusId) {
         List<Product> syncedProducts = new ArrayList<>();
-
+        var config = configContificoRepository.findByCampusId(campusId).orElseThrow(
+                () -> new BaseException("Config not found", List.of(""))
+        );
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.contifico.com/sistema/api/v1/producto/"))
+            ResponseEntity<String> response = client.get()
+                    .uri("https://api.contifico.com/sistema/api/v1/producto/")
                     .header("Content-Type", "application/json")
-                    .GET()
-                    .build();
+                    .header("Api-Token", config.getApiKey())
+                    .header("Authorization", config.getApiSecret())
+                    .retrieve()
+                    .toEntity(String.class);
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
+            if (response.getStatusCode().value() == 200) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode rootNode = objectMapper.readTree(response.body());
+                JsonNode rootNode = objectMapper.readTree(response.getBody());
 
                 if (rootNode.isArray()) {
                     for (JsonNode contificoProduct : rootNode) {
@@ -71,40 +77,45 @@ public class ProductCreateService {
                         String name = contificoProduct.get("nombre").asText();
                         double price = contificoProduct.get("pvp1").asDouble();
 
-                        Product product = repository.findByContificoId(contificoId)
-                                .orElse(new Product(
-                                        UUID.randomUUID().toString(),
-                                        code,
-                                        name,
-                                        price,
-                                        "DOLAR",
-                                        true,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        contificoId
-                                ));
+                        Optional<Product> existingProduct = repository.findByContificoId(contificoId);
 
-                        product.setContificoId(contificoId);
-                        product.setCode(code);
-                        product.setName(name);
-                        product.setBasePrice(price);
-                        product.setActive(true);
+                        if (existingProduct.isEmpty()) {
+                            Product newProduct = new Product(
+                                    UUID.randomUUID().toString(),
+                                    code,
+                                    name,
+                                    price,
+                                    "DOLAR",
+                                    true,
+                                    null,
+                                    null,
+                                    null,
+                                    config.getCampus(),
+                                    contificoId
+                            );
 
-                        repository.save(product);
-                        syncedProducts.add(product);
+                            newProduct.setContificoId(contificoId);
+                            newProduct.setCode(code);
+                            newProduct.setName(name);
+                            newProduct.setBasePrice(price);
+                            newProduct.setActive(true);
+
+                            repository.save(newProduct);
+                            syncedProducts.add(newProduct);
+                        } else {
+                            syncedProducts.add(existingProduct.get());
+                        }
                     }
                 }
 
             } else {
-                throw new RuntimeException("Failed to fetch products from Contifico API: " + response.body());
+                throw new BaseException("Failed to fetch products from Contifico API", List.of("")  );
             }
+            return syncedProducts;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Error syncing products with Contifico", e);
+            throw new BaseException("Error sincronizando con contifico", List.of(""));
         }
 
-        return syncedProducts;
     }
 }

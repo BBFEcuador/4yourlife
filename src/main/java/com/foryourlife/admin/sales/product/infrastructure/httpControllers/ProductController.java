@@ -96,4 +96,10 @@ public class ProductController {
     public ResponseEntity<?> getProductById(@PathVariable String id) {
         return new ResponseEntity<>(finderService.findById(id), HttpStatus.OK);
     }
+
+    @PostMapping("sync")
+    public ResponseEntity<?> syncProducts(@RequestParam String campusId) {
+        createService.syncProducts(campusId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

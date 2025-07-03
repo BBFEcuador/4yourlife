@@ -1,12 +1,10 @@
 package com.foryourlife.admin.contifico.config.domain;
 
 import com.foryourlife.admin.programs.campus.domain.Campus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "configs_contifico")
 public class ConfigContifico {
     @Id
     private String id;

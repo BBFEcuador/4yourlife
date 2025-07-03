@@ -1,8 +1,11 @@
 package com.foryourlife.admin.sales.product.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.sales.programs.domain.Program;
 import com.foryourlife.admin.sales.rules.domain.Rule;
+import com.foryourlife.shared.domain.AggregateRoot;
+import com.foryourlife.shared.domain.events.ProductCreated;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -10,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "products")
-public class Product {
+public class Product extends AggregateRoot {
     @Id
     private String id;
 
@@ -27,6 +30,8 @@ public class Product {
 
     private String description;
 
+    private String contificoId;
+
     @OneToMany(mappedBy = "product", targetEntity = Rule.class)
     private List<Rule> rules;
 
@@ -36,11 +41,19 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "program_id")
     )
     private List<Program> programs;
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(
+            name = "campus_id",
+            referencedColumnName = "id"
+    )
+    private Campus campus;
 
     protected Product() {
     }
 
-    public Product(String id, String name, String code, Double basePrice, String currency, Boolean isActive, String description, List<Rule> rules, List<Program> programs) {
+    public Product(String id, String name, String code, Double basePrice, String currency, Boolean isActive, String description, List<Rule> rules, List<Program> programs, Campus campus, String contificoId) {
         this.id = id;
         this.name = name;
         this.code = code;
@@ -50,10 +63,14 @@ public class Product {
         this.description = description;
         this.rules = rules;
         this.programs = programs;
+        this.campus = campus;
+        this.contificoId = contificoId;
     }
 
-    public static Product create(String id, String name, String code, Double basePrice, String currency, Boolean isActive, String description, List<Rule> rules, List<Program> programs) {
-        return new Product(id, name, code,basePrice,currency, isActive, description, rules, programs);
+    public static Product create(String id, String name, String code, Double basePrice, String currency, Boolean isActive, String description, List<Rule> rules, List<Program> programs, Campus campus, String contificoId) {
+        var product = new Product(id, name, code,basePrice,currency, isActive, description, rules, programs, campus, contificoId);
+        product.record(new ProductCreated(product));
+        return product;
     }
 
     public String getId() {
@@ -127,5 +144,21 @@ public class Product {
 
     public void setPrograms(List<Program> programs) {
         this.programs = programs;
+    }
+
+    public String getContificoId() {
+        return contificoId;
+    }
+
+    public void setContificoId(String contificoId) {
+        this.contificoId = contificoId;
+    }
+
+    public Campus getCampus() {
+        return campus;
+    }
+
+    public void setCampus(Campus campus) {
+        this.campus = campus;
     }
 }

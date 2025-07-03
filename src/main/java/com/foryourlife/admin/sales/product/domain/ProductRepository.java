@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository {
-    void save(Product product);
+    Product save(Product product);
 
     Optional<Product> findById(String id);
-
+    Optional<Product> findByContificoId(String contificoId);
     Page<Product> findAll(Pageable pageable, Criteria criteria);
     Page<Product> findAll(Pageable pageable);
     Page<Product> findAllAvailable(Pageable pageable);

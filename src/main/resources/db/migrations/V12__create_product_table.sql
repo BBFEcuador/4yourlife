@@ -5,8 +5,11 @@ CREATE TABLE IF NOT EXISTS products (
   basePrice FLOAT NOT NULL,
   currency TEXT NOT NULL,
   is_active BOOLEAN NOT NULL,
+  contificoId TEXT,
   description TEXT,
-  CONSTRAINT pk_products PRIMARY KEY (id)
+  campus_id TEXT NOT NULL,
+  CONSTRAINT pk_products PRIMARY KEY (id),
+    CONSTRAINT fk_campus_on_products FOREIGN KEY (campus_id) REFERENCES campus (id)
 );
 CREATE TABLE IF NOT EXISTS rules(
   id TEXT NOT NULL,

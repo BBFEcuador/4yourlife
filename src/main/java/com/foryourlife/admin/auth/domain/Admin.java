@@ -30,7 +30,7 @@ public class Admin extends AggregateRoot {
     @JsonProperty("role")
     private AdminRole role;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "campus_admins",
             joinColumns = @JoinColumn(name = "admin_id", referencedColumnName = "id"),

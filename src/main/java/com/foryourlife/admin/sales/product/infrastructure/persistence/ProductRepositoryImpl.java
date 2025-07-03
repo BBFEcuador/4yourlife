@@ -2,7 +2,6 @@ package com.foryourlife.admin.sales.product.infrastructure.persistence;
 
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
-import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.data.domain.Page;
@@ -24,8 +23,8 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public void save(Product product) {
-        this.impl.save(product);
+    public Product save(Product product) {
+        return this.impl.save(product);
     }
 
     @Override
@@ -51,5 +50,10 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public void saveAll(List<Product> products) {
         this.impl.saveAll(products);
+    }
+
+    @Override
+    public Optional<Product> findByContificoId(String contificoId) {
+        return this.impl.findByContificoId(contificoId);
     }
 }

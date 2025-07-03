@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.product.infrastructure.httpControllers;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.programs.domain.Program;
 import com.foryourlife.admin.sales.rules.domain.Rule;
@@ -38,8 +39,10 @@ public class ProductRequest {
     @JsonProperty(value = "isActive")
     private Boolean isActive;
 
+    private Campus campus;
+
     public Product toDomain() {
-        return Product.create(id!=null ? id: UUID.randomUUID().toString(), name, code, basePrice, currency, isActive, description, rules, programs);
+        return Product.create(id!=null ? id: UUID.randomUUID().toString(), name, code, basePrice, currency, isActive, description, rules, programs, campus, null);
     }
 
     public String getId() {

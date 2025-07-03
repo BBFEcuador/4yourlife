@@ -12,7 +12,7 @@ public class PaymentMethodRequest {
     public String type;
     @NotNull(message = "El campo estado es requerido")
     @NotNull(message = "El campo código es requerido")
-    @Pattern(regexp = "^(0[1-9]|1[0-9]|2[0-1])$", message = "El código debe ser un número del 01 al 21")
+    @Pattern(regexp = "^(EF|CQ|TC|TRA)$", message = "El tipo debe ser EF, CQ, TC o TRA")
     public String code;
     public Boolean isActive;
     @NotNull(message = "El id del campus es requerido")

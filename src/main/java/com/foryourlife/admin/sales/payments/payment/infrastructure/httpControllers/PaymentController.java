@@ -5,6 +5,7 @@ import com.foryourlife.admin.sales.payments.payment.application.QueryPaymentServ
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import jakarta.validation.Valid;
+import javassist.bytecode.ByteArray;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -101,13 +102,13 @@ public class PaymentController {
     }
 
     @GetMapping("/generate-pdf/{paymentId}")
-    public ResponseEntity<ByteArrayOutputStream> generateInvoice(@PathVariable String paymentId) {
+    public ResponseEntity<byte[]> generateInvoice(@PathVariable String paymentId) {
         ByteArrayOutputStream pdfBytes = commandPaymentService.generateInvoice(paymentId);
 
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_PDF);
-//        headers.setContentDispositionFormData("filename", "payment.pdf");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("filename", "payment.pdf");
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().headers(headers).body(pdfBytes.toByteArray());
     }
 }

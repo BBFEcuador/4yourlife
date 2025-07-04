@@ -1,6 +1,5 @@
 package com.foryourlife.admin.contifico.config.infrastructure.http;
 
-import com.foryourlife.admin.programs.campus.domain.Campus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

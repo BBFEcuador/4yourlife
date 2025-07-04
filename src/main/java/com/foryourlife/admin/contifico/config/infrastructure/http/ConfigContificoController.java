@@ -2,6 +2,7 @@ package com.foryourlife.admin.contifico.config.infrastructure.http;
 
 import com.foryourlife.admin.contifico.config.application.ConfigContificoCommandService;
 import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ public class ConfigContificoController {
     private ConfigContificoQueryService configContificoQueryService;
 
     @PostMapping("")
-    public ResponseEntity<?> createConfigContifico(ConfigContificoRequest configContificoRequest) {
+    public ResponseEntity<?> createConfigContifico(@Valid  @RequestBody ConfigContificoRequest configContificoRequest) {
         configContificoCommandService.createConfigContifico(configContificoRequest);
         return ResponseEntity.ok().build();
     }

@@ -9,6 +9,10 @@ import com.foryourlife.admin.programs.trainer.application.TrainerCreatorService;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.application.CommandTrainingService;
 import com.foryourlife.admin.programs.training.infrastructure.httpControllers.TrainingAutoGenerateRequest;
+import com.foryourlife.admin.sales.product.domain.Product;
+import com.foryourlife.admin.sales.product.domain.ProductRepository;
+import com.foryourlife.admin.sales.programs.domain.Program;
+import com.foryourlife.admin.sales.programs.domain.ProgramRepository;
 import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
 import com.foryourlife.clients.account.invitations.applications.CommandInvitationService;
 import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
@@ -46,6 +50,8 @@ import java.util.UUID;
 public class AdminSeeder {
     private final AdminRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final ProgramRepository programRepository;
+    private final ProductRepository productRepository;
     private final CampusRepository campusRepository;
     private final TrainerCreatorService trainerCreatorService;
     private final CommandTrainingService commandTrainingService;
@@ -58,7 +64,7 @@ public class AdminSeeder {
     private final ParticipantLevelRepository participantLevelRepository;
     private final Faker faker = new Faker();
 
-    public AdminSeeder(AdminRepository repository, PasswordEncoder passwordEncoder, CampusRepository campusRepository, TrainerCreatorService trainerCreatorService, CommandTrainingService commandTrainingService, StaffCreatorService staffCreatorService, VisionaryCreatorService visionaryCreatorService, ParticipantCommandService participantCommandService, CommandMasterLifeService commandMasterLifeService, CommandInvitationService commandInvitationService, QueryInvitationServices queryInvitationServices, ParticipantLevelRepository participantLevelRepository) {
+    public AdminSeeder(AdminRepository repository, ProductRepository productRepository, ProgramRepository programRepository, PasswordEncoder passwordEncoder, CampusRepository campusRepository, TrainerCreatorService trainerCreatorService, CommandTrainingService commandTrainingService, StaffCreatorService staffCreatorService, VisionaryCreatorService visionaryCreatorService, ParticipantCommandService participantCommandService, CommandMasterLifeService commandMasterLifeService, CommandInvitationService commandInvitationService, QueryInvitationServices queryInvitationServices, ParticipantLevelRepository participantLevelRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.campusRepository = campusRepository;
@@ -71,21 +77,32 @@ public class AdminSeeder {
         this.commandInvitationService = commandInvitationService;
         this.queryInvitationServices = queryInvitationServices;
         this.participantLevelRepository = participantLevelRepository;
+        this.productRepository = productRepository;
+        this.programRepository = programRepository;
     }
 
     @Bean
     CommandLineRunner initAdmin() {
         return args -> {
-            campusRepository.save(Campus.create("61d88b2a-a22e-4cb0-8e43-e036483039d6", "Ecuador", "Quito", "De los Cedros OE1-13 y Real Audiencia", "094456123"));
-            campusRepository.save(Campus.create("01a680a4-3bf6-4caf-98b8-f3d5c7a8811b", "Ecuador", "Guayaquil", "Alborada etapa 14 manzana 5", "094456123"));
-            campusRepository.save(Campus.create("a35d480e-f17a-4b5c-887e-2ba9ddd3b696", "Ecuador", "Cuenca", "Por definir", "094456123"));
+            List<Campus> campuses = List.of(Campus.create("61d88b2a-a22e-4cb0-8e43-e036483039d6", "Ecuador", "Quito", "De los Cedros OE1-13 y Real Audiencia", "094456123"), Campus.create("01a680a4-3bf6-4caf-98b8-f3d5c7a8811b", "Ecuador", "Guayaquil", "Alborada etapa 14 manzana 5", "094456123"), Campus.create("a35d480e-f17a-4b5c-887e-2ba9ddd3b696", "Ecuador", "Cuenca", "Por definir", "094456123"));
+            campusRepository.save(campuses.get(0));
+            campusRepository.save(campuses.get(1));
+            campusRepository.save(campuses.get(2));
             repository.save(new Admin("3936ae5e-0cc1-4375-abc7-520d16999110", new User("72efe963-52b5-439a-ada2-3ea7b0258b89", "diegofyl@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "DIEGO", "", "FYL", "", "Diego FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))), new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"), new HashSet<>(campusRepository.getAll()), true));
             repository.save(new Admin("1a34e4df-33fa-4078-9acd-df7d04dde5f4", new User("93030dda-f43f-44bb-a500-991cda675aa7", "jairo@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "JAIRO", "", "FYL", "", "Jairo FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))), new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"), new HashSet<>(campusRepository.getAll()), true));
             repository.save(new Admin("b85430d1-e9fc-4c8d-8dd0-6c483511f0b8", new User("4f158ff7-3584-4c1b-abce-d1cbee0ced26", "katy@admin.com", passwordEncoder.encode("FocusYourLife2025--"), "KATY", "", "FYL", "", "Katy FYL", "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))), new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN"), new HashSet<>(campusRepository.getAll()), true));
             List<ParticipantLevel> roles = Arrays.asList(ParticipantLevel.create("6642e863-7f6f-40a3-80e2-934388ade735", "ROLE_INIT", true, CourseLevel.INIT), ParticipantLevel.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "ROLE_FOCUS", false, CourseLevel.FOCUS), ParticipantLevel.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "ROLE_YOUR", false, CourseLevel.YOUR), ParticipantLevel.create("5b2da953-9791-47e6-a5b8-3442b52b8ebc", "ROLE_LIFE", false, CourseLevel.LIFE), ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9", "ROLE_GRADUATE", false, CourseLevel.LIFE_GRADUATE));
             this.participantLevelRepository.saveAll(roles);
             createAdminTestUser();
-//            mock();
+
+            List<Program> programs = Arrays.asList(Program.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "Focus", CourseLevel.FOCUS), Program.create("bff32809-d719-4dfd-90b0-6f7a0f63e2fe", "Your", CourseLevel.YOUR), Program.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "Life", CourseLevel.LIFE));
+
+            this.programRepository.saveAll(programs);
+            Product product = Product.create("1a9f5420-a08d-4b66-99ed-616a7a50864a", "Focus + Your", "elweso-code", 700.5, "DOLAR", true, "Focus + Your", null, List.of(programs.get(0), programs.get(1)), campuses.get(0), "bala-id");
+            this.productRepository.save(product);
+
+
+            //mock();
         };
     }
 
@@ -154,26 +171,13 @@ public class AdminSeeder {
         var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600", "61d88b2a-a22e-4cb0-8e43-e036483039d6"));
         for (int i = 0; i < 350; i++) {
             var staffId = UUID.randomUUID().toString();
-            var user = new User(
-                    UUID.randomUUID().toString(),
-                    faker.internet().emailAddress(),
-                    faker.internet().password(),
-                    faker.name().firstName(),
-                    faker.name().firstName(),
-                    faker.name().lastName(),
-                    faker.name().lastName(),
-                    faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
+            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), passwordEncoder.encode("focus2025"), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
             var bd = faker.date().birthday().toInstant();
             System.out.println(bd + "==================");
             var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();
             var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false, queryInvitationServices.findInvitationByToken(invitationToken).getCampus());
             var medicalRecord = new MedicalRecordSaveRequest("N/A", "N/A", "N/A");
-            participantCommandService.createInitUser(
-                    trainer,
-                    medicalRecord,
-                    new SaveContactRequest(null,faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(),null),
-                    null
-            );
+            participantCommandService.createInitUser(trainer, medicalRecord, new SaveContactRequest(null, faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(), null), null);
 
         }
     }

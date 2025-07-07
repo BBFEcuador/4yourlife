@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,65 +32,31 @@ public class ParticipantController {
     public ResponseEntity<?> getUsers(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "perPage", defaultValue = "10") int perPage,
-            @RequestParam(value = "search", defaultValue = "") String search
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "campusId", defaultValue = "") String campusId
     ) {
-        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-        Criteria criteria = new Criteria(
-                List.of(), Optional.empty(), Optional.empty()
-        );
-        if (!search.isEmpty()){
-            criteria.filters = List.of(
-                    new Filter(
-                            "name",
-                            search,
-                            "user",
-                            Filter.Operation.LIKE,
-                            Filter.LogicalOperator.OR
-                    ),
-                    new Filter(
-                            "email",
-                            search,
-                            "user",
-                            Filter.Operation.LIKE,
-                            Filter.LogicalOperator.OR
-                    ),
-                    new Filter(
-                            "phone",
-                            search,
-                            "user",
-                            Filter.Operation.LIKE,
-                            Filter.LogicalOperator.OR
-                    ),
-                    new Filter(
-                            "city",
-                            search,
-                            "campus",
-                            Filter.Operation.LIKE,
-                            Filter.LogicalOperator.OR
-                    ),
-                    new Filter(
-                            "dni",
-                            search,
-                            "profile",
-                            Filter.Operation.LIKE,
-                            Filter.LogicalOperator.OR
-                    ),
-                    new Filter(
-                            "name",
-                            search,
-                            "teams",
-                            Filter.Operation.LIKE,
-                            Filter.LogicalOperator.OR
-                    ),new Filter(
-                            "courseLevel",
-                            search,
-                            "participantLevel",
-                            Filter.Operation.LIKE,
-                            Filter.LogicalOperator.OR
-                    )
-            );
+        var pageable = PageRequest.of(page, perPage, Sort.by("id").descending());
+        List<Filter> filters = new ArrayList<>();
+
+        if (!search.isEmpty()) {
+            filters.addAll(List.of(
+                    new Filter("name", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("email", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("phone", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("city", search, "campus", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("dni", search, "profile", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("name", search, "teams", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("courseLevel", search, "participantLevel", Filter.Operation.LIKE, Filter.LogicalOperator.OR)
+            ));
         }
-        return new ResponseEntity<>(participantQueryService.getAll(p,criteria), HttpStatus.OK);
+
+        if (!campusId.isEmpty()) {
+            filters.add(new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND));
+        }
+
+        var criteria = new Criteria(filters, Optional.empty(), Optional.empty());
+        var result = participantQueryService.getAll(pageable, criteria);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("{id}")
@@ -120,57 +87,15 @@ public class ParticipantController {
 
         switch (lvl) {
             case "FOCUS" -> {
-                var criteria = new Criteria(
-                        List.of(new Filter(
-                                "courseLevel",
-                                CourseLevel.FOCUS.toString(),
-                                "participantLevel",
-                                Filter.Operation.EQUAL,
-                                Filter.LogicalOperator.AND
-                        ), new Filter(
-                                "teams",
-                                null,
-                                null,
-                                Filter.Operation.IS_EMPTY,
-                                Filter.LogicalOperator.AND
-                        )), Optional.empty(), Optional.empty()
-                );
+                var criteria = new Criteria(List.of(new Filter("courseLevel", CourseLevel.FOCUS.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
                 return new ResponseEntity<>(participantQueryService.matchers(criteria), HttpStatus.OK);
             }
             case "YOUR" -> {
-                var criteria = new Criteria(
-                        List.of(new Filter(
-                                "courseLevel",
-                                CourseLevel.YOUR.toString(),
-                                "participantLevel",
-                                Filter.Operation.EQUAL,
-                                Filter.LogicalOperator.AND
-                        ), new Filter(
-                                "teams",
-                                null,
-                                null,
-                                Filter.Operation.IS_EMPTY,
-                                Filter.LogicalOperator.AND
-                        )), Optional.empty(), Optional.empty()
-                );
+                var criteria = new Criteria(List.of(new Filter("courseLevel", CourseLevel.YOUR.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
                 return new ResponseEntity<>(participantQueryService.matchers(criteria), HttpStatus.OK);
             }
             case "LIFE" -> {
-                var criteria = new Criteria(
-                        List.of(new Filter(
-                                "courseLevel",
-                                CourseLevel.LIFE.toString(),
-                                "participantLevel",
-                                Filter.Operation.EQUAL,
-                                Filter.LogicalOperator.AND
-                        ), new Filter(
-                                "teams",
-                                null,
-                                null,
-                                Filter.Operation.IS_EMPTY,
-                                Filter.LogicalOperator.AND
-                        )), Optional.empty(), Optional.empty()
-                );
+                var criteria = new Criteria(List.of(new Filter("courseLevel", CourseLevel.LIFE.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
                 return new ResponseEntity<>(participantQueryService.matchers(criteria), HttpStatus.OK);
             }
             default -> throw new BaseException("Illegal argument", List.of("Type must be FOCUS, YOUR or LIFE"));

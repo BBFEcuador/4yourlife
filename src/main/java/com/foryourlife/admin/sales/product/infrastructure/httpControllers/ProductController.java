@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,28 +28,22 @@ public class ProductController {
     private ProductFinderService finderService;
 
     @GetMapping("")
-    public ResponseEntity<?> getAllProducts(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search) {
+    public ResponseEntity<?> getAllProducts(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search, @RequestParam(value = "campusId", defaultValue = "") String campusId) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+        List<Filter> filters = new ArrayList<>();
 
-        if (search.isEmpty()) {
-            return new ResponseEntity<>(finderService.findAll(p), HttpStatus.OK);
-        } else {
-            Criteria criteria = new Criteria(List.of(new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)), Optional.empty(), Optional.empty());
-            return new ResponseEntity<>(finderService.findAll(p, criteria), HttpStatus.OK);
+        if (!search.isEmpty()) {
+            filters.addAll(List.of(
+                    new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)));
         }
-    }
 
-    @GetMapping("/campus/{campusId}")
-    public ResponseEntity<?> getAllProductsByCampus(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search, @PathVariable String campusId) {
-        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-
-        if (search.isEmpty()) {
-            Criteria criteria = new Criteria(List.of(new Filter("id", campusId, "campus", Filter.Operation.LIKE, Filter.LogicalOperator.OR)), Optional.empty(), Optional.empty());
-            return new ResponseEntity<>(finderService.findAll(p, criteria), HttpStatus.OK);
-        } else {
-            Criteria criteria = new Criteria(List.of(new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("id", campusId, "campus", Filter.Operation.LIKE, Filter.LogicalOperator.OR)), Optional.empty(), Optional.empty());
-            return new ResponseEntity<>(finderService.findAll(p, criteria), HttpStatus.OK);
+        if (!campusId.isEmpty()) {
+            filters.add(new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND));
         }
+        var criteria = new Criteria(filters, Optional.empty(), Optional.empty());
+        return new ResponseEntity<>(finderService.findAll(p, criteria), HttpStatus.OK);
     }
 
     @GetMapping("/available")

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class ConfigContificoRequest {
+    public String id;
     @NotNull(message = "campusId es requerido")
     @NotBlank(message = "campusId no puede estar vacío")
     public String campusId;

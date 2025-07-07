@@ -2,7 +2,6 @@ package com.foryourlife.admin.sales.invoices.domain;
 
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.product.domain.Product;
-import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
@@ -25,7 +24,7 @@ public class Invoice {
     @Column(name = "invoice_date")
     private LocalDate invoiceDate;
 
-    @Column( columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     @Type(JsonType.class)
     private List<Product> products;
 
@@ -33,8 +32,8 @@ public class Invoice {
     @JoinColumn(name = "payment_id", referencedColumnName = "id")
     private Payment payment;
 
-    @Column(name = "sent_sri")
-    private Boolean sentSri;
+    @Column(name = "is_sent_contifico")
+    private Boolean isSentContifico;
 
     @Column(
             name = "tax_amount"
@@ -42,6 +41,9 @@ public class Invoice {
     private Double taxAmount;
     private Double tax;
     private Double amount;
+    @Column(columnDefinition = "jsonb", name = "invoice_contifico_json")
+    @Type(JsonType.class)
+    private InvoiceContificoJson invoiceContifico;
 
     protected Invoice() {
     }
@@ -57,7 +59,7 @@ public class Invoice {
         this.invoiceDate = invoiceDate;
         this.products = products;
         this.payment = payment;
-        this.sentSri = sentSri;
+        this.isSentContifico = sentSri;
         this.taxAmount = taxAmount;
         this.tax = tax;
         this.amount = amount;
@@ -105,14 +107,6 @@ public class Invoice {
 
     public void setPayment(Payment payment) {
         this.payment = payment;
-    }
-
-    public Boolean getSentSri() {
-        return sentSri;
-    }
-
-    public void setSentSri(Boolean sentSri) {
-        this.sentSri = sentSri;
     }
 
     public String getFullName() {
@@ -177,5 +171,21 @@ public class Invoice {
 
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    public Boolean getSentContifico() {
+        return isSentContifico;
+    }
+
+    public void setSentContifico(Boolean sentContifico) {
+        isSentContifico = sentContifico;
+    }
+
+    public InvoiceContificoJson getInvoiceContifico() {
+        return invoiceContifico;
+    }
+
+    public void setInvoiceContifico(InvoiceContificoJson invoiceContifico) {
+        this.invoiceContifico = invoiceContifico;
     }
 }

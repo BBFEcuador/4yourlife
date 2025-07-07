@@ -21,7 +21,7 @@ public class ConfigContificoCommandService {
     public void createConfigContifico(ConfigContificoRequest configContificoRequest) {
         var campus = queryCampusService.findById(configContificoRequest.campusId);
         ConfigContifico configContifico = new ConfigContifico(
-                UUID.randomUUID().toString(),
+                configContificoRequest.id == null ?  UUID.randomUUID().toString(): configContificoRequest.id,
                 configContificoRequest.apiKey,
                 configContificoRequest.apiSecret,
                 campus

@@ -21,7 +21,7 @@ public class CommandInvoiceService {
         if (invoiceReq.id == null) {
             throw new IllegalArgumentException("No se puede actualizar, ID nula");
         }
-        if (invoiceRepository.findById(invoiceReq.id).getSentSri() == true)
+        if (invoiceRepository.findById(invoiceReq.id).getSentContifico() == true)
             throw new IllegalArgumentException("No se puede actualizar, ya fue enviada al SRI");
         var invoice = Invoice.create(
                 invoiceReq.id,

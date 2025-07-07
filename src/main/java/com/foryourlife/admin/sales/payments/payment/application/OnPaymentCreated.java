@@ -3,6 +3,7 @@ package com.foryourlife.admin.sales.payments.payment.application;
 import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
+import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
 import com.foryourlife.admin.sales.product.application.ProductFinderService;
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.participant.domain.Participant;
@@ -87,11 +88,70 @@ public class OnPaymentCreated {
                     : 1;
             event.getInvoice().setInvoiceNumber(String.valueOf(invoiceNumber));
             event.getInvoice().setId(UUID.randomUUID().toString());
+//            event.getInvoice().setInvoiceContifico(
+//                    new InvoiceContificoJson(
+//                            "1234356789",
+//                            event.getPayment().getCreated_at(),
+//                            "FA",
+//                            ,
+//
+//                    )
+//            );
             commandInvoiceService.save(event.getInvoice());
             System.out.println("Invoice created and saved successfully.");
+
         } catch (Exception e) {
             System.err.println("Error creating or saving invoice: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
+    public void sendInvoiceToContifico(PaymentCreated event){
+
+
+    }
+
+
+
+    // pos * la api token
+    // fecha_emision
+    // tipo_documento * FAC
+    // documento
+    // autorizacion * El numero de 49 digitos
+    // cliente {
+    //        "ruc": "0922054366001", required
+    //        "cedula": "0922054366",required
+    //        "razon_social": "Nombres del Cliente", required
+    //        "telefonos": "0988800001",
+    //        "direccion": "Direccion cliente",
+    //        "tipo": "N", required
+    //        "email": "cliente@contifico.com",
+    //        "es_extranjero": false
+    // }
+    // subtotal_0 * 2 decimales
+    // subtotal_15 * 2 decimales
+    // ice * 2 decimales
+    // iva * 2 decimales
+    // total * 2 decimales
+    //     "detalles": [{
+    //        "producto_id": "RZxg87rxLh9Mb1pV", required
+    //        "cantidad": 1.00, required
+    //        "precio": 1.00, required
+    //        "porcentaje_iva": 12,
+    //        "porcentaje_descuento": 0.00, required
+    //        "base_cero": 0.00, required
+    //        "base_gravable": 1.00,
+    //        "base_no_gravable": 0.00, required
+    //        "porcentaje_ice": 15,
+    //        "valor_ice" : null
+    //    },
+    // base_no_gravable
+    // "cobros":[{
+    //      "forma_cobro" : "TC", optional
+    //      "monto" : 1.51,
+    //      "numero_cheque" : "4567897",
+    //      "tipo_ping" : "D"
+    //    }]
+    // monto required
+    // tipo_ping *cuando sea la forma de pago TC
 }

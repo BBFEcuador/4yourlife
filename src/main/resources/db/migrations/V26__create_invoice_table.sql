@@ -10,10 +10,11 @@ CREATE TABLE IF NOT EXISTS invoices
     invoice_date date not null,
     products jsonb not null,
     payment_id text not null,
-    sent_sri boolean not null default false,
+    is_sent_contifico boolean not null default false,
     tax_amount decimal not null,
     tax decimal not null,
     amount decimal not null,
     created_at timestamp not null default now(),
+    invoice_contifico_json jsonb,
     constraint fk_payment_on_invoices foreign key (payment_id) references payments(id)
 );

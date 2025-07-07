@@ -33,7 +33,7 @@ public class ProductCreateService {
 
     public void saveProduct(Product product) {
         this.repository.save(product);
-        eventBus.publish(product.pullDomainEvents());
+//        eventBus.publish(product.pullDomainEvents());
     }
 
     public void disableProductById(String id) {

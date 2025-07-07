@@ -52,19 +52,10 @@ public class ProductCreateService {
         repository.save(product);
     }
 
-    public List<Product> syncProducts(String campusId) {
-        List<Product> syncedProducts = new ArrayList<>();
-        var config = configContificoRepository.findByCampusId(campusId).orElseThrow(
-                () -> new BaseException("Config not found", List.of(""))
-        );
+    public void syncProducts(String campusId) {
+        var config = configContificoRepository.findByCampusId(campusId).orElseThrow(() -> new BaseException("Config not found", List.of("")));
         try {
-            ResponseEntity<String> response = client.get()
-                    .uri("https://api.contifico.com/sistema/api/v1/producto/")
-                    .header("Content-Type", "application/json")
-                    .header("Api-Token", config.getApiKey())
-                    .header("Authorization", config.getApiSecret())
-                    .retrieve()
-                    .toEntity(String.class);
+            ResponseEntity<String> response = client.get().uri("https://api.contifico.com/sistema/api/v1/producto/").header("Content-Type", "application/json").header("Api-Token", config.getApiKey()).header("Authorization", config.getApiSecret()).retrieve().toEntity(String.class);
 
             if (response.getStatusCode().value() == 200) {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -80,19 +71,7 @@ public class ProductCreateService {
                         Optional<Product> existingProduct = repository.findByContificoId(contificoId);
 
                         if (existingProduct.isEmpty()) {
-                            Product newProduct = new Product(
-                                    UUID.randomUUID().toString(),
-                                    code,
-                                    name,
-                                    price,
-                                    "DOLAR",
-                                    true,
-                                    null,
-                                    null,
-                                    null,
-                                    config.getCampus(),
-                                    contificoId
-                            );
+                            Product newProduct = new Product(UUID.randomUUID().toString(), code, name, price, "DOLAR", true, null, null, null, config.getCampus(), contificoId);
 
                             newProduct.setContificoId(contificoId);
                             newProduct.setCode(code);
@@ -101,17 +80,13 @@ public class ProductCreateService {
                             newProduct.setActive(true);
 
                             repository.save(newProduct);
-                            syncedProducts.add(newProduct);
-                        } else {
-                            syncedProducts.add(existingProduct.get());
                         }
                     }
-                }
 
-            } else {
-                throw new BaseException("Failed to fetch products from Contifico API", List.of("")  );
+                } else {
+                    throw new BaseException("Failed to fetch products from Contifico API", List.of(""));
+                }
             }
-            return syncedProducts;
         } catch (Exception e) {
             e.printStackTrace();
             throw new BaseException("Error sincronizando con contifico", List.of(""));

@@ -42,7 +42,7 @@ public class Product extends AggregateRoot {
     )
     private List<Program> programs;
     @ManyToOne(
-            fetch = FetchType.LAZY
+            fetch = FetchType.EAGER
     )
     @JoinColumn(
             name = "campus_id",

@@ -41,7 +41,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
 
     @Override
     public Optional<Invoice> findLastInvoice() {
-        return jpaInvoiceRepository.findTopBySentSriIsTrueOrderByInvoiceDateDesc();
+        return jpaInvoiceRepository.findTopByIsSentContificoIsTrueOrderByInvoiceDateDesc();
     }
 
     @Override

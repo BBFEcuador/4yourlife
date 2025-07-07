@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface JPAInvoiceRepository extends JpaRepository<Invoice, String>, JpaSpecificationExecutor<Invoice> {
-    Optional<Invoice> findTopBySentSriIsTrueOrderByInvoiceDateDesc();
+    Optional<Invoice> findTopByIsSentContificoIsTrueOrderByInvoiceDateDesc();
 
     List<Invoice> findAllByPayment_Id(String paymentId);
 

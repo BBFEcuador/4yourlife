@@ -27,55 +27,38 @@ public class ProductController {
     private ProductFinderService finderService;
 
     @GetMapping("")
-    public ResponseEntity<?> getAllProducts(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
-            @RequestParam(value = "search", defaultValue = "") String search
-    ) {
+    public ResponseEntity<?> getAllProducts(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
 
         if (search.isEmpty()) {
             return new ResponseEntity<>(finderService.findAll(p), HttpStatus.OK);
         } else {
-            Criteria criteria = new Criteria(
-                    List.of(
-                            new Filter(
-                                    "name",
-                                    search,
-                                    null,
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            ),
-                            new Filter(
-                                    "code",
-                                    search,
-                                    null,
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            ),new Filter(
-                                    "description",
-                                    search,
-                                    null,
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            )
-                    ), Optional.empty(), Optional.empty()
-            );
+            Criteria criteria = new Criteria(List.of(new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)), Optional.empty(), Optional.empty());
+            return new ResponseEntity<>(finderService.findAll(p, criteria), HttpStatus.OK);
+        }
+    }
+
+    @GetMapping("/campus/{campusId}")
+    public ResponseEntity<?> getAllProductsByCampus(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search, @PathVariable String campusId) {
+        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+
+        if (search.isEmpty()) {
+            Criteria criteria = new Criteria(List.of(new Filter("id", campusId, "campus", Filter.Operation.LIKE, Filter.LogicalOperator.OR)), Optional.empty(), Optional.empty());
+            return new ResponseEntity<>(finderService.findAll(p, criteria), HttpStatus.OK);
+        } else {
+            Criteria criteria = new Criteria(List.of(new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("id", campusId, "campus", Filter.Operation.LIKE, Filter.LogicalOperator.OR)), Optional.empty(), Optional.empty());
             return new ResponseEntity<>(finderService.findAll(p, criteria), HttpStatus.OK);
         }
     }
 
     @GetMapping("/available")
-    public ResponseEntity<?> getAllProducts(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "perPage", defaultValue = "10") int perPage
-    ) {
+    public ResponseEntity<?> getAllProducts(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
         return new ResponseEntity<>(finderService.findAllAvailable(p), HttpStatus.OK);
     }
 
     @PutMapping("")
-    public ResponseEntity<?> updateProduct(@RequestBody @Valid ProductRequest product) {
+    public ResponseEntity<?> updateProduct(@Valid @RequestBody ProductRequest product) {
         createService.updateProduct(product.toDomain());
         return new ResponseEntity<>(HttpStatus.OK);
     }

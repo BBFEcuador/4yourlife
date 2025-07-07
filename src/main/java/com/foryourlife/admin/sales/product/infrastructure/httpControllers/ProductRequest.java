@@ -13,107 +13,37 @@ import java.util.List;
 import java.util.UUID;
 
 public class ProductRequest {
-    private String id;
+    public String id;
 
-    @NotBlank(message = "Campo nombre no puede estar vacio" )
-    private String name;
+    @NotBlank(message = "Campo nombre no puede estar vacio")
+    public String name;
 
-    @NotBlank(message = "Campo codigo no puede estar vacio" )
-    private String code;
+    @NotBlank(message = "Campo codigo no puede estar vacio")
+    public String code;
 
-    @NotNull(message = "Campo precio base no puede estar vacio" )
-    private Double basePrice;
+    @NotNull(message = "Campo precio base no puede estar vacio")
+    public Double basePrice;
 
-    @NotBlank(message = "Campo moneda no puede estar vacio" )
-    private String currency;
+    @NotBlank(message = "Campo moneda no puede estar vacio")
+    public String currency;
 
-    @NotBlank(message = "Campo descripcion no puede estar vacio" )
-    private String description;
+    @NotBlank(message = "Campo descripcion no puede estar vacio")
+    public String description;
 
-    private List<Rule> rules;
+    public List<Rule> rules;
 
-    @NotNull(message = "Campo nombre no puede estar vacio" )
-    private List<Program> programs;
+    @NotNull(message = "Campo programas no puede estar vacio")
+    public List<Program> programs;
 
-    @NotNull(message = "Campo activo no puede estar vacio" )
+    @NotNull(message = "Campo activo no puede estar vacio")
     @JsonProperty(value = "isActive")
-    private Boolean isActive;
+    public Boolean isActive;
 
-    private Campus campus;
+    public Campus campus;
+
+    public String contificoId;
 
     public Product toDomain() {
-        return Product.create(id!=null ? id: UUID.randomUUID().toString(), name, code, basePrice, currency, isActive, description, rules, programs, campus, null);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public Double getBasePrice() {
-        return basePrice;
-    }
-
-    public void setBasePrice(Double basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<Rule> getRules() {
-        return rules;
-    }
-
-    public void setRules(List<Rule> rules) {
-        this.rules = rules;
-    }
-
-    public List<Program> getPrograms() {
-        return programs;
-    }
-
-    public void setPrograms(List<Program> programs) {
-        this.programs = programs;
-    }
-
-    public Boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(Boolean active) {
-        isActive = active;
+        return Product.create(id != null ? id : UUID.randomUUID().toString(), name, code, basePrice, currency, isActive, description, rules, programs, campus, contificoId);
     }
 }

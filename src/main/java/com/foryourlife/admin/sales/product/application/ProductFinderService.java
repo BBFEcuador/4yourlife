@@ -19,8 +19,9 @@ public class ProductFinderService {
     }
 
     public Page<Product> findAll(Pageable pageable, Criteria criteria) {
-        return repository.findAll(pageable,criteria);
+        return repository.findAll(pageable, criteria);
     }
+
     public Page<Product> findAll(Pageable pageable) {
         return repository.findAll(pageable);
     }

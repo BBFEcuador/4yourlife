@@ -53,10 +53,8 @@ public class TrainingController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'USER')")
     @GetMapping("/calendar-event")
     public ResponseEntity<?> getAllCalendarEvent() {
-        System.out.println("entroooooo");
         var trainings = queryTrainingService.getAllTrainings();
         List<TrainingResponse> trainingResponse = new ArrayList<>();
         trainings.forEach(training -> {
@@ -87,7 +85,6 @@ public class TrainingController {
                     )
             );
         });
-        System.out.println("terminoooo");
         return new ResponseEntity<>(trainingResponse, HttpStatus.OK);
     }
 

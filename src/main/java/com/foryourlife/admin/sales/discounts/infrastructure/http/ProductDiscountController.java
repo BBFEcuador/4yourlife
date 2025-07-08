@@ -50,7 +50,8 @@ public class ProductDiscountController {
     public ResponseEntity<Page<ProductDiscount>> getAll(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "perPage", defaultValue = "10") int perPage,
-            @RequestParam(value = "search", defaultValue = "") String search
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "campusId", defaultValue = "") String campusId
     ) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
         Criteria criteria = new Criteria(
@@ -64,6 +65,12 @@ public class ProductDiscountController {
                                     "name",
                                     search,
                                     null,
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            ),new Filter(
+                                    "id",
+                                    campusId,
+                                    "campus",
                                     Filter.Operation.LIKE,
                                     Filter.LogicalOperator.OR
                             )

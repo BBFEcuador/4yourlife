@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,36 +57,23 @@ public class PaymentController {
     }
 
     @GetMapping("/participant/{id}")
-    public ResponseEntity<?> getPaymentsByParticipantId(
-            @PathVariable String id,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "perPage", defaultValue = "10") int perPage) {
+    public ResponseEntity<?> getPaymentsByParticipantId(@PathVariable String id, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
         return new ResponseEntity<>(queryPaymentService.findByParticipantId(id, p), HttpStatus.OK);
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllPayments(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
-            @RequestParam(value = "search", defaultValue = "") String search
-
-    ) {
+    public ResponseEntity<?> getAllPayments(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search, @RequestParam(value = "campusId", defaultValue = "") String campusId) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-        Criteria criteria = new Criteria(
-                List.of(), Optional.empty(), Optional.empty()
-        );
-        if(!search.isEmpty()){
-            criteria.filters = List.of(
-                    new Filter(
-                            "number",
-                            search,
-                            "cashDrawerDetail.cashDrawer.cashBox",
-                            Filter.Operation.LIKE,
-                            Filter.LogicalOperator.AND
-                    )
-            );
+        Criteria criteria = new Criteria(List.of(), Optional.empty(), Optional.empty());
+        List<Filter> filters = new ArrayList<>();
+        if (!search.isEmpty()) {
+            filters.addAll(List.of(new Filter("number", search, "cashDrawerDetail.cashDrawer.cashBox", Filter.Operation.LIKE, Filter.LogicalOperator.AND)));
         }
+        if (!campusId.isEmpty()) {
+            filters.add(new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND));
+        }
+        criteria.filters = filters;
         return new ResponseEntity<>(queryPaymentService.findAll(p, criteria), HttpStatus.OK);
     }
 

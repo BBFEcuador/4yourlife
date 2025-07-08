@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.payments.paymentMethod.application;
 
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethod;
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethodRepository;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +16,8 @@ public class PaymentMethodQueryService {
         this.repository = repository;
     }
 
-    public List<PaymentMethod> getAll() {
-        return repository.getAll();
+    public List<PaymentMethod> getAll(Criteria criteria) {
+        return repository.getAll(criteria);
     }
 
     public PaymentMethod getById(String id) {

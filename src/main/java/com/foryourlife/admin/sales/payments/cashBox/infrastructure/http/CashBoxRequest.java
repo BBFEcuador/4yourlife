@@ -14,7 +14,7 @@ public class CashBoxRequest {
     @NotBlank(message = "The number field is required")
     public String number;
     public User user;
-    private Integer firstNumberInvoice;
+    public Integer firstNumberInvoice;
     public Store store;
 
     public CashBox toDomain() {

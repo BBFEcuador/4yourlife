@@ -10,6 +10,7 @@ public class ConfigContifico {
     private String id;
     private String apiKey;
     private String apiSecret;
+    private String ruc;
     @OneToOne
     @JoinColumn(
             name = "campus_id",
@@ -20,10 +21,11 @@ public class ConfigContifico {
     protected ConfigContifico() {
     }
 
-    public ConfigContifico(String id, String apiKey, String apiSecret, Campus campus) {
+    public ConfigContifico(String id, String apiKey, String apiSecret, String ruc, Campus campus) {
         this.id = id;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
+        this.ruc = ruc;
         this.campus = campus;
     }
 
@@ -57,5 +59,13 @@ public class ConfigContifico {
 
     public void setCampus(Campus campus) {
         this.campus = campus;
+    }
+
+    public String getRuc() {
+        return ruc;
+    }
+
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
     }
 }

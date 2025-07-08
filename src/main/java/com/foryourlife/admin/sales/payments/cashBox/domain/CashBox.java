@@ -44,6 +44,7 @@ public class CashBox {
     )
     private Store store;
 
+    @Column(name = "first_number_invoice")
     private Integer firstNumberInvoice;
     @JsonIgnore
     @OneToMany(mappedBy = "cashBox", fetch = FetchType.EAGER)

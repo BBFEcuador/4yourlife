@@ -21,12 +21,12 @@ public class StoreController {
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
-    @GetMapping("{campusId}")
+    @GetMapping("campus/{campusId}")
     public ResponseEntity<?> getAllStoresByCampus(@RequestParam String campusId) {
         return new ResponseEntity<>(storeQueryService.getAllStoresByCampus(campusId), HttpStatus.OK);
     }
 
-    @GetMapping("id/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<?> getStoreById(@PathVariable String id) {
         return new ResponseEntity<>(storeQueryService.getStoreById(id), HttpStatus.OK);
     }

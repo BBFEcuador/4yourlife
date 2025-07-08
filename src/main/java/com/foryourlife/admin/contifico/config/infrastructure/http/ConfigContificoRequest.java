@@ -14,4 +14,7 @@ public class ConfigContificoRequest {
     @NotNull(message = "Api secret es requerida")
     @NotBlank(message = "Api secret no puede estar vacío")
     public String apiSecret;
+    @NotNull(message = "Ruc es requerido")
+    @NotBlank(message = "El RUC no puede estar vacío")
+    public String ruc;
 }

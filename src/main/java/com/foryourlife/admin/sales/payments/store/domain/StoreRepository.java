@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StoreRepository {
-    void save(Store store);
+    Store save(Store store);
     Optional<Store> findById(String id);
     void deleteById(String id);
     List<Store> getByCampusId(String campusId);
+    List<Store> getAll();
+    Optional<Store> findByEstablishment(String campusId, String name);
 }

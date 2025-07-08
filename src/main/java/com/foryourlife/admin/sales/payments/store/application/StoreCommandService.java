@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foryourlife.admin.contifico.config.domain.ConfigContificoRepository;
 import com.foryourlife.admin.sales.payments.store.domain.Store;
 import com.foryourlife.admin.sales.payments.store.domain.StoreRepository;
-import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,6 +12,7 @@ import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class StoreCommandService {
@@ -26,15 +26,15 @@ public class StoreCommandService {
         this.configContificoRepository = configContificoRepository;
     }
 
-    public void createStore(String campusId) {
-        List<Product> syncedProducts = new ArrayList<>();
+    public void syncStoresFromContifico(String campusId) {
+        List<Store> syncedStores = new ArrayList<>();
         var config = configContificoRepository.findByCampusId(campusId).orElseThrow(
                 () -> new BaseException("Config not found", List.of(""))
         );
 
         try {
             ResponseEntity<String> response = client.get()
-                    .uri("https://api.contifico.com/sistema/api/v1/producto/")
+                    .uri("https://api.contifico.com/sistema/api/v1/pos")
                     .header("Content-Type", "application/json")
                     .header("Api-Token", config.getApiKey())
                     .header("Authorization", config.getApiSecret())
@@ -45,12 +45,20 @@ public class StoreCommandService {
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode rootNode = objectMapper.readTree(response.getBody());
                 if (rootNode.isArray()) {
-//                    for (JsonNode contificoPos : rootNode) {
-//                        var contificoPos =
-//                    }
+                    for (JsonNode contificoPos : rootNode) {
+
+                        var store = repository.findByEstablishment(campusId, contificoPos.get("establecimiento").asText()).orElse(
+                                new Store(
+                                        UUID.randomUUID().toString(),
+                                        contificoPos.get("direccion").asText(),
+                                        contificoPos.get("establecimiento").asText(),
+                                        config.getCampus()
+                                )
+                        );
+                        repository.save(store);
+                    }
                 }
             }
-//                repository.save(new Store());
         } catch (Exception e) {
             e.printStackTrace();
             throw new BaseException("Error sincronizando con contifico", List.of(""));

@@ -121,13 +121,13 @@ public class CommandPaymentService {
             payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
             paymentHistoryId = payment.getPaymentshistory().getFirst().getId();
         }
-
+        cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
+        var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
         _paymentRepository.save(payment);
-        payment.record(new PaymentCreated(payment, invoice));
+        payment.record(new PaymentCreated(payment, invoice, cashDrawer));
         var events = payment.pullDomainEvents();
         eventBus.publish(events);
 
-        cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
     }
 
     public void update(PaymentRequest paymentReq) {

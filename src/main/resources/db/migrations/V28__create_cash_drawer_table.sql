@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS stores
     number text not null,
     address text not null,
     campus_id text not null,
-    CONSTRAINT fk_campus_on_payment FOREIGN KEY (campus_id) REFERENCES campus (id)
+    store_id text not null,
+    CONSTRAINT fk_campus_on_payment FOREIGN KEY (campus_id) REFERENCES campus (id),
+    CONSTRAINT fk_store_on_payment FOREIGN KEY (store_id) REFERENCES stores (id)
 );
 
 CREATE TABLE IF NOT EXISTS cash_boxes
@@ -12,8 +14,12 @@ CREATE TABLE IF NOT EXISTS cash_boxes
     id text not null primary key,
     number text not null,
     isActive boolean not null,
+    store_id text not null,
     created_by_user text not null,
     created_at timestamp not null default now(),
+    CONSTRAINT fk_store_on_cash_box
+    FOREIGN KEY (store_id)
+    REFERENCES stores (id),
     CONSTRAINT fk_cash_drawer_created_by_user
     FOREIGN KEY (created_by_user)
     REFERENCES users (id)

@@ -82,18 +82,23 @@ public class OnPaymentCreated {
             } catch (BaseException e) {
                 System.out.println("No previous invoice found, starting with invoice #1");
             }
+            int invoiceNumber = 0;
+            if (lastInvoice == null) {
+                 invoiceNumber = event.getCashDrawer().getCashBox().getFirstNumberInvoice();
+            }else {
+                 invoiceNumber = Integer.parseInt(lastInvoice.getInvoiceNumber()) + 1;
+            }
 
-            int invoiceNumber = (lastInvoice != null)
-                    ? Integer.parseInt(lastInvoice.getInvoiceNumber()) + 1
-                    : 1;
             event.getInvoice().setInvoiceNumber(String.valueOf(invoiceNumber));
             event.getInvoice().setId(UUID.randomUUID().toString());
-//            event.getInvoice().setInvoiceContifico(
+
+//            var authorization = event.getInvoice().getInvoiceDate().toString() + "01" + event.j;
+//             event.getInvoice().setInvoiceContifico(
 //                    new InvoiceContificoJson(
 //                            "1234356789",
 //                            event.getPayment().getCreated_at(),
 //                            "FA",
-//                            ,
+//                            event.getInvoice().getDocument(),
 //
 //                    )
 //            );
@@ -111,7 +116,17 @@ public class OnPaymentCreated {
 
     }
 
-
+        public static int generateModule(String claveAcceso) {
+            int factor = 2;
+            int suma = 0;
+            for (int i = claveAcceso.length() - 1; i >= 0; i--) {
+                suma += factor * Character.getNumericValue(claveAcceso.charAt(i));
+                factor = factor % 7 == 0 ? 2 : factor + 1;
+            }
+            int dv = 11 - suma % 11;
+            int ds = dv == 11 ? 0 : (dv == 10 ? 1 : dv);
+            return ds;
+        }
 
     // pos * la api token
     // fecha_emision

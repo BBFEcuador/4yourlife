@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
+import com.foryourlife.admin.sales.payments.store.domain.Store;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -35,17 +36,29 @@ public class CashBox {
     )
     private LocalDateTime created_at = LocalDateTime.now();
     @JsonIgnore
+    @ManyToOne
+    @JoinColumn(
+            name = "store_id",
+            referencedColumnName = "id",
+            nullable = false
+    )
+    private Store store;
+
+    private Integer firstNumberInvoice;
+    @JsonIgnore
     @OneToMany(mappedBy = "cashBox", fetch = FetchType.EAGER)
     public List<CashDrawer> cashDrawer;
 
     protected CashBox() {
     }
 
-    public CashBox(String id, String number, Boolean is_active, User createdBy) {
+    public CashBox(String id, String number, Boolean isActive, Integer firstNumberInvoice, User createdBy, Store store) {
         this.id = id;
         this.number = number;
-        this.isActive = is_active;
+        this.isActive = isActive;
         this.createdBy = createdBy;
+        this.store = store;
+        this.firstNumberInvoice = firstNumberInvoice;
     }
 
     public String getId() {
@@ -88,7 +101,23 @@ public class CashBox {
         this.createdBy = createdBy;
     }
 
-    public static CashBox create(String id, String number, Boolean is_active, User createdBy) {
-        return new CashBox(id, number, is_active, createdBy);
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
+    }
+
+    public Integer getFirstNumberInvoice() {
+        return firstNumberInvoice;
+    }
+
+    public void setFirstNumberInvoice(Integer firstNumberInvoice) {
+        this.firstNumberInvoice = firstNumberInvoice;
+    }
+
+    public static CashBox create(String id, String number, Boolean isActive, Integer firstNumberInvoice, User createdBy, Store store) {
+        return new CashBox(id, number, isActive, firstNumberInvoice, createdBy, store);
     }
 }

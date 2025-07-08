@@ -16,8 +16,8 @@ public class JPAStoreRepository implements StoreRepository {
     }
 
     @Override
-    public void save(Store store) {
-        repository.save(store);
+    public Store save(Store store) {
+        return repository.save(store);
     }
 
     @Override
@@ -33,5 +33,15 @@ public class JPAStoreRepository implements StoreRepository {
     @Override
     public List<Store> getByCampusId(String campusId) {
         return repository.findAllByCampus_Id(campusId);
+    }
+
+    @Override
+    public Optional<Store> findByEstablishment(String campusId, String name) {
+        return repository.findByCampus_IdAndNumber(campusId, name);
+    }
+
+    @Override
+    public List<Store> getAll() {
+        return repository.findAll();
     }
 }

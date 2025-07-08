@@ -1,5 +1,10 @@
 package com.foryourlife.admin.sales.payments.payment.application;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
+import com.foryourlife.admin.contifico.config.domain.ConfigContifico;
+import com.foryourlife.admin.programs.campus.domain.CampusRepository;
 import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
@@ -14,10 +19,15 @@ import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,14 +41,18 @@ public class OnPaymentCreated {
     private final QueryInvoiceService queryInvoiceService;
     private final ParticipantRepository participantRepository;
     private final ParticipantLevelService participantLevelRepository;
+    private final ConfigContificoQueryService configContificoQueryService;
+    @Qualifier("restClient") private final RestClient httpClient;
 
-    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository) {
+    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, ConfigContificoQueryService configContificoQueryService, @Qualifier("restClient") RestClient httpClient) {
         this.productFinderService = productFinderService;
         this.clientModuleCreatorService = clientModuleCreatorService;
         this.commandInvoiceService = commandInvoiceService;
         this.queryInvoiceService = queryInvoiceService;
         this.participantRepository = participantRepository;
         this.participantLevelRepository = participantLevelRepository;
+        this.configContificoQueryService = configContificoQueryService;
+        this.httpClient = httpClient;
     }
 
     @Async
@@ -82,27 +96,80 @@ public class OnPaymentCreated {
             } catch (BaseException e) {
                 System.out.println("No previous invoice found, starting with invoice #1");
             }
-            int invoiceNumber = 0;
+            String invoiceNumber;
             if (lastInvoice == null) {
-                 invoiceNumber = event.getCashDrawer().getCashBox().getFirstNumberInvoice();
-            }else {
-                 invoiceNumber = Integer.parseInt(lastInvoice.getInvoiceNumber()) + 1;
+                invoiceNumber = String.format("%09d", event.getCashDrawer().getCashBox().getFirstNumberInvoice());
+            } else {
+                int nextInvoiceNumber = Integer.parseInt(lastInvoice.getInvoiceNumber()) + 1;
+                invoiceNumber = String.format("%09d", nextInvoiceNumber);
             }
 
-            event.getInvoice().setInvoiceNumber(String.valueOf(invoiceNumber));
+            event.getInvoice().setInvoiceNumber(invoiceNumber);
             event.getInvoice().setId(UUID.randomUUID().toString());
 
-//            var authorization = event.getInvoice().getInvoiceDate().toString() + "01" + event.j;
-//             event.getInvoice().setInvoiceContifico(
-//                    new InvoiceContificoJson(
-//                            "1234356789",
-//                            event.getPayment().getCreated_at(),
-//                            "FA",
-//                            event.getInvoice().getDocument(),
-//
-//                    )
-//            );
-            commandInvoiceService.save(event.getInvoice());
+            var config = configContificoQueryService.findConfigContificoByCampusId(event.getPayment().getCampus().getId());
+            if(config == null) {
+                System.out.println("Invoice created and saved successfully.");
+
+                commandInvoiceService.save(event.getInvoice());
+
+                System.err.println("No se encontró la configuración de Contifico para el campus.");
+                return;
+            }
+            String formattedDate = event.getInvoice().getInvoiceDate().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+            var authorization = formattedDate + "01" + config.getRuc() + "2" + event.getCashDrawer().getCashBox().getStore().getNumber() + event.getCashDrawer().getCashBox().getNumber() + invoiceNumber + "12345678" + "1";
+            var verificationDigit = generateModule(authorization);
+            System.out.println(authorization);
+
+            var client = new InvoiceContificoJson.Cliente(
+                    event.getInvoice().getDocument(),
+                    event.getInvoice().getFullName(),
+                    event.getInvoice().getPhone(),
+                    event.getInvoice().getAddress(),
+                    "N",
+                    event.getInvoice().getEmail()
+            );
+
+            var listProducts = new ArrayList<InvoiceContificoJson.Detalle>();
+            for (var product : event.getPayment().getProducts()) {
+                listProducts.add(
+                        new InvoiceContificoJson.Detalle(
+                                product.getContificoId(),
+                                1,
+                                product.getBasePrice(),
+                                15,
+                                0,
+                                0,
+                                product.getBasePrice() - event.getInvoice().getTax(),
+                                0,
+                                0,
+                                0.0
+                        )
+                );
+            }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String formattedDateInvoice = event.getInvoice().getInvoiceDate().format(formatter);
+            event.getInvoice().setInvoiceContifico(
+                    new InvoiceContificoJson(
+                            config.getApiKey(),
+                            formattedDateInvoice,
+                            "FA",
+                            event.getInvoice().getDocument(),
+                            authorization + verificationDigit,
+                            client,
+                            0,
+                            event.getInvoice().getAmount() - event.getInvoice().getTax(),
+                            0,
+                            event.getInvoice().getTax(),
+                            event.getInvoice().getAmount(),
+                            listProducts,
+                            0
+
+                    )
+            );
+
+            var invoice = commandInvoiceService.save(event.getInvoice());
+            this.sendInvoiceToContifico(config, invoice);
             System.out.println("Invoice created and saved successfully.");
 
         } catch (Exception e) {
@@ -111,62 +178,41 @@ public class OnPaymentCreated {
         }
     }
 
-    public void sendInvoiceToContifico(PaymentCreated event){
+    public void sendInvoiceToContifico(ConfigContifico configContifico, Invoice invoice) {
+        try {
 
+            var json = new ObjectMapper().writeValueAsString(invoice.getInvoiceContifico());
+            ResponseEntity<String> response = httpClient.post()
+                    .uri("https://api.contifico.com/sistema/api/v1/documento/")
+                    .body(json)
+                    .header("Api-Token", configContifico.getApiKey())
+                    .header("Authorization", configContifico.getApiSecret())
+                    .retrieve()
+                    .toEntity(String.class);
 
-    }
-
-        public static int generateModule(String claveAcceso) {
-            int factor = 2;
-            int suma = 0;
-            for (int i = claveAcceso.length() - 1; i >= 0; i--) {
-                suma += factor * Character.getNumericValue(claveAcceso.charAt(i));
-                factor = factor % 7 == 0 ? 2 : factor + 1;
+            if (response.getStatusCode().is2xxSuccessful()) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode rootNode = objectMapper.readTree(response.getBody());
+                invoice.setSentContifico(true);
+                invoice.setContificoId(rootNode.get("id").asText());
+                System.out.println("Invoice sent to contifico successfully.");
+            } else {
+                System.err.println("Error sending invoice to contifico: " + response.getBody());
             }
-            int dv = 11 - suma % 11;
-            int ds = dv == 11 ? 0 : (dv == 10 ? 1 : dv);
-            return ds;
-        }
 
-    // pos * la api token
-    // fecha_emision
-    // tipo_documento * FAC
-    // documento
-    // autorizacion * El numero de 49 digitos
-    // cliente {
-    //        "ruc": "0922054366001", required
-    //        "cedula": "0922054366",required
-    //        "razon_social": "Nombres del Cliente", required
-    //        "telefonos": "0988800001",
-    //        "direccion": "Direccion cliente",
-    //        "tipo": "N", required
-    //        "email": "cliente@contifico.com",
-    //        "es_extranjero": false
-    // }
-    // subtotal_0 * 2 decimales
-    // subtotal_15 * 2 decimales
-    // ice * 2 decimales
-    // iva * 2 decimales
-    // total * 2 decimales
-    //     "detalles": [{
-    //        "producto_id": "RZxg87rxLh9Mb1pV", required
-    //        "cantidad": 1.00, required
-    //        "precio": 1.00, required
-    //        "porcentaje_iva": 12,
-    //        "porcentaje_descuento": 0.00, required
-    //        "base_cero": 0.00, required
-    //        "base_gravable": 1.00,
-    //        "base_no_gravable": 0.00, required
-    //        "porcentaje_ice": 15,
-    //        "valor_ice" : null
-    //    },
-    // base_no_gravable
-    // "cobros":[{
-    //      "forma_cobro" : "TC", optional
-    //      "monto" : 1.51,
-    //      "numero_cheque" : "4567897",
-    //      "tipo_ping" : "D"
-    //    }]
-    // monto required
-    // tipo_ping *cuando sea la forma de pago TC
+        }catch (Exception e) {
+            System.err.println("Error sending invoice to contifico: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    public static int generateModule(String claveAcceso) {
+        int factor = 2;
+        int suma = 0;
+        for (int i = claveAcceso.length() - 1; i >= 0; i--) {
+            suma += factor * Character.getNumericValue(claveAcceso.charAt(i));
+            factor = factor % 7 == 0 ? 2 : factor + 1;
+        }
+        int dv = 11 - suma % 11;
+        return dv == 11 ? 0 : (dv == 10 ? 1 : dv);
+    }
 }

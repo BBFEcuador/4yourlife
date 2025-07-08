@@ -13,8 +13,8 @@ public class CommandInvoiceService {
         this.invoiceRepository = invoiceRepository;
     }
 
-    public void save(Invoice invoice) {
-        invoiceRepository.save(invoice);
+    public Invoice save(Invoice invoice) {
+        return invoiceRepository.save(invoice);
     }
 
     public void update(InvoiceRequest invoiceReq) {

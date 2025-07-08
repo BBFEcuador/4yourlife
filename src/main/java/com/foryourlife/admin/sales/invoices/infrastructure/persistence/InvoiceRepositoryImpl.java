@@ -20,8 +20,8 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     }
 
     @Override
-    public void save(Invoice invoice) {
-        jpaInvoiceRepository.save(invoice);
+    public Invoice save(Invoice invoice) {
+        return jpaInvoiceRepository.save(invoice);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
 
     @Override
     public Page<Invoice> findByUserId(String id, Pageable pageable) {
-        return jpaInvoiceRepository.findAllByPayment_Participant_Id(id,pageable);
+        return jpaInvoiceRepository.findAllByPayment_Participant_Id(id, pageable);
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface InvoiceRepository {
-    void save(Invoice invoice);
+    Invoice save(Invoice invoice);
     Invoice findById(String id);
     Page<Invoice> findByUserId(String id, Pageable pageable);
     Page<Invoice> findAll(Pageable pageable);

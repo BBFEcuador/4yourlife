@@ -1,7 +1,6 @@
 package com.foryourlife.admin.sales.payments.payment.application;
 
 import com.foryourlife.admin.programs.campus.application.QueryCampusService;
-import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerQueryService;
@@ -21,7 +20,9 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -121,9 +122,9 @@ public class CommandPaymentService {
             payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
             paymentHistoryId = payment.getPaymentshistory().getFirst().getId();
         }
-        cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
         _paymentRepository.save(payment);
+        cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
         payment.record(new PaymentCreated(payment, invoice, cashDrawer));
         var events = payment.pullDomainEvents();
         eventBus.publish(events);
@@ -141,7 +142,6 @@ public class CommandPaymentService {
                     var product = _productRepository.findById(productId).orElseThrow(
                             () -> new BaseException("Producto no encontrado", List.of(""))
                     );
-
                     products.add(product);
                 }
         );

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS stores
     number text not null,
     address text not null,
     campus_id text not null,
-    CONSTRAINT fk_campus_on_payment FOREIGN KEY (campus_id) REFERENCES campus (id)
+    CONSTRAINT fk_campus_on_store FOREIGN KEY (campus_id) REFERENCES campus (id)
 );
 
 CREATE TABLE IF NOT EXISTS cash_boxes

@@ -22,7 +22,7 @@ public class StoreController {
     }
 
     @GetMapping("campus/{campusId}")
-    public ResponseEntity<?> getAllStoresByCampus(@RequestParam String campusId) {
+    public ResponseEntity<?> getAllStoresByCampus(@PathVariable String campusId) {
         return new ResponseEntity<>(storeQueryService.getAllStoresByCampus(campusId), HttpStatus.OK);
     }
 

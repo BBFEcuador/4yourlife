@@ -34,8 +34,7 @@ public class StoreCommandService {
 
         try {
             ResponseEntity<String> response = client.get()
-                    .uri("https://api.contifico.com/sistema/api/v1/pos")
-                    .header("Content-Type", "application/json")
+                    .uri("https://api.contifico.com/sistema/api/v1/pos/")
                     .header("Api-Token", config.getApiKey())
                     .header("Authorization", config.getApiSecret())
                     .retrieve()

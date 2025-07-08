@@ -2,18 +2,15 @@ package com.foryourlife.admin.sales.payments.store.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.campus.domain.Campus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "stores")
 public class Store {
     @Id
     private String id;
     private String address;
     private String number;
-    @JsonIgnoreProperties
     @ManyToOne
     @JoinColumn(
             name = "campus_id",

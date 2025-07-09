@@ -23,6 +23,8 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -99,6 +101,10 @@ public class CommandPaymentService {
                 paymentReq.note
         );
 
+        BigDecimal totalProduct = BigDecimal.valueOf(paymentReq.total);
+        BigDecimal divisor = BigDecimal.valueOf(1.15);
+        BigDecimal taxAmount = totalProduct.subtract(totalProduct.divide(divisor, 2, RoundingMode.HALF_UP));
+
         var invoice = Invoice.create(
                 UUID.randomUUID().toString(),
                 paymentReq.invoice.fullName,
@@ -111,7 +117,7 @@ public class CommandPaymentService {
                 products,
                 payment,
                 false,
-                (paymentReq.total * 0.15),
+                taxAmount.doubleValue(),
                 15.0,
                 paymentReq.total
         );

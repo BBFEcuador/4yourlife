@@ -26,6 +26,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -131,17 +133,20 @@ public class OnPaymentCreated {
                     event.getInvoice().getEmail()
             );
 
+            BigDecimal subtotal = BigDecimal.valueOf(event.getInvoice().getAmount()).subtract(BigDecimal.valueOf(event.getInvoice().getTaxAmount())).setScale(2, RoundingMode.HALF_UP);
             var listProducts = new ArrayList<InvoiceContificoJson.Detalle>();
             for (var product : event.getPayment().getProducts()) {
+                BigDecimal productSubtotal = subtotal.divide(BigDecimal.valueOf(event.getPayment().getProducts().size()), 2, RoundingMode.HALF_UP);
+
                 listProducts.add(
                         new InvoiceContificoJson.Detalle(
                                 product.getContificoId(),
                                 1,
-                                product.getBasePrice(),
+                                productSubtotal.doubleValue(),
                                 15,
                                 0,
                                 0,
-                                product.getBasePrice() - event.getInvoice().getTaxAmount(),
+                                productSubtotal.doubleValue(),
                                 0,
                                 0,
                                 0.0
@@ -159,9 +164,9 @@ public class OnPaymentCreated {
                             authorization + verificationDigit,
                             client,
                             0,
-                            event.getInvoice().getAmount() - event.getInvoice().getTax(),
+                            subtotal.doubleValue(),
                             0,
-                            event.getInvoice().getTax(),
+                            event.getInvoice().getTaxAmount(),
                             event.getInvoice().getAmount(),
                             listProducts,
                             0,
@@ -170,8 +175,14 @@ public class OnPaymentCreated {
                     )
             );
 
+            if (event.getInvoice().getInvoiceContifico().cliente.cedula.length() == 13) {
+                event.getInvoice().getInvoiceContifico().cliente.ruc = event.getInvoice().getInvoiceContifico().cliente.cedula;
+                String cedula = event.getInvoice().getInvoiceContifico().cliente.cedula;
+                event.getInvoice().getInvoiceContifico().cliente.cedula = cedula.substring(0, cedula.length() - 3);
+            }
+
             var invoice = commandInvoiceService.save(event.getInvoice());
-//            this.sendInvoiceToContifico(config, invoice);
+            this.sendInvoiceToContifico(config, invoice);
             System.out.println("Invoice created and saved successfully.");
 
         } catch (Exception e) {
@@ -197,6 +208,7 @@ public class OnPaymentCreated {
                 JsonNode rootNode = objectMapper.readTree(response.getBody());
                 invoice.setSentContifico(true);
                 invoice.setContificoId(rootNode.get("id").asText());
+                commandInvoiceService.save(invoice);
                 System.out.println("Invoice sent to contifico successfully.");
             } else {
                 System.err.println("Error sending invoice to contifico: " + response.getBody());

@@ -17,6 +17,8 @@ import com.foryourlife.clients.account.participant.application.ParticipantQueryS
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
+import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -54,7 +56,7 @@ public class CommandPaymentService {
         this.cashDrawerDetailCommandService = cashDrawerDetailCommandService;
         this.cashDrawerQueryService = cashDrawerQueryService;
     }
-
+    @Transactional
     public void save(PaymentRequest paymentReq) {
 
         boolean hasPendingPayments = _paymentRepository.existsByParticipantIdAndStatus(paymentReq.participant, PaymentStatus.PENDING);
@@ -82,11 +84,13 @@ public class CommandPaymentService {
             paymentReq.status = PaymentStatus.COMPLETED;
         }
 
-        var products =
+        List<Product> products =
                 paymentReq.products.stream().map(productId -> {
-                    return _productRepository.findById(productId).orElseThrow(
+                    var p = _productRepository.findById(productId).orElseThrow(
                             () -> new BaseException("Producto no encontrado", List.of(""))
                     );
+                    Hibernate.initialize(p.getRules());
+                    return p;
                 }).collect(Collectors.toList());
 
         var payment = Payment.create(

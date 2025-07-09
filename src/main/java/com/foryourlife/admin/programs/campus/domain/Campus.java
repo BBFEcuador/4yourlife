@@ -1,6 +1,8 @@
 package com.foryourlife.admin.programs.campus.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.auth.domain.Admin;
+import com.foryourlife.admin.contifico.config.domain.ConfigContifico;
 import jakarta.persistence.*;
 
 import java.util.Set;

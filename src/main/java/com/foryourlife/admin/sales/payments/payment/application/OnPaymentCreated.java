@@ -171,7 +171,7 @@ public class OnPaymentCreated {
             );
 
             var invoice = commandInvoiceService.save(event.getInvoice());
-            this.sendInvoiceToContifico(config, invoice);
+//            this.sendInvoiceToContifico(config, invoice);
             System.out.println("Invoice created and saved successfully.");
 
         } catch (Exception e) {

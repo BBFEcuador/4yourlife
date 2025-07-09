@@ -4,6 +4,8 @@ import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +24,8 @@ public class QueryTrainingService {
         );
     }
 
-    public List<Training> getAllTrainings() {
-        return this.repository.getAll();
+    public Page<Training> getAllTrainings(Pageable pageable, Criteria criteria) {
+        return this.repository.getAll(pageable,criteria);
     }
 
     public List<Training> match(Criteria criteria) {

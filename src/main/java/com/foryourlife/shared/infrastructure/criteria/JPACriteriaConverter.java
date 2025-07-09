@@ -4,6 +4,7 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -51,7 +52,7 @@ public class JPACriteriaConverter<T> {
                     case LESS_THAN -> criteriaBuilder.lessThan(join.get(filter.getColumn()), filter.getValue());
                     case BETWEEN -> {
                         String[] split1 = filter.getValue().split(",");
-                        yield criteriaBuilder.between(join.get(filter.getColumn()), Long.parseLong(split1[0]), Long.parseLong(split1[1]));
+                        yield criteriaBuilder.between(join.get(filter.getColumn()), criteriaBuilder.literal(split1[0]), criteriaBuilder.literal(split1[1]));
                     }
                     case JOIN -> {
                         yield criteriaBuilder.equal(join.get(filter.getColumn()), criteriaBuilder.literal(filter.getValue()));

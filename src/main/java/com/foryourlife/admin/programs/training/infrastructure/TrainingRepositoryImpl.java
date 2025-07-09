@@ -5,7 +5,9 @@ import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,8 +35,8 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     }
 
     @Override
-    public List<Training> getAll() {
-        return this.repository.findAll();
+    public Page<Training> getAll(Pageable pageable, Criteria criteria) {
+        return this.repository.findAll(criteriaConverter.getJpaSpecifications(criteria), pageable);
     }
 
     @Override
@@ -54,8 +56,8 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     }
 
     @Override
-    public List<Training> findByStartDateAndCampus_id(StartDate date,String campusId) {
-        return repository.findByStartDateAndCampus_id(date,campusId);
+    public List<Training> findByStartDateAndCampus_id(StartDate date, String campusId) {
+        return repository.findByStartDateAndCampus_id(date, campusId);
     }
 
     @Override

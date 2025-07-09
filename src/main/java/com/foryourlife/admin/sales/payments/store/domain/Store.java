@@ -1,5 +1,6 @@
 package com.foryourlife.admin.sales.payments.store.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import jakarta.persistence.*;
@@ -11,6 +12,7 @@ public class Store {
     private String id;
     private String address;
     private String number;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(
             name = "campus_id",

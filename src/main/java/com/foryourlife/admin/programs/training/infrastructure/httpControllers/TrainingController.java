@@ -65,7 +65,8 @@ public class TrainingController {
 
         if (!search.isEmpty()) {
             filters.addAll(List.of(new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("courseLevel", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)));
-        } else {
+        }
+        if (!startDate.isEmpty() && !endDate.isEmpty()) {
             filters.add(new Filter("startDate", startDate + "," + endDate, null, Filter.Operation.BETWEEN, Filter.LogicalOperator.OR));
             filters.add(new Filter("endDate", startDate + "," + endDate, null, Filter.Operation.BETWEEN, Filter.LogicalOperator.OR));
         }

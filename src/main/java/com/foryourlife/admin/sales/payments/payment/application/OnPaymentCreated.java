@@ -42,7 +42,8 @@ public class OnPaymentCreated {
     private final ParticipantRepository participantRepository;
     private final ParticipantLevelService participantLevelRepository;
     private final ConfigContificoQueryService configContificoQueryService;
-    @Qualifier("restClient") private final RestClient httpClient;
+    @Qualifier("restClient")
+    private final RestClient httpClient;
 
     public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, ConfigContificoQueryService configContificoQueryService, @Qualifier("restClient") RestClient httpClient) {
         this.productFinderService = productFinderService;
@@ -108,7 +109,7 @@ public class OnPaymentCreated {
             event.getInvoice().setId(UUID.randomUUID().toString());
 
             var config = configContificoQueryService.findConfigContificoByCampusId(event.getPayment().getCampus().getId());
-            if(config == null) {
+            if (config == null) {
                 System.out.println("Invoice created and saved successfully.");
 
                 commandInvoiceService.save(event.getInvoice());
@@ -140,7 +141,7 @@ public class OnPaymentCreated {
                                 15,
                                 0,
                                 0,
-                                product.getBasePrice() - event.getInvoice().getTax(),
+                                product.getBasePrice() - event.getInvoice().getTaxAmount(),
                                 0,
                                 0,
                                 0.0
@@ -153,8 +154,8 @@ public class OnPaymentCreated {
                     new InvoiceContificoJson(
                             config.getApiKey(),
                             formattedDateInvoice,
-                            "FA",
-                            event.getInvoice().getDocument(),
+                            "FAC",
+                            event.getCashDrawer().getCashBox().getStore().getNumber() + "-" + event.getCashDrawer().getCashBox().getNumber() + "-" + event.getInvoice().getInvoiceNumber(),
                             authorization + verificationDigit,
                             client,
                             0,
@@ -163,8 +164,9 @@ public class OnPaymentCreated {
                             event.getInvoice().getTax(),
                             event.getInvoice().getAmount(),
                             listProducts,
-                            0
-
+                            0,
+                            "Generado en 4YourLife",
+                            "P"
                     )
             );
 
@@ -200,11 +202,12 @@ public class OnPaymentCreated {
                 System.err.println("Error sending invoice to contifico: " + response.getBody());
             }
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("Error sending invoice to contifico: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
     public static int generateModule(String claveAcceso) {
         int factor = 2;
         int suma = 0;

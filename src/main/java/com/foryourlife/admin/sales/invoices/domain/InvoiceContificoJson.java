@@ -1,8 +1,9 @@
 package com.foryourlife.admin.sales.invoices.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class InvoiceContificoJson {
+public class InvoiceContificoJson implements Serializable {
     public String pos;
     public String fecha_emision;
     public String tipo_documento;
@@ -10,12 +11,14 @@ public class InvoiceContificoJson {
     public String autorizacion;
     public Cliente cliente;
     public double subtotal_0;
-    public double subtotal_15;
+    public double subtotal_12;
     public double ice;
     public double iva;
     public double total;
     public List<Detalle> detalles;
     public double base_no_gravable;
+    public String adicional1;
+    public String estado;
 
     public static class Cliente {
         public String ruc;
@@ -61,7 +64,7 @@ public class InvoiceContificoJson {
         }
     }
 
-    public InvoiceContificoJson(String pos, String fecha_emision, String tipo_documento, String documento, String autorizacion, Cliente cliente, double subtotal_0, double subtotal_15, double ice, double iva, double total, List<Detalle> detalles, double base_no_gravable) {
+    public InvoiceContificoJson(String pos, String fecha_emision, String tipo_documento, String documento, String autorizacion, Cliente cliente, double subtotal_0, double subtotal_12, double ice, double iva, double total, List<Detalle> detalles, double base_no_gravable, String adicional1, String estado) {
         this.pos = pos;
         this.fecha_emision = fecha_emision;
         this.tipo_documento = tipo_documento;
@@ -69,11 +72,13 @@ public class InvoiceContificoJson {
         this.autorizacion = autorizacion;
         this.cliente = cliente;
         this.subtotal_0 = subtotal_0;
-        this.subtotal_15 = subtotal_15;
+        this.subtotal_12 = subtotal_12;
         this.ice = ice;
         this.iva = iva;
         this.total = total;
         this.detalles = detalles;
         this.base_no_gravable = base_no_gravable;
+        this.adicional1 = adicional1;
+        this.estado = estado;
     }
 }

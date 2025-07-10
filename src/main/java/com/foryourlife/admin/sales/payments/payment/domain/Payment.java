@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.payments.payment.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.foryourlife.admin.contifico.config.domain.ConfigContifico;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.sales.discounts.domain.ProductDiscount;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;

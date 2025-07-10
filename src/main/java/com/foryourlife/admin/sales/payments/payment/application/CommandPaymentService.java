@@ -17,12 +17,16 @@ import com.foryourlife.clients.account.participant.application.ParticipantQueryS
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
+import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -52,7 +56,7 @@ public class CommandPaymentService {
         this.cashDrawerDetailCommandService = cashDrawerDetailCommandService;
         this.cashDrawerQueryService = cashDrawerQueryService;
     }
-
+    @Transactional
     public void save(PaymentRequest paymentReq) {
 
         boolean hasPendingPayments = _paymentRepository.existsByParticipantIdAndStatus(paymentReq.participant, PaymentStatus.PENDING);
@@ -80,11 +84,13 @@ public class CommandPaymentService {
             paymentReq.status = PaymentStatus.COMPLETED;
         }
 
-        var products =
+        List<Product> products =
                 paymentReq.products.stream().map(productId -> {
-                    return _productRepository.findById(productId).orElseThrow(
+                    var p = _productRepository.findById(productId).orElseThrow(
                             () -> new BaseException("Producto no encontrado", List.of(""))
                     );
+                    Hibernate.initialize(p.getRules());
+                    return p;
                 }).collect(Collectors.toList());
 
         var payment = Payment.create(
@@ -99,6 +105,10 @@ public class CommandPaymentService {
                 paymentReq.note
         );
 
+        BigDecimal totalProduct = BigDecimal.valueOf(paymentReq.total);
+        BigDecimal divisor = BigDecimal.valueOf(1.15);
+        BigDecimal taxAmount = totalProduct.subtract(totalProduct.divide(divisor, 2, RoundingMode.HALF_UP));
+
         var invoice = Invoice.create(
                 UUID.randomUUID().toString(),
                 paymentReq.invoice.fullName,
@@ -111,7 +121,7 @@ public class CommandPaymentService {
                 products,
                 payment,
                 false,
-                (paymentReq.total * 0.15),
+                taxAmount.doubleValue(),
                 15.0,
                 paymentReq.total
         );

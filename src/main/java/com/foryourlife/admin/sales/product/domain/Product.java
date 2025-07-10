@@ -1,5 +1,6 @@
 package com.foryourlife.admin.sales.product.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.sales.programs.domain.Program;
@@ -8,12 +9,13 @@ import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.ProductCreated;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 
 @Entity
 @Table(name = "products")
-public class Product extends AggregateRoot {
+public class Product extends AggregateRoot implements Serializable {
     @Id
     private String id;
 
@@ -41,6 +43,7 @@ public class Product extends AggregateRoot {
             inverseJoinColumns = @JoinColumn(name = "program_id")
     )
     private List<Program> programs;
+    @JsonIgnoreProperties
     @ManyToOne(
             fetch = FetchType.EAGER
     )

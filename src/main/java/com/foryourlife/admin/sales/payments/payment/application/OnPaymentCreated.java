@@ -1,10 +1,6 @@
 package com.foryourlife.admin.sales.payments.payment.application;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
-import com.foryourlife.admin.contifico.config.domain.ConfigContifico;
-import com.foryourlife.admin.programs.campus.domain.CampusRepository;
 import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
@@ -19,13 +15,12 @@ import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +37,8 @@ public class OnPaymentCreated {
     private final ParticipantRepository participantRepository;
     private final ParticipantLevelService participantLevelRepository;
     private final ConfigContificoQueryService configContificoQueryService;
-    @Qualifier("restClient")
-    private final RestClient httpClient;
 
-    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, ConfigContificoQueryService configContificoQueryService, @Qualifier("restClient") RestClient httpClient) {
+    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, ConfigContificoQueryService configContificoQueryService) {
         this.productFinderService = productFinderService;
         this.clientModuleCreatorService = clientModuleCreatorService;
         this.commandInvoiceService = commandInvoiceService;
@@ -53,7 +46,6 @@ public class OnPaymentCreated {
         this.participantRepository = participantRepository;
         this.participantLevelRepository = participantLevelRepository;
         this.configContificoQueryService = configContificoQueryService;
-        this.httpClient = httpClient;
     }
 
     @Async
@@ -131,17 +123,20 @@ public class OnPaymentCreated {
                     event.getInvoice().getEmail()
             );
 
+            BigDecimal subtotal = BigDecimal.valueOf(event.getInvoice().getAmount()).subtract(BigDecimal.valueOf(event.getInvoice().getTaxAmount())).setScale(2, RoundingMode.HALF_UP);
             var listProducts = new ArrayList<InvoiceContificoJson.Detalle>();
             for (var product : event.getPayment().getProducts()) {
+                BigDecimal productSubtotal = subtotal.divide(BigDecimal.valueOf(event.getPayment().getProducts().size()), 2, RoundingMode.HALF_UP);
+
                 listProducts.add(
                         new InvoiceContificoJson.Detalle(
                                 product.getContificoId(),
                                 1,
-                                product.getBasePrice(),
+                                productSubtotal.doubleValue(),
                                 15,
                                 0,
                                 0,
-                                product.getBasePrice() - event.getInvoice().getTaxAmount(),
+                                productSubtotal.doubleValue(),
                                 0,
                                 0,
                                 0.0
@@ -159,9 +154,9 @@ public class OnPaymentCreated {
                             authorization + verificationDigit,
                             client,
                             0,
-                            event.getInvoice().getAmount() - event.getInvoice().getTax(),
+                            subtotal.doubleValue(),
                             0,
-                            event.getInvoice().getTax(),
+                            event.getInvoice().getTaxAmount(),
                             event.getInvoice().getAmount(),
                             listProducts,
                             0,
@@ -170,40 +165,18 @@ public class OnPaymentCreated {
                     )
             );
 
+            if (event.getInvoice().getInvoiceContifico().cliente.cedula.length() == 13) {
+                event.getInvoice().getInvoiceContifico().cliente.ruc = event.getInvoice().getInvoiceContifico().cliente.cedula;
+                String cedula = event.getInvoice().getInvoiceContifico().cliente.cedula;
+                event.getInvoice().getInvoiceContifico().cliente.cedula = cedula.substring(0, cedula.length() - 3);
+            }
+
             var invoice = commandInvoiceService.save(event.getInvoice());
-//            this.sendInvoiceToContifico(config, invoice);
+            commandInvoiceService.sendInvoiceToContifico(invoice);
             System.out.println("Invoice created and saved successfully.");
 
         } catch (Exception e) {
             System.err.println("Error creating or saving invoice: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    public void sendInvoiceToContifico(ConfigContifico configContifico, Invoice invoice) {
-        try {
-
-            var json = new ObjectMapper().writeValueAsString(invoice.getInvoiceContifico());
-            ResponseEntity<String> response = httpClient.post()
-                    .uri("https://api.contifico.com/sistema/api/v1/documento/")
-                    .body(json)
-                    .header("Api-Token", configContifico.getApiKey())
-                    .header("Authorization", configContifico.getApiSecret())
-                    .retrieve()
-                    .toEntity(String.class);
-
-            if (response.getStatusCode().is2xxSuccessful()) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode rootNode = objectMapper.readTree(response.getBody());
-                invoice.setSentContifico(true);
-                invoice.setContificoId(rootNode.get("id").asText());
-                System.out.println("Invoice sent to contifico successfully.");
-            } else {
-                System.err.println("Error sending invoice to contifico: " + response.getBody());
-            }
-
-        } catch (Exception e) {
-            System.err.println("Error sending invoice to contifico: " + e.getMessage());
             e.printStackTrace();
         }
     }

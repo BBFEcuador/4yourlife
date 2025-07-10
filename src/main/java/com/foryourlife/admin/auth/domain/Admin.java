@@ -1,5 +1,6 @@
 package com.foryourlife.admin.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.shared.domain.AggregateRoot;
@@ -30,6 +31,7 @@ public class Admin extends AggregateRoot {
     @JsonProperty("role")
     private AdminRole role;
 
+    @JsonIgnoreProperties
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "campus_admins",

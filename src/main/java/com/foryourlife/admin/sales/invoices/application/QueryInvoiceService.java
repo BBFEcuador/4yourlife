@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.invoices.application;
 
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,8 +23,8 @@ public class QueryInvoiceService {
         return invoiceRepository.findById(id);
     }
 
-    public Page<Invoice> findAll(Pageable pageable) {
-        return invoiceRepository.findAll(pageable);
+    public Page<Invoice> findAll(Pageable pageable, Criteria criteria) {
+        return invoiceRepository.findAll(pageable, criteria);
     }
 
     public Page<Invoice> findByUserId(String id, Pageable pageable) {

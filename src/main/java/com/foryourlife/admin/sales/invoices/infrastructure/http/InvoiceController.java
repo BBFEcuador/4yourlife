@@ -2,11 +2,17 @@ package com.foryourlife.admin.sales.invoices.infrastructure.http;
 
 import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.criteria.Filter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/invoices")
@@ -33,28 +39,39 @@ public class InvoiceController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> findInvoices(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "perPage", defaultValue = "10") int perPage
-    ) {
+    public ResponseEntity<?> findInvoices(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search, @RequestParam(value = "campusId", defaultValue = "") String campusId) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-        return new ResponseEntity<>(queryInvoiceService.findAll(p), HttpStatus.OK);
+        List<Filter> filters = new ArrayList<>();
+
+        if (!search.isEmpty()) {
+            filters.addAll(List.of(
+                            new Filter("fullName", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("address", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("document", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("phone", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("email", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("invoiceNumber", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)
+                    )
+            );
+        }
+
+        if (!campusId.isEmpty()) {
+            filters.add(new Filter("id", campusId, "payment.campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND));
+        }
+
+        var criteria = new Criteria(filters, Optional.empty(), Optional.empty());
+        criteria.filters = filters;
+        return new ResponseEntity<>(queryInvoiceService.findAll(p, criteria), HttpStatus.OK);
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> findInvoicesByUser(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
-            @PathVariable String id
-    ) {
+    public ResponseEntity<?> findInvoicesByUser(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @PathVariable String id) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
         return new ResponseEntity<>(queryInvoiceService.findByUserId(id, p), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findInvoiceById(
-            @PathVariable String id
-    ) {
+    public ResponseEntity<?> findInvoiceById(@PathVariable String id) {
         return new ResponseEntity<>(queryInvoiceService.findById(id), HttpStatus.OK);
     }
 }

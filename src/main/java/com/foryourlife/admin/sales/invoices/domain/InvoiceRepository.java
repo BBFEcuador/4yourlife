@@ -1,5 +1,6 @@
 package com.foryourlife.admin.sales.invoices.domain;
 
+import com.foryourlife.shared.domain.criteria.Criteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,7 +11,7 @@ public interface InvoiceRepository {
     Invoice save(Invoice invoice);
     Invoice findById(String id);
     Page<Invoice> findByUserId(String id, Pageable pageable);
-    Page<Invoice> findAll(Pageable pageable);
+    Page<Invoice> findAll(Pageable pageable, Criteria criteria);
     Optional<Invoice> findLastInvoice();
     List<Invoice> findAllInvoiceByPaymentId(String paymentId);
 }

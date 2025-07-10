@@ -2,7 +2,9 @@ package com.foryourlife.admin.sales.invoices.infrastructure.persistence;
 
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,9 +16,11 @@ import java.util.Optional;
 public class InvoiceRepositoryImpl implements InvoiceRepository {
 
     private final JPAInvoiceRepository jpaInvoiceRepository;
+    private final JPACriteriaConverter<Invoice> criteriaConverter;
 
-    public InvoiceRepositoryImpl(JPAInvoiceRepository jpaInvoiceRepository) {
+    public InvoiceRepositoryImpl(JPAInvoiceRepository jpaInvoiceRepository, JPACriteriaConverter<Invoice> criteriaConverter) {
         this.jpaInvoiceRepository = jpaInvoiceRepository;
+        this.criteriaConverter = criteriaConverter;
     }
 
     @Override
@@ -35,8 +39,8 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     }
 
     @Override
-    public Page<Invoice> findAll(Pageable pageable) {
-        return jpaInvoiceRepository.findAll(pageable);
+    public Page<Invoice> findAll(Pageable pageable, Criteria criteria) {
+        return jpaInvoiceRepository.findAll(criteriaConverter.getJpaSpecifications(criteria), pageable);
     }
 
     @Override

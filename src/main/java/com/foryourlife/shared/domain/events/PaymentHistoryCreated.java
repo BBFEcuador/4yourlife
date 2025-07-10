@@ -1,6 +1,6 @@
 package com.foryourlife.shared.domain.events;
 
-import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.shared.domain.bus.DomainEvent;
 
@@ -8,26 +8,20 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 public class PaymentHistoryCreated extends DomainEvent {
-    private final PaymentHistory PaymentHistory;
-    private final Payment payment;
-    private final String cashDrawerId;
+    private final PaymentHistory paymentHistory;
+    private final Invoice invoice;
 
-    public PaymentHistoryCreated(PaymentHistory paymentHistory, Payment payment, String cashDrawerId) {
-        PaymentHistory = paymentHistory;
-        this.payment = payment;
-        this.cashDrawerId = cashDrawerId;
+    public PaymentHistoryCreated(PaymentHistory paymentHistory, Invoice invoice) {
+        this.paymentHistory = paymentHistory;
+        this.invoice = invoice;
     }
 
     public PaymentHistory getPaymentHistory() {
-        return PaymentHistory;
+        return paymentHistory;
     }
 
-    public Payment getPayment() {
-        return payment;
-    }
-
-    public String getCashDrawerId() {
-        return cashDrawerId;
+    public Invoice getInvoice() {
+        return invoice;
     }
 
     @Override

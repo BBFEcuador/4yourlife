@@ -36,11 +36,11 @@ public class PaymentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("")
-    public ResponseEntity<?> updatePayment(@RequestBody PaymentRequest request) {
-        commandPaymentService.update(request);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//    @PutMapping("")
+//    public ResponseEntity<?> updatePayment(@RequestBody PaymentRequest request) {
+//        commandPaymentService.update(request);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
 //    @GetMapping("")
 //    public ResponseEntity<?> getAllPayments(

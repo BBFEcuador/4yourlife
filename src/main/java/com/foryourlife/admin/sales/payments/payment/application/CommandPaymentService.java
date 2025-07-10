@@ -189,12 +189,13 @@ public class CommandPaymentService {
         paymentHistory.setId(UUID.randomUUID().toString());
         payment.getPaymentshistory().add(paymentHistory);
 
-
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);
 
         cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
 
         _paymentRepository.save(payment);
+
+
     }
 
     public void changeStatus(String id, String status) {

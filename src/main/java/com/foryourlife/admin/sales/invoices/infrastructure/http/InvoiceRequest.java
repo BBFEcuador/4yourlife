@@ -5,6 +5,7 @@ import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.product.domain.Product;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +22,7 @@ public class InvoiceRequest {
     public String address;
     @NotNull(message = "El número de documento es requerido")
     @NotBlank(message = "El número de documento es requerido")
+    @Pattern(regexp = "^\\d{10}$|^\\d{13}$", message = "El documento debe tener 10 o 13 dígitos")
     public String document;
     @NotNull(message = "El número de teléfono es requerido")
     @NotBlank(message = "El número de teléfono es requerido")

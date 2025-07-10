@@ -3,7 +3,6 @@ package com.foryourlife.shared.domain.events;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
-import com.foryourlife.clients.account.invoiceData.domain.DataInvoice;
 import com.foryourlife.shared.domain.bus.DomainEvent;
 
 import java.io.Serializable;

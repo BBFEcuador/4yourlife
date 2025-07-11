@@ -34,7 +34,7 @@ public class Product extends AggregateRoot implements Serializable {
 
     private String contificoId;
 
-    @OneToMany(mappedBy = "product", targetEntity = Rule.class)
+    @OneToMany(mappedBy = "product", targetEntity = Rule.class, fetch = FetchType.EAGER)
     private List<Rule> rules;
 
     @ManyToMany(fetch = FetchType.EAGER)

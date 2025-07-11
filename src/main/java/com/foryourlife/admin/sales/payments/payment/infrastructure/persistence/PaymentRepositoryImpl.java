@@ -14,6 +14,8 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -29,12 +31,12 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     @Override
     public Payment save(Payment payment) {
-       return  _jpaPaymentRepository.save(payment);
+        return _jpaPaymentRepository.save(payment);
     }
 
     @Override
     public Payment findById(String id) {
-        return _jpaPaymentRepository.findById(id).orElseThrow(()-> new BaseException("Payment not found", List.of("")));
+        return _jpaPaymentRepository.findById(id).orElseThrow(() -> new BaseException("Payment not found", List.of("")));
     }
 
     @Override
@@ -50,12 +52,12 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public Page<Payment> findAll(Pageable pageable, Criteria criteria) {
         var jpaCriteria = converter.getJpaSpecifications(criteria);
-        return _jpaPaymentRepository.findAll(jpaCriteria,pageable);
+        return _jpaPaymentRepository.findAll(jpaCriteria, pageable);
     }
 
     @Override
     public boolean existsByParticipantIdAndStatus(String participantId, PaymentStatus status) {
-        return _jpaPaymentRepository.existsByParticipant_IdAndStatus(participantId,status);
+        return _jpaPaymentRepository.existsByParticipant_IdAndStatus(participantId, status);
     }
 
     @Override
@@ -70,11 +72,11 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         Context context = new Context();
         context.setVariable("payment", payment);
         context.setVariable("date", payment.getCreated_at());
-        context.setVariable("subtotal", payment.getTotal() - (payment.getTotal() * 0.15));
-        context.setVariable("iva", payment.getTotal() * 0.15);
-        if (payment.getDiscount()!= null) {
+        context.setVariable("subtotal", BigDecimal.valueOf(payment.getTotal() / 1.15).setScale(2, RoundingMode.HALF_UP));
+        context.setVariable("iva", BigDecimal.valueOf(payment.getTotal() - (payment.getTotal() / 1.15)).setScale(2, RoundingMode.HALF_UP));
+        if (payment.getDiscount() != null) {
             context.setVariable("discount", payment.getDiscount().getDiscountValue());
-        }else {
+        } else {
             context.setVariable("discount", 0.0);
         }
 

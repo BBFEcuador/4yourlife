@@ -1,9 +1,14 @@
 package com.foryourlife.admin.sales.payments.payment.application;
 
+import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
 import com.foryourlife.admin.programs.campus.application.QueryCampusService;
+import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
+import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
+import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerQueryService;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.application.CashDrawerDetailCommandService;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
@@ -23,12 +28,10 @@ import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -42,22 +45,28 @@ public class CommandPaymentService {
     private final ProductRepository _productRepository;
     private final ParticipantQueryService participantQueryService;
     private final QueryCampusService queryCampusService;
+    private final QueryInvoiceService queryInvoiceService;
     private final EventBus eventBus;
     private final CashDrawerDetailCommandService cashDrawerDetailCommandService;
     private final CashDrawerQueryService cashDrawerQueryService;
+    private final ConfigContificoQueryService configContificoQueryService;
+    private final CommandInvoiceService commandInvoiceService;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService) {
         this._paymentRepository = _paymentRepository;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
         this.participantQueryService = participantQueryService;
         this.queryCampusService = queryCampusService;
+        this.queryInvoiceService = queryInvoiceService;
         this.eventBus = eventBus;
         this.cashDrawerDetailCommandService = cashDrawerDetailCommandService;
         this.cashDrawerQueryService = cashDrawerQueryService;
+        this.configContificoQueryService = configContificoQueryService;
+        this.commandInvoiceService = commandInvoiceService;
     }
-    @Transactional
-    public void save(PaymentRequest paymentReq) {
+
+    public ByteArrayOutputStream save(PaymentRequest paymentReq) {
 
         boolean hasPendingPayments = _paymentRepository.existsByParticipantIdAndStatus(paymentReq.participant, PaymentStatus.PENDING);
         var participant = participantQueryService.getUserById(paymentReq.participant);
@@ -84,48 +93,18 @@ public class CommandPaymentService {
             paymentReq.status = PaymentStatus.COMPLETED;
         }
 
-        List<Product> products =
-                paymentReq.products.stream().map(productId -> {
-                    var p = _productRepository.findById(productId).orElseThrow(
-                            () -> new BaseException("Producto no encontrado", List.of(""))
-                    );
-                    Hibernate.initialize(p.getRules());
-                    return p;
-                }).collect(Collectors.toList());
+        List<Product> products = paymentReq.products.stream().map(productId -> {
+            var p = _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
+            return p;
+        }).collect(Collectors.toList());
 
-        var payment = Payment.create(
-                UUID.randomUUID().toString(),
-                products,
-                paymentReq.discount,
-                participant,
-                queryCampusService.findById(paymentReq.campus),
-                paymentReq.paymentsHistory,
-                paymentReq.total,
-                paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING,
-                paymentReq.note
-        );
+        var payment = Payment.create(UUID.randomUUID().toString(), products, paymentReq.discount, participant, queryCampusService.findById(paymentReq.campus), paymentReq.paymentsHistory, paymentReq.total, paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING, paymentReq.note);
 
         BigDecimal totalProduct = BigDecimal.valueOf(paymentReq.total);
         BigDecimal divisor = BigDecimal.valueOf(1.15);
         BigDecimal taxAmount = totalProduct.subtract(totalProduct.divide(divisor, 2, RoundingMode.HALF_UP));
 
-        var invoice = Invoice.create(
-                UUID.randomUUID().toString(),
-                paymentReq.invoice.fullName,
-                paymentReq.invoice.address,
-                paymentReq.invoice.document,
-                paymentReq.invoice.phone,
-                paymentReq.invoice.email,
-                paymentReq.invoice.invoiceNumber,
-                LocalDate.now(),
-                products,
-                payment,
-                false,
-                taxAmount.doubleValue(),
-                15.0,
-                paymentReq.total
-        );
-
+        var invoice = Invoice.create(UUID.randomUUID().toString(), paymentReq.invoice.fullName, paymentReq.invoice.address, paymentReq.invoice.document, paymentReq.invoice.phone, paymentReq.invoice.email, paymentReq.invoice.invoiceNumber, LocalDate.now(), products, payment, false, taxAmount.doubleValue(), 15.0, paymentReq.total);
         String paymentHistoryId = null;
         if (!payment.getPaymentshistory().isEmpty()) {
 
@@ -134,12 +113,116 @@ public class CommandPaymentService {
         }
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
         _paymentRepository.save(payment);
+        createInvoice(invoice, cashDrawer, payment);
         cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
-        payment.record(new PaymentCreated(payment, invoice, cashDrawer));
-        var events = payment.pullDomainEvents();
-        eventBus.publish(events);
-
+        eventBus.publish(List.of(new PaymentCreated(payment, invoice, cashDrawer)));
+        var pdfarray = generateInvoice(payment.getId());
+        return pdfarray;
     }
+
+    public void createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment payment) {
+        if (invoice == null) {
+            System.err.println("No se puede crear factura: el campo dataInvoice está vacío.");
+            return;
+        }
+
+        try {
+            String invoiceNumber = getNextInvoiceNumber(cashDrawer);
+
+            invoice.setInvoiceNumber(invoiceNumber);
+
+            // Obtener configuración Contifico
+            var config = configContificoQueryService.findConfigContificoByCampusId(payment.getCampus().getId());
+            if (config == null) {
+                commandInvoiceService.save(invoice);
+                System.err.println("No se encontró la configuración de Contifico para el campus.");
+                return;
+            }
+
+            // Generar autorización
+            String formattedDate = invoice.getInvoiceDate().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+            String storeCode = cashDrawer.getCashBox().getStore().getNumber();
+            String cashBoxCode = cashDrawer.getCashBox().getNumber();
+            String authorization = formattedDate + "01" + config.getRuc() + "2" + storeCode + cashBoxCode + invoiceNumber + "12345678" + "1";
+            var verificationDigit = generateModule(authorization);
+
+            // Cliente Contifico
+            var client = new InvoiceContificoJson.Cliente(invoice.getDocument(), invoice.getFullName(), invoice.getPhone(), invoice.getAddress(), "N", invoice.getEmail());
+
+            // Subtotales
+            BigDecimal totalAmount = BigDecimal.valueOf(invoice.getAmount());
+            BigDecimal taxAmount = BigDecimal.valueOf(invoice.getTaxAmount());
+            BigDecimal subtotal = totalAmount.subtract(taxAmount).setScale(2, RoundingMode.HALF_UP);
+
+            // Detalles del producto
+            List<InvoiceContificoJson.Detalle> productDetails = buildProductDetails(payment, subtotal);
+
+            // Crear objeto Contifico
+            String formattedInvoiceDate = invoice.getInvoiceDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            String sequential = storeCode + "-" + cashBoxCode + "-" + invoiceNumber;
+            String claveAcceso = authorization + verificationDigit;
+
+            var invoiceContifico = new InvoiceContificoJson(config.getApiKey(), formattedInvoiceDate, "FAC", sequential, claveAcceso, client, 0, subtotal.doubleValue(), 0, taxAmount.doubleValue(), totalAmount.doubleValue(), productDetails, 0, "Generado en 4YourLife", "P");
+
+            // Ajustar RUC si aplica
+            adjustRucIfNeeded(invoiceContifico);
+
+            invoice.setInvoiceContifico(invoiceContifico);
+
+            // Guardar y enviar
+            Invoice savedInvoice = commandInvoiceService.save(invoice);
+            commandInvoiceService.sendInvoiceToContifico(savedInvoice);
+
+            System.out.println("Factura creada y enviada correctamente.");
+
+        } catch (Exception e) {
+            System.err.println("Error al crear o guardar la factura: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    public static int generateModule(String claveAcceso) {
+        int factor = 2;
+        int suma = 0;
+        for (int i = claveAcceso.length() - 1; i >= 0; i--) {
+            suma += factor * Character.getNumericValue(claveAcceso.charAt(i));
+            factor = factor % 7 == 0 ? 2 : factor + 1;
+        }
+        int dv = 11 - suma % 11;
+        return dv == 11 ? 0 : (dv == 10 ? 1 : dv);
+    }
+
+    private String getNextInvoiceNumber(CashDrawer cashDrawer) {
+        try {
+            Invoice lastInvoice = queryInvoiceService.findLastInvoice();
+            int nextNumber = Integer.parseInt(lastInvoice.getInvoiceNumber()) + 1;
+            return String.format("%09d", nextNumber);
+        } catch (BaseException e) {
+            System.out.println("No previous invoice found, starting with invoice #1");
+            return String.format("%09d", cashDrawer.getCashBox().getFirstNumberInvoice());
+        }
+    }
+
+    private List<InvoiceContificoJson.Detalle> buildProductDetails(Payment payment, BigDecimal subtotal) {
+        List<InvoiceContificoJson.Detalle> details = new ArrayList<>();
+        int productCount = payment.getProducts().size();
+        BigDecimal productSubtotal = subtotal.divide(BigDecimal.valueOf(productCount), 2, RoundingMode.HALF_UP);
+
+        for (var product : payment.getProducts()) {
+            details.add(new InvoiceContificoJson.Detalle(product.getContificoId(), 1, productSubtotal.doubleValue(), 15, 0, 0, productSubtotal.doubleValue(), 0, 0, 0.0));
+        }
+
+        return details;
+    }
+
+    private void adjustRucIfNeeded(InvoiceContificoJson invoiceContifico) {
+        if (invoiceContifico.cliente.cedula.length() == 13) {
+            invoiceContifico.cliente.ruc = invoiceContifico.cliente.cedula;
+            invoiceContifico.cliente.cedula = invoiceContifico.cliente.cedula.substring(0, 10);
+        }
+    }
+
 
     public void update(PaymentRequest paymentReq) {
         if (paymentReq.id == null || paymentReq.id.isEmpty()) {
@@ -147,26 +230,12 @@ public class CommandPaymentService {
         }
         var participant = participantQueryService.getUserById(paymentReq.participant);
         List<Product> products = new ArrayList<>(List.of());
-        paymentReq.products.forEach(
-                productId -> {
-                    var product = _productRepository.findById(productId).orElseThrow(
-                            () -> new BaseException("Producto no encontrado", List.of(""))
-                    );
-                    products.add(product);
-                }
-        );
+        paymentReq.products.forEach(productId -> {
+            var product = _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
+            products.add(product);
+        });
         _paymentRepository.findById(paymentReq.id);
-        var payment = Payment.create(
-                paymentReq.id,
-                products,
-                paymentReq.discount,
-                participant,
-                queryCampusService.findById(paymentReq.campus),
-                paymentReq.paymentsHistory,
-                paymentReq.total,
-                paymentReq.status,
-                paymentReq.note
-        );
+        var payment = Payment.create(paymentReq.id, products, paymentReq.discount, participant, queryCampusService.findById(paymentReq.campus), paymentReq.paymentsHistory, paymentReq.total, paymentReq.status, paymentReq.note);
         _paymentRepository.save(payment);
     }
 
@@ -180,8 +249,7 @@ public class CommandPaymentService {
             throw new BaseException("No se puede actualizar, el pago ya ha sido completado", List.of(""));
 
         } else if (total > payment.getTotal()) {
-            throw new BaseException("El pago no puede superar el total de la compra: ", List.of(
-                    "el total de pagos es: " + total + ", el total de la compra es: " + payment.getTotal()));
+            throw new BaseException("El pago no puede superar el total de la compra: ", List.of("el total de pagos es: " + total + ", el total de la compra es: " + payment.getTotal()));
 
         } else if (total == payment.getTotal() && payment.getStatus() != PaymentStatus.COMPLETED) {
             payment.setStatus(PaymentStatus.COMPLETED);
@@ -227,12 +295,12 @@ public class CommandPaymentService {
             renderer.setDocumentFromString(_paymentRepository.generatePdf(payment));
             renderer.layout();
             renderer.createPDF(pdf);
-            String fileName = "invoice_" + paymentId + ".pdf";
+            /*String fileName = "invoice_" + paymentId + ".pdf";
             String filePath = Paths.get("").toAbsolutePath().toString() + File.separator + fileName;
 
             try (FileOutputStream fos = new FileOutputStream(filePath)) {
                 fos.write(pdf.toByteArray());
-            }
+            }*/
             return pdf;
         } catch (Exception e) {
             throw new BaseException("Error generating invoice", List.of(e.getMessage()));

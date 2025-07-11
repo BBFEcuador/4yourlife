@@ -3,11 +3,14 @@ package com.foryourlife.admin.sales.payments.cashBox.infrastructure.http;
 import com.foryourlife.admin.sales.payments.cashBox.application.CashBoxCommandService;
 import com.foryourlife.admin.sales.payments.cashBox.application.CashBoxQueryService;
 import com.foryourlife.admin.sales.payments.cashBox.domain.CashBox;
+import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("cash-box")
@@ -38,7 +41,11 @@ public class CashBoxController {
     }
 
     @GetMapping("available")
-    public ResponseEntity<?> getAvailableCashDrawers() {
-        return new ResponseEntity<>(queryService.getCashBoxNotOpened(), HttpStatus.OK);
+    public ResponseEntity<?> getAvailableCashDrawers(@RequestParam(value = "campusId",defaultValue = "") String campusId) {
+        if (!campusId.isEmpty()) {
+            return new ResponseEntity<>(queryService.getCashBoxNotOpened(campusId), HttpStatus.OK);
+        } else {
+            throw new BaseException("Seleccione un campus para continuar", List.of(""));
+        }
     }
 }

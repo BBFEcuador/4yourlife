@@ -119,26 +119,31 @@ public class TrainingController {
         }
 
         var criteria = new Criteria(filters, Optional.empty(), Optional.empty());
-        criteria.filters = filters;
         return new ResponseEntity<>(queryTrainingService.getAllTrainings(p, criteria), HttpStatus.OK);
     }
 
     @PostMapping("/filter/{lvl}")
-    public ResponseEntity<?> getByLevel(@PathVariable String lvl) {
+    public ResponseEntity<?> getByLevel(@PathVariable String lvl, @RequestParam(value = "campusId", defaultValue = "") String campusId) {
+
+        List<Filter> filters = new ArrayList<>();
+
+        if (!campusId.isEmpty()) {
+            filters.add(new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND));
+        }
+
         switch (lvl) {
-            case "FOCUS" -> {
-                var criteria = new Criteria(List.of(new Filter("courseLevel", CourseLevel.FOCUS.toString(), null, Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("originalTeam", null, null, Filter.Operation.IS_NULL, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
-                return new ResponseEntity<>(queryTrainingService.match(criteria), HttpStatus.OK);
-            }
-            case "YOUR" -> {
-                var criteria = new Criteria(List.of(new Filter("courseLevel", CourseLevel.YOUR.name(), null, Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("originalTeam", null, null, Filter.Operation.IS_NULL, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
-                return new ResponseEntity<>(queryTrainingService.match(criteria), HttpStatus.OK);
-            }
-            case "LIFE" -> {
-                var criteria = new Criteria(List.of(new Filter("courseLevel", CourseLevel.LIFE.name(), null, Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("originalTeam", null, null, Filter.Operation.IS_NULL, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
-                return new ResponseEntity<>(queryTrainingService.match(criteria), HttpStatus.OK);
-            }
+            case "FOCUS" ->
+                    filters.addAll(List.of(new Filter("courseLevel", CourseLevel.FOCUS.toString(), null, Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("originalTeam", null, null, Filter.Operation.IS_NULL, Filter.LogicalOperator.AND)));
+
+            case "YOUR" ->
+                    filters.addAll(List.of(new Filter("courseLevel", CourseLevel.YOUR.name(), null, Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("originalTeam", null, null, Filter.Operation.IS_NULL, Filter.LogicalOperator.AND)));
+
+            case "LIFE" ->
+                    filters.addAll(List.of(new Filter("courseLevel", CourseLevel.LIFE.name(), null, Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("originalTeam", null, null, Filter.Operation.IS_NULL, Filter.LogicalOperator.AND)));
+
             default -> throw new BaseException("Illegal argument", List.of("Type must be FOCUS, YOUR or LIFE"));
         }
+        var criteria = new Criteria(filters, Optional.empty(), Optional.empty());
+        return new ResponseEntity<>(queryTrainingService.match(criteria), HttpStatus.OK);
     }
 }

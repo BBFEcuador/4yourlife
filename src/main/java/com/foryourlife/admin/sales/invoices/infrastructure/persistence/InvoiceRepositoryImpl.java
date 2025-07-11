@@ -52,4 +52,9 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     public List<Invoice> findAllInvoiceByPaymentId(String paymentId) {
         return jpaInvoiceRepository.findAllByPayment_Id(paymentId);
     }
+
+    @Override
+    public Optional<Invoice> findInvoiceByPaymentId(String paymentId) {
+        return jpaInvoiceRepository.findByPayment_Id(paymentId);
+    }
 }

@@ -5,6 +5,7 @@ import com.foryourlife.admin.bank.domain.BankRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BankQueryService {
@@ -18,8 +19,8 @@ public class BankQueryService {
         return repository.getAll();
     }
 
-    public Bank findById(String id) {
-        return repository.findById(id).orElse(null);
+    public Optional<Bank> findById(String id) {
+        return repository.findById(id);
     }
 
     public Bank findByCampusId(String CampusId) {

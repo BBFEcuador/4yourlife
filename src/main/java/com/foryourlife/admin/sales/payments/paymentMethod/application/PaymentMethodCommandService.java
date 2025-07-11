@@ -23,7 +23,7 @@ public class PaymentMethodCommandService {
 
     public void createPaymentMethod(PaymentMethodRequest command) {
         var campus = campusRepository.findById(command.campusId).orElseThrow(() -> new BaseException("Campus no encontrado", List.of("")));
-        var bank = bankQueryService.findById(command.bankId);
+        var bank = bankQueryService.findById(command.bankId).orElse(null);
         repository.save(new PaymentMethod(
                 command.id,
                 command.type,

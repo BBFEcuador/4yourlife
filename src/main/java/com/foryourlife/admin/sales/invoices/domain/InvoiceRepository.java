@@ -14,4 +14,5 @@ public interface InvoiceRepository {
     Page<Invoice> findAll(Pageable pageable, Criteria criteria);
     Optional<Invoice> findLastInvoice();
     List<Invoice> findAllInvoiceByPaymentId(String paymentId);
+    Optional<Invoice> findInvoiceByPaymentId(String paymentId);
 }

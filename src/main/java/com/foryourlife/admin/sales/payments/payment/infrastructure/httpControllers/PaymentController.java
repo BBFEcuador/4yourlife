@@ -84,7 +84,7 @@ public class PaymentController {
 
     @PutMapping("add/payment-history/{paymentId}")
     public ResponseEntity<?> addPaymentHistory(@RequestBody @Valid PaymentHistoryRequest paymentHistory, @PathVariable String paymentId) {
-        commandPaymentService.updatePaymentsHistory(paymentHistory.paymentHistory, paymentHistory.invoice, paymentId, paymentHistory.cashDrawerId);
+        commandPaymentService.updatePaymentsHistory(paymentHistory.paymentHistory, paymentId, paymentHistory.cashDrawerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

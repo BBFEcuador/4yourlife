@@ -17,7 +17,6 @@ public class PaymentMethodRequest {
     public Boolean isActive;
     @NotNull(message = "El id del campus es requerido")
     public String campusId;
-    @NotNull(message = "El id del banco es requerido")
     public String bankId;
 
     public String getId() {

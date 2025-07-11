@@ -6,7 +6,6 @@ import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
-import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerQueryService;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.application.CashDrawerDetailCommandService;
@@ -21,9 +20,8 @@ import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
+import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
-import jakarta.transaction.Transactional;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -94,8 +92,7 @@ public class CommandPaymentService {
         }
 
         List<Product> products = paymentReq.products.stream().map(productId -> {
-            var p = _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
-            return p;
+            return _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
         }).collect(Collectors.toList());
 
         var payment = Payment.create(UUID.randomUUID().toString(), products, paymentReq.discount, participant, queryCampusService.findById(paymentReq.campus), paymentReq.paymentsHistory, paymentReq.total, paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING, paymentReq.note);
@@ -116,8 +113,7 @@ public class CommandPaymentService {
         createInvoice(invoice, cashDrawer, payment);
         cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
         eventBus.publish(List.of(new PaymentCreated(payment, invoice, cashDrawer)));
-        var pdfarray = generateInvoice(payment.getId());
-        return pdfarray;
+        return generateInvoice(payment.getId());
     }
 
     public void createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment payment) {
@@ -239,7 +235,7 @@ public class CommandPaymentService {
         _paymentRepository.save(payment);
     }
 
-    public void updatePaymentsHistory(PaymentHistory paymentHistory, InvoiceRequest invoiceRequest, String paymentId, String cashDrawerId) {
+    public void updatePaymentsHistory(PaymentHistory paymentHistory, String paymentId, String cashDrawerId) {
         var payment = _paymentRepository.findById(paymentId);
         if (!_paymentMethodRepository.exist(paymentHistory.getPaymentMethod().getId())) {
             throw new BaseException("El método de pago no existe", List.of(""));
@@ -259,11 +255,15 @@ public class CommandPaymentService {
 
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);
 
+        var invoice = queryInvoiceService.getByPaymentId(paymentId);
+
         cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
 
         _paymentRepository.save(payment);
 
+        PaymentHistoryCreated event = new PaymentHistoryCreated(paymentHistory, invoice);
 
+        eventBus.publish(List.of(event));
     }
 
     public void changeStatus(String id, String status) {

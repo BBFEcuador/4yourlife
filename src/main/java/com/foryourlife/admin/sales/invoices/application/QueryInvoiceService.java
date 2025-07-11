@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class QueryInvoiceService {
@@ -35,8 +34,14 @@ public class QueryInvoiceService {
         return invoiceRepository.findLastInvoice().orElseThrow(() -> new BaseException("Not found", List.of("Last invoice not found")));
     }
 
-    public List<Invoice> findByPaymentId(String paymentId) {
+    public List<Invoice> findAllByPaymentId(String paymentId) {
         return invoiceRepository.findAllInvoiceByPaymentId(paymentId);
 
+    }
+
+    public Invoice getByPaymentId(String paymentId) {
+        return invoiceRepository.findAllInvoiceByPaymentId(paymentId).stream()
+               .findFirst()
+               .orElseThrow(() -> new BaseException("Not found", List.of("Invoice with payment id " + paymentId + " not found")));
     }
 }

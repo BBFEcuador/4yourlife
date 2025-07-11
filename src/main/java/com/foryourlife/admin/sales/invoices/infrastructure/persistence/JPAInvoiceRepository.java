@@ -17,4 +17,6 @@ public interface JPAInvoiceRepository extends JpaRepository<Invoice, String>, Jp
     List<Invoice> findAllByPayment_Id(String paymentId);
 
     Page<Invoice> findAllByPayment_Participant_Id(String paymentParticipantId, Pageable pageable);
+
+    Optional<Invoice> findByPayment_Id(String paymentId);
 }

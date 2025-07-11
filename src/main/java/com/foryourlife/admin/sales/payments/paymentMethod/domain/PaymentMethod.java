@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.payments.paymentMethod.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.foryourlife.admin.bank.domain.Bank;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import jakarta.persistence.*;
@@ -16,16 +17,22 @@ public class PaymentMethod {
     @ManyToOne
     @JoinColumn(name = "campus_id", referencedColumnName = "id")
     private Campus campus;
+    @ManyToOne
+    @JoinColumn(
+            name = "bank_id", referencedColumnName = "id", nullable = true
+    )
+    private Bank bank;
 
     protected PaymentMethod() {
     }
 
-    public PaymentMethod(String id, String type, Boolean isActive, String code, Campus campus) {
+    public PaymentMethod(String id, String type, Boolean isActive, String code, Campus campus, Bank bank) {
         this.id = id;
         this.type = type;
         this.isActive = isActive;
         this.code = code;
         this.campus = campus;
+        this.bank = bank;
     }
 
     public String getId() {
@@ -69,7 +76,15 @@ public class PaymentMethod {
         this.campus = campus;
     }
 
-    public static PaymentMethod create(String id, String type, Boolean isActive, String code, Campus campus) {
-        return new PaymentMethod(id, type, isActive, code, campus);
+    public Bank getBank() {
+        return bank;
+    }
+
+    public void setBank(Bank bank) {
+        this.bank = bank;
+    }
+
+    public PaymentMethod create(String id, String type, Boolean isActive, String code, Campus campus, Bank bank) {
+        return new PaymentMethod(id, type, isActive, code, campus, bank);
     }
 }

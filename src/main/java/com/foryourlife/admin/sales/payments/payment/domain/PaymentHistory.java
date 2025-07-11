@@ -8,6 +8,7 @@ public class PaymentHistory {
     private double amount;
     private String date;
     private String transactionId;
+    private String pingType;
 
     public PaymentHistory(PaymentMethod paymentMethod, double amount, String date) {
         this.paymentMethod = paymentMethod;
@@ -49,6 +50,10 @@ public class PaymentHistory {
 
     public String getTransactionId() {
         return transactionId;
+    }
+
+    public String getPingType() {
+        return pingType;
     }
 
     public void setTransactionId(String transactionId) {

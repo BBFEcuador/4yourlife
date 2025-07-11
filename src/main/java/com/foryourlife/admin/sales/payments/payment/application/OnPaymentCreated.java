@@ -89,6 +89,7 @@ public class OnPaymentCreated {
             } catch (BaseException e) {
                 System.out.println("No previous invoice found, starting with invoice #1");
             }
+
             String invoiceNumber;
             if (lastInvoice == null) {
                 invoiceNumber = String.format("%09d", event.getCashDrawer().getCashBox().getFirstNumberInvoice());

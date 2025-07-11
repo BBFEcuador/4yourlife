@@ -48,7 +48,6 @@ public class OnPaymentCreated {
         this.configContificoQueryService = configContificoQueryService;
     }
 
-    @Async
     @EventListener
     @Transactional
     public void on(PaymentCreated event) {
@@ -73,7 +72,7 @@ public class OnPaymentCreated {
         });
         clientModuleCreatorService.createClientModule(participant.getModules());
 
-        createInvoice(event);
+        /*createInvoice(event);*/
     }
 
     public void createInvoice(PaymentCreated event) {
@@ -99,8 +98,6 @@ public class OnPaymentCreated {
             }
 
             event.getInvoice().setInvoiceNumber(invoiceNumber);
-            event.getInvoice().setId(UUID.randomUUID().toString());
-
             var config = configContificoQueryService.findConfigContificoByCampusId(event.getPayment().getCampus().getId());
             if (config == null) {
                 System.out.println("Invoice created and saved successfully.");

@@ -1,255 +1,247 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang='es' xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Factura de Pago</title>
+    <meta charset='UTF-8'/>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+    <title>Factura</title>
     <style>
-        .a {
-            display: none;
+        @page {
+          size: A4;
+          margin: 1cm;
         }
 
-        .b {
-            display: inline-block;
-            width: 200px;
-            height: 50px;
+        body {
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 11px;
+          margin: 0;
+          padding: 10px;
         }
 
-        .c {
-            display: block;
+        .header {
+          margin-bottom: 15px;
+          overflow: hidden;
         }
 
-        .d {
-            display: inline-block;
-            margin-top: 10%;
-            width: 349px;
+        .header-left,
+        .header-right {
+          width: 48%;
+          display: inline-block;
+          vertical-align: top;
         }
 
-        .e {
-            height: 18%;
-            /* padding-left: 10% */
+        .header-left {
+          float: left;
         }
 
-        p {
-            color: black;
+        .header-right {
+          float: right;
         }
 
-        .contenedor-footer {
-            position: relative;
-            width: 100%;
+        .logo img {
+          width: 100%;
+          max-width: 200px;
+          margin-bottom: 20px;
         }
 
-        .contenedor-1 {
-            display: inline-block;
-            width: 74%;
-            margin-top: -19px !important;
+        .info-box {
+          border: 1px solid #000;
+          padding: 15px;
+          border-radius: 10px;
         }
 
-        .contenedor-2 {
-            display: inline-block;
-            width: 25%;
-            margin-top: 60px;
+        .info-row {
+          margin: 8px 0;
+          line-height: 1.4;
         }
 
-        .table {
-            border-collapse: separate;
-            border-spacing: 13px;
+        .info-label {
+          font-weight: bold;
         }
 
+        .main-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 15px 0;
+        }
+
+        .main-table th {
+          background-color: #f2f2f2;
+          border: 1px solid #000;
+          padding: 5px;
+          font-size: 10px;
+        }
+
+        .main-table td {
+          border: 1px solid #000;
+          padding: 5px;
+          font-size: 10px;
+        }
+
+        .text-right {
+          text-align: right;
+        }
+
+        .text-center {
+          text-align: center;
+        }
+
+        .bottom-section {
+          overflow: hidden;
+          margin-top: 10px;
+        }
+
+        .bottom-left,
+        .bottom-right {
+          display: inline-block;
+          vertical-align: top;
+        }
+
+        .bottom-left {
+          width: 60%;
+        }
+
+        .bottom-right {
+          width: 35%;
+          margin-left: 4%;
+        }
+
+        .barcode-container {
+          text-align: center;
+          margin: 10px 0;
+        }
+
+        .barcode {
+          width: 100%;
+          max-height: 50px;
+        }
     </style>
-</head>
-<body style="font-family: Arial, Helvetica, sans-serif; font-size: 12px;">
-<section>
-        <div class="d">
-            <div class="e">
-                <img style="width: 75%" th:src="@{classpath:static/images/focusYourLife.png}"/>
-            </div>
 
-            <div style="border: solid; border-width: 1px; padding: 10px; border-radius: 10px;  margin-right: 10px;">
-                <table class="table">
-                    <tr>
-                        <td>
-                            <strong>Razón social:</strong> Focus Your Life
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Correo electrónico:</strong> <span>focus@focus.com</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Dirección:</strong> <span th:text="${payment.campus.address}"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Telefono:</strong> <span th:text="${payment.campus.phone}"></span>
-                        </td>
-                    </tr>
-                </table>
-            </div>
+</head>
+<body>
+<div class="header">
+    <div class="header-left">
+        <div class="logo">
+            <img
+                    style="width: 75%"
+                    th:src="@{classpath:static/images/focusYourLife.png}"/>
         </div>
-        <div class="d">
-            <div style="border-style: solid; border-width: 1px; border-radius: 10px;">
-                <table class="table">
-                    <tr>
-                        <td>
-                            <strong>RUC: </strong> 12314434546
-                        </td>
-                    </tr>
-                    <tr>
-                        <div style="font-size: 20px;">
-                            <left><strong>FACTURA</strong></left>
-                        </div>
-                    </tr>
-                    <tr>
-                        <td>
-                            FECHA DE EMISION:
-                        </td>
-                    </tr>
-                    <tr>
-                        <td th:text="${date}">
-                        </td>
-                    </tr>
-                </table>
+        <div class="info-box">
+            <div class="info-row"><span class="info-label">Nombre Comercial:</span>
+                <span>
+                FOCUS YOUR LIFE
+                </span>
             </div>
-        </div>
-</section>
-<section>
-    <div style="margin-top: -55px">
-        <div class="c" style="border-style: solid; border-width: 1px; padding: 10px;">
-            <div class="c">
-                <table>
-                    <tr>
-                        <td>
-                            <strong>Nombre del cliente:</strong> <span th:text="${payment.invoice.fullName}"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Dirección:</strong> <span th:text="${payment.invoice.address}"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Teléfono:</strong> <span th:text="${payment.invoice.phone}"></span>
-                        </td>
-                    </tr>
-                </table>
+            <div class="info-row"><span class="info-label">Razón social:</span>
+                <span>
+                        IMPETUS S.A
+                </span>
             </div>
-            <div class="d" style="margin-top: 10px;">
-                <table>
-                    <tr>
-                        <td>
-                            <strong>N° documento:</strong> <span th:text="${payment.invoice.document}"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Fecha Emision:</strong> <span th:text="${payment.invoice.invoiceDate}"></span>
-                        </td>
-                    </tr>
-                </table>
+            <div class="info-row"><span class="info-label">Dirección:</span>
+                <span th:text="${payment.campus.address}"></span>
+            </div>
+            <div class="info-row"><span class="info-label">Teléfono:</span>
+                <span th:text="${payment.campus.phone}"></span>
             </div>
         </div>
     </div>
-</section>
-<section>
-    <div class="c" style="margin-top: 20px;">
-        <table style="border: 1px solid #23234b; width: 100%;">
-            <thead style="color:white; border: 1px solid #23234b; background-color:#663c84">
+    <div class="header-right">
+        <div class="info-box" style="height: 100%;">
+            <div class="info-row"><span class="info-label">RUC:</span> 1999999999999</div>
+            <div class="info-row"><span style="font-size: 16px; font-weight: bold; margin: 15px 0;">FACTURA</span>
+                <span style="font-size: 16px; font-weight: bold;"
+                      th:text="${payment.invoice.invoiceNumber}"></span></div>
+            <div class="info-row"><span class="info-label">FECHA:</span> <span th:text="${date}"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-row"><span class="info-label">Razón Social / Nombres y Apellidos:</span>
+        <span th:text="${payment.invoice.fullName}"></span></div>
+    <div class="info-row"><span class="info-label">Identificación:</span>
+        <span
+                th:text="${payment.invoice.document}"></span></div>
+    <div class="info-row"><span class="info-label">Teléfono:</span>
+        <span
+                th:text="${payment.invoice.phone}"></span></div>
+    <div class="info-row"><span class="info-label">Fecha de Emisión:</span>
+        <span
+                th:text="${payment.invoice.invoiceDate}"></span></div>
+    <div class="info-row"><span class="info-label">Dirección:</span>
+        <span
+                th:text="${payment.invoice.address}"></span></div>
+</div>
+
+<table class="main-table">
+    <thead>
+    <tr>
+        <th style="width: 8%;">Codigo</th>
+        <th style="width: 8%;">Producto</th>
+        <th style="width: 30%;">Descripción</th>
+        <th style="width: 10%;">Precio Unitario</th>
+        <th style="width: 10%;">Precio Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="product: ${payment.products}">
+        <td th:text="${product.code}"></td>
+        <td th:text="${product.name}"></td>
+        <td th:text="${product.description}"></td>
+        <td th:text="${product.basePrice}"></td>
+        <td th:text="${product.basePrice}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="bottom-section">
+    <div class="bottom-left">
+        <table class="main-table">
             <tr>
-                <th>Producto</th>
-                <th>Codigo</th>
-                <th>Descripcion</th>
-                <th>Cantidad</th>
-                <th>Precio Unitario</th>
-                <th>Total</th>
+                <td colspan="2" style="text-align: center; font-weight: bold;">Información adicional</td>
             </tr>
-            </thead>
-            <tbody>
-            <tr th:each="product : ${payment.products}">
-                <td th:text="${product.name}"></td>
-                <td th:text="${product.code}"></td>
-                <td th:text="${product.description}"></td>
-                <td>1</td>
-                <td th:text="${product.basePrice}"></td>
-                <td th:text="${product.basePrice}"></td>
+            <tr>
+                <td>Email:</td>
+                <td th:text="${payment.invoice.email}"></td>
             </tr>
-            </tbody>
+            <tr>
+                <td>Campus:</td>
+                <td th:text="${payment.campus.city}"></td>
+            </tr>
+            <tr>
+                <td>Notas</td>
+                <td th:text="${payment.note}"></td>
+            </tr>
         </table>
     </div>
-</section>
-<section>
-    <div class="contenedor-footer">
-        <div class="contenedor-1">
-            <div style="padding-top: 10px;">
-                <table style="border: 1px solid black;width: 100%;">
-                    <tr style="background-color: #663c84; color: white; ">
-                        <th colspan="2">Informacion Adicional</th>
-                    </tr>
-                    <tr>
-                        <td>
-                            Email:
-                        </td>
-                        <td th:text="${payment.invoice.email}">
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Campus:
-                        </td>
-                        <td th:text="${payment.campus.city}">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Notas
-                        </td>
-                        <td th:text="${payment.note}">
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <div class="contenedor-2">
-            <table style="border: 1px solid black;">
-                <tr>
-                    <td>
-                        SUBTOTAL 15%
-                    </td>
-                    <td>
-                        <span th:text="${subtotal}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Descuento
-                    </td>
-                    <td>
-                        <span th:text="${discount}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        IVA (15%)
-                    </td>
-                    <td>
-                        <span th:text="${iva}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Total
-                    </td>
-                    <td>
-                        <span th:text="${payment.total}"></span>
-                    </td>
-                </tr>
-            </table>
-        </div>
+    <div class="bottom-right">
+        <table class="main-table">
+            <tr>
+                <td>SUBTOTAL 15%</td>
+                <td>
+                    <span th:text="${subtotal}"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Descuento</td>
+                <td>
+                    <span th:text="${discount}"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>IVA (15%)</td>
+                <td>
+                    <span th:text="${iva}"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Total</td>
+                <td>
+                    <span th:text="${payment.total}"></span>
+                </td>
+            </tr>
+        </table>
     </div>
-</section>
+</div>
 </body>
 </html>

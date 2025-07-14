@@ -98,9 +98,6 @@ public class AdminSeeder {
             List<Program> programs = Arrays.asList(Program.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "Focus", CourseLevel.FOCUS), Program.create("bff32809-d719-4dfd-90b0-6f7a0f63e2fe", "Your", CourseLevel.YOUR), Program.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "Life", CourseLevel.LIFE));
 
             this.programRepository.saveAll(programs);
-            Product product = Product.create("1a9f5420-a08d-4b66-99ed-616a7a50864a", "Focus + Your", "elweso-code", 700.5, "DOLAR", true, "Focus + Your", null, List.of(programs.get(0), programs.get(1)), campuses.get(0), "bala-id");
-            this.productRepository.save(product);
-
 
             //mock();
         };

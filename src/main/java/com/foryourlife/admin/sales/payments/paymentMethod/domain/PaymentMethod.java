@@ -84,7 +84,7 @@ public class PaymentMethod {
         this.bank = bank;
     }
 
-    public PaymentMethod create(String id, String type, Boolean isActive, String code, Campus campus, Bank bank) {
+    public static PaymentMethod create(String id, String type, Boolean isActive, String code, Campus campus, Bank bank) {
         return new PaymentMethod(id, type, isActive, code, campus, bank);
     }
 }

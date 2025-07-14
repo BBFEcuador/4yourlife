@@ -32,4 +32,10 @@ public class BankController {
     public ResponseEntity<?> getBanksByCampus(String campusId) {
         return ResponseEntity.ok(bankQueryService.findByCampusId(campusId));
     }
+    
+    @PostMapping("sync")
+    public ResponseEntity<?> syncBanks(@RequestParam String campusId) {
+        bankCommandService.syncBanks(campusId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }

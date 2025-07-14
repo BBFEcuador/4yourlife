@@ -177,7 +177,6 @@ public class CommandPaymentService {
         }
     }
 
-
     public static int generateModule(String claveAcceso) {
         int factor = 2;
         int suma = 0;

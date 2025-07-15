@@ -68,6 +68,7 @@ public class CashDrawer {
     private Instant updated_at;
     @OneToMany(mappedBy = "cashDrawer", fetch = FetchType.EAGER)
     @JsonIgnoreProperties("cashDrawer")
+    @JsonIgnore
     private List<CashDrawerDetail> cashDrawerDetails;
 
     protected CashDrawer() {}

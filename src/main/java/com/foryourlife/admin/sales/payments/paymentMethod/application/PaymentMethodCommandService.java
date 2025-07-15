@@ -24,19 +24,17 @@ public class PaymentMethodCommandService {
     }
 
     public void createPaymentMethod(PaymentMethodRequest command) {
-        var campus = campusRepository.findById(command.campusId)
-                .orElseThrow(() -> new BaseException("Campus no encontrado", List.of("")));
-        var bank = bankQueryService.findById(command.bankId).orElse(null);
-        
+        var campus = campusRepository.findById(command.campusId).orElseThrow(() -> new BaseException("Campus no encontrado", List.of("")));
+
         String paymentMethodId = command.id != null ? command.id : UUID.randomUUID().toString();
-        
+
         PaymentMethod paymentMethod = PaymentMethod.create(
                 paymentMethodId,
                 command.type,
                 command.isActive,
                 command.code,
                 campus,
-                bank
+                command.bankId != null ? bankQueryService.findById(command.bankId).orElse(null) : null
         );
         repository.save(paymentMethod);
     }

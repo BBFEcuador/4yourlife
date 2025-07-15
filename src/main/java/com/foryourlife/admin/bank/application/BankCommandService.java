@@ -6,6 +6,7 @@ import com.foryourlife.admin.bank.domain.Bank;
 import com.foryourlife.admin.bank.domain.BankRepository;
 import com.foryourlife.admin.bank.infrastructure.http.BankRequest;
 import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
+import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,18 +19,20 @@ import java.util.UUID;
 @Service
 public class BankCommandService {
     private final BankRepository repository;
+    private QueryCampusService queryCampusService;
     private final RestClient client;
     private final ConfigContificoQueryService config;
 
-    public BankCommandService(BankRepository repository, RestClient client, ConfigContificoQueryService config) {
+    public BankCommandService(BankRepository repository, QueryCampusService queryCampusService, RestClient client, ConfigContificoQueryService config) {
         this.repository = repository;
+        this.queryCampusService = queryCampusService;
         this.client = client;
         this.config = config;
     }
 
     public void syncBanks(String campusId) {
         var configContifico = config.findConfigContificoByCampusId(campusId);
-        try{
+        try {
             ResponseEntity<String> response = client.get().uri("https://api.contifico.com/sistema/api/v1/banco/cuenta/").header("Content-Type", "application/json").header("Api-Token", configContifico.getApiKey()).header("Authorization", configContifico.getApiSecret()).retrieve().toEntity(String.class);
             if (response.getStatusCode().value() == 200) {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -44,7 +47,7 @@ public class BankCommandService {
                         Optional<Bank> existingBank = repository.findByContificoId(contificoId);
 
                         if (existingBank.isEmpty()) {
-                            Bank newBank = new Bank(UUID.randomUUID().toString(), name,number, contificoId,configContifico.getCampus());
+                            Bank newBank = new Bank(UUID.randomUUID().toString(), name, number, contificoId, configContifico.getCampus());
 
                             repository.saveBank(newBank);
                         }
@@ -54,14 +57,14 @@ public class BankCommandService {
                     throw new BaseException("Failed to fetch products from Contifico API", List.of(""));
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new BaseException("Error syncing banks", List.of(""));
         }
     }
 
     public void createBank(BankRequest bank) {
-        var configContifico = config.findConfigContificoByCampusId(bank.getCampusId());
-        var newBank = new Bank(UUID.randomUUID().toString(), bank.getName(), bank.getNumber(), null, configContifico.getCampus());
+        var campus = queryCampusService.findById(bank.getCampusId());
+        var newBank = new Bank(UUID.randomUUID().toString(), bank.getName(), bank.getNumber(), null, campus);
         repository.saveBank(newBank);
     }
 }

@@ -23,7 +23,7 @@ public class BankQueryService {
         return repository.findById(id);
     }
 
-    public Bank findByCampusId(String CampusId) {
-        return repository.findByCampusId(CampusId).orElse(null);
+    public List<Bank> findByCampusId(String CampusId) {
+        return repository.findByCampusId(CampusId);
     }
 }

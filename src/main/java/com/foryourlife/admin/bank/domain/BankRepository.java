@@ -8,6 +8,6 @@ public interface BankRepository {
     Optional<Bank> findById(String id);
     void deleteById(String id);
     List<Bank> getAll();
-    Optional<Bank> findByCampusId(String campusId);
+    List<Bank> findByCampusId(String campusId);
     Optional<Bank> findByContificoId(String contificoId);
 }

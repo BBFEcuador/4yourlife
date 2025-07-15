@@ -36,7 +36,7 @@ public class JPABankRepository implements BankRepository {
     }
 
     @Override
-    public Optional<Bank> findByCampusId(String campusId) {
+    public List<Bank> findByCampusId(String campusId) {
         return repository.findByCampus_Id(campusId);
     }
 

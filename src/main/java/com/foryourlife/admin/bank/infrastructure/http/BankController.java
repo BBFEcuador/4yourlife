@@ -29,13 +29,13 @@ public class BankController {
     }
 
     @GetMapping("{campusId}")
-    public ResponseEntity<?> getBanksByCampus(String campusId) {
+    public ResponseEntity<?> getBanksByCampus(@PathVariable String campusId) {
         return ResponseEntity.ok(bankQueryService.findByCampusId(campusId));
     }
     
     @PostMapping("sync")
-    public ResponseEntity<?> syncBanks(@RequestParam String campusId) {
+    public ResponseEntity<?> syncBanks(@RequestParam(value = "campusId", defaultValue = "") String campusId) {
         bankCommandService.syncBanks(campusId);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -4,6 +4,7 @@ import com.foryourlife.admin.sales.discounts.domain.ProductDiscount;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class PaymentRequest {
     public Double total;
     public PaymentStatus status;
     @NotNull(message = "Los datos de facturación son requeridos")
+    @Valid
     public InvoiceRequest invoice;
     public String note;
     public String cashDrawerId;

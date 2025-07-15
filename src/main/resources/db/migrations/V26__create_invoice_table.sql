@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS invoices
     tax_amount decimal not null,
     tax decimal not null,
     contifico_id text,
+    contifico_error text,
     amount decimal not null,
     created_at timestamp not null default now(),
     invoice_contifico_json jsonb,

@@ -3,6 +3,7 @@ package com.foryourlife.admin.sales.invoices.infrastructure.http;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.product.domain.Product;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -22,13 +23,16 @@ public class InvoiceRequest {
     public String address;
     @NotNull(message = "El número de documento es requerido")
     @NotBlank(message = "El número de documento es requerido")
-    @Pattern(regexp = "^\\d{10}$|^\\d{13}$", message = "El documento debe tener 10 o 13 dígitos")
+    @Pattern(regexp = "^\\d{10}$|^\\d{13}$", message = "El documento debe tener 10 o 13 dígitos numericos")
+    @Pattern(regexp = "^[0-9]*$", message = "El documento solo acepta dígitos")
     public String document;
     @NotNull(message = "El número de teléfono es requerido")
     @NotBlank(message = "El número de teléfono es requerido")
+    @Pattern(regexp = "^[0-9]{10}$", message = "El número de teléfono debe tener 10 dígitos numericos")
     public String phone;
     @NotNull(message = "El email es requerido")
     @NotBlank(message = "El email es requerido")
+    @Email(message = "El email es inválido")
     public String email;
 
     public List<Product> products;

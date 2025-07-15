@@ -43,6 +43,10 @@ public class Invoice {
             name = "contifico_id"
     )
     private String contificoId;
+    @Column(
+            name = "contifico_error"
+    )
+    private String contificoError;
     private Double tax;
     private Double amount;
     @Column(columnDefinition = "jsonb", name = "invoice_contifico_json")
@@ -199,5 +203,13 @@ public class Invoice {
 
     public void setContificoId(String contificoId) {
         this.contificoId = contificoId;
+    }
+
+    public String getContificoError() {
+        return contificoError;
+    }
+
+    public void setContificoError(String contificoError) {
+        this.contificoError = contificoError;
     }
 }

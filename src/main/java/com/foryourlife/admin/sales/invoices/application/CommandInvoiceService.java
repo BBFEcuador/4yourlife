@@ -8,8 +8,10 @@ import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -71,20 +73,34 @@ public class CommandInvoiceService {
                     .header("Authorization", configContifico.getApiSecret())
                     .retrieve()
                     .toEntity(String.class);
-
+            ObjectMapper objectMapper = new ObjectMapper();
+            var status = response.getStatusCode();
+            System.out.println(status);
             if (response.getStatusCode().is2xxSuccessful()) {
-                ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode rootNode = objectMapper.readTree(response.getBody());
                 invoice.setSentContifico(true);
                 invoice.setContificoId(rootNode.get("id").asText());
-                invoiceRepository.save(invoice);
                 System.out.println("Invoice sent to contifico successfully.");
-            } else {
-                System.err.println("Error sending invoice to contifico: " + response.getBody());
             }
+            invoiceRepository.save(invoice);
 
+        } catch (HttpClientErrorException e) {
+            try {
+                if (e.getStatusCode() == HttpStatusCode.valueOf(400)) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode errorNode = objectMapper.readTree(e.getResponseBodyAsString());
+                    String errorMessage = errorNode.has("mensaje") ? errorNode.get("mensaje").asText() : "Error desconocido";
+                    invoice.setContificoError(errorMessage);
+                    invoiceRepository.save(invoice);
+                } else {
+                    invoice.setContificoError("Error de cliente HTTP: " + e.getStatusCode());
+                }
+            } catch (Exception jsonException) {
+                invoice.setContificoError("Error al procesar la respuesta de error: " + e.getMessage());
+            }
+            System.err.println("Error sending invoice to contifico: " + e.getResponseBodyAsString());
         } catch (Exception e) {
-            System.err.println("Error sending invoice to contifico: " + e.getMessage());
+            System.err.println("Error sending invoice to contifico second: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -99,7 +99,7 @@ public class AdminSeeder {
 
             this.programRepository.saveAll(programs);
 
-            //mock();
+//            mock();
         };
     }
 

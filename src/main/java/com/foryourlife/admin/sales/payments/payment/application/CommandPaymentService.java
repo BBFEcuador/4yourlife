@@ -64,7 +64,7 @@ public class CommandPaymentService {
         this.commandInvoiceService = commandInvoiceService;
     }
 
-    public ByteArrayOutputStream save(PaymentRequest paymentReq) {
+    public String save(PaymentRequest paymentReq) {
 
         boolean hasPendingPayments = _paymentRepository.existsByParticipantIdAndStatus(paymentReq.participant, PaymentStatus.PENDING);
         var participant = participantQueryService.getUserById(paymentReq.participant);
@@ -120,7 +120,7 @@ public class CommandPaymentService {
         }
         cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
         eventBus.publish(List.of(new PaymentCreated(payment, invoice, cashDrawer)));
-        return generateInvoice(payment.getId());
+        return payment.getId();
     }
 
     public Invoice createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment payment) {

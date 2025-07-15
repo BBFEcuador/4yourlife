@@ -32,13 +32,7 @@ public class PaymentController {
 
     @PostMapping("")
     public ResponseEntity<?> savePayment(@RequestBody @Valid PaymentRequest request) {
-        ByteArrayOutputStream pdfBytes = commandPaymentService.save(request);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("filename", "payment.pdf");
-
-        return ResponseEntity.ok().headers(headers).body(pdfBytes.toByteArray());
+        return ResponseEntity.ok().body(commandPaymentService.save(request));
     }
 
 //    @PutMapping("")

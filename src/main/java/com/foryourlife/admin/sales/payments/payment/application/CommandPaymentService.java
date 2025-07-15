@@ -103,25 +103,30 @@ public class CommandPaymentService {
 
         var invoice = Invoice.create(UUID.randomUUID().toString(), paymentReq.invoice.fullName, paymentReq.invoice.address, paymentReq.invoice.document, paymentReq.invoice.phone, paymentReq.invoice.email, paymentReq.invoice.invoiceNumber, LocalDate.now(), products, payment, false, taxAmount.doubleValue(), 15.0, paymentReq.total);
         String paymentHistoryId = null;
+
+        var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
+        _paymentRepository.save(payment);
+        var newInvoice = createInvoice(invoice, cashDrawer, payment);
         if (!payment.getPaymentshistory().isEmpty()) {
 
             payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
             paymentHistoryId = payment.getPaymentshistory().getFirst().getId();
+
+            if (newInvoice.getContificoId() != null) {
+                PaymentHistoryCreated event = new PaymentHistoryCreated(payment.getPaymentshistory().getFirst(), newInvoice);
+
+                eventBus.publish(List.of(event));
+            }
         }
-        var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
-        _paymentRepository.save(payment);
-        createInvoice(invoice, cashDrawer, payment);
         cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
         eventBus.publish(List.of(new PaymentCreated(payment, invoice, cashDrawer)));
         return generateInvoice(payment.getId());
     }
 
-    public void createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment payment) {
+    public Invoice createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment payment) {
         if (invoice == null) {
-            System.err.println("No se puede crear factura: el campo dataInvoice está vacío.");
-            return;
+            throw new BaseException("No se puede crear factura: el campo dataInvoice está vacío.", List.of(""));
         }
-
         try {
             String invoiceNumber = getNextInvoiceNumber(cashDrawer);
 
@@ -130,9 +135,8 @@ public class CommandPaymentService {
             // Obtener configuración Contifico
             var config = configContificoQueryService.findConfigContificoByCampusId(payment.getCampus().getId());
             if (config == null) {
-                commandInvoiceService.save(invoice);
                 System.err.println("No se encontró la configuración de Contifico para el campus.");
-                return;
+                return commandInvoiceService.save(invoice);
             }
 
             // Generar autorización
@@ -171,10 +175,12 @@ public class CommandPaymentService {
 
             System.out.println("Factura creada y enviada correctamente.");
 
+            return savedInvoice;
         } catch (Exception e) {
             System.err.println("Error al crear o guardar la factura: " + e.getMessage());
             e.printStackTrace();
         }
+        return invoice;
     }
 
     public static int generateModule(String claveAcceso) {

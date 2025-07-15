@@ -9,6 +9,7 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -24,7 +25,12 @@ public class PaymentMethodCommandService {
     }
 
     public void createPaymentMethod(PaymentMethodRequest command) {
-        var campus = campusRepository.findById(command.campusId).orElseThrow(() -> new BaseException("Campus no encontrado", List.of("")));
+        if (Objects.equals(command.code, "TRA") && command.bankId == null) {
+            throw new BaseException("Para transferencias es necesario indicar el banco", List.of(""));
+        }
+        var campus = campusRepository.findById(command.campusId)
+                .orElseThrow(() -> new BaseException("Campus no encontrado", List.of("")));
+        var bank = bankQueryService.findById(command.bankId).orElse(null);
 
         String paymentMethodId = command.id != null ? command.id : UUID.randomUUID().toString();
 

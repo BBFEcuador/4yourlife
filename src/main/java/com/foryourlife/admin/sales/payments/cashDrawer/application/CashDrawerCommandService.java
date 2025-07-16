@@ -12,7 +12,12 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +38,7 @@ public class CashDrawerCommandService {
         return repository.save(cashDrawer);
     }
 
-    public void closeDrawer(String id, String userId) {
+    public ByteArrayOutputStream closeDrawer(String id, String userId) {
         var existingDrawer = repository.findByCashBoxIdAndStatus(id, CashDrawerStatus.OPEN).orElseThrow(
                 () -> new BaseException("No hay cajas abiertas para el cash box", List.of(""))
         );
@@ -50,6 +55,23 @@ public class CashDrawerCommandService {
         existingDrawer.setClosedByUser(user);
         existingDrawer.setClosedBalance(getActualBalance(existingDrawer));
         repository.save(existingDrawer);
+        ByteArrayOutputStream pdf = new ByteArrayOutputStream();
+
+        try {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(repository.generatePdfReport(existingDrawer));
+            renderer.layout();
+            renderer.createPDF(pdf);
+            String fileName = "invoice_" + existingDrawer.getId() + ".pdf";
+            String filePath = Paths.get("").toAbsolutePath().toString() + File.separator + fileName;
+
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                fos.write(pdf.toByteArray());
+            }
+            return pdf;
+        } catch (Exception e) {
+            throw new BaseException("Error generating invoice", List.of(e.getMessage()));
+        }
     }
 
     public CashDrawer openDrawer(String cashBoxId, String userId, Double openingBalance,String detail) {

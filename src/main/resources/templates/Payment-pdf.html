@@ -3,116 +3,116 @@
 <head>
     <meta charset='UTF-8'/>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
-    <title>Factura</title>
+    <title>Cobro</title>
     <style>
         @page {
-          size: A4;
-          margin: 1cm;
+            size: A4;
+            margin: 1cm;
         }
 
         body {
-          font-family: Arial, Helvetica, sans-serif;
-          font-size: 11px;
-          margin: 0;
-          padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            margin: 0;
+            padding: 10px;
         }
 
         .header {
-          margin-bottom: 15px;
-          overflow: hidden;
+            margin-bottom: 15px;
+            overflow: hidden;
         }
 
         .header-left,
         .header-right {
-          width: 48%;
-          display: inline-block;
-          vertical-align: top;
+            width: 48%;
+            display: inline-block;
+            vertical-align: top;
         }
 
         .header-left {
-          float: left;
+            float: left;
         }
 
         .header-right {
-          float: right;
+            float: right;
         }
 
         .logo img {
-          width: 100%;
-          max-width: 200px;
-          margin-bottom: 20px;
+            width: 100%;
+            max-width: 200px;
+            margin-bottom: 20px;
         }
 
         .info-box {
-          border: 1px solid #000;
-          padding: 15px;
-          border-radius: 10px;
+            border: 1px solid #000;
+            padding: 15px;
+            border-radius: 10px;
         }
 
         .info-row {
-          margin: 8px 0;
-          line-height: 1.4;
+            margin: 8px 0;
+            line-height: 1.4;
         }
 
         .info-label {
-          font-weight: bold;
+            font-weight: bold;
         }
 
         .main-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 15px 0;
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
         }
 
         .main-table th {
-          background-color: #f2f2f2;
-          border: 1px solid #000;
-          padding: 5px;
-          font-size: 10px;
+            background-color: #f2f2f2;
+            border: 1px solid #000;
+            padding: 5px;
+            font-size: 10px;
         }
 
         .main-table td {
-          border: 1px solid #000;
-          padding: 5px;
-          font-size: 10px;
+            border: 1px solid #000;
+            padding: 5px;
+            font-size: 10px;
         }
 
         .text-right {
-          text-align: right;
+            text-align: right;
         }
 
         .text-center {
-          text-align: center;
+            text-align: center;
         }
 
         .bottom-section {
-          overflow: hidden;
-          margin-top: 10px;
+            overflow: hidden;
+            margin-top: 10px;
         }
 
         .bottom-left,
         .bottom-right {
-          display: inline-block;
-          vertical-align: top;
+            display: inline-block;
+            vertical-align: top;
         }
 
         .bottom-left {
-          width: 60%;
+            width: 60%;
         }
 
         .bottom-right {
-          width: 35%;
-          margin-left: 4%;
+            width: 35%;
+            margin-left: 4%;
         }
 
         .barcode-container {
-          text-align: center;
-          margin: 10px 0;
+            text-align: center;
+            margin: 10px 0;
         }
 
         .barcode {
-          width: 100%;
-          max-height: 50px;
+            width: 100%;
+            max-height: 50px;
         }
     </style>
 
@@ -123,7 +123,7 @@
         <div class="logo">
             <img
                     style="width: 75%"
-                    th:src="@{classpath:static/images/focusYourLife.png}"/>
+                    th:src="@{classpath:static/images/focusYourLife.png}" alt="focus"/>
         </div>
         <div class="info-box">
             <div class="info-row"><span class="info-label">Nombre Comercial:</span>
@@ -132,22 +132,24 @@
                 </span>
             </div>
             <div class="info-row"><span class="info-label">Razón social:</span>
-                <span>
-                        IMPETUS S.A
+                <span th:text="${config.razonSocial}">
                 </span>
+            </div>
+            <div class="info-row"><span class="info-label">Dirección Matriz:</span>
+                <span th:text="${config.address}"></span>
             </div>
             <div class="info-row"><span class="info-label">Dirección:</span>
                 <span th:text="${payment.campus.address}"></span>
             </div>
             <div class="info-row"><span class="info-label">Teléfono:</span>
-                <span th:text="${payment.campus.phone}"></span>
+                <span th:text="${config.phone}"></span>
             </div>
         </div>
     </div>
     <div class="header-right">
         <div class="info-box" style="height: 100%;">
-            <div class="info-row"><span class="info-label">RUC:</span> 1999999999999</div>
-            <div class="info-row"><span style="font-size: 16px; font-weight: bold; margin: 15px 0;">FACTURA</span>
+            <div class="info-row"><span class="info-label">RUC:</span><span th:text="${config.ruc}"></span> </div>
+            <div class="info-row"><span style="font-size: 16px; font-weight: bold; margin: 15px 0;">COBRO</span>
                 <span style="font-size: 16px; font-weight: bold;"
                       th:text="${payment.invoice.invoiceNumber}"></span></div>
             <div class="info-row"><span class="info-label">FECHA:</span> <span th:text="${date}"></span>

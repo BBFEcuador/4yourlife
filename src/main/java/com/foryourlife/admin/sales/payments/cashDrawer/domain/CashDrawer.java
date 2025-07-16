@@ -3,7 +3,6 @@ package com.foryourlife.admin.sales.payments.cashDrawer.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.sales.payments.cashBox.domain.CashBox;
-import com.foryourlife.admin.sales.payments.cashDrawerDetail.application.CashDrawerDetailQueryService;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;

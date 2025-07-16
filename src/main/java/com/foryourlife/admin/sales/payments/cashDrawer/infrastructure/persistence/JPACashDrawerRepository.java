@@ -3,17 +3,27 @@ package com.foryourlife.admin.sales.payments.cashDrawer.infrastructure.persisten
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.PaymentMethodSummary;
+import com.foryourlife.admin.sales.payments.cashDrawerDetail.application.CashDrawerDetailQueryService;
+import com.foryourlife.admin.sales.payments.payment.application.QueryPaymentService;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.ByteArrayOutputStream;
+import java.util.*;
 
 @Service
 public class JPACashDrawerRepository implements CashDrawerRepository {
     private final JPAImplCashDrawerRepository repository;
+    private final CashDrawerDetailQueryService cashDrawerDetailQueryService;
 
-    public JPACashDrawerRepository(JPAImplCashDrawerRepository repository) {
+    public JPACashDrawerRepository(JPAImplCashDrawerRepository repository, CashDrawerDetailQueryService cashDrawerDetailQueryService) {
         this.repository = repository;
+        this.cashDrawerDetailQueryService = cashDrawerDetailQueryService;
     }
 
     @Override
@@ -38,7 +48,7 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
 
     @Override
     public List<CashDrawer> getByUserIdAndStatusOpen(String userid) {
-        return this.repository.findAllByStatusAndOpenedByUser_Id(CashDrawerStatus.OPEN,userid);
+        return this.repository.findAllByStatusAndOpenedByUser_Id(CashDrawerStatus.OPEN, userid);
     }
 
     @Override
@@ -54,5 +64,50 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     @Override
     public List<CashDrawer> getByCashBoxId(String id) {
         return this.repository.findAllByCashBox_Id(id);
+    }
+
+    @Override
+    public String generatePdfReport(CashDrawer cashDrawer) {
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+
+        var details = cashDrawerDetailQueryService.getByCashDrawerId(cashDrawer.getId());
+
+        List<PaymentMethodSummary> paymentMethods = new ArrayList<>();
+
+        for (var detail : details) {
+            for (var paymentHistory : detail.getPayment().getPaymentshistory()) {
+                PaymentMethodSummary existingSummary = paymentMethods.stream()
+                        .filter(summary -> summary.getPaymentMethod().getId().equals(paymentHistory.getPaymentMethod().getId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (existingSummary == null) {
+                    existingSummary = new PaymentMethodSummary(paymentHistory.getPaymentMethod());
+                    paymentMethods.add(existingSummary);
+                }
+
+                existingSummary.addPayment(paymentHistory.getAmount());
+            }
+        }
+
+        paymentMethods = List.copyOf(paymentMethods);
+
+        System.out.println("Number of payment methods found: " + paymentMethods.size());
+        for (PaymentMethodSummary summary : paymentMethods) {
+            System.out.println("Payment Method: " + summary.getPaymentMethod().getType() +
+                    ", Total Amount: " + summary.getTotalAmount() +
+                    ", Transaction Count: " + summary.getTransactionCount());
+        }
+
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+        Context context = new Context();
+
+        context.setVariable("cashDrawer", cashDrawer);
+        context.setVariable("details", details);
+        context.setVariable("paymentMethods", paymentMethods);
+        return templateEngine.process("templates/Report-cash-drawer-pdf", context);
     }
 }

@@ -1,5 +1,7 @@
 package com.foryourlife.admin.sales.payments.payment.infrastructure.persistence;
 
+import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
+import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
@@ -23,10 +25,12 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     private final JPAPaymentRepository _jpaPaymentRepository;
     private final JPACriteriaConverter<Payment> converter;
+    private final ConfigContificoQueryService configContificoQueryService;
 
-    public PaymentRepositoryImpl(JPAPaymentRepository jpaPaymentRepository, JPACriteriaConverter<Payment> converter) {
-        _jpaPaymentRepository = jpaPaymentRepository;
+    public PaymentRepositoryImpl(JPAPaymentRepository _jpaPaymentRepository, JPACriteriaConverter<Payment> converter, ConfigContificoQueryService configContificoQueryService) {
+        this._jpaPaymentRepository = _jpaPaymentRepository;
         this.converter = converter;
+        this.configContificoQueryService = configContificoQueryService;
     }
 
     @Override
@@ -66,6 +70,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode(TemplateMode.HTML);
 
+        var config = configContificoQueryService.findConfigContificoByCampusId(payment.getCampus().getId());
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
 
@@ -74,12 +79,12 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         context.setVariable("date", payment.getCreated_at());
         context.setVariable("subtotal", BigDecimal.valueOf(payment.getTotal() / 1.15).setScale(2, RoundingMode.HALF_UP));
         context.setVariable("iva", BigDecimal.valueOf(payment.getTotal() - (payment.getTotal() / 1.15)).setScale(2, RoundingMode.HALF_UP));
+        context.setVariable("config", config);
         if (payment.getDiscount() != null) {
             context.setVariable("discount", payment.getDiscount().getDiscountValue());
         } else {
             context.setVariable("discount", 0.0);
         }
-
         return templateEngine.process("templates/Payment-pdf", context);
     }
 }

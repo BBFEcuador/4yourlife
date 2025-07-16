@@ -3,8 +3,10 @@ package com.foryourlife.admin.sales.payments.store.application;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foryourlife.admin.contifico.config.domain.ConfigContificoRepository;
+import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.sales.payments.store.domain.Store;
 import com.foryourlife.admin.sales.payments.store.domain.StoreRepository;
+import com.foryourlife.admin.sales.payments.store.infrastructure.http.StoreRequest;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,11 +21,13 @@ public class StoreCommandService {
     private final StoreRepository repository;
     private final RestClient client;
     private final ConfigContificoRepository configContificoRepository;
+    private final QueryCampusService queryCampusService;
 
-    public StoreCommandService(StoreRepository repository, RestClient client, ConfigContificoRepository configContificoRepository) {
+    public StoreCommandService(StoreRepository repository, RestClient client, ConfigContificoRepository configContificoRepository, QueryCampusService queryCampusService) {
         this.repository = repository;
         this.client = client;
         this.configContificoRepository = configContificoRepository;
+        this.queryCampusService = queryCampusService;
     }
 
     public void syncStoresFromContifico(String campusId) {
@@ -62,5 +66,18 @@ public class StoreCommandService {
             e.printStackTrace();
             throw new BaseException("Error sincronizando con contifico", List.of(""));
         }
+    }
+
+    public void create(StoreRequest store) {
+
+        var campus = queryCampusService.findById(store.getCampusId());
+
+        var newStore = new Store(
+                store.id != null? store.getId() : UUID.randomUUID().toString(),
+                store.getAddress(),
+                store.getNumber(),
+                campus
+        );
+        repository.save(newStore);
     }
 }

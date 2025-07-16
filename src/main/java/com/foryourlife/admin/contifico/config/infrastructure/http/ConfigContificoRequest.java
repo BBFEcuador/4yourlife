@@ -17,4 +17,14 @@ public class ConfigContificoRequest {
     @NotNull(message = "Ruc es requerido")
     @NotBlank(message = "El RUC no puede estar vacío")
     public String ruc;
+    @NotNull(message = "Razón social es requerida")
+    @NotBlank(message = "La razón social no puede estar vacía")
+    public String razonSocial;
+    @NotNull(message = "Dirección es requerida")
+    @NotBlank(message = "La dirección no puede estar vacía")
+    public String address;
+    @NotNull(message = "Telefono es requerido")
+    @NotBlank(message = "El telefono no puede estar vacío")
+    public String phone;
+
 }

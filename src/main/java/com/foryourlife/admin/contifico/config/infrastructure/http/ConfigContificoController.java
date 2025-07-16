@@ -35,4 +35,10 @@ public class ConfigContificoController {
     public ResponseEntity<?> getConfigContificoByCampusId(@PathVariable String campusId) {
         return ResponseEntity.ok(configContificoQueryService.findConfigContificoByCampusId(campusId));
     }
+
+    @PostMapping("/manual")
+    public ResponseEntity<?> createConfigContificoManual(@Valid  @RequestBody ConfigContificoRequest configContificoRequest) {
+        configContificoCommandService.createConfigContifico(configContificoRequest);
+        return ResponseEntity.ok().build();
+    }
 }

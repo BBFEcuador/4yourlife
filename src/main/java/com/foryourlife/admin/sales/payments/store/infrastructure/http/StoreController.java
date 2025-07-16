@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.payments.store.infrastructure.http;
 
 import com.foryourlife.admin.sales.payments.store.application.StoreCommandService;
 import com.foryourlife.admin.sales.payments.store.application.StoreQueryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,5 +30,11 @@ public class StoreController {
     @GetMapping("{id}")
     public ResponseEntity<?> getStoreById(@PathVariable String id) {
         return new ResponseEntity<>(storeQueryService.getStoreById(id), HttpStatus.OK);
+    }
+
+    @PostMapping("add-change")
+    public ResponseEntity<?> addStore(@RequestBody @Valid StoreRequest store) {
+        storeService.create(store);
+        return ResponseEntity.ok(HttpStatus.CREATED);
     }
 }

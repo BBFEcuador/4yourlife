@@ -24,8 +24,12 @@ public class ConfigContificoCommandService {
                 configContificoRequest.id == null ?  UUID.randomUUID().toString(): configContificoRequest.id,
                 configContificoRequest.apiKey,
                 configContificoRequest.apiSecret,
+                configContificoRequest.razonSocial,
+                configContificoRequest.address,
+                configContificoRequest.phone,
                 configContificoRequest.ruc,
                 campus
+
         );
         repository.save(configContifico);
     }

@@ -5,8 +5,10 @@ import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerReposito
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.PaymentMethodSummary;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.application.CashDrawerDetailQueryService;
+import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
 import com.foryourlife.admin.sales.payments.payment.application.QueryPaymentService;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -74,27 +76,11 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
 
         var details = cashDrawerDetailQueryService.getByCashDrawerId(cashDrawer.getId());
 
-        List<PaymentMethodSummary> paymentMethods = new ArrayList<>();
+        Map<String, PaymentMethodSummary> paymentMethodMap = getStringPaymentMethodSummaryMap(details);
 
-        for (var detail : details) {
-            for (var paymentHistory : detail.getPayment().getPaymentshistory()) {
-                PaymentMethodSummary existingSummary = paymentMethods.stream()
-                        .filter(summary -> summary.getPaymentMethod().getId().equals(paymentHistory.getPaymentMethod().getId()))
-                        .findFirst()
-                        .orElse(null);
+        PaymentMethodSummary[] paymentMethods = paymentMethodMap.values().toArray(new PaymentMethodSummary[0]);
 
-                if (existingSummary == null) {
-                    existingSummary = new PaymentMethodSummary(paymentHistory.getPaymentMethod());
-                    paymentMethods.add(existingSummary);
-                }
-
-                existingSummary.addPayment(paymentHistory.getAmount());
-            }
-        }
-
-        paymentMethods = List.copyOf(paymentMethods);
-
-        System.out.println("Number of payment methods found: " + paymentMethods.size());
+        System.out.println("Number of payment methods found: " + paymentMethods.length);
         for (PaymentMethodSummary summary : paymentMethods) {
             System.out.println("Payment Method: " + summary.getPaymentMethod().getType() +
                     ", Total Amount: " + summary.getTotalAmount() +
@@ -109,5 +95,25 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
         context.setVariable("details", details);
         context.setVariable("paymentMethods", paymentMethods);
         return templateEngine.process("templates/Report-cash-drawer-pdf", context);
+    }
+
+    @NotNull
+    private static Map<String, PaymentMethodSummary> getStringPaymentMethodSummaryMap(List<CashDrawerDetail> details) {
+        Map<String, PaymentMethodSummary> paymentMethodMap = new HashMap<>();
+
+        for (var detail : details) {
+            for (var paymentHistory : detail.getPayment().getPaymentshistory()) {
+                String paymentMethodId = paymentHistory.getPaymentMethod().getId();
+                PaymentMethodSummary summary = paymentMethodMap.get(paymentMethodId);
+
+                if (summary == null) {
+                    summary = new PaymentMethodSummary(paymentHistory.getPaymentMethod());
+                    paymentMethodMap.put(paymentMethodId, summary);
+                }
+
+                summary.addPayment(paymentHistory.getAmount());
+            }
+        }
+        return paymentMethodMap;
     }
 }

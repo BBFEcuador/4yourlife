@@ -9,41 +9,36 @@
             margin: 0;
         }
 
-        table,
-        h3 {
-            width: 80%;
-            border-collapse: collapse;
-            margin-left: auto;
-            margin-right: auto;
+        body {
+            font-family: monospace;
+            font-size: 12px;
         }
 
-        th,
-        td {
-            border: 1px solid black;
-            padding: 6px;
-            text-align: left;
-            font-size: 11 !important;
-        }
-
-        h1 {
+        .center {
             text-align: center;
-            font-size: 20
         }
 
-        .flex-container {
+        .section {
+            width: 85%;
+            margin: auto;
+            margin-bottom: 15px;
+        }
+
+        .flex {
             display: flex;
             justify-content: space-between;
-            width: 80%;
-            margin-left: 10%;
-            margin-right: auto;
-            align-items: center;
-            width: 100%;
         }
 
-        .height-adjusted-row th,
-        .height-adjusted-row td {
-            height: 50px;
-            /* Ajusta esta altura según tus necesidades */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: left;
         }
 
         footer {
@@ -52,88 +47,116 @@
             left: 0;
             width: 100%;
         }
+
+        h2, h3 {
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 
-
-<h1 class="title">Informe Cierre de Caja </h1>
-
 <body>
-<div class="flex-container">
-    <strong>Fecha de apertura:</strong>
-    <span th:text="${cashDrawer.startDate}" ></span>
-</div>
-<div class="flex-container">
-    <strong>Fecha de cierre:</strong>
-    <span th:text="${cashDrawer.closeDate}"></span>
-</div>
-<div class="flex-container">
-    <strong>Monto de apertura:</strong>
-    <span th:text="${cashDrawer.openingBalance}"></span>
+<!-- ENCABEZADO -->
+<div class="section center">
+    <h2>EVA ERP 10009 CON DATOS</h2>
+    <p>CIERRE DE CAJA No. <span th:text="${cashDrawer.id}">0000680</span></p>
 </div>
 
-<table>
-    <thead>
-    <tr>
-        <th>Total</th>
-        <th>Forma de Pago</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="paymentMethod : ${paymentMethods}">
-        <td th:text="${paymentMethod.getPaymentMethod().type}"></td>
-        <td th:text="${paymentMethod.getAmount()}"></td>
-    </tr>
-    </tbody>
-</table>
-<table>
-    <thead>
-    <tr>
-        <th>Observación:</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td>
-            @if ($cajaDetalle->observacion)
-            {{ $cajaDetalle->observacion }}
-            @else
-            No hay observaciones
-            @endif
-            </td>
-    </tr>
-    </tbody>
-</table>
-</body>
+<!-- DATOS GENERALES -->
+<div class="section">
+    <div class="flex">
+        <span><strong>Caja:</strong> <span th:text="${cashDrawer.cashBox.number}">Caja 1</span></span>
+        <span><strong>Tienda:</strong> <span th:text="${cashDrawer.cashBox.store.name}">Matriz</span></span>
+    </div>
+    <div class="flex">
+        <span><strong>Fecha apertura:</strong> <span th:text="${#temporals.format(cashDrawer.startDate, 'dd/MM/yyyy HH:mm:ss')}"></span></span>
+        <span><strong>Fecha cierre:</strong> <span th:text="${#temporals.format(cashDrawer.closeDate, 'dd/MM/yyyy HH:mm:ss')}"></span></span>
+    </div>
+    <div class="flex">
+        <span><strong>Abierto por:</strong> <span th:text="${cashDrawer.openedByUser.fullName}"></span></span>
+        <span><strong>Cerrado por:</strong> <span th:text="${cashDrawer.closedByUser.fullName}"></span></span>
+    </div>
+    <div class="flex">
+        <span><strong>Saldo Inicial:</strong> <span th:text="${cashDrawer.openingBalance}"></span></span>
+        <span><strong>Saldo Final:</strong> <span th:text="${cashDrawer.closedBalance}"></span></span>
+    </div>
+    <div class="flex">
+        <span><strong>Estado:</strong> <span th:text="${cashDrawer.status}"></span></span>
+        <span><strong>Observación:</strong> <span th:text="${cashDrawer.detail != null ? cashDrawer.detail : 'No hay observaciones'}"></span></span>
+    </div>
+</div>
 
-<footer>
+<!-- INGRESOS POR FORMA DE PAGO -->
+<div class="section">
+    <h3>Ingresos por forma de pago</h3>
     <table>
         <thead>
-        <tr class="height-adjusted-row">
-            <th style="width: 50%"></th>
-            <th></th>
+        <tr>
+            <th>Forma de Pago</th>
+            <th>Total</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-            <th>Encargado</th>
-            <th>
-                Supervidor
-            </th>
+            <td>Efectivo</td>
+            <td th:text="${cashDrawer.cashDrawerDetails.?[paymentMethod == 'EFECTIVO'].![amount].stream().reduce(0.0, T(java.lang.Double).sum)}">0.00</td>
+        </tr>
+        <tr>
+            <td>Cheque</td>
+            <td th:text="${cashDrawer.cashDrawerDetails.?[paymentMethod == 'CHEQUE'].![amount].stream().reduce(0.0, T(java.lang.Double).sum)}">0.00</td>
+        </tr>
+        <tr>
+            <td>Tarjeta de Crédito</td>
+            <td th:text="${cashDrawer.cashDrawerDetails.?[paymentMethod == 'TARJETA'].![amount].stream().reduce(0.0, T(java.lang.Double).sum)}">0.00</td>
+        </tr>
+        <tr>
+            <td>Depósitos</td>
+            <td th:text="${cashDrawer.cashDrawerDetails.?[paymentMethod == 'DEPOSITO'].![amount].stream().reduce(0.0, T(java.lang.Double).sum)}">0.00</td>
+        </tr>
+        <tr>
+            <td><strong>Total Ingresos</strong></td>
+            <td th:text="${cashDrawer.cashDrawerDetails.![amount].stream().reduce(0.0, T(java.lang.Double).sum)}">0.00</td>
         </tr>
         </tbody>
-        <tfoot>
-        <tr>
-            <td>
-                @if ($user)
-                {{ $user }}
-                @else
-                No hay observaciones
-                @endif
-            </td>
-            <td></td>
-        </tr>
-        </tfoot>
     </table>
+</div>
+
+<!-- DETALLE DE INGRESOS -->
+<div class="section">
+    <h3>Detalle de Ingresos</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Descripción</th>
+            <th>Monto</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="paymentMethod : ${paymentMethods}">
+            <td th:text="${paymentMethod.paymentMethod.type}"></td>
+            <td th:text="${paymentMethod.totalAmount}"></td>
+        </tr>
+        <tr>
+            <td><strong>Total</strong></td>
+            <td th:text="${#lists.isEmpty(cashDrawer.cashDrawerDetails) ? '0.00' : #aggregates.sum(cashDrawer.cashDrawerDetails.![amount])}">0.00</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- PIE DE FIRMA -->
+<footer>
+    <div class="section">
+        <table>
+            <tr>
+                <th>Encargado</th>
+                <th>Supervisor</th>
+            </tr>
+            <tr>
+                <td th:text="${cashDrawer.closedByUser.name}">Encargado</td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
 </footer>
+</body>
 </html>

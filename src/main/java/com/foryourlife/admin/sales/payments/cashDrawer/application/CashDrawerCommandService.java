@@ -1,6 +1,5 @@
 package com.foryourlife.admin.sales.payments.cashDrawer.application;
 
-import com.foryourlife.admin.sales.payments.cashBox.domain.CashBox;
 import com.foryourlife.admin.sales.payments.cashBox.domain.CashBoxRepository;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
@@ -10,7 +9,6 @@ import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.UserRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 

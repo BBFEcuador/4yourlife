@@ -60,12 +60,12 @@ public class CashDrawerCommandService {
             renderer.setDocumentFromString(repository.generatePdfReport(existingDrawer));
             renderer.layout();
             renderer.createPDF(pdf);
-            String fileName = "invoice_" + existingDrawer.getId() + ".pdf";
-            String filePath = Paths.get("").toAbsolutePath().toString() + File.separator + fileName;
-
-            try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                fos.write(pdf.toByteArray());
-            }
+//            String fileName = "invoice_" + existingDrawer.getId() + ".pdf";
+//            String filePath = Paths.get("").toAbsolutePath().toString() + File.separator + fileName;
+//
+//            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+//                fos.write(pdf.toByteArray());
+//            }
             return pdf;
         } catch (Exception e) {
             throw new BaseException("Error generating invoice", List.of(e.getMessage()));

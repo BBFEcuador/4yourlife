@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Reporte de Cierre de Caja</title>
     <style>
         @page {
@@ -58,22 +58,24 @@
 <!-- ENCABEZADO -->
 <div class="section center">
     <h2>EVA ERP 10009 CON DATOS</h2>
-    <p>CIERRE DE CAJA No. <span th:text="${cashDrawer.id}">0000680</span></p>
+    <p>CIERRE DE CAJA No. <span th:text="${cashDrawer.id}"></span></p>
 </div>
 
 <!-- DATOS GENERALES -->
 <div class="section">
     <div class="flex">
-        <span><strong>Caja:</strong> <span th:text="${cashDrawer.cashBox.number}">Caja 1</span></span>
-        <span><strong>Tienda:</strong> <span th:text="${cashDrawer.cashBox.store.name}">Matriz</span></span>
+        <span><strong>Caja:</strong> <span th:text="${cashDrawer.cashBox.number}"></span></span>
+        <span><strong>Tienda:</strong> <span th:text="${cashDrawer.cashBox.store.address}">Matriz</span></span>
     </div>
     <div class="flex">
-        <span><strong>Fecha apertura:</strong> <span th:text="${#temporals.format(cashDrawer.startDate, 'dd/MM/yyyy HH:mm:ss')}"></span></span>
-        <span><strong>Fecha cierre:</strong> <span th:text="${#temporals.format(cashDrawer.closeDate, 'dd/MM/yyyy HH:mm:ss')}"></span></span>
+        <span><strong>Fecha apertura:</strong> <span
+                th:text="${#temporals.format(cashDrawer.startDate, 'dd/MM/yyyy HH:mm:ss')}"></span></span>
+        <span><strong>Fecha cierre:</strong> <span
+                th:text="${#temporals.format(cashDrawer.closeDate, 'dd/MM/yyyy HH:mm:ss')}"></span></span>
     </div>
     <div class="flex">
-        <span><strong>Abierto por:</strong> <span th:text="${cashDrawer.openedByUser.fullName}"></span></span>
-        <span><strong>Cerrado por:</strong> <span th:text="${cashDrawer.closedByUser.fullName}"></span></span>
+        <span><strong>Abierto por:</strong> <span th:text="${cashDrawer.openedByUser.name}"></span></span>
+        <span><strong>Cerrado por:</strong> <span th:text="${cashDrawer.closedByUser.name}"></span></span>
     </div>
     <div class="flex">
         <span><strong>Saldo Inicial:</strong> <span th:text="${cashDrawer.openingBalance}"></span></span>
@@ -81,11 +83,11 @@
     </div>
     <div class="flex">
         <span><strong>Estado:</strong> <span th:text="${cashDrawer.status}"></span></span>
-        <span><strong>Observación:</strong> <span th:text="${cashDrawer.detail != null ? cashDrawer.detail : 'No hay observaciones'}"></span></span>
+        <span><strong>Observación:</strong> <span
+                th:text="${cashDrawer.detail != null ? cashDrawer.detail : 'No hay observaciones'}"></span></span>
     </div>
 </div>
 
-<!-- INGRESOS POR FORMA DE PAGO -->
 <div class="section">
     <h3>Ingresos por forma de pago</h3>
     <table>
@@ -96,25 +98,13 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>Efectivo</td>
-            <td th:text="${cashDrawer.cashDrawerDetails.?[paymentMethod == 'EFECTIVO'].![amount].stream().reduce(0.0, T(java.lang.Double).sum)}">0.00</td>
-        </tr>
-        <tr>
-            <td>Cheque</td>
-            <td th:text="${cashDrawer.cashDrawerDetails.?[paymentMethod == 'CHEQUE'].![amount].stream().reduce(0.0, T(java.lang.Double).sum)}">0.00</td>
-        </tr>
-        <tr>
-            <td>Tarjeta de Crédito</td>
-            <td th:text="${cashDrawer.cashDrawerDetails.?[paymentMethod == 'TARJETA'].![amount].stream().reduce(0.0, T(java.lang.Double).sum)}">0.00</td>
-        </tr>
-        <tr>
-            <td>Depósitos</td>
-            <td th:text="${cashDrawer.cashDrawerDetails.?[paymentMethod == 'DEPOSITO'].![amount].stream().reduce(0.0, T(java.lang.Double).sum)}">0.00</td>
+        <tr th:each="method : ${paymentMethods}">
+            <td th:text="${method.paymentMethod.type}">Forma de Pago</td>
+            <td th:text="${#numbers.formatDecimal(method.totalAmount, 1, 2)}"></td>
         </tr>
         <tr>
             <td><strong>Total Ingresos</strong></td>
-            <td th:text="${cashDrawer.cashDrawerDetails.![amount].stream().reduce(0.0, T(java.lang.Double).sum)}">0.00</td>
+            <td th:text="${#numbers.formatDecimal(totalIncome, 1, 2)}"></td>
         </tr>
         </tbody>
     </table>
@@ -126,18 +116,22 @@
     <table>
         <thead>
         <tr>
+            <th>Fecha</th>
             <th>Descripción</th>
+            <th>Forma de Pago</th>
             <th>Monto</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="paymentMethod : ${paymentMethods}">
-            <td th:text="${paymentMethod.paymentMethod.type}"></td>
-            <td th:text="${paymentMethod.totalAmount}"></td>
+        <tr th:each="detail : ${details}">
+            <td th:text="${detail.date}"></td>
+            <td th:text="${detail.productName}"></td>
+            <td th:text="${detail.paymentMethod}"></td>
+            <td th:text="${#numbers.formatDecimal(detail.amount, 1, 2)}"></td>
         </tr>
         <tr>
             <td><strong>Total</strong></td>
-            <td th:text="${#lists.isEmpty(cashDrawer.cashDrawerDetails) ? '0.00' : #aggregates.sum(cashDrawer.cashDrawerDetails.![amount])}">0.00</td>
+            <td th:text="${cashDrawer.closedBalance}"></td>
         </tr>
         </tbody>
     </table>
@@ -149,10 +143,14 @@
         <table>
             <tr>
                 <th>Encargado</th>
+                <th>Firma</th>
                 <th>Supervisor</th>
+                <th>Firma</th>
             </tr>
             <tr>
                 <td th:text="${cashDrawer.closedByUser.name}">Encargado</td>
+                <td></td>
+                <td></td>
                 <td></td>
             </tr>
         </table>

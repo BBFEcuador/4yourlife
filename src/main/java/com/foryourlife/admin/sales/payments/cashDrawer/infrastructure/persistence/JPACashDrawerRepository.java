@@ -17,6 +17,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.io.ByteArrayOutputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class JPACashDrawerRepository implements CashDrawerRepository {
@@ -80,20 +81,38 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
 
         PaymentMethodSummary[] paymentMethods = paymentMethodMap.values().toArray(new PaymentMethodSummary[0]);
 
+        double totalIncome = Arrays.stream(paymentMethods)
+                .mapToDouble(PaymentMethodSummary::getTotalAmount)
+                .sum();
+
         System.out.println("Number of payment methods found: " + paymentMethods.length);
         for (PaymentMethodSummary summary : paymentMethods) {
             System.out.println("Payment Method: " + summary.getPaymentMethod().getType() +
                     ", Total Amount: " + summary.getTotalAmount() +
                     ", Transaction Count: " + summary.getTransactionCount());
         }
+        List<Map<String, Object>> simplifiedDetails = details.stream()
+                .map(detail -> {
+                    Map<String, Object> map = new HashMap<>();
+                    PaymentHistory paymentHistory = findPaymentHistory(detail);
+                    map.put("date", paymentHistory != null ? paymentHistory.getDate() : "");
+                    map.put("productName", detail.getPayment() != null && !detail.getPayment().getProducts().isEmpty()
+                            ? detail.getPayment().getProducts().getFirst().getName() : "");
+                    map.put("paymentMethod", paymentHistory != null && paymentHistory.getPaymentMethod() != null
+                            ? paymentHistory.getPaymentMethod().getType() : "");
+                    map.put("amount", paymentHistory != null ? paymentHistory.getAmount() : 0.0);
+                    return map;
+                })
+                .toList();
 
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
         Context context = new Context();
 
         context.setVariable("cashDrawer", cashDrawer);
-        context.setVariable("details", details);
+        context.setVariable("details", simplifiedDetails);
         context.setVariable("paymentMethods", paymentMethods);
+        context.setVariable("totalIncome", totalIncome);
         return templateEngine.process("templates/Report-cash-drawer-pdf", context);
     }
 
@@ -104,16 +123,21 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
         for (var detail : details) {
             for (var paymentHistory : detail.getPayment().getPaymentshistory()) {
                 String paymentMethodId = paymentHistory.getPaymentMethod().getId();
-                PaymentMethodSummary summary = paymentMethodMap.get(paymentMethodId);
-
-                if (summary == null) {
-                    summary = new PaymentMethodSummary(paymentHistory.getPaymentMethod());
-                    paymentMethodMap.put(paymentMethodId, summary);
-                }
+                PaymentMethodSummary summary = paymentMethodMap.computeIfAbsent(paymentMethodId, k -> new PaymentMethodSummary(paymentHistory.getPaymentMethod()));
 
                 summary.addPayment(paymentHistory.getAmount());
             }
         }
         return paymentMethodMap;
+    }
+
+    private PaymentHistory findPaymentHistory(CashDrawerDetail detail) {
+        if (detail.getPayment() != null && detail.getPaymentHistoryId() != null) {
+            return detail.getPayment().getPaymentshistory().stream()
+                    .filter(ph -> ph.getId().equals(detail.getPaymentHistoryId()))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
     }
 }

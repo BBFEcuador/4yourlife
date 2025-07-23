@@ -40,4 +40,9 @@ public class InvitationController {
     public ResponseEntity<?> getUserInvitation(@PathVariable String id) {
         return new ResponseEntity<>(this.queryInvitationServices.findActiveUserInvitation(id), HttpStatus.CREATED);
     }
+
+    @GetMapping("{token}")
+    public ResponseEntity<?> getInvitationByToken(@PathVariable String token) {
+        return new ResponseEntity<>(this.queryInvitationServices.findInvitationByToken(token), HttpStatus.CREATED);
+    }
 }

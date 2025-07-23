@@ -8,6 +8,8 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
+import java.util.List;
+
 @Entity
 @Table(name = "invitation")
 public class Invitation extends AggregateRoot {
@@ -15,9 +17,9 @@ public class Invitation extends AggregateRoot {
     private String id;
     @Column(unique = true)
     private String token;
-    @OneToOne(optional = true)
-    @JoinColumn(referencedColumnName = "id", name = "user_id", nullable = true)
-    private Participant users;
+    @Type(JsonType.class)
+    @Column(columnDefinition = "jsonb")
+    private List<EnrolledUsers> users = List.of();
     @ManyToOne()
     @JoinColumn(referencedColumnName = "id", name = "campus_id")
     private Campus campus;
@@ -29,10 +31,9 @@ public class Invitation extends AggregateRoot {
     @Column(columnDefinition = "jsonb")
     private Sender enrolled;
 
-    private Invitation(String id, String token, Participant users, Boolean isAdmin, Boolean isUsed, String senderId, Sender enrolled, Integer quantity, Campus campus) {
+    private Invitation(String id, String token, Boolean isAdmin, Boolean isUsed, String senderId, Sender enrolled, Integer quantity, Campus campus) {
         this.id = id;
         this.token = token;
-        this.users = users;
         this.isAdmin = isAdmin;
         this.isUsed = isUsed;
         this.senderId = senderId;
@@ -47,7 +48,7 @@ public class Invitation extends AggregateRoot {
 
 
     public static Invitation create(String id, String token, Participant users, Boolean isAdmin, String senderId, Sender enrolled, Integer quantity, Campus campus) {
-        var invitation = new Invitation(id, token, users, isAdmin, false, senderId, enrolled, quantity, campus);
+        var invitation = new Invitation(id, token, isAdmin, false, senderId, enrolled, quantity, campus);
         invitation.record(new InvitationCreated(id, invitation));
         return invitation;
     }
@@ -68,7 +69,7 @@ public class Invitation extends AggregateRoot {
         return token;
     }
 
-    public Participant getUsers() {
+    public List<EnrolledUsers> getUsers() {
         return users;
     }
 
@@ -89,14 +90,12 @@ public class Invitation extends AggregateRoot {
     }
 
     public void consumeToken() {
-        if (this.quantity == 0)
-            return;
+        if (this.quantity == 0) return;
         this.quantity--;
-        if (this.quantity == 0)
-            this.isUsed = true;
+        if (this.quantity == 0) this.isUsed = true;
     }
 
-    public void setUsers(Participant users) {
+    public void setUsers(List<EnrolledUsers> users) {
         this.users = users;
     }
 

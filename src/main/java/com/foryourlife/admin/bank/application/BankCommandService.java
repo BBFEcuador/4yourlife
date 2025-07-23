@@ -64,7 +64,7 @@ public class BankCommandService {
 
     public void createBank(BankRequest bank) {
         var campus = queryCampusService.findById(bank.getCampusId());
-        var newBank = new Bank(!bank.getId().isEmpty() && bank.getId() != null ? bank.getId() : UUID.randomUUID().toString(), bank.getName(), bank.getNumber(), null, campus);
+        var newBank = new Bank(bank.getId() != null && !bank.getId().isEmpty() ? bank.getId() : UUID.randomUUID().toString(), bank.getName(), bank.getNumber(), null, campus);
         repository.saveBank(newBank);
     }
 }

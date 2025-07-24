@@ -57,4 +57,14 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     public Optional<Invoice> findInvoiceByPaymentId(String paymentId) {
         return jpaInvoiceRepository.findByPayment_Id(paymentId);
     }
+
+    @Override
+    public List<Invoice> findInvoicesBySentContifico(Boolean sentContifico) {
+        return jpaInvoiceRepository.findAllByIsSentContifico(sentContifico);
+    }
+
+    @Override
+    public List<Invoice> findInvoicesBySentContificoAndCampusId(Boolean sentContifico, String campusId) {
+        return jpaInvoiceRepository.findAllByIsSentContificoAndPayment_Campus_Id(sentContifico, campusId);
+    }
 }

@@ -32,6 +32,12 @@ public class InvoiceController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("send")
+    public ResponseEntity<?> sendInvoicesContifico(@RequestParam(value = "campusId", defaultValue = "") String campusId) {
+        commandInvoiceService.resendToContifico(campusId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PutMapping("")
     public ResponseEntity<?> updateInvoice(@RequestBody InvoiceRequest request) {
         commandInvoiceService.update(request);
@@ -44,15 +50,7 @@ public class InvoiceController {
         List<Filter> filters = new ArrayList<>();
 
         if (!search.isEmpty()) {
-            filters.addAll(List.of(
-                            new Filter("fullName", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                            new Filter("address", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                            new Filter("document", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                            new Filter("phone", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                            new Filter("email", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                            new Filter("invoiceNumber", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)
-                    )
-            );
+            filters.addAll(List.of(new Filter("fullName", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("address", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("document", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("phone", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("email", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("invoiceNumber", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)));
         }
 
         if (!campusId.isEmpty()) {

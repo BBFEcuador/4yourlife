@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS configs_contifico
 (
     id text not null primary key,
-    apiKey text not null,
-    apiSecret text not null,
+    apiKey text,
+    apiSecret text,
     ruc text not null,
     razon_social text not null,
     address text not null,

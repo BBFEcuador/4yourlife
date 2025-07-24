@@ -14,6 +14,10 @@ import java.util.Optional;
 public interface JPAInvoiceRepository extends JpaRepository<Invoice, String>, JpaSpecificationExecutor<Invoice> {
     Optional<Invoice> findTopByIsSentContificoIsTrueOrderByInvoiceDateDesc();
 
+    List<Invoice> findAllByIsSentContifico(Boolean sentContifico);
+
+    List<Invoice> findAllByIsSentContificoAndPayment_Campus_Id(Boolean sentContifico, String campusId);
+
     List<Invoice> findAllByPayment_Id(String paymentId);
 
     Page<Invoice> findAllByPayment_Participant_Id(String paymentParticipantId, Pageable pageable);

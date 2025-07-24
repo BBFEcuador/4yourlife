@@ -12,7 +12,6 @@ public class Store {
     private String id;
     private String address;
     private String number;
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(
             name = "campus_id",

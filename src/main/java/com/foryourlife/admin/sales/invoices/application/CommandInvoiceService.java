@@ -37,42 +37,33 @@ public class CommandInvoiceService {
         if (invoiceReq.id == null) {
             throw new IllegalArgumentException("No se puede actualizar, ID nula");
         }
-        if (invoiceRepository.findById(invoiceReq.id).getSentContifico() == true)
+
+        var invoice = invoiceRepository.findById(invoiceReq.id);
+
+        if (invoice.getSentContifico() == true)
             throw new IllegalArgumentException("No se puede actualizar, ya fue enviada al SRI");
-        var invoice = Invoice.create(
-                invoiceReq.id,
-                invoiceReq.fullName,
-                invoiceReq.address,
-                invoiceReq.document,
-                invoiceReq.phone,
-                invoiceReq.email,
-                invoiceReq.invoiceNumber,
-                invoiceReq.invoiceDate,
-                invoiceReq.products,
-                invoiceReq.payment,
-                invoiceReq.sentSri,
-                invoiceReq.amount,
-                15.0,
-                invoiceReq.amount
-
-
-        );
+        invoice = Invoice.create(invoiceReq.id, invoiceReq.fullName, invoiceReq.address, invoiceReq.document, invoiceReq.phone, invoiceReq.email, invoice.getInvoiceNumber(), invoice.getInvoiceDate(), invoice.getProducts(), invoice.getPayment(), invoice.getSentContifico(), invoice.getTaxAmount(), invoice.getTax(), invoice.getAmount());
         invoiceRepository.save(invoice);
+        sendInvoiceToContifico((invoice));
+    }
+
+    public void resendToContifico(String campusId) {
+        var invoices = List.<Invoice>of();
+        if (campusId != null && !campusId.isEmpty()) {
+            invoices = invoiceRepository.findInvoicesBySentContificoAndCampusId(false, campusId);
+        } else {
+            invoices = invoiceRepository.findInvoicesBySentContifico(false);
+        }
+        for (Invoice invoice : invoices) {
+            sendInvoiceToContifico(invoice);
+        }
     }
 
     public void sendInvoiceToContifico(Invoice invoice) {
-        var configContifico = configContificoRepository.findByCampusId(invoice.getPayment().getCampus().getId()).orElseThrow(
-                () -> new BaseException("Config for the campus not found", List.of(""))
-        );
+        var configContifico = configContificoRepository.findByCampusId(invoice.getPayment().getCampus().getId()).orElseThrow(() -> new BaseException("Config for the campus not found", List.of("")));
         try {
             var json = new ObjectMapper().writeValueAsString(invoice.getInvoiceContifico());
-            ResponseEntity<String> response = httpClient.post()
-                    .uri("https://api.contifico.com/sistema/api/v1/documento/")
-                    .body(json)
-                    .header("Api-Token", configContifico.getApiKey())
-                    .header("Authorization", configContifico.getApiSecret())
-                    .retrieve()
-                    .toEntity(String.class);
+            ResponseEntity<String> response = httpClient.post().uri("https://api.contifico.com/sistema/api/v1/documento/").body(json).header("Api-Token", configContifico.getApiKey()).header("Authorization", configContifico.getApiSecret()).retrieve().toEntity(String.class);
             ObjectMapper objectMapper = new ObjectMapper();
             var status = response.getStatusCode();
             System.out.println(status);
@@ -91,12 +82,14 @@ public class CommandInvoiceService {
                     JsonNode errorNode = objectMapper.readTree(e.getResponseBodyAsString());
                     String errorMessage = errorNode.has("mensaje") ? errorNode.get("mensaje").asText() : "Error desconocido";
                     invoice.setContificoError(errorMessage);
-                    invoiceRepository.save(invoice);
+
                 } else {
                     invoice.setContificoError("Error de cliente HTTP: " + e.getStatusCode());
                 }
+                invoiceRepository.save(invoice);
             } catch (Exception jsonException) {
                 invoice.setContificoError("Error al procesar la respuesta de error: " + e.getMessage());
+                invoiceRepository.save(invoice);
             }
             System.err.println("Error sending invoice to contifico: " + e.getResponseBodyAsString());
         } catch (Exception e) {

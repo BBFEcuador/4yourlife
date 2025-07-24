@@ -35,7 +35,6 @@ public class CashBox {
             updatable = false
     )
     private LocalDateTime created_at = LocalDateTime.now();
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(
             name = "store_id",

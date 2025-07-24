@@ -33,10 +33,7 @@ public class ProductController {
         List<Filter> filters = new ArrayList<>();
 
         if (!search.isEmpty()) {
-            filters.addAll(List.of(
-                    new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                    new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                    new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)));
+            filters.addAll(List.of(new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)));
         }
 
         if (!campusId.isEmpty()) {
@@ -47,9 +44,16 @@ public class ProductController {
     }
 
     @GetMapping("/available")
-    public ResponseEntity<?> getAllProducts(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage) {
+    public ResponseEntity<?> getAllProducts(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-        return new ResponseEntity<>(finderService.findAllAvailable(p), HttpStatus.OK);
+        List<Filter> filters = new ArrayList<>();
+
+        if (!search.isEmpty()) {
+            filters.addAll(List.of(new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)));
+        }
+        filters.add(new Filter("isActive", "true", null, Filter.Operation.IS_TRUE, Filter.LogicalOperator.AND));
+        var criteria = new Criteria(filters, Optional.empty(), Optional.empty());
+        return new ResponseEntity<>(finderService.findAll(p, criteria), HttpStatus.OK);
     }
 
     @PutMapping("")

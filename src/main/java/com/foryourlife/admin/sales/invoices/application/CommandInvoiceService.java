@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foryourlife.admin.contifico.config.domain.ConfigContificoRepository;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
+import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -42,7 +43,14 @@ public class CommandInvoiceService {
 
         if (invoice.getSentContifico() == true)
             throw new IllegalArgumentException("No se puede actualizar, ya fue enviada al SRI");
-        invoice = Invoice.create(invoiceReq.id, invoiceReq.fullName, invoiceReq.address, invoiceReq.document, invoiceReq.phone, invoiceReq.email, invoice.getInvoiceNumber(), invoice.getInvoiceDate(), invoice.getProducts(), invoice.getPayment(), invoice.getSentContifico(), invoice.getTaxAmount(), invoice.getTax(), invoice.getAmount());
+        invoice.setFullName(invoiceReq.fullName);
+        invoice.setAddress(invoiceReq.address);
+        invoice.setDocument(invoiceReq.document);
+        invoice.setPhone(invoiceReq.phone);
+        invoice.setEmail(invoiceReq.email);
+
+        invoice.getInvoiceContifico().setCliente(new InvoiceContificoJson.Cliente(invoiceReq.document, invoiceReq.fullName, invoiceReq.phone, invoiceReq.address, invoiceReq.type, invoiceReq.email));
+
         invoiceRepository.save(invoice);
         sendInvoiceToContifico((invoice));
     }

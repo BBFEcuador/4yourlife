@@ -81,4 +81,8 @@ public class InvoiceContificoJson implements Serializable {
         this.adicional1 = adicional1;
         this.estado = estado;
     }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
 }

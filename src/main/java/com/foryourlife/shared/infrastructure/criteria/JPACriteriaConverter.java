@@ -65,6 +65,8 @@ public class JPACriteriaConverter<T> {
                     case IS_NOT ->
                             criteriaBuilder.notEqual(join.get(filter.getColumn()), criteriaBuilder.literal(filter.getValue()));
                     case IS_EMPTY -> criteriaBuilder.isEmpty(join.get(filter.getColumn()));
+                    case IS_TRUE -> criteriaBuilder.isTrue(join.get(filter.getColumn()));
+                    case IS_FALSE -> criteriaBuilder.isFalse(join.get(filter.getColumn()));
                     default -> throw new IllegalStateException("Unexpected value: ");
                 };
 

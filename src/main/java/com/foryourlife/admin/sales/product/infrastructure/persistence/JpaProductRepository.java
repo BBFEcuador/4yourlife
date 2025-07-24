@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.product.infrastructure.persistence;
 
 import com.foryourlife.admin.sales.product.domain.Product;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

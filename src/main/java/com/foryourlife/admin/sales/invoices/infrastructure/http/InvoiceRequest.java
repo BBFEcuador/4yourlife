@@ -34,6 +34,9 @@ public class InvoiceRequest {
     @NotBlank(message = "El email es requerido")
     @Email(message = "El email es inválido")
     public String email;
+    @NotNull(message = "El tipo de persona es requerido")
+    @NotBlank(message = "El tipo de persona es requerido")
+    public String type;
 
     public List<Product> products;
     public Payment payment;

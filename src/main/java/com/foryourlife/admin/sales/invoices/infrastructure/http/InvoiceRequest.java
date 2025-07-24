@@ -36,6 +36,7 @@ public class InvoiceRequest {
     public String email;
     @NotNull(message = "El tipo de persona es requerido")
     @NotBlank(message = "El tipo de persona es requerido")
+    @Pattern(regexp = "^[NJ]$", message = "tipo de persona debe ser N o J")
     public String type;
 
     public List<Product> products;
@@ -44,7 +45,6 @@ public class InvoiceRequest {
     public String invoiceNumber;
     public LocalDate invoiceDate;
     public Double amount;
-
 
     public Invoice toDomain() {
         return Invoice.create(
@@ -61,7 +61,8 @@ public class InvoiceRequest {
                 sentSri,
                 (amount*0.15),
                 15.0,
-                amount
+                amount,
+                type
         );
     }
 }

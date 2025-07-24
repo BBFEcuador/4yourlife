@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS invoices
     is_sent_contifico boolean not null default false,
     tax_amount decimal not null,
     tax decimal not null,
+    client_type text not null,
     contifico_id text,
     contifico_error text,
     amount decimal not null,

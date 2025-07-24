@@ -27,7 +27,7 @@ public class CommandCampusService {
 
     public void update(Campus campus) {
         if (!this._campusRepository.findById(campus.getId()).isPresent())
-            throw new CampusNotFoundException("The Id: " + campus.getId() + " doesn't exist.");
+            throw new CampusNotFoundException("The campus Id: " + campus.getId() + " doesn't exist.");
         try {
             this._campusRepository.save(campus);
         } catch (Exception e) {

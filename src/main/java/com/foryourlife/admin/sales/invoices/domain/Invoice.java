@@ -47,6 +47,10 @@ public class Invoice {
             name = "contifico_error"
     )
     private String contificoError;
+    @Column(
+            name = "client_type"
+    )
+    private String clientType;
     private Double tax;
     private Double amount;
     @Column(columnDefinition = "jsonb", name = "invoice_contifico_json")
@@ -56,7 +60,7 @@ public class Invoice {
     protected Invoice() {
     }
 
-    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount) {
+    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount, String clientType) {
         this.id = id;
         this.fullName = fullName;
         this.address = address;
@@ -71,10 +75,11 @@ public class Invoice {
         this.taxAmount = taxAmount;
         this.tax = tax;
         this.amount = amount;
+        this.clientType = clientType;
     }
 
-    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount) {
-        return new Invoice(id, fullName, address, document, phone, email, invoiceNumber, invoiceDate, products, payment, sentSri, taxAmount, tax, amount);
+    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount, String clientType) {
+        return new Invoice(id, fullName, address, document, phone, email, invoiceNumber, invoiceDate, products, payment, sentSri, taxAmount, tax, amount, clientType);
     }
 
     public String getId() {
@@ -211,5 +216,13 @@ public class Invoice {
 
     public void setContificoError(String contificoError) {
         this.contificoError = contificoError;
+    }
+
+    public String getClientType() {
+        return clientType;
+    }
+
+    public void setClientType(String clientType) {
+        this.clientType = clientType;
     }
 }

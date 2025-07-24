@@ -23,12 +23,12 @@ public class ParticipantQueryService {
     }
 
     public Participant getUserById(String id) {
-        return this._participantRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The Id: " + id + " doesn't exist."));
+        return this._participantRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The participant Id: " + id + " doesn't exist."));
 
     }
 
     public Participant getUserTrainerById(String id) {
-        return this._participantRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The Id: " + id + " doesn't exist."));
+        return this._participantRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The participant Id: " + id + " doesn't exist."));
     }
 
     public List<Participant> getAll() {

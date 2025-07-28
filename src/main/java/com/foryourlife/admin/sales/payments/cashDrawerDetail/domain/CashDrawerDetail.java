@@ -17,7 +17,7 @@ public class CashDrawerDetail {
             referencedColumnName = "id"
     )
     private Payment payment;
-    @Column(name = "payment_history_id")
+    @Column(name = "payment_history_id",nullable = true)
     private String paymentHistoryId;
     @ManyToOne
     @JoinColumn(

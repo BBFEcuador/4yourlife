@@ -119,6 +119,7 @@ public class CommandPaymentService {
                 eventBus.publish(List.of(event));
             }
         }
+        _paymentRepository.save(payment);
         cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
         eventBus.publish(List.of(new PaymentCreated(payment, invoice, cashDrawer)));
         return payment.getId();

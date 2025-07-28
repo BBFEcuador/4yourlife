@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +102,7 @@ public class CommandPaymentService {
         BigDecimal divisor = BigDecimal.valueOf(1.15);
         BigDecimal taxAmount = totalProduct.subtract(totalProduct.divide(divisor, 2, RoundingMode.HALF_UP));
 
-        var invoice = Invoice.create(UUID.randomUUID().toString(), paymentReq.invoice.fullName, paymentReq.invoice.address, paymentReq.invoice.document, paymentReq.invoice.phone, paymentReq.invoice.email, paymentReq.invoice.invoiceNumber, LocalDate.now(), products, payment, false, taxAmount.doubleValue(), 15.0, paymentReq.total, paymentReq.invoice.type);
+        var invoice = Invoice.create(UUID.randomUUID().toString(), paymentReq.invoice.fullName, paymentReq.invoice.address, paymentReq.invoice.document, paymentReq.invoice.phone, paymentReq.invoice.email, paymentReq.invoice.invoiceNumber, LocalDateTime.now(), products, payment, false, taxAmount.doubleValue(), 15.0, paymentReq.total, paymentReq.invoice.type);
         String paymentHistoryId = null;
 
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);

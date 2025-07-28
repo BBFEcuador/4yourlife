@@ -85,15 +85,10 @@ public class CommandInvoiceService {
 
         } catch (HttpClientErrorException e) {
             try {
-                if (e.getStatusCode() == HttpStatusCode.valueOf(400)) {
                     ObjectMapper objectMapper = new ObjectMapper();
                     JsonNode errorNode = objectMapper.readTree(e.getResponseBodyAsString());
                     String errorMessage = errorNode.has("mensaje") ? errorNode.get("mensaje").asText() : "Error desconocido";
                     invoice.setContificoError(errorMessage);
-
-                } else {
-                    invoice.setContificoError("Error de cliente HTTP: " + e.getStatusCode());
-                }
                 invoiceRepository.save(invoice);
             } catch (Exception jsonException) {
                 invoice.setContificoError("Error al procesar la respuesta de error: " + e.getMessage());

@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -22,7 +23,7 @@ public class Invoice {
     @Column(name = "invoice_number")
     private String invoiceNumber;
     @Column(name = "invoice_date")
-    private LocalDate invoiceDate;
+    private LocalDateTime invoiceDate;
 
     @Column(columnDefinition = "jsonb")
     @Type(JsonType.class)
@@ -35,21 +36,13 @@ public class Invoice {
     @Column(name = "is_sent_contifico")
     private Boolean isSentContifico;
 
-    @Column(
-            name = "tax_amount"
-    )
+    @Column(name = "tax_amount")
     private Double taxAmount;
-    @Column(
-            name = "contifico_id"
-    )
+    @Column(name = "contifico_id")
     private String contificoId;
-    @Column(
-            name = "contifico_error"
-    )
+    @Column(name = "contifico_error")
     private String contificoError;
-    @Column(
-            name = "client_type"
-    )
+    @Column(name = "client_type")
     private String clientType;
     private Double tax;
     private Double amount;
@@ -60,7 +53,7 @@ public class Invoice {
     protected Invoice() {
     }
 
-    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount, String clientType) {
+    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDateTime invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount, String clientType) {
         this.id = id;
         this.fullName = fullName;
         this.address = address;
@@ -78,7 +71,7 @@ public class Invoice {
         this.clientType = clientType;
     }
 
-    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDate invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount, String clientType) {
+    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDateTime invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount, String clientType) {
         return new Invoice(id, fullName, address, document, phone, email, invoiceNumber, invoiceDate, products, payment, sentSri, taxAmount, tax, amount, clientType);
     }
 
@@ -98,11 +91,11 @@ public class Invoice {
         this.invoiceNumber = invoiceNumber;
     }
 
-    public LocalDate getInvoiceDate() {
+    public LocalDateTime getInvoiceDate() {
         return invoiceDate;
     }
 
-    public void setInvoiceDate(LocalDate invoiceDate) {
+    public void setInvoiceDate(LocalDateTime invoiceDate) {
         this.invoiceDate = invoiceDate;
     }
 

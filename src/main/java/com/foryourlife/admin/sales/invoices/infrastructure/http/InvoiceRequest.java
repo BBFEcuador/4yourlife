@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +44,7 @@ public class InvoiceRequest {
     public Payment payment;
     public Boolean sentSri;
     public String invoiceNumber;
-    public LocalDate invoiceDate;
+    public LocalDateTime invoiceDate;
     public Double amount;
 
     public Invoice toDomain() {
@@ -55,7 +56,7 @@ public class InvoiceRequest {
                 phone,
                 email,
                 invoiceNumber,
-                invoiceDate != null ? invoiceDate : LocalDate.now(),
+                invoiceDate != null ? invoiceDate : LocalDateTime.now(),
                 products != null ? products : List.of(),
                 payment,
                 sentSri,

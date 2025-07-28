@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS invoices
     phone text not null,
     email text not null,
     invoice_number text not null,
-    invoice_date date not null,
+    invoice_date timestamp not null,
     products jsonb not null,
     payment_id text not null,
     is_sent_contifico boolean not null default false,

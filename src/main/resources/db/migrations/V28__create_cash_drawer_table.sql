@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS cash_drawers
     closing_balance numeric,
     details text,
     cash_box_id text not null,
+    pin text,
     created_at timestamp not null default now(),
     updated_at timestamp default current_timestamp,
     CONSTRAINT fk_cash_drawer_opened_by_user_id

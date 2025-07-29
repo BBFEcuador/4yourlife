@@ -9,13 +9,20 @@ import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.UserRepository;
+import com.foryourlife.shared.email.DispatchNotification;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -25,11 +32,13 @@ public class CashDrawerCommandService {
     private final CashDrawerRepository repository;
     private final UserRepository userRepository;
     private final CashBoxRepository cashBoxRepository;
+    private final DispatchNotification sendgrid;
 
-    public CashDrawerCommandService(CashDrawerRepository repository, UserRepository userRepository, CashBoxRepository cashBoxRepository) {
+    public CashDrawerCommandService(CashDrawerRepository repository, UserRepository userRepository, CashBoxRepository cashBoxRepository, DispatchNotification sendgrid) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.cashBoxRepository = cashBoxRepository;
+        this.sendgrid = sendgrid;
     }
 
     public CashDrawer save(CashDrawer cashDrawer) {
@@ -106,5 +115,59 @@ public class CashDrawerCommandService {
             }
         }
         return cashDrawer.getOpeningBalance() + totalPayments;
+    }
+
+    public void lockCashDrawer(String id, String pin){
+        var cashDrawer = repository.getById(id).orElseThrow(
+                () -> new BaseException("Cash drawer not found", List.of(""))
+        );
+
+        if(cashDrawer.getStatus()==CashDrawerStatus.OPEN){
+            cashDrawer.setStatus(CashDrawerStatus.LOCKED);
+            cashDrawer.setPin(pin);
+            repository.save(cashDrawer);
+        }else if (cashDrawer.getStatus()==CashDrawerStatus.LOCKED){
+            if(pin.equals(cashDrawer.getPin())){
+                cashDrawer.setStatus(CashDrawerStatus.OPEN);
+                cashDrawer.setPin(null);
+                repository.save(cashDrawer);
+            }else{
+                throw new BaseException("Pin incorrecto", List.of(""));
+            }
+        }
+    }
+
+    public void forgetPin(String id){
+        var cashDrawer = repository.getById(id).orElseThrow(
+                () -> new BaseException("Cash drawer not found", List.of(""))
+        );
+
+
+        sendgrid.send(
+                cashDrawer.getOpenedByUser().getEmail(),
+                "Verificación de correo",
+                "Este es tu token de recuperación de contraseña: ${builder.toString()}"
+            );
+
+//                Email toEmail = new Email(
+//                cashDrawer.getOpenedByUser().getEmail());
+//
+//        Content content = new Content("text/plain", cashDrawer.getPin());
+//        Mail mail = new Mail(cashDrawer.getOpenedByUser().getEmail(), "Recuperacion de pin", toEmail, content);
+//
+//        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+//
+//        Request request = new Request();
+//        try {
+//            request.setMethod(Method.POST);
+//            request.setEndpoint("mail/send");
+//            request.setBody(mail.build());
+//            Response response = sg.api(request);
+//            System.out.println(response.getStatusCode());
+//            System.out.println(response.getBody());
+//            System.out.println(response.getHeaders());
+//        } catch (IOException ex) {
+//            throw new BaseException("Error sending email", List.of(ex.getMessage()));
+//        }
     }
 }

@@ -3,6 +3,7 @@ package com.foryourlife.admin.sales.payments.cashDrawer.infrastructure.httpContr
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerCommandService;
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerQueryService;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -49,5 +50,17 @@ public class CashDrawerController {
         headers.setContentDispositionFormData("filename", "cash-drawer-report.pdf");
 
         return new ResponseEntity<>(pdfBytes.toByteArray(), headers, HttpStatus.OK);
+    }
+
+    @PutMapping("/lock/{id}")
+    public ResponseEntity<?> lockDrawer(@PathVariable String id, @RequestParam @Valid String pin) {
+        commandService.lockCashDrawer(id, pin);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/forget-pin/{id}")
+    public ResponseEntity<?> forgetPin(@PathVariable String id) {
+        commandService.forgetPin(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

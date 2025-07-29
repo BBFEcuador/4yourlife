@@ -37,7 +37,7 @@ public class InvoiceRequest {
     public String email;
     @NotNull(message = "El tipo de persona es requerido")
     @NotBlank(message = "El tipo de persona es requerido")
-    @Pattern(regexp = "^[NJ]$", message = "tipo de persona debe ser N o J")
+    @Pattern(regexp = "^[NJ]$", message = "Tipo de persona debe ser N o J")
     public String type;
 
     public List<Product> products;

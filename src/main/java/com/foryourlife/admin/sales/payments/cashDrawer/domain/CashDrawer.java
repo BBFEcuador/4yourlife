@@ -49,6 +49,7 @@ public class CashDrawer {
             name = "details"
     )
     private String detail;
+    private String pin;
     @JsonIgnoreProperties(
             "cashDrawer"
     )
@@ -193,5 +194,13 @@ public class CashDrawer {
             }
         }
         return this.openingBalance + totalPayments;
+    }
+
+    public String getPin() {
+        return pin;
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
     }
 }

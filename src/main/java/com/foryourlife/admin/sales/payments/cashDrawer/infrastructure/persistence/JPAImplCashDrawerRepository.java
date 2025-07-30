@@ -10,15 +10,9 @@ import java.util.Optional;
 
 interface JPAImplCashDrawerRepository extends JpaRepository<CashDrawer, String> {
 
-    Boolean existsByStatusAndOpenedByUser_Id(CashDrawerStatus status, String openedByUserId);
-
     Optional<CashDrawer> findByStatusIsAndCashBox_Id(CashDrawerStatus status, String cashBoxId);
 
     List<CashDrawer> findAllByCashBox_Id(String cashBoxId);
-
-    List<CashDrawer> findAllByOpenedByUser_IdAndStatus(String openedByUserId, CashDrawerStatus status);
-
-    List<CashDrawer> findAllByStatusAndOpenedByUser(CashDrawerStatus status, User openedByUser);
 
     List<CashDrawer> findAllByStatusAndOpenedByUser_Id(CashDrawerStatus status, String openedByUserId);
 

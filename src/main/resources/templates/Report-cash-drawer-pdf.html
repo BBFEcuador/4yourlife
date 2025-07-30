@@ -75,7 +75,7 @@
     </div>
     <div class="flex">
         <span><strong>Abierto por:</strong> <span th:text="${cashDrawer.openedByUser.name}"></span></span>
-        <span><strong>Cerrado por:</strong> <span th:text="${cashDrawer.closedByUser.name}"></span></span>
+        <span><strong>Cerrado por:</strong> <span th:text="${cashDrawer.closedByUser != null ? cashDrawer.closedByUser.name : ''}"></span></span>
     </div>
     <div class="flex">
         <span><strong>Saldo Inicial:</strong> <span th:text="${cashDrawer.openingBalance}"></span></span>
@@ -148,7 +148,7 @@
                 <th>Firma</th>
             </tr>
             <tr>
-                <td th:text="${cashDrawer.closedByUser.name}">Encargado</td>
+                <td th:text="${cashDrawer.closedByUser != null ? cashDrawer.closedByUser.name : ''}">Encargado</td>
                 <td></td>
                 <td></td>
                 <td></td>

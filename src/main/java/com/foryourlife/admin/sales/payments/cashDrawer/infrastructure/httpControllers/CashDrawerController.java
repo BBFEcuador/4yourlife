@@ -63,4 +63,15 @@ public class CashDrawerController {
         commandService.forgetPin(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("generate-report")
+    public ResponseEntity<?> getDrawerReport(@RequestParam String id) {
+        ByteArrayOutputStream pdfBytes = commandService.getCloseReport(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("filename", "cash-drawer-report.pdf");
+
+        return new ResponseEntity<>(pdfBytes.toByteArray(), headers, HttpStatus.OK);
+    }
 }

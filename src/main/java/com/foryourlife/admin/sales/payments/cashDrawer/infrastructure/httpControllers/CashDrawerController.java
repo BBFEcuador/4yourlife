@@ -3,6 +3,7 @@ package com.foryourlife.admin.sales.payments.cashDrawer.infrastructure.httpContr
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerCommandService;
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerQueryService;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
+import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 @RestController
 @RequestMapping("/cash-drawer")
@@ -65,7 +67,8 @@ public class CashDrawerController {
     }
 
     @PostMapping("generate-report")
-    public ResponseEntity<?> getDrawerReport(@RequestParam String id) {
+    public ResponseEntity<?> getDrawerReport(@RequestParam(value = "id", defaultValue = "") String id) {
+        if (!id.isEmpty()) {
         ByteArrayOutputStream pdfBytes = commandService.getCloseReport(id);
 
         HttpHeaders headers = new HttpHeaders();
@@ -73,5 +76,8 @@ public class CashDrawerController {
         headers.setContentDispositionFormData("filename", "cash-drawer-report.pdf");
 
         return new ResponseEntity<>(pdfBytes.toByteArray(), headers, HttpStatus.OK);
+        } else {
+            throw new BaseException("Id esta vacío", List.of(""));
+        }
     }
 }

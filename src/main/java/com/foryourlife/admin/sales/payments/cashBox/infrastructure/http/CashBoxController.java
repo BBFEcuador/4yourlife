@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -36,12 +37,17 @@ public class CashBoxController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllCashDrawers() {
-        return new ResponseEntity<>(queryService.getAllCashBox(), HttpStatus.OK);
+    public ResponseEntity<?> getAllCashDrawers(@RequestParam(value = "campusId", defaultValue = "") String campusId) {
+        List<CashBox> cashboxes;
+        if (!campusId.isEmpty()) {
+            return new ResponseEntity<>(queryService.getAllCashBoxByCampus(campusId), HttpStatus.OK);
+        } else {
+            throw new BaseException("Seleccione un campus para continuar", List.of(""));
+        }
     }
 
     @GetMapping("available")
-    public ResponseEntity<?> getAvailableCashDrawers(@RequestParam(value = "campusId",defaultValue = "") String campusId) {
+    public ResponseEntity<?> getAvailableCashDrawers(@RequestParam(value = "campusId", defaultValue = "") String campusId) {
         if (!campusId.isEmpty()) {
             return new ResponseEntity<>(queryService.getCashBoxNotOpened(campusId), HttpStatus.OK);
         } else {

@@ -36,4 +36,9 @@ public class JPACashBoxRepository implements CashBoxRepository {
         return repository.findAll();
     }
 
+    @Override
+    public List<CashBox> findAllByCampus(String campusId) {
+        return repository.findAllByStore_Campus_Id(campusId);
+    }
+
 }

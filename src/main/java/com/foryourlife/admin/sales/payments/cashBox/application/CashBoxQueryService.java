@@ -22,6 +22,10 @@ public class CashBoxQueryService {
         return repository.findAll();
     }
 
+    public List<CashBox> getAllCashBoxByCampus(String campusId) {
+        return repository.findAllByCampus(campusId);
+    }
+
     public CashBox getCashBoxById(String id) {
         return repository.findById(id).orElseThrow(() -> new BaseException("Cashbox not found", List.of("The cashbox with id " + id + " does not exist")));
     }

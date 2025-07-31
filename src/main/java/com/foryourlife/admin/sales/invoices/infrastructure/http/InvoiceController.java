@@ -46,7 +46,7 @@ public class InvoiceController {
 
     @GetMapping("")
     public ResponseEntity<?> findInvoices(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search, @RequestParam(value = "campusId", defaultValue = "") String campusId) {
-        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+        var p = PageRequest.of(page, perPage, Sort.by("invoiceDate").descending());
         List<Filter> filters = new ArrayList<>();
 
         if (!search.isEmpty()) {

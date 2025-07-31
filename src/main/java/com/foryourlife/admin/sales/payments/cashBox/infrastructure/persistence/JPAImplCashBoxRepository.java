@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface JPAImplCashBoxRepository extends JpaRepository<CashBox, String> {
     Optional<CashBox> findByNumber(String number);
-
+    List<CashBox> findAllByStore_Campus_Id(String campusId);
 }

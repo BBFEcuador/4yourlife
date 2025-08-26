@@ -22,6 +22,13 @@ repositories {
 
 ext {
     set('snippetsDir', file("build/generated-snippets"))
+    set('springShellVersion', "3.4.0")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.shell:spring-shell-dependencies:${springShellVersion}"
+    }
 }
 
 dependencies {
@@ -33,6 +40,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
+
+    implementation 'org.springframework.shell:spring-shell-starter'
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

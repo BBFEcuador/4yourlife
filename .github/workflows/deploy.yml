@@ -24,7 +24,8 @@ jobs:
             cd /var/www/4yourlife
             git pull https://${{secrets.TOKEN_GITHUB}}@github.com/BBFEcuador/4yourlife.git
             ./gradlew bootJar
-            tmux kill-session -t java-app 2>/dev/null || true
+            tmux -S /tmp/shared-tmux kill-session -t java-app 2>/dev/null || true
             sleep 3
-            tmux new-session -d -s java-app -c /var/www/4yourlife 'java -jar build/libs/4yourlife-0.0.1-SNAPSHOT.jar'
-            tmux list-sessions | grep java-app
+            tmux -S /tmp/shared-tmux new-session -d -s java-app -c /var/www/4yourlife 'java -jar build/libs/*.jar'
+            chmod 777 /tmp/shared-tmux
+            tmux -S /tmp/shared-tmux list-sessions | grep java-app

@@ -1,0 +1,30 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /var/www/4yourlife
+            git pull https://${{secrets.TOKEN_GITHUB}}@github.com/BBFEcuador/4yourlife.git
+            ./gradlew bootJar
+            tmux kill-session -t java-app 2>/dev/null || true
+            sleep 3
+            tmux new-session -d -s java-app -c /var/www/4yourlife 'java -jar build/libs/4yourlife-0.0.1-SNAPSHOT.jar'
+            tmux list-sessions | grep java-app

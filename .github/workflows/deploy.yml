@@ -24,17 +24,12 @@ jobs:
             cd /var/www/4yourlife
             git pull https://${{ secrets.TOKEN_GITHUB }}@github.com/BBFEcuador/4yourlife.git
             ./gradlew bootJar
-
-            # matar solo la sesión de la app si existe
+            # detener procesos viejos
             tmux kill-session -t java-app 2>/dev/null || true
+            pkill -f 'java -jar build/libs/4yourlife-0.0.1-SNAPSHOT.jar' || true
             rm -f /tmp/shared-tmux
             mkdir -p /var/log/4yourlife
-
-            # iniciar app en tmux y redirigir logs
             tmux -S /tmp/shared-tmux new-session -d -s java-app -c /var/www/4yourlife \
-              "java -jar build/libs/4yourlife-0.0.1-SNAPSHOT.jar > /var/log/4yourlife/app.log 2>&1"
-
+              bash -c "java -jar build/libs/4yourlife-0.0.1-SNAPSHOT.jar > /var/log/4yourlife/app.log 2>&1"
             chmod 777 /tmp/shared-tmux
-
-            # mostrar últimas 100 líneas del log (no en vivo, para no bloquear)
-            tail -n 100 /var/log/4yourlife/app.log
+            tail -n 50 /var/log/4yourlife/app.log

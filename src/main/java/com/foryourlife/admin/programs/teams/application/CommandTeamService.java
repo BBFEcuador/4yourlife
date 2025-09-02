@@ -29,7 +29,6 @@ import java.util.UUID;
 @Service
 public class CommandTeamService {
 
-    @Value("${api.url}")
     private String baseUrl;
     private final TeamRepository _teamRepository;
     private final EventBus bus;

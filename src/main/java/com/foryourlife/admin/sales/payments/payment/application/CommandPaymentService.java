@@ -110,8 +110,11 @@ public class CommandPaymentService {
         var newInvoice = createInvoice(invoice, cashDrawer, payment);
         if (!payment.getPaymentshistory().isEmpty()) {
 
-            payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
-            paymentHistoryId = payment.getPaymentshistory().getFirst().getId();
+            payment.getPaymentshistory().forEach(
+                    paymentHistory -> {
+                    paymentHistory.setId(UUID.randomUUID().toString());
+                    }
+            );
 
             if (newInvoice.getContificoId() != null) {
                 payment.getPaymentshistory().forEach(
@@ -122,6 +125,7 @@ public class CommandPaymentService {
                 );
             }
         }
+        _paymentRepository.save(payment);
         cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
         eventBus.publish(List.of(new PaymentCreated(payment, invoice, cashDrawer)));
         return payment.getId();

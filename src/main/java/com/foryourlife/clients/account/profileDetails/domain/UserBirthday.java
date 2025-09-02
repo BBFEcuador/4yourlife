@@ -28,7 +28,7 @@ public class UserBirthday {
         LocalDate birthDate = value.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate today = LocalDate.now();
         Period age = Period.between(birthDate, today);
-        if (age.getYears() >= 18) {
+        if (age.getYears() >= 17) {
             return value;
         } else {
             throw new BaseException("No cumple", List.of("El usuario no es mayor de edad"));

@@ -55,7 +55,7 @@ public class OnPaymentHistoryCreated {
                 case "TRA":
                     jsonNode.put("forma_cobro", "TRA");
                     jsonNode.put("monto", event.getPaymentHistory().getAmount());
-                    jsonNode.put("cuenta_bancaria_id", event.getPaymentHistory().getAmount());
+                    jsonNode.put("cuenta_bancaria_id", event.getPaymentHistory().getPaymentMethod().getBank().getContificoId());
                     jsonNode.put("numero_comprobante", event.getPaymentHistory().getTransactionId());
                     jsonNode.put("fecha", formattedDate);
                     break;
@@ -65,7 +65,7 @@ public class OnPaymentHistoryCreated {
 
             var configContifico = configContificoQueryService.findConfigContificoByCampusId(event.getInvoice().getPayment().getCampus().getId());
 
-            var paymentHistoryJson = new ObjectMapper().writeValueAsString(event.getPaymentHistory());
+            var paymentHistoryJson = new ObjectMapper().writeValueAsString(jsonNode);
 
             ResponseEntity<String> response = httpClient.post()
                     .uri("https://api.contifico.com/sistema/api/v1/documento/"+ event.getInvoice().getContificoId() +"/cobro/")

@@ -46,7 +46,7 @@ public class OnCreatedProduct {
             jsonNode.put("porcentaje_iva", event.getProduct().getDescription());
             jsonNode.put("tipo_producto", "SIM");
 
-            String json = jsonNode.toString();
+                String json = jsonNode.toString();
 
             var config = configContificoRepository.findByCampusId(event.getProduct().getCampus().getId()).orElseThrow(
                     () -> new BaseException("Config not found", List.of(""))

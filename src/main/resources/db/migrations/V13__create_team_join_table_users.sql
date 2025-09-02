@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS teams
     photo text,
     training_id text,
     training_number text,
+    trainer_id text not null,
+    CONSTRAINT fk_trainer_id FOREIGN KEY (trainer_id) REFERENCES trainers (id),
     CONSTRAINT fk_trainingId FOREIGN KEY (training_id) REFERENCES training (id),
     CONSTRAINT pk_teams PRIMARY KEY (id)
 );

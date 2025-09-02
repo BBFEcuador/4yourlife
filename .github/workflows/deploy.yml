@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up SSH key
+      - name: Deploy to Droplet
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.DROPLET_IP }}
@@ -22,11 +22,7 @@ jobs:
           port: 22
           script: |
             cd /var/www/4yourlife
-            git pull https://${{secrets.TOKEN_GITHUB}}@github.com/BBFEcuador/4yourlife.git
+            git pull https://${{ secrets.TOKEN_GITHUB }}@github.com/BBFEcuador/4yourlife.git
             ./gradlew bootJar
-            tmux kill-server 2>/dev/null || true
-            rm -f /tmp/shared-tmux
-            mkdir -p /var/log/4yourlife
-            tmux -S /tmp/shared-tmux new-session -d -s java-app -c /var/www/4yourlife \ 'java -jar build/libs/4yourlife-0.0.1-SNAPSHOT.jar 2>&1 | tee /var/log/4yourlife/app.log'
-            chmod 777 /tmp/shared-tmux
-            tail -f /var/log/4yourlife/app.log
+            tmux kill-session -t java-app 2>/dev/null || true
+            tmux -S /tmp/shared-tmux new-session -d -s java-app -c /var/www/4yourlife "java -jar build/libs/4yourlife-0.0.1-SNAPSHOT.jar"

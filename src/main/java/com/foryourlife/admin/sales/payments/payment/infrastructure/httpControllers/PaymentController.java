@@ -32,23 +32,8 @@ public class PaymentController {
 
     @PostMapping("")
     public ResponseEntity<?> savePayment(@RequestBody @Valid PaymentRequest request) {
-        return ResponseEntity.ok().body(commandPaymentService.save(request));
+        return new ResponseEntity<>(commandPaymentService.save(request), HttpStatus.CREATED);
     }
-
-//    @PutMapping("")
-//    public ResponseEntity<?> updatePayment(@RequestBody PaymentRequest request) {
-//        commandPaymentService.update(request);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-
-//    @GetMapping("")
-//    public ResponseEntity<?> getAllPayments(
-//            @RequestParam(value = "page", defaultValue = "0") int page,
-//            @RequestParam(value = "perPage", defaultValue = "10") int perPage
-//    ) {
-//        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-//        return new ResponseEntity<>(queryPaymentService.findAll(p), HttpStatus.OK);
-//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPaymentById(@PathVariable String id) {

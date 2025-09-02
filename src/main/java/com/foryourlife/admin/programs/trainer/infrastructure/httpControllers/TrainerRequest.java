@@ -9,16 +9,16 @@ public class TrainerRequest {
 
     public String id;
 
-    @NotBlank(message = "El campo nombre es requerido")
+    @NotBlank(message = "El nombre es requerido")
     public String name;
 
-    @NotBlank(message = "El campo email es requerido")
+    @NotBlank(message = "El email es requerido")
     public String email;
 
-    @NotBlank(message = "El campo contraseña es requerido")
+    @NotBlank(message = "El contraseña es requerido")
     public String password;
 
-    @NotBlank(message = "El campo telefono es requerido")
+    @NotBlank(message = "El telefono es requerido")
     public String phone;
 
     public TrainerRequest() {

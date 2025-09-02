@@ -6,6 +6,7 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,6 +39,8 @@ public class Invoice {
 
     @Column(name = "tax_amount")
     private Double taxAmount;
+    @Column(name = "total_discount")
+    private BigDecimal totalDiscount;
     @Column(name = "contifico_id")
     private String contificoId;
     @Column(name = "contifico_error")
@@ -53,7 +56,7 @@ public class Invoice {
     protected Invoice() {
     }
 
-    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDateTime invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount, String clientType) {
+    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDateTime invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, BigDecimal totalDiscount, Double tax, Double amount, String clientType) {
         this.id = id;
         this.fullName = fullName;
         this.address = address;
@@ -66,13 +69,14 @@ public class Invoice {
         this.payment = payment;
         this.isSentContifico = sentSri;
         this.taxAmount = taxAmount;
+        this.totalDiscount = totalDiscount;
         this.tax = tax;
         this.amount = amount;
         this.clientType = clientType;
     }
 
-    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDateTime invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, Double tax, Double amount, String clientType) {
-        return new Invoice(id, fullName, address, document, phone, email, invoiceNumber, invoiceDate, products, payment, sentSri, taxAmount, tax, amount, clientType);
+    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDateTime invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, BigDecimal totalDiscount, Double tax, Double amount, String clientType) {
+        return new Invoice(id, fullName, address, document, phone, email, invoiceNumber, invoiceDate, products, payment, sentSri, taxAmount, totalDiscount, tax, amount, clientType);
     }
 
     public String getId() {
@@ -217,5 +221,13 @@ public class Invoice {
 
     public void setClientType(String clientType) {
         this.clientType = clientType;
+    }
+
+    public BigDecimal getTotalDiscount() {
+        return totalDiscount;
+    }
+
+    public void setTotalDiscount(BigDecimal totalDiscount) {
+        this.totalDiscount = totalDiscount;
     }
 }

@@ -1,9 +1,14 @@
 package com.foryourlife.admin.bank.infrastructure.http;
 
+import jakarta.validation.constraints.NotNull;
+
 public class BankRequest {
     private String id;
+    @NotNull(message = "El nombre es requerido")
     private String name;
+    @NotNull(message = "El numero de cuenta es requerido")
     private String number;
+    @NotNull(message = "El campus es requerido")
     private String campusId;
 
     public String getId() {

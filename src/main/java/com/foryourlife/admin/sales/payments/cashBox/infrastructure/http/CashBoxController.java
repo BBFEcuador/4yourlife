@@ -31,10 +31,6 @@ public class CashBoxController {
         return new ResponseEntity<>(queryService.getCashBoxById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/number/{number}")
-    public ResponseEntity<?> getCashDrawerByNumber(@PathVariable String number) {
-        return new ResponseEntity<>(queryService.getCashBoxByNumber(number), HttpStatus.OK);
-    }
 
     @GetMapping("")
     public ResponseEntity<?> getAllCashDrawers(@RequestParam(value = "campusId", defaultValue = "") String campusId) {

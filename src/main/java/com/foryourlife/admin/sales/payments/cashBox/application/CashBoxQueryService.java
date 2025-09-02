@@ -6,7 +6,6 @@ import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,10 +27,6 @@ public class CashBoxQueryService {
 
     public CashBox getCashBoxById(String id) {
         return repository.findById(id).orElseThrow(() -> new BaseException("Cashbox not found", List.of("The cashbox with id " + id + " does not exist")));
-    }
-
-    public CashBox getCashBoxByNumber(String number) {
-        return repository.findByNumber(number).orElseThrow(() -> new BaseException("Cashbox not found", List.of("The cashbox with number " + number + " does not exist")));
     }
 
     public List<CashBox> getCashBoxNotOpened(String campusId) {

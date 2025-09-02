@@ -27,8 +27,8 @@ public class JPACashBoxRepository implements CashBoxRepository {
     }
 
     @Override
-    public Optional<CashBox> findByNumber(String number) {
-        return repository.findByNumber(number);
+    public Optional<CashBox> findByNumberAndStoreId(String number,  String storeId) {
+        return repository.findByStore_IdAndNumber(storeId, number);
     }
 
     @Override

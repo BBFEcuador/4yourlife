@@ -83,7 +83,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         if (payment.getDiscount() != null) {
             context.setVariable("discount", payment.getDiscount().getDiscountValue());
         } else {
-            context.setVariable("discount", 0.0);
+            context.setVariable("discount", payment.getInvoice().getTotalDiscount());
         }
         return templateEngine.process("templates/Payment-pdf", context);
     }

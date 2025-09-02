@@ -72,7 +72,7 @@ public class OnPaymentCreated {
         });
         clientModuleCreatorService.createClientModule(participant.getModules());
 
-        /*createInvoice(event);*/
+//        createInvoice(event);
     }
 
     public void createInvoice(PaymentCreated event) {

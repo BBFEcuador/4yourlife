@@ -6,7 +6,7 @@ import java.util.Optional;
 public interface CashBoxRepository {
     CashBox save(CashBox cashBox);
     Optional<CashBox> findById(String id);
-    Optional<CashBox> findByNumber(String number);
+    Optional<CashBox> findByNumberAndStoreId(String number,  String storeId);
     List<CashBox> findAll();
     List<CashBox> findAllByCampus(String campusId);
 }

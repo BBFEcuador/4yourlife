@@ -31,4 +31,4 @@ jobs:
             echo "matando carpeta compartida de tmux"
             rm -f /tmp/shared-tmux
             echo "iniciando nueva sesion de tmux"
-            tmux -S /tmp/shared-tmux new-session -d -s java-app -c /var/www/4yourlife bash -c "java -jar build/libs/4yourlife-0.0.1-SNAPSHOT.jar"
+            setsid tmux -S /tmp/shared-tmux new-session -d -s java-app -c /var/www/4yourlife bash -c "java -jar build/libs/4yourlife-0.0.1-SNAPSHOT.jar"

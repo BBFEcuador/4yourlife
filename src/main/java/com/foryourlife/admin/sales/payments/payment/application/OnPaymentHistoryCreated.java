@@ -127,7 +127,6 @@ public class OnPaymentHistoryCreated {
                 System.err.println("Error sending payment to contifico second: " + ex.getMessage());
                 ex.printStackTrace();
             }
-
         }
     }
 }

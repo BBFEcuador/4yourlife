@@ -55,8 +55,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     @Override
     public Page<Payment> findAll(Pageable pageable, Criteria criteria) {
-        var jpaCriteria = converter.getJpaSpecifications(criteria);
-        return _jpaPaymentRepository.findAll(jpaCriteria, pageable);
+        return _jpaPaymentRepository.findAll(converter.getJpaSpecifications(criteria), pageable);
     }
 
     @Override

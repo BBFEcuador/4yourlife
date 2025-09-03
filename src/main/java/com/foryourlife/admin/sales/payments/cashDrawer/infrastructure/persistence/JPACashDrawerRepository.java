@@ -50,8 +50,8 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     }
 
     @Override
-    public List<CashDrawer> getByUserIdAndStatusOpen(String userid) {
-        return this.repository.findAllByStatusAndOpenedByUser_Id(CashDrawerStatus.OPEN, userid);
+    public List<CashDrawer> getByUserIdAndStatusOpenOrLock(String userid) {
+        return this.repository.findAllByStatusIsNotAndOpenedByUser_Id(CashDrawerStatus.CLOSED, userid);
     }
 
     @Override

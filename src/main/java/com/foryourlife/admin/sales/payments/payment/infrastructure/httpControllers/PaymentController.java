@@ -52,7 +52,17 @@ public class PaymentController {
         Criteria criteria = new Criteria(List.of(), Optional.empty(), Optional.empty());
         List<Filter> filters = new ArrayList<>();
         if (!search.isEmpty()) {
-            filters.addAll(List.of(new Filter("number", search, "cashDrawerDetail.cashDrawer.cashBox", Filter.Operation.LIKE, Filter.LogicalOperator.AND)));
+            filters.addAll(
+                    List.of(
+                            new Filter("number", search, "cashDrawerDetail.cashDrawer.cashBox", Filter.Operation.LIKE, Filter.LogicalOperator.AND),
+                            new Filter("fullName", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("address", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("document", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("phone", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("email", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("invoiceNumber", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR)
+                    )
+            );
         }
         if (!campusId.isEmpty()) {
             filters.add(new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND));

@@ -3,6 +3,8 @@ package com.foryourlife.admin.sales.payments.payment.application;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
+import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.shared.domain.bus.DomainEventSubscriber;
 import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import org.springframework.context.event.EventListener;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 @Service
 @DomainEventSubscriber(value = PaymentHistoryCreated.class)
@@ -18,12 +21,13 @@ public class OnPaymentHistoryCreated {
     private final RestClient httpClient;
     private final ConfigContificoQueryService configContificoQueryService;
     private final ObjectMapper objectMapper;
+    private final PaymentRepository paymentRepository;
 
-
-    public OnPaymentHistoryCreated(RestClient httpClient, ConfigContificoQueryService configContificoQueryService, ObjectMapper objectMapper) {
+    public OnPaymentHistoryCreated(RestClient httpClient, ConfigContificoQueryService configContificoQueryService, ObjectMapper objectMapper, PaymentRepository paymentRepository) {
         this.httpClient = httpClient;
         this.configContificoQueryService = configContificoQueryService;
         this.objectMapper = objectMapper;
+        this.paymentRepository = paymentRepository;
     }
 
     @EventListener
@@ -74,14 +78,38 @@ public class OnPaymentHistoryCreated {
                     .header("Authorization", configContifico.getApiSecret())
                     .retrieve()
                     .toEntity(String.class);
-            if (response.getStatusCode().is2xxSuccessful()) {
+            boolean sentOk = response.getStatusCode().is2xxSuccessful();
+
+            if (sentOk) {
                 System.out.println("Payment created in Contifico: " + response.getBody());
-            }else {
-                System.err.println("Error creating payment in Contifico: " + response.getStatusCodeValue() + ", " + response.getBody());
+            } else {
+                System.err.println("Error creating payment in Contifico: "
+                        + response.getStatusCodeValue() + ", " + response.getBody());
             }
+
+            Payment payment = paymentRepository.findById(event.getInvoice().getPayment().getId());
+
+            if (payment.getPaymentshistory() != null) {
+                payment.getPaymentshistory().stream()
+                        .filter(ph -> ph.getId().equals(event.getPaymentHistory().getId()))
+                        .findFirst()
+                        .ifPresent(ph -> ph.setSent(sentOk));
+            }
+
+            paymentRepository.save(payment);
         } catch (Exception e) {
             System.err.println("Error creating payment in Contifico: " + e.getMessage());
             e.printStackTrace();
+            Payment payment = paymentRepository.findById(event.getInvoice().getPayment().getId());
+
+            if (payment.getPaymentshistory() != null) {
+                payment.getPaymentshistory().stream()
+                        .filter(ph -> ph.getId().equals(event.getPaymentHistory().getId()))
+                        .findFirst()
+                        .ifPresent(ph -> ph.setSent(false));
+            }
+
+            paymentRepository.save(payment);
         }
     }
 }

@@ -9,6 +9,7 @@ public class PaymentHistory {
     private String date;
     private String transactionId;
     private String pingType;
+    private Boolean sent;
 
     public PaymentHistory(PaymentMethod paymentMethod, double amount, String date) {
         this.paymentMethod = paymentMethod;
@@ -60,4 +61,15 @@ public class PaymentHistory {
         this.transactionId = transactionId;
     }
 
+    public void setPingType(String pingType) {
+        this.pingType = pingType;
+    }
+
+    public Boolean getSent() {
+        return sent;
+    }
+
+    public void setSent(Boolean sent) {
+        this.sent = sent;
+    }
 }

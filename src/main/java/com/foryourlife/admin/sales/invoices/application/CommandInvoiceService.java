@@ -7,6 +7,8 @@ import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
+import com.foryourlife.shared.domain.bus.EventBus;
+import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
@@ -23,11 +25,14 @@ public class CommandInvoiceService {
     private final ConfigContificoRepository configContificoRepository;
     @Qualifier("restClient")
     private final RestClient httpClient;
+    private final EventBus eventBus;
 
-    public CommandInvoiceService(InvoiceRepository invoiceRepository, ConfigContificoRepository configContificoRepository, @Qualifier("restClient") RestClient httpClient) {
+
+    public CommandInvoiceService(InvoiceRepository invoiceRepository, ConfigContificoRepository configContificoRepository, @Qualifier("restClient") RestClient httpClient, EventBus eventBus) {
         this.invoiceRepository = invoiceRepository;
         this.configContificoRepository = configContificoRepository;
         this.httpClient = httpClient;
+        this.eventBus = eventBus;
     }
 
     public Invoice save(Invoice invoice) {
@@ -82,6 +87,12 @@ public class CommandInvoiceService {
                 System.out.println("Invoice sent to contifico successfully.");
             }
             invoiceRepository.save(invoice);
+
+            invoice.getPayment().getPaymentshistory().forEach(history -> {
+                PaymentHistoryCreated event = new PaymentHistoryCreated(history, invoice);
+
+                eventBus.publish(List.of(event));
+            });
 
         } catch (HttpClientErrorException e) {
             try {

@@ -80,9 +80,6 @@ public class CommandPaymentService {
             }
         });
 
-        if (participant.getModules().getHasFocus() || participant.getModules().getHasYour() || participant.getModules().getHasLife()) {
-            throw new BaseException("El participante ya tiene un módulo activo", List.of(""));
-        }
         var total = paymentReq.paymentsHistory.stream().mapToDouble(PaymentHistory::getAmount).sum();
 
         if (total > paymentReq.total) {
@@ -95,6 +92,12 @@ public class CommandPaymentService {
         List<Product> products = paymentReq.products.stream().map(productId -> {
             return _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
         }).collect(Collectors.toList());
+
+        products.forEach(product -> {
+            if (participant.getModules().getHasFocus() || participant.getModules().getHasYour() || participant.getModules().getHasLife()) {
+                throw new BaseException("El participante ya tiene un módulo activo", List.of(""));
+            }
+        });
 
         var payment = Payment.create(UUID.randomUUID().toString(), products, paymentReq.discount, participant, queryCampusService.findById(paymentReq.campus), paymentReq.paymentsHistory, paymentReq.total, paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING, paymentReq.note);
 
@@ -264,6 +267,7 @@ public class CommandPaymentService {
             payment.setStatus(PaymentStatus.COMPLETED);
         }
         paymentHistory.setId(UUID.randomUUID().toString());
+        paymentHistory.setSent(false);
         payment.getPaymentshistory().add(paymentHistory);
 
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);

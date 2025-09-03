@@ -136,4 +136,8 @@ public class Payment extends AggregateRoot {
     public Invoice getInvoice() {
         return invoice;
     }
+
+    public void setPaymentshistory(List<PaymentHistory> paymentshistory) {
+        this.paymentshistory = paymentshistory;
+    }
 }

@@ -54,7 +54,7 @@ public class PaymentController {
         if (!search.isEmpty()) {
             filters.addAll(
                     List.of(
-                            new Filter("number", search, "cashDrawerDetail.cashDrawer.cashBox", Filter.Operation.LIKE, Filter.LogicalOperator.AND),
+                            new Filter("number", search, "cashDrawerDetail.cashDrawer.cashBox", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
                             new Filter("fullName", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
                             new Filter("address", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
                             new Filter("document", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),

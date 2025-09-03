@@ -17,11 +17,13 @@ import com.foryourlife.admin.sales.payments.payment.infrastructure.httpControlle
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethodRepository;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
+import com.foryourlife.admin.sales.programs.domain.Program;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -32,6 +34,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -92,12 +95,25 @@ public class CommandPaymentService {
         List<Product> products = paymentReq.products.stream().map(productId -> {
             return _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
         }).collect(Collectors.toList());
+        EnumSet<CourseLevel> activeLevels = EnumSet.noneOf(CourseLevel.class);
+        var modules = participant.getModules();
+        if (modules != null) {
+            if (Boolean.TRUE.equals(modules.getHasFocus())) activeLevels.add(CourseLevel.FOCUS);
+            if (Boolean.TRUE.equals(modules.getHasYour())) activeLevels.add(CourseLevel.YOUR);
+            if (Boolean.TRUE.equals(modules.getHasLife())) activeLevels.add(CourseLevel.LIFE);
+        }
 
-        products.forEach(product -> {
-            if (participant.getModules().getHasFocus() || participant.getModules().getHasYour() || participant.getModules().getHasLife()) {
-                throw new BaseException("El participante ya tiene un módulo activo", List.of(""));
+        for (Product product : products) {
+            var programs = product.getPrograms() != null ? product.getPrograms() : List.<Program>of();
+
+            for (Program program : programs) {
+                var level = program.getCourseLevel();
+                if (level != null && activeLevels.contains(level)) {
+                    String msg = "El participante ya tiene activo un programa de nivel " + level;
+                    throw new BaseException(msg, List.of(""));
+                }
             }
-        });
+        }
 
         var payment = Payment.create(UUID.randomUUID().toString(), products, paymentReq.discount, participant, queryCampusService.findById(paymentReq.campus), paymentReq.paymentsHistory, paymentReq.total, paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING, paymentReq.note);
 
@@ -131,7 +147,7 @@ public class CommandPaymentService {
 
             payment.getPaymentshistory().forEach(
                     paymentHistory -> {
-                    paymentHistory.setId(UUID.randomUUID().toString());
+                        paymentHistory.setId(UUID.randomUUID().toString());
                     }
             );
 

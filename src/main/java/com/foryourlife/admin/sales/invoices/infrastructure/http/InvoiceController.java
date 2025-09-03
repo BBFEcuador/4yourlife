@@ -75,7 +75,7 @@ public class InvoiceController {
         return new ResponseEntity<>(queryInvoiceService.findById(id), HttpStatus.OK);
     }
 
-    @PostMapping("resend-paymentHistory")
+    @PostMapping("resend-payment-history")
     public ResponseEntity<?> sendPaymentHistory(@RequestParam(value = "invoiceId") String invoiceId) {
         commandInvoiceService.resendPaymentHistoryToContifico(invoiceId);
         return new ResponseEntity<>(HttpStatus.OK);

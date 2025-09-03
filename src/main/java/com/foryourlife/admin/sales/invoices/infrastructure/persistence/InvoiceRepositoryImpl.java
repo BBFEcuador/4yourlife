@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.invoices.infrastructure.persistence;
 
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
@@ -65,6 +66,6 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
 
     @Override
     public List<Invoice> findInvoicesBySentContificoAndCampusId(Boolean sentContifico, String campusId) {
-        return jpaInvoiceRepository.findAllByIsSentContificoAndPayment_Campus_Id(sentContifico, campusId);
+        return jpaInvoiceRepository.findAllByIsSentContificoAndPayment_Campus_IdAndPayment_StatusIsNot(sentContifico, campusId, PaymentStatus.CANCELLED);
     }
 }

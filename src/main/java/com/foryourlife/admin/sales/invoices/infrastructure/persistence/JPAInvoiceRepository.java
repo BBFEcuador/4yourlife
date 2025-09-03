@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.invoices.infrastructure.persistence;
 
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,6 @@ public interface JPAInvoiceRepository extends JpaRepository<Invoice, String>, Jp
     Optional<Invoice> findByPayment_Id(String paymentId);
 
     Optional<Invoice> findTopByOrderByInvoiceDateDesc();
+
+    List<Invoice> findAllByIsSentContificoAndPayment_Campus_IdAndPayment_StatusIsNot(Boolean isSentContifico, String paymentCampusId, PaymentStatus paymentStatus);
 }

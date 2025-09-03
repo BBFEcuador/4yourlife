@@ -56,7 +56,6 @@ public class Participant extends AggregateRoot implements Serializable {
             var team = teams.stream().findFirst().get();
             Hibernate.initialize(team.getTrainer());
             Hibernate.initialize(team.getTraining());
-            System.out.println(team.getTraining());
             return team;
         }
         return null;

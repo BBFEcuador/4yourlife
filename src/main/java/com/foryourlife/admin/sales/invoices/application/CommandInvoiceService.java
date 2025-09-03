@@ -7,6 +7,7 @@ import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -23,14 +24,16 @@ import java.util.List;
 @Service
 public class CommandInvoiceService {
     private final InvoiceRepository invoiceRepository;
+    private final PaymentRepository paymentRepository;
     private final ConfigContificoRepository configContificoRepository;
     @Qualifier("restClient")
     private final RestClient httpClient;
     private final EventBus eventBus;
 
 
-    public CommandInvoiceService(InvoiceRepository invoiceRepository, ConfigContificoRepository configContificoRepository, @Qualifier("restClient") RestClient httpClient, EventBus eventBus) {
+    public CommandInvoiceService(InvoiceRepository invoiceRepository, PaymentRepository paymentRepository, ConfigContificoRepository configContificoRepository, @Qualifier("restClient") RestClient httpClient, EventBus eventBus) {
         this.invoiceRepository = invoiceRepository;
+        this.paymentRepository = paymentRepository;
         this.configContificoRepository = configContificoRepository;
         this.httpClient = httpClient;
         this.eventBus = eventBus;
@@ -113,14 +116,14 @@ public class CommandInvoiceService {
         }
     }
 
-    public void resendPaymentHistoryToContifico(String invoiceId) {
-        var invoice = invoiceRepository.findById(invoiceId);
-        if (invoice.getContificoId() == null || invoice.getContificoId().isEmpty()) {
+    public void resendPaymentHistoryToContifico(String paymentId) {
+        var payment = paymentRepository.findById(paymentId);
+        if (payment.getInvoice().getContificoId() == null || payment.getInvoice().getContificoId().isEmpty()) {
             throw new IllegalArgumentException("No se puede reenviar el historial de pagos, la factura no ha sido enviada a Contifico");
         }
-        invoice.getPayment().getPaymentshistory().forEach(history -> {
+        payment.getPaymentshistory().forEach(history -> {
             if (!history.getSent()) {
-                PaymentHistoryCreated event = new PaymentHistoryCreated(history, invoice);
+                PaymentHistoryCreated event = new PaymentHistoryCreated(history, payment.getInvoice());
 
                 eventBus.publish(List.of(event));
             }

@@ -2,6 +2,8 @@ package com.foryourlife.admin.sales.invoices.infrastructure.http;
 
 import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
+import com.foryourlife.admin.sales.invoices.domain.Invoice;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import org.springframework.data.domain.PageRequest;
@@ -71,5 +73,11 @@ public class InvoiceController {
     @GetMapping("/{id}")
     public ResponseEntity<?> findInvoiceById(@PathVariable String id) {
         return new ResponseEntity<>(queryInvoiceService.findById(id), HttpStatus.OK);
+    }
+
+    @PostMapping("resend-paymentHistory")
+    public ResponseEntity<?> sendPaymentHistory(@RequestParam(value = "invoiceId") String invoiceId) {
+        commandInvoiceService.resendPaymentHistoryToContifico(invoiceId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

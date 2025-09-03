@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.security.SecureRandom;
 import java.util.List;
 
 @Service
@@ -96,10 +97,10 @@ public class CommandInvoiceService {
 
         } catch (HttpClientErrorException e) {
             try {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode errorNode = objectMapper.readTree(e.getResponseBodyAsString());
-                    String errorMessage = errorNode.has("mensaje") ? errorNode.get("mensaje").asText() : "Error desconocido";
-                    invoice.setContificoError(errorMessage);
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode errorNode = objectMapper.readTree(e.getResponseBodyAsString());
+                String errorMessage = errorNode.has("mensaje") ? errorNode.get("mensaje").asText() : "Error desconocido";
+                invoice.setContificoError(errorMessage);
                 invoiceRepository.save(invoice);
             } catch (Exception jsonException) {
                 invoice.setContificoError("Error al procesar la respuesta de error: " + e.getMessage());
@@ -110,5 +111,19 @@ public class CommandInvoiceService {
             System.err.println("Error sending invoice to contifico second: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void resendPaymentHistoryToContifico(String invoiceId) {
+        var invoice = invoiceRepository.findById(invoiceId);
+        if (invoice.getContificoId() == null || invoice.getContificoId().isEmpty()) {
+            throw new IllegalArgumentException("No se puede reenviar el historial de pagos, la factura no ha sido enviada a Contifico");
+        }
+        invoice.getPayment().getPaymentshistory().forEach(history -> {
+            if (!history.getSent()) {
+                PaymentHistoryCreated event = new PaymentHistoryCreated(history, invoice);
+
+                eventBus.publish(List.of(event));
+            }
+        });
     }
 }

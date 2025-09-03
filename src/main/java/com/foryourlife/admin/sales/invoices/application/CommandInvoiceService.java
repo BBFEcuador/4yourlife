@@ -7,6 +7,9 @@ import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
+import com.foryourlife.shared.domain.bus.EventBus;
+import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
@@ -15,19 +18,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.security.SecureRandom;
 import java.util.List;
 
 @Service
 public class CommandInvoiceService {
     private final InvoiceRepository invoiceRepository;
+    private final PaymentRepository paymentRepository;
     private final ConfigContificoRepository configContificoRepository;
     @Qualifier("restClient")
     private final RestClient httpClient;
+    private final EventBus eventBus;
 
-    public CommandInvoiceService(InvoiceRepository invoiceRepository, ConfigContificoRepository configContificoRepository, @Qualifier("restClient") RestClient httpClient) {
+
+    public CommandInvoiceService(InvoiceRepository invoiceRepository, PaymentRepository paymentRepository, ConfigContificoRepository configContificoRepository, @Qualifier("restClient") RestClient httpClient, EventBus eventBus) {
         this.invoiceRepository = invoiceRepository;
+        this.paymentRepository = paymentRepository;
         this.configContificoRepository = configContificoRepository;
         this.httpClient = httpClient;
+        this.eventBus = eventBus;
     }
 
     public Invoice save(Invoice invoice) {
@@ -83,12 +92,18 @@ public class CommandInvoiceService {
             }
             invoiceRepository.save(invoice);
 
+            invoice.getPayment().getPaymentshistory().forEach(history -> {
+                PaymentHistoryCreated event = new PaymentHistoryCreated(history, invoice);
+
+                eventBus.publish(List.of(event));
+            });
+
         } catch (HttpClientErrorException e) {
             try {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode errorNode = objectMapper.readTree(e.getResponseBodyAsString());
-                    String errorMessage = errorNode.has("mensaje") ? errorNode.get("mensaje").asText() : "Error desconocido";
-                    invoice.setContificoError(errorMessage);
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode errorNode = objectMapper.readTree(e.getResponseBodyAsString());
+                String errorMessage = errorNode.has("mensaje") ? errorNode.get("mensaje").asText() : "Error desconocido";
+                invoice.setContificoError(errorMessage);
                 invoiceRepository.save(invoice);
             } catch (Exception jsonException) {
                 invoice.setContificoError("Error al procesar la respuesta de error: " + e.getMessage());
@@ -99,5 +114,19 @@ public class CommandInvoiceService {
             System.err.println("Error sending invoice to contifico second: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void resendPaymentHistoryToContifico(String paymentId) {
+        var payment = paymentRepository.findById(paymentId);
+        if (payment.getInvoice().getContificoId() == null || payment.getInvoice().getContificoId().isEmpty()) {
+            throw new IllegalArgumentException("No se puede reenviar el historial de pagos, la factura no ha sido enviada a Contifico");
+        }
+        payment.getPaymentshistory().forEach(history -> {
+            if (!history.getSent()) {
+                PaymentHistoryCreated event = new PaymentHistoryCreated(history, payment.getInvoice());
+
+                eventBus.publish(List.of(event));
+            }
+        });
     }
 }

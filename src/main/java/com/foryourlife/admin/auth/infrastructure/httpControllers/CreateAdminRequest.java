@@ -15,16 +15,16 @@ import java.util.UUID;
 public class CreateAdminRequest {
     public String id;
     @NotNull
-    @NotBlank(message = "The name1 field is required")
+    @NotBlank(message = "El primer nombre es requerido")
     public String name1;
     @NotNull
-    @NotBlank(message = "The name2 field is required")
+    @NotBlank(message = "El segundo nombre es requerido")
     public String name2;
     @NotNull
-    @NotBlank(message = "The lastname1 field is required")
+    @NotBlank(message = "El primer apellido es requerido")
     public String lastname1;
     @NotNull
-    @NotBlank(message = "The lastname2 field is required")
+    @NotBlank(message = "El segundo apellido es requerido")
     public String lastname2;
     @NotNull
     @Email

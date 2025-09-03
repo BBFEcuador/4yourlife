@@ -13,14 +13,14 @@ public class CampusRequest {
     @NotBlank(message = "The country field is required")
     public String country;
     @NotNull
-    @NotBlank(message = "The city field is required")
+    @NotBlank(message = "La ciudad es requerida")
     public String city;
     @NotNull
-    @NotBlank(message = "The address field is required")
+    @NotBlank(message = "La dirección es requerida")
     public String address;
     @NotNull
-    @NotBlank(message = "The phone field is required")
-    @Pattern(regexp = "^[0-9]*$", message = "The phone field only accept digits")
+    @NotBlank(message = "El numero de telefono es requerido")
+    @Pattern(regexp = "^[0-9]*$", message = "El telefono solo puede contener digitos")
     public String phone;
 
     public CampusRequest(String id, String country, String city, String address, String phone) {

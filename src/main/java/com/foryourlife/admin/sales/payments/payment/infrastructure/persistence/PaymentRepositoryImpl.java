@@ -55,8 +55,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     @Override
     public Page<Payment> findAll(Pageable pageable, Criteria criteria) {
-        var jpaCriteria = converter.getJpaSpecifications(criteria);
-        return _jpaPaymentRepository.findAll(jpaCriteria, pageable);
+        return _jpaPaymentRepository.findAll(converter.getJpaSpecifications(criteria), pageable);
     }
 
     @Override
@@ -83,7 +82,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         if (payment.getDiscount() != null) {
             context.setVariable("discount", payment.getDiscount().getDiscountValue());
         } else {
-            context.setVariable("discount", 0.0);
+            context.setVariable("discount", payment.getInvoice().getTotalDiscount());
         }
         return templateEngine.process("templates/Payment-pdf", context);
     }

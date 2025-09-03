@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.payments.payment.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.contifico.config.domain.ConfigContifico;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.sales.discounts.domain.ProductDiscount;
@@ -16,6 +17,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.List;
@@ -52,22 +54,14 @@ public class Payment extends AggregateRoot {
 
     private String note;
 
-    @OneToMany(
-            mappedBy = "payment"
-    )
+    @OneToMany(mappedBy = "payment")
     @JsonIgnoreProperties("payment")
     private List<CashDrawerDetail> cashDrawerDetail;
     @JsonIgnore
-    @OneToOne(
-            mappedBy = "payment",
-            fetch = FetchType.EAGER
-    )
+    @OneToOne(mappedBy = "payment", fetch = FetchType.EAGER)
     private Invoice invoice;
     @CreatedDate
-    @Column(
-            name = "created_at",
-            updatable = false
-    )
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime created_at = LocalDateTime.now();
 
     protected Payment() {
@@ -136,4 +130,19 @@ public class Payment extends AggregateRoot {
     public Invoice getInvoice() {
         return invoice;
     }
+
+    public void setPaymentshistory(List<PaymentHistory> paymentshistory) {
+        this.paymentshistory = paymentshistory;
+    }
+
+    @JsonProperty("remainingBalance")
+    public double getRemainingBalance() {
+        double totalPayments = this.paymentshistory.stream()
+                .mapToDouble(PaymentHistory::getAmount)
+                .sum();
+        double remaining = this.invoice.getAmount() - totalPayments;
+        return Math.round(remaining * 100.0) / 100.0;
+    }
+
+
 }

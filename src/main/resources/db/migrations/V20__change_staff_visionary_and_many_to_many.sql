@@ -15,7 +15,3 @@ CREATE TABLE IF NOT EXISTS team_visionary
     CONSTRAINT fk_team_on_visionary FOREIGN KEY (team_id) REFERENCES teams (id),
     CONSTRAINT pk_team_visionary PRIMARY KEY (team_id, visionary_id)
 );
-
-
-ALTER TABLE staffs add column isActive BOOLEAN null DEFAULT TRUE;
-ALTER TABLE visionaries add column isActive BOOLEAN null DEFAULT TRUE;

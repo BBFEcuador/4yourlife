@@ -4,10 +4,10 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class AdminLoginRequest {
-    @NotBlank(message = "username cannot be blank")
-    @Email(message = "Not valid email")
+    @NotBlank(message = "El nombre de usuario es obligatorio")
+    @Email(message = "El email no es valido")
     public String username;
-    @NotBlank(message = "Password cannot be blank")
+    @NotBlank(message = "La contraseña no puede ser vacia")
     public String password;
 
     public AdminLoginRequest(String username, String password) {

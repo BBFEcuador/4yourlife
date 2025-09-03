@@ -9,6 +9,8 @@ public class PaymentHistory {
     private String date;
     private String transactionId;
     private String pingType;
+    private Boolean sent;
+    private String notSendError;
 
     public PaymentHistory(PaymentMethod paymentMethod, double amount, String date) {
         this.paymentMethod = paymentMethod;
@@ -60,4 +62,23 @@ public class PaymentHistory {
         this.transactionId = transactionId;
     }
 
+    public void setPingType(String pingType) {
+        this.pingType = pingType;
+    }
+
+    public Boolean getSent() {
+        return sent;
+    }
+
+    public void setSent(Boolean sent) {
+        this.sent = sent;
+    }
+
+    public String getNotSendError() {
+        return notSendError;
+    }
+
+    public void setNotSendError(String notSendError) {
+        this.notSendError = notSendError;
+    }
 }

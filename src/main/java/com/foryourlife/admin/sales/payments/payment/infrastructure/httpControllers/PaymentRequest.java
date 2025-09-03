@@ -7,6 +7,7 @@ import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class PaymentRequest {
@@ -23,6 +24,7 @@ public class PaymentRequest {
     public List<PaymentHistory> paymentsHistory = List.of();
     @NotNull(message = "El valor total es requerido")
     public Double total;
+    public BigDecimal totalDiscount;
     public PaymentStatus status;
     @NotNull(message = "Los datos de facturación son requeridos")
     @Valid

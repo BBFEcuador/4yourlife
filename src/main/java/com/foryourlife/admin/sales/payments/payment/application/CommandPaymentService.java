@@ -17,11 +17,13 @@ import com.foryourlife.admin.sales.payments.payment.infrastructure.httpControlle
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethodRepository;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
+import com.foryourlife.admin.sales.programs.domain.Program;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -32,6 +34,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -80,9 +83,6 @@ public class CommandPaymentService {
             }
         });
 
-        if (participant.getModules().getHasFocus() || participant.getModules().getHasYour() || participant.getModules().getHasLife()) {
-            throw new BaseException("El participante ya tiene un módulo activo", List.of(""));
-        }
         var total = paymentReq.paymentsHistory.stream().mapToDouble(PaymentHistory::getAmount).sum();
 
         if (total > paymentReq.total) {
@@ -95,6 +95,25 @@ public class CommandPaymentService {
         List<Product> products = paymentReq.products.stream().map(productId -> {
             return _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
         }).collect(Collectors.toList());
+        EnumSet<CourseLevel> activeLevels = EnumSet.noneOf(CourseLevel.class);
+        var modules = participant.getModules();
+        if (modules != null) {
+            if (Boolean.TRUE.equals(modules.getHasFocus())) activeLevels.add(CourseLevel.FOCUS);
+            if (Boolean.TRUE.equals(modules.getHasYour())) activeLevels.add(CourseLevel.YOUR);
+            if (Boolean.TRUE.equals(modules.getHasLife())) activeLevels.add(CourseLevel.LIFE);
+        }
+
+        for (Product product : products) {
+            var programs = product.getPrograms() != null ? product.getPrograms() : List.<Program>of();
+
+            for (Program program : programs) {
+                var level = program.getCourseLevel();
+                if (level != null && activeLevels.contains(level)) {
+                    String msg = "El participante ya tiene activo un programa de nivel " + level;
+                    throw new BaseException(msg, List.of(""));
+                }
+            }
+        }
 
         var payment = Payment.create(UUID.randomUUID().toString(), products, paymentReq.discount, participant, queryCampusService.findById(paymentReq.campus), paymentReq.paymentsHistory, paymentReq.total, paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING, paymentReq.note);
 
@@ -102,7 +121,23 @@ public class CommandPaymentService {
         BigDecimal divisor = BigDecimal.valueOf(1.15);
         BigDecimal taxAmount = totalProduct.subtract(totalProduct.divide(divisor, 2, RoundingMode.HALF_UP));
 
-        var invoice = Invoice.create(UUID.randomUUID().toString(), paymentReq.invoice.fullName, paymentReq.invoice.address, paymentReq.invoice.document, paymentReq.invoice.phone, paymentReq.invoice.email, paymentReq.invoice.invoiceNumber, LocalDateTime.now(), products, payment, false, taxAmount.doubleValue(), 15.0, paymentReq.total, paymentReq.invoice.type);
+        var invoice = Invoice.create(
+                UUID.randomUUID().toString(),
+                paymentReq.invoice.fullName,
+                paymentReq.invoice.address,
+                paymentReq.invoice.document,
+                paymentReq.invoice.phone,
+                paymentReq.invoice.email,
+                paymentReq.invoice.invoiceNumber,
+                LocalDateTime.now(),
+                products,
+                payment,
+                false,
+                taxAmount.doubleValue(),
+                paymentReq.totalDiscount,
+                15.0,
+                paymentReq.total,
+                paymentReq.invoice.type);
         String paymentHistoryId = null;
 
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
@@ -110,13 +145,19 @@ public class CommandPaymentService {
         var newInvoice = createInvoice(invoice, cashDrawer, payment);
         if (!payment.getPaymentshistory().isEmpty()) {
 
-            payment.getPaymentshistory().getFirst().setId(UUID.randomUUID().toString());
-            paymentHistoryId = payment.getPaymentshistory().getFirst().getId();
+            payment.getPaymentshistory().forEach(
+                    paymentHistory -> {
+                        paymentHistory.setId(UUID.randomUUID().toString());
+                    }
+            );
 
             if (newInvoice.getContificoId() != null) {
-                PaymentHistoryCreated event = new PaymentHistoryCreated(payment.getPaymentshistory().getFirst(), newInvoice);
-
-                eventBus.publish(List.of(event));
+                payment.getPaymentshistory().forEach(
+                        paymentHistory -> {
+                            PaymentHistoryCreated event = new PaymentHistoryCreated(paymentHistory, newInvoice);
+                            eventBus.publish(List.of(event));
+                        }
+                );
             }
         }
         _paymentRepository.save(payment);
@@ -258,6 +299,7 @@ public class CommandPaymentService {
             payment.setStatus(PaymentStatus.COMPLETED);
         }
         paymentHistory.setId(UUID.randomUUID().toString());
+        paymentHistory.setSent(false);
         payment.getPaymentshistory().add(paymentHistory);
 
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);

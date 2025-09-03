@@ -9,7 +9,7 @@ public interface CashDrawerRepository {
     void deleteById(String id);
     List<CashDrawer> getAll();
     List<CashDrawer> getByCashBoxId(String id);
-    List<CashDrawer> getByUserIdAndStatusOpen(String userId);
+    List<CashDrawer> getByUserIdAndStatusOpenOrLock(String userId);
     Optional<CashDrawer> getByIsOpenAndByUserId(String userId);
     Optional<CashDrawer> findByCashBoxIdAndStatus(String id, CashDrawerStatus status);
     String generatePdfReport(CashDrawer cashDrawer);

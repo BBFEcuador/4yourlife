@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,7 +40,7 @@ public class InvoiceRequest {
     @NotBlank(message = "El tipo de persona es requerido")
     @Pattern(regexp = "^[NJ]$", message = "Tipo de persona debe ser N o J")
     public String type;
-
+    public BigDecimal totalDiscount;
     public List<Product> products;
     public Payment payment;
     public Boolean sentSri;
@@ -61,6 +62,7 @@ public class InvoiceRequest {
                 payment,
                 sentSri,
                 (amount*0.15),
+                totalDiscount,
                 15.0,
                 amount,
                 type

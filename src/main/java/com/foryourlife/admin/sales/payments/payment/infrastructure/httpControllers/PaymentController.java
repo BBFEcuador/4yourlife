@@ -32,23 +32,8 @@ public class PaymentController {
 
     @PostMapping("")
     public ResponseEntity<?> savePayment(@RequestBody @Valid PaymentRequest request) {
-        return ResponseEntity.ok().body(commandPaymentService.save(request));
+        return new ResponseEntity<>(commandPaymentService.save(request), HttpStatus.CREATED);
     }
-
-//    @PutMapping("")
-//    public ResponseEntity<?> updatePayment(@RequestBody PaymentRequest request) {
-//        commandPaymentService.update(request);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-
-//    @GetMapping("")
-//    public ResponseEntity<?> getAllPayments(
-//            @RequestParam(value = "page", defaultValue = "0") int page,
-//            @RequestParam(value = "perPage", defaultValue = "10") int perPage
-//    ) {
-//        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-//        return new ResponseEntity<>(queryPaymentService.findAll(p), HttpStatus.OK);
-//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPaymentById(@PathVariable String id) {
@@ -67,7 +52,17 @@ public class PaymentController {
         Criteria criteria = new Criteria(List.of(), Optional.empty(), Optional.empty());
         List<Filter> filters = new ArrayList<>();
         if (!search.isEmpty()) {
-            filters.addAll(List.of(new Filter("number", search, "cashDrawerDetail.cashDrawer.cashBox", Filter.Operation.LIKE, Filter.LogicalOperator.AND)));
+            filters.addAll(
+                    List.of(
+                            new Filter("number", search, "cashDrawerDetail.cashDrawer.cashBox", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("fullName", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("address", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("document", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("phone", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("email", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("invoiceNumber", search, "invoice", Filter.Operation.LIKE, Filter.LogicalOperator.OR)
+                    )
+            );
         }
         if (!campusId.isEmpty()) {
             filters.add(new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND));

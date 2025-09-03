@@ -43,7 +43,7 @@ public class AdminRepositoryImpl implements AdminRepository {
         Authentication authentication = this.authenticate(username.toLowerCase(), password);
         var token = jwtUtils.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        var cashDrawer = cashDrawerRepository.getByUserIdAndStatusOpen(this.loadAdmin.getUser().getId());
+        var cashDrawer = cashDrawerRepository.getByUserIdAndStatusOpenOrLock(this.loadAdmin.getUser().getId());
         return new AdminLoginResponse(this.loadAdmin, token, cashDrawer);
     }
 

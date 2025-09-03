@@ -15,13 +15,11 @@ public class SaveFocusTeamsRequest {
     @NotNull
     public String training;
     @NotNull
-    @Size(min = 1)
+    @Size(min = 1, message = "El equipo debe tener al menos un participante")
     public List<Participant> users;
     @NotNull
-    @Size(min = 1)
     public List<Visionary> visionaries;
     @NotNull
-    @Size(min = 1)
     public List<Staff> staffs;
     @NotNull
     public String trainer;

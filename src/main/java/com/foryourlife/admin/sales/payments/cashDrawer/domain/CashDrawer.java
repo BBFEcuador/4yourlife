@@ -11,6 +11,8 @@ import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,7 +73,8 @@ public class CashDrawer {
     @JsonIgnore
     private List<CashDrawerDetail> cashDrawerDetails;
 
-    protected CashDrawer() {}
+    protected CashDrawer() {
+    }
 
     public CashDrawer(String id, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, CashBox cashBox) {
         this.id = id;
@@ -178,23 +181,32 @@ public class CashDrawer {
         return cashDrawerDetails;
     }
 
-    public Double getActualBalance() {
-        Double totalPayments = 0.0;
-        if (this.cashDrawerDetails==null || this.cashDrawerDetails.isEmpty()){
-            return this.openingBalance;
+    public BigDecimal getActualBalance() {
+        BigDecimal totalPayments = BigDecimal.ZERO;
+
+        if (this.cashDrawerDetails == null || this.cashDrawerDetails.isEmpty()) {
+            return BigDecimal.valueOf(this.openingBalance)
+                    .setScale(2, RoundingMode.HALF_UP);
         }
+
         for (CashDrawerDetail detail : this.cashDrawerDetails) {
             Payment payment = detail.getPayment();
             if (payment != null) {
                 for (PaymentHistory paymentHistory : payment.getPaymentshistory()) {
                     if (paymentHistory.getId().equals(detail.getPaymentHistoryId())) {
-                        totalPayments += paymentHistory.getAmount();
+                        totalPayments = totalPayments.add(
+                                BigDecimal.valueOf(paymentHistory.getAmount())
+                        );
                     }
                 }
             }
         }
-        return this.openingBalance + totalPayments;
+
+        return BigDecimal.valueOf(this.openingBalance)
+                .add(totalPayments)
+                .setScale(2, RoundingMode.HALF_UP);
     }
+
 
     public String getPin() {
         return pin;

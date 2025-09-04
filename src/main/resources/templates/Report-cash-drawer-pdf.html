@@ -6,7 +6,7 @@
     <style>
         @page {
             size: A4 !important;
-            margin: 0;
+            margin: 15mm 10mm 35mm 10mm;
         }
 
         body {
@@ -41,24 +41,31 @@
             text-align: left;
         }
 
-        footer {
-            position: fixed;
-            bottom: 10%;
-            left: 0;
-            width: 100%;
-        }
+        footer { position: static; }
+        .page-break { page-break-before: always; }
 
         h2, h3 {
             margin-bottom: 5px;
         }
+
+        .content {
+            padding-bottom: 40mm;
+        }
+
+        tfoot { display: table-row-group; }
+        tfoot { page-break-before: avoid; page-break-inside: avoid; }
+        tfoot tr { page-break-inside: avoid; }
+        tfoot { display: table-row-group; }
+        thead { display: table-header-group; }
+        tr { page-break-inside: avoid; }
     </style>
 </head>
 
 <body>
 <!-- ENCABEZADO -->
 <div class="section center">
-    <h2>EVA ERP 10009 CON DATOS</h2>
-    <p>CIERRE DE CAJA No. <span th:text="${cashDrawer.id}"></span></p>
+    <h2 th:text="'Establecimiento ' + ${cashDrawer.cashBox.store.number} + ', ' + ${#temporals.format(cashDrawer.startDate, 'dd/MM/yyyy HH:mm')}"></h2>
+    <p>CIERRE DE CAJA No. <span th:text="${cashDrawer.cashBox.number}"></span></p>
 </div>
 
 <!-- DATOS GENERALES -->
@@ -129,11 +136,13 @@
             <td th:text="${detail.paymentMethod}"></td>
             <td th:text="${#numbers.formatDecimal(detail.amount, 1, 2)}"></td>
         </tr>
-        <tr>
-            <td><strong>Total</strong></td>
-            <td th:text="${cashDrawer.closedBalance}"></td>
-        </tr>
         </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="3"><strong>Total</strong></td>
+            <td th:text="${#numbers.formatDecimal(cashDrawer.getActualBalance(), 1, 2)}"></td>
+        </tr>
+        </tfoot>
     </table>
 </div>
 
@@ -147,8 +156,8 @@
                 <th>Supervisor</th>
                 <th>Firma</th>
             </tr>
-            <tr>
-                <td th:text="${cashDrawer.closedByUser != null ? cashDrawer.closedByUser.name : ''}">Encargado</td>
+            <tr style="height: 60px;">
+                <td th:text="${cashDrawer.openedByUser.name}">Encargado</td>
                 <td></td>
                 <td></td>
                 <td></td>

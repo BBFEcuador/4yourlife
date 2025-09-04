@@ -131,6 +131,10 @@ public class Payment extends AggregateRoot {
         return invoice;
     }
 
+    public Boolean getHasSomePaymentWithError() {
+        return this.paymentshistory.stream().anyMatch(PaymentHistory::getSent);
+    }
+
     public void setPaymentshistory(List<PaymentHistory> paymentshistory) {
         this.paymentshistory = paymentshistory;
     }

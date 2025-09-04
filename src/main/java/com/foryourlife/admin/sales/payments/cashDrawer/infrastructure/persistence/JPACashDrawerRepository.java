@@ -97,7 +97,7 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
                     PaymentHistory paymentHistory = findPaymentHistory(detail);
                     map.put("date", paymentHistory != null ? paymentHistory.getDate() : detail.getPayment().getCreated_at());
                     map.put("productName", detail.getPaymentHistoryId() != null && !detail.getPayment().getProducts().isEmpty()
-                            ? detail.getPayment().getProducts().getFirst().getName() + " - ABONO" : detail.getPayment().getProducts().getFirst().getName() + " - COBRO");
+                            ? detail.getPayment().getProducts().getFirst().getName() + " - ABONO" : detail.getPayment().getProducts().getFirst().getName() + " - COMPROMISO DE PAGO");
                     map.put("paymentMethod", paymentHistory != null && paymentHistory.getPaymentMethod() != null
                             ? paymentHistory.getPaymentMethod().getType() : "");
                     map.put("amount", paymentHistory != null ? paymentHistory.getAmount() : 0.0);
@@ -119,8 +119,13 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     @NotNull
     private static Map<String, PaymentMethodSummary> getStringPaymentMethodSummaryMap(List<CashDrawerDetail> details) {
         Map<String, PaymentMethodSummary> paymentMethodMap = new HashMap<>();
-
+        List<String> paymentId = new ArrayList<>();
         for (var detail : details) {
+            if (paymentId.contains(detail.getPayment().getId())) {
+                continue;
+            } else {
+                paymentId.add(detail.getPayment().getId());
+            }
             for (var paymentHistory : detail.getPayment().getPaymentshistory()) {
                 String paymentMethodId = paymentHistory.getPaymentMethod().getId();
                 PaymentMethodSummary summary = paymentMethodMap.computeIfAbsent(paymentMethodId, k -> new PaymentMethodSummary(paymentHistory.getPaymentMethod()));

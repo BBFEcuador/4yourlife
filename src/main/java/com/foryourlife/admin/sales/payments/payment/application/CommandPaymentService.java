@@ -302,6 +302,11 @@ public class CommandPaymentService {
         } else if (total == payment.getTotal() && payment.getStatus() != PaymentStatus.COMPLETED) {
             payment.setStatus(PaymentStatus.COMPLETED);
         }
+        payment.getPaymentshistory().forEach(history -> {
+            if (history.getTransactionId().equals(paymentHistory.getTransactionId())) {
+                throw new BaseException("El pago con el codigo de transaccion: " + paymentHistory.getTransactionId() + " ya existe!", List.of(""));
+            }
+        });
         paymentHistory.setId(UUID.randomUUID().toString());
         paymentHistory.setSent(false);
         payment.getPaymentshistory().add(paymentHistory);

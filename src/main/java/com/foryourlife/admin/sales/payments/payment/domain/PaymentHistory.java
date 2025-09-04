@@ -2,8 +2,10 @@ package com.foryourlife.admin.sales.payments.payment.domain;
 
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethod;
 
+import java.util.UUID;
+
 public class PaymentHistory {
-    private String id;
+    private String id = UUID.randomUUID().toString();
     private PaymentMethod paymentMethod;
     private double amount;
     private String date;

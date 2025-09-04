@@ -95,9 +95,9 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
                 .map(detail -> {
                     Map<String, Object> map = new HashMap<>();
                     PaymentHistory paymentHistory = findPaymentHistory(detail);
-                    map.put("date", paymentHistory != null ? paymentHistory.getDate() : "");
-                    map.put("productName", detail.getPayment() != null && !detail.getPayment().getProducts().isEmpty()
-                            ? detail.getPayment().getProducts().getFirst().getName() : "");
+                    map.put("date", paymentHistory != null ? paymentHistory.getDate() : detail.getPayment().getCreated_at());
+                    map.put("productName", detail.getPaymentHistoryId() != null && !detail.getPayment().getProducts().isEmpty()
+                            ? detail.getPayment().getProducts().getFirst().getName() + " - ABONO" : detail.getPayment().getProducts().getFirst().getName() + " - COBRO");
                     map.put("paymentMethod", paymentHistory != null && paymentHistory.getPaymentMethod() != null
                             ? paymentHistory.getPaymentMethod().getType() : "");
                     map.put("amount", paymentHistory != null ? paymentHistory.getAmount() : 0.0);

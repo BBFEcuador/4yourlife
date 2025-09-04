@@ -138,16 +138,18 @@ public class CommandPaymentService {
                 15.0,
                 paymentReq.total,
                 paymentReq.invoice.type);
-        String paymentHistoryId = null;
 
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
         _paymentRepository.save(payment);
         var newInvoice = createInvoice(invoice, cashDrawer, payment);
+
+        cashDrawerDetailCommandService.save(null, paymentReq.cashDrawerId, payment);
+
         if (!payment.getPaymentshistory().isEmpty()) {
 
             payment.getPaymentshistory().forEach(
                     paymentHistory -> {
-                        paymentHistory.setId(UUID.randomUUID().toString());
+                        cashDrawerDetailCommandService.save(paymentHistory.getId(), paymentReq.cashDrawerId, payment);
                     }
             );
 
@@ -161,8 +163,10 @@ public class CommandPaymentService {
             }
         }
         _paymentRepository.save(payment);
-        cashDrawerDetailCommandService.save(paymentHistoryId, paymentReq.cashDrawerId, payment);
+
+
         eventBus.publish(List.of(new PaymentCreated(payment, invoice, cashDrawer)));
+
         return payment.getId();
     }
 

@@ -35,7 +35,6 @@ public class SpringSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-                    session.maximumSessions(1);
                 })
                 .authorizeHttpRequests(http -> {
                     http.requestMatchers(unauthorizedRoutes).permitAll().anyRequest().authenticated();

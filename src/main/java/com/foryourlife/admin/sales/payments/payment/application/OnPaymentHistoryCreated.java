@@ -34,11 +34,13 @@ public class OnPaymentHistoryCreated {
 
     @EventListener
     public void handle(PaymentHistoryCreated event) {
+        boolean sentOk = false;
+        String errorMessage = null;
+
         try {
             ObjectNode jsonNode = objectMapper.createObjectNode();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             String formattedDate = event.getInvoice().getInvoiceDate().format(formatter);
-
 
             switch (event.getPaymentHistory().getPaymentMethod().getCode()) {
                 case "EF":
@@ -69,7 +71,8 @@ public class OnPaymentHistoryCreated {
                     throw new RuntimeException("Invalid payment method");
             }
 
-            var configContifico = configContificoQueryService.findConfigContificoByCampusId(event.getInvoice().getPayment().getCampus().getId());
+            var configContifico = configContificoQueryService.findConfigContificoByCampusId(
+                    event.getInvoice().getPayment().getCampus().getId());
 
             var paymentHistoryJson = objectMapper.writeValueAsString(jsonNode);
 
@@ -80,53 +83,53 @@ public class OnPaymentHistoryCreated {
                     .header("Authorization", configContifico.getApiSecret())
                     .retrieve()
                     .toEntity(String.class);
-            boolean sentOk = response.getStatusCode().is2xxSuccessful();
+
+            sentOk = response.getStatusCode().is2xxSuccessful();
 
             if (sentOk) {
                 System.out.println("Payment created in Contifico: " + response.getBody());
             } else {
-                System.err.println("Error creating payment in Contifico: "
-                        + response.getStatusCodeValue() + ", " + response.getBody());
+                errorMessage = "Error creando pago en Contifico: " + response.getStatusCodeValue() + " - " + response.getBody();
+                System.err.println(errorMessage);
             }
 
-            Payment payment = paymentRepository.findById(event.getInvoice().getPayment().getId());
-
-            if (payment.getPaymentshistory() != null) {
-                payment.getPaymentshistory().stream()
-                        .filter(ph -> ph.getId().equals(event.getPaymentHistory().getId()))
-                        .findFirst()
-                        .ifPresent(ph -> ph.setSent(sentOk));
-            }
-
-            paymentRepository.save(payment);
         } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
-            System.err.println("Error serializing payment history JSON: " + e.getMessage());
+            errorMessage = "Error serializando JSON de pago: " + e.getMessage();
             e.printStackTrace();
         } catch (HttpClientErrorException e) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode errorNode = objectMapper.readTree(e.getResponseBodyAsString());
-                String errorMessage = errorNode.has("mensaje") ? errorNode.get("mensaje").asText() : "Error desconocido";
-                System.err.println("Error al crear el pago en contifico: " + e.getMessage());
-                e.printStackTrace();
+                JsonNode errorNode = new ObjectMapper().readTree(e.getResponseBodyAsString());
+                errorMessage = errorNode.has("mensaje") ? errorNode.get("mensaje").asText() : "Error desconocido";
+            } catch (Exception ex) {
+                errorMessage = "Error procesando respuesta de Contifico: " + ex.getMessage();
+            }
+            e.printStackTrace();
+        } catch (Exception e) {
+            errorMessage = "Error inesperado al enviar pago, intente reenviar";
+            e.printStackTrace();
+        } finally {
+            try {
                 Payment payment = paymentRepository.findById(event.getInvoice().getPayment().getId());
 
                 if (payment.getPaymentshistory() != null) {
+                    boolean finalSentOk = sentOk;
+                    String finalErrorMessage = errorMessage;
                     payment.getPaymentshistory().stream()
                             .filter(ph -> ph.getId().equals(event.getPaymentHistory().getId()))
                             .findFirst()
-                            .ifPresent(ph -> ph.setSent(false));
-                    payment.getPaymentshistory().stream()
-                            .filter(ph -> ph.getId().equals(event.getPaymentHistory().getId()))
-                            .findFirst()
-                            .ifPresent(ph -> ph.setNotSendError(errorMessage));
+                            .ifPresent(ph -> {
+                                ph.setSent(finalSentOk);
+                                if (!finalSentOk) {
+                                    ph.setNotSendError(finalErrorMessage != null ? finalErrorMessage : "Error contifico, intente reenviar");
+                                }
+                            });
                 }
-
                 paymentRepository.save(payment);
             } catch (Exception ex) {
-                System.err.println("Error sending payment to contifico second: " + ex.getMessage());
+                System.err.println("Error guardando el estado del PaymentHistory: " + ex.getMessage());
                 ex.printStackTrace();
             }
         }
     }
+
 }

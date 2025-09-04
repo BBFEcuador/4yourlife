@@ -11,7 +11,7 @@ public class PaymentHistory {
     private String date;
     private String transactionId;
     private String pingType;
-    private Boolean sent;
+    private Boolean sent = false;
     private String notSendError;
 
     public PaymentHistory(PaymentMethod paymentMethod, double amount, String date) {

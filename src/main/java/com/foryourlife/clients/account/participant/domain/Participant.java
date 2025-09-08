@@ -64,7 +64,7 @@ public class Participant extends AggregateRoot implements Serializable {
     protected Participant() {
     }
 
-    public void setLingerer(Boolean lingerer) {
+    public void setIsLingerer(Boolean lingerer) {
         isLingerer = lingerer;
     }
 
@@ -80,7 +80,7 @@ public class Participant extends AggregateRoot implements Serializable {
         return isDesertor;
     }
 
-    public void setDesertor(Boolean desertor) {
+    public void setIsDesertor(Boolean desertor) {
         isDesertor = desertor;
     }
 

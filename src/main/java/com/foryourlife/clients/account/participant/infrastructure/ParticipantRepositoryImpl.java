@@ -94,7 +94,7 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
 
     @Override
     public void save(Participant user) {
-        this.repository.save(user);
+        this.repository.saveAndFlush(user);
     }
 
     @Override

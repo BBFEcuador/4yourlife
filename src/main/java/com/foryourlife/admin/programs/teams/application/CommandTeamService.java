@@ -282,14 +282,6 @@ public class CommandTeamService {
                 .map(u -> _participantRepository.findById(u.getId()).orElseThrow())
                 .toList();
 
-        team.getUsers().stream()
-                .filter(p -> !participants.contains(p))
-                .forEach(p -> {
-                    p.setIsLingerer(true);
-                    p.setIsDesertor(true);
-                    _participantRepository.save(p);
-                });
-
         var filteredUsers = participants.stream()
                 .filter(p -> p.getModules().getHasYour())
                 .toList();
@@ -297,6 +289,14 @@ public class CommandTeamService {
         if (filteredUsers.isEmpty()) {
             throw new BaseException("No hay usuarios suficientes", List.of());
         }
+
+        team.getUsers().stream()
+                .filter(p -> !participants.contains(p))
+                .forEach(p -> {
+                    p.setIsLingerer(true);
+                    p.setIsDesertor(true);
+                    _participantRepository.save(p);
+                });
 
         var masterLife = request.masterLife.stream().map(participant -> {
             var p = queryMasterLifeService.findById(participant.getId());
@@ -336,14 +336,6 @@ public class CommandTeamService {
                 .map(u -> _participantRepository.findById(u.getId()).orElseThrow())
                 .toList();
 
-        team.getUsers().stream()
-                .filter(p -> !participants.contains(p))
-                .forEach(p -> {
-                    p.setIsLingerer(true);
-                    p.setIsDesertor(true);
-                    _participantRepository.save(p);
-                });
-
         var filteredUsers = participants.stream()
                 .filter(p -> p.getModules().getHasYour())
                 .toList();
@@ -351,6 +343,14 @@ public class CommandTeamService {
         if (filteredUsers.isEmpty()) {
             throw new BaseException("No hay usuarios suficientes", List.of());
         }
+
+        team.getUsers().stream()
+                .filter(p -> !participants.contains(p))
+                .forEach(p -> {
+                    p.setIsLingerer(true);
+                    p.setIsDesertor(true);
+                    _participantRepository.save(p);
+                });
 
         var staff = request.staffs.stream().map(participant -> {
             var p = staffRepository.findById(participant.getId()).orElseThrow();

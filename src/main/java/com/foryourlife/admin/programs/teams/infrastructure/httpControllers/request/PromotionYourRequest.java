@@ -14,7 +14,6 @@ public class PromotionYourRequest {
     @Size(min = 1)
     public List<Participant> users;
     @NotNull
-    @Size(min = 1)
     public List<Staff> staffs;
     @NotNull
     public String trainer;

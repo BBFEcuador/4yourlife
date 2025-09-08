@@ -87,7 +87,9 @@ public class ParticipantController {
 
         switch (lvl) {
             case "FOCUS" -> {
-                var criteria = new Criteria(List.of(new Filter("courseLevel", CourseLevel.FOCUS.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
+                var criteria = new Criteria(List.of(
+                        new Filter("courseLevel", CourseLevel.FOCUS.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND),
+                        new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
                 return new ResponseEntity<>(participantQueryService.matchers(criteria), HttpStatus.OK);
             }
             case "YOUR" -> {

@@ -16,21 +16,26 @@ public class AddOriginalTeamOnTeamAssigned {
     private final TrainingRepository trainingRepository;
     private final TeamRepository teamRepository;
 
-    public AddOriginalTeamOnTeamAssigned(TeamRepository teamRepository, TrainingRepository trainingRepository, TeamRepository teamRepository1) {
+    public AddOriginalTeamOnTeamAssigned(TeamRepository teamRepository, TrainingRepository trainingRepository) {
         this.trainingRepository = trainingRepository;
-        this.teamRepository = teamRepository1;
+        this.teamRepository = teamRepository;
     }
 
     @Async
     @EventListener
     @Transactional
     public void on(TeamToTrainingAssigned event) {
-        var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow(() -> new RuntimeException(""));
-        var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException(""));
+        var training = trainingRepository.findById(event.getTraining().getId())
+                .orElseThrow(() -> new RuntimeException("Training not found: " + event.getTraining().getId()));
+        var team = teamRepository.findById(event.getTeam().getId())
+                .orElseThrow(() -> new RuntimeException("Team not found: " + event.getTeam().getId()));
+
         Hibernate.initialize(team.getStaffs());
         Hibernate.initialize(team.getVisionaries());
         Hibernate.initialize(team.getMasterLife());
+
         training.setOriginalTeam(team);
         trainingRepository.save(training);
     }
 }
+

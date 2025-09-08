@@ -27,7 +27,6 @@ public class UpdateCourseLevelOnTeamAssigned {
         this.participantLevelRepository = participantLevelRepository;
     }
 
-    @Async
     @EventListener
     @Transactional
     public void on(TeamToTrainingAssigned event) {

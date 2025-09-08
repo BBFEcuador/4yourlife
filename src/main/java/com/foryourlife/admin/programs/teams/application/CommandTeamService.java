@@ -14,7 +14,6 @@ import com.foryourlife.staff.domain.StaffRepository;
 import com.foryourlife.visionary.domain.VisionaryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -154,47 +153,8 @@ public class CommandTeamService {
         this._teamRepository.save(team);
         this.bus.publish(team.pullDomainEvents());
     }
-    @Transactional
-    public void promotionYourTeam(PromotionYourRequest request) {
-        var team = _teamRepository.findById(request.id).orElseThrow(() -> new BaseException("Team not found", List.of()));
-        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow(() -> new BaseException("Trainer not found", List.of()));
-        var training = team.getTraining().getNextLevel();
-        var users = request.users.stream().map(participant -> {
-            var p = _participantRepository.findById(participant.getId()).orElseThrow();
-            if (p.getTeam() != null && !Objects.equals(p.getTeam().getId(), team.getId())) {
-                throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
-            }
-            if (p.getModules().getHasYour()) return p;
-            p.setLingerer(true);
-            p.setDesertor(true);
-            _participantRepository.save(p);
-            return null;
-        }).toList();
-        if (users.stream().filter(Objects::nonNull).toList().isEmpty()) {
-            throw new BaseException("No hay usuarios suficientes", List.of());
-        }
-        var staff = request.staffs.stream().map(participant -> {
-            var p = staffRepository.findById(participant.getId()).orElseThrow();
-            if (!staffRepository.isStaffAvailable(p.getId(), training.getStartDate(), training.getEndDate(), training.getId())) {
-                throw new BaseException("Staff not available", List.of("The user " + p.getUser().getName() + " has team"));
-            }
-            return p;
-        }).toList();
-        var n = Team.create(
-                team.getId(),
-                training.getCourseLevel().name()+"-" + training.getNumber(),
-                team.getPhoto(),
-                training,
-                training.getNumber(),
-                users,
-                trainer,
-                staff,
-                new ArrayList<>(),
-                new ArrayList<>()
-        );
-        _teamRepository.save(n);
-        bus.publish(n.pullDomainEvents());
-    }
+
+
 
     public void update(Team team) {
         this._teamRepository.findById(team.getId())
@@ -234,8 +194,8 @@ public class CommandTeamService {
         }
 
         var user = _participantRepository.findById(userId).get();
-        user.setLingerer(lingerer);
-        user.setDesertor(desertor);
+        user.setIsLingerer(lingerer);
+        user.setIsDesertor(desertor);
         _participantRepository.save(user);
         _teamRepository.removeParticipants(teamId, userId);
     }
@@ -311,25 +271,33 @@ public class CommandTeamService {
 
         return relativeFilePath;
     }
+
     @Transactional
     public void promotionLifeTeam(PromotionLifeRequest request) {
         var team = _teamRepository.findById(request.id).orElseThrow();
         var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
         var training = team.getTraining().getNextLevel();
-        var users = request.users.stream().map(participant -> {
-            var p = _participantRepository.findById(participant.getId()).orElseThrow();
-            if (p.getTeam() != null && !Objects.equals(p.getTeam().getId(), team.getId())) {
-                throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
-            }
-            if (p.getModules().getHasLife()) return p;
-            p.setLingerer(true);
-            p.setDesertor(true);
-            _participantRepository.save(p);
-            return null;
-        }).toList();
-        if (users.stream().filter(Objects::nonNull).toList().isEmpty()) {
+
+        var participants = request.users.stream()
+                .map(u -> _participantRepository.findById(u.getId()).orElseThrow())
+                .toList();
+
+        team.getUsers().stream()
+                .filter(p -> !participants.contains(p))
+                .forEach(p -> {
+                    p.setIsLingerer(true);
+                    p.setIsDesertor(true);
+                    _participantRepository.save(p);
+                });
+
+        var filteredUsers = participants.stream()
+                .filter(p -> p.getModules().getHasYour())
+                .toList();
+
+        if (filteredUsers.isEmpty()) {
             throw new BaseException("No hay usuarios suficientes", List.of());
         }
+
         var masterLife = request.masterLife.stream().map(participant -> {
             var p = queryMasterLifeService.findById(participant.getId());
             if (!queryMasterLifeService.isMasterLifeAvailable(p.getId(), training.getStartDate(), training.getEndDate(), training.getId())) {
@@ -337,20 +305,83 @@ public class CommandTeamService {
             }
             return p;
         }).toList();
-        var n = Team.create(
-                team.getId(),
-                request.name != null ? request.name : training.getCourseLevel().name() + "-" + training.getNumber(),
-                team.getPhoto(),
-                training,
-                training.getNumber(),
-                users,
-                trainer,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                masterLife
-        );
-        _teamRepository.save(n);
-        bus.publish(n.pullDomainEvents());
+
+        team.setName(request.name != null ? request.name : training.getCourseLevel().name() + "-" + training.getNumber());
+        team.setTraining(training);
+        team.setTrainingNumber(training.getNumber());
+        team.setTrainer(trainer);
+
+        team.getUsers().clear();
+        team.getUsers().addAll(filteredUsers);
+
+        team.getMasterLife().clear();
+        team.getMasterLife().addAll(masterLife);
+
+        team.getStaffs().clear();
+        _teamRepository.save(team);
+        bus.publish(team.pullDomainEvents());
+    }
+
+    @Transactional
+    public void promotionYourTeam(PromotionYourRequest request) {
+        var team = _teamRepository.findById(request.id)
+                .orElseThrow(() -> new BaseException("Team not found", List.of()));
+
+        var trainer = trainerFinderService.findTrainerById(request.trainer)
+                .orElseThrow(() -> new BaseException("Trainer not found", List.of()));
+
+        var training = team.getTraining().getNextLevel();
+
+        var participants = request.users.stream()
+                .map(u -> _participantRepository.findById(u.getId()).orElseThrow())
+                .toList();
+
+        team.getUsers().stream()
+                .filter(p -> !participants.contains(p))
+                .forEach(p -> {
+                    p.setIsLingerer(true);
+                    p.setIsDesertor(true);
+                    _participantRepository.save(p);
+                });
+
+        var filteredUsers = participants.stream()
+                .filter(p -> p.getModules().getHasYour())
+                .toList();
+
+        if (filteredUsers.isEmpty()) {
+            throw new BaseException("No hay usuarios suficientes", List.of());
+        }
+
+        var staff = request.staffs.stream().map(participant -> {
+            var p = staffRepository.findById(participant.getId()).orElseThrow();
+            if (!staffRepository.isStaffAvailable(
+                    p.getId(),
+                    training.getStartDate(),
+                    training.getEndDate(),
+                    training.getId()
+            )) {
+                throw new BaseException("Staff not available",
+                        List.of("The user " + p.getUser().getName() + " has team"));
+            }
+            return p;
+        }).toList();
+
+        team.setName(training.getCourseLevel().name() + "-" + training.getNumber());
+        team.setTraining(training);
+        team.setTrainingNumber(training.getNumber());
+        team.setTrainer(trainer);
+
+        team.getUsers().clear();
+        team.getUsers().addAll(filteredUsers);
+
+        team.getStaffs().clear();
+        team.getStaffs().addAll(staff);
+
+        team.getVisionaries().clear();
+        team.getMasterLife().clear();
+
+        _teamRepository.save(team);
+        bus.publish(team.pullDomainEvents());
     }
 
     public void removeVisionaries(String teamId, String id) {

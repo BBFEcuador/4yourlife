@@ -1,5 +1,7 @@
 package com.foryourlife.admin.programs.attendance.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.AggregateRoot;
@@ -21,10 +23,15 @@ public class Attendance extends AggregateRoot {
     private FylStage stage;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private Participant userId;
+    @JsonIgnoreProperties({"user", "participantLevel", "campus", "modules", "contacts", "medicalRecord"})
+    private Participant participant;
     @ManyToOne
     @JoinColumn(name = "training_id", referencedColumnName = "id")
-    private Training trainingId;
+    @JsonIgnoreProperties({"nextLevel", "campus", "originalTeam"})
+    private Training training;
+    @Column(name = "is_active")
+    @JsonProperty("isActive")
+    private Boolean isActive = true;
 
     public Attendance() {
     }
@@ -35,8 +42,8 @@ public class Attendance extends AggregateRoot {
         this.saturdayAttendance = saturdayAttendance;
         this.sundayAttendance = sundayAttendance;
         this.stage = stage;
-        this.userId = userId;
-        this.trainingId = trainingId;
+        this.participant = userId;
+        this.training = trainingId;
     }
 
     public static Attendance create(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, Participant userId, Training trainingId) {
@@ -63,31 +70,38 @@ public class Attendance extends AggregateRoot {
         return stage;
     }
 
-    public Participant getUserId() {
-        return userId;
+    public Participant getParticipant() {
+        return participant;
     }
 
-    public Training getTrainingId() {
-        return trainingId;
+    public Training getTraining() {
+        return training;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
+    public void setFridayAttendance(AttendanceStatus fridayAttendance) {
+        this.fridayAttendance = fridayAttendance;
+    }
+
+    public void setSaturdayAttendance(AttendanceStatus saturdayAttendance) {
+        this.saturdayAttendance = saturdayAttendance;
+    }
+
+    public void setSundayAttendance(AttendanceStatus sundayAttendance) {
+        this.sundayAttendance = sundayAttendance;
     }
 
     public boolean HasUnAttendance() {
-        var unAttendance = this.fridayAttendance ==
-                AttendanceStatus.NO_ASISTIO
-                || this.fridayAttendance ==
-                AttendanceStatus.DESERTO
-                ||
-                this.saturdayAttendance ==
-                        AttendanceStatus.NO_ASISTIO
-                || this.saturdayAttendance ==
-                AttendanceStatus.DESERTO
-                ||
-                this.sundayAttendance ==
-                        AttendanceStatus.NO_ASISTIO
-                || this.sundayAttendance ==
-                AttendanceStatus.DESERTO;
+        var unAttendance = this.fridayAttendance == AttendanceStatus.NO_ASISTIO || this.fridayAttendance == AttendanceStatus.DESERTO || this.saturdayAttendance == AttendanceStatus.NO_ASISTIO || this.saturdayAttendance == AttendanceStatus.DESERTO || this.sundayAttendance == AttendanceStatus.NO_ASISTIO || this.sundayAttendance == AttendanceStatus.DESERTO;
         if (unAttendance) {
-            this.record(new OnNullDesistedAttend(this.userId.getId(), this.userId, this.trainingId));
+            this.record(new OnNullDesistedAttend(this.participant.getId(), this.participant, this.training, this));
         }
         return unAttendance;
     }

@@ -1,5 +1,6 @@
 package com.foryourlife.shared.domain.events;
 
+import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.bus.DomainEvent;
@@ -13,8 +14,9 @@ import java.util.UUID;
 public class OnNullDesistedAttend extends DomainEvent {
     private final Participant user;
     private final Training training;
+    private final Attendance attendance;
 
-    public OnNullDesistedAttend(String aggregateId, Participant user, Training training) {
+    public OnNullDesistedAttend(String aggregateId, Participant user, Training training, Attendance attendance) {
         super(
                 aggregateId,
                 UUID.randomUUID().toString(),
@@ -22,6 +24,7 @@ public class OnNullDesistedAttend extends DomainEvent {
         );
         this.user = user;
         this.training = training;
+        this.attendance = attendance;
     }
 
     public Participant getUser() {
@@ -30,6 +33,10 @@ public class OnNullDesistedAttend extends DomainEvent {
 
     public Training getTraining() {
         return training;
+    }
+
+    public Attendance getAttendance() {
+        return attendance;
     }
 
     @Override

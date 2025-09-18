@@ -111,7 +111,7 @@ public class TrainingController {
         List<Filter> filters = new ArrayList<>();
 
         if (!search.isEmpty()) {
-            filters.addAll(List.of(new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("number", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("courseLevel", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("startDate", search, null, Filter.Operation.BETWEEN, Filter.LogicalOperator.OR)));
+            filters.addAll(List.of(new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("courseLevel", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)));
         }
 
         if (!campusId.isEmpty()) {

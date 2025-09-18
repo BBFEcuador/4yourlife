@@ -20,24 +20,24 @@ public class AttendanceController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getAttendancesByUser(String userId) {
+    public ResponseEntity<?> getAttendancesByUser(@PathVariable String userId) {
         return new ResponseEntity<>(_queryAttedanceService.getAttendancesByUser(userId), HttpStatus.OK);
     }
 
     @GetMapping("/training/{trainingId}")
-    public ResponseEntity<?> getAttendancesByTraining(String trainingId) {
-        return new ResponseEntity<>(_queryAttedanceService.getAttendancesByTraining(trainingId),HttpStatus.OK);
+    public ResponseEntity<?> getAttendancesByTraining(@PathVariable String trainingId) {
+        return new ResponseEntity<>(_queryAttedanceService.getAttendancesByTraining(trainingId), HttpStatus.OK);
     }
 
-    @PostMapping("/save")
+    @PostMapping("")
     public ResponseEntity<?> saveAttendance(@RequestBody SaveAttendanceRequest request) {
-        _commandAttendanceService.saveAttendance(request.toDomain());
+        _commandAttendanceService.saveAttendance(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/saveAll")
-    public ResponseEntity<?> saveAttendance(@RequestBody List<SaveAttendanceRequest> request) {
-        _commandAttendanceService.saveAttendance(request.stream().map(SaveAttendanceRequest::toDomain).toList());
+    @PostMapping("close-attendance/{id}")
+    public ResponseEntity<?> closeAttendance(@PathVariable String id) {
+        _commandAttendanceService.closeAttendance(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

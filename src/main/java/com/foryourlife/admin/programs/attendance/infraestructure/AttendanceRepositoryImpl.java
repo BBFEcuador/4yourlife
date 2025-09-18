@@ -5,6 +5,7 @@ import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AttendanceRepositoryImpl implements AttendanceRepository {
@@ -25,12 +26,17 @@ public class AttendanceRepositoryImpl implements AttendanceRepository {
     }
 
     @Override
+    public Optional<Attendance> findById(String id) {
+        return _jpaAttendanceRepository.findById(id);
+    }
+
+    @Override
     public List<Attendance> findAttendanceByUser(String userId) {
-        return _jpaAttendanceRepository.findByUserId_Id(userId);
+        return _jpaAttendanceRepository.findByParticipant_Id(userId);
     }
 
     @Override
     public List<Attendance> findAttendanceByTraining(String trainingId) {
-        return _jpaAttendanceRepository.findByTrainingId_Id(trainingId);
+        return _jpaAttendanceRepository.findByTraining_Id(trainingId);
     }
 }

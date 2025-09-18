@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface JPAAttendanceRepository extends JpaRepository<Attendance,String> {
-    List<Attendance> findByUserId_Id(String userId);
-    List<Attendance> findByTrainingId_Id(String trainingId);
+    List<Attendance> findByParticipant_Id(String userId);
+    List<Attendance> findByTraining_Id(String trainingId);
 }

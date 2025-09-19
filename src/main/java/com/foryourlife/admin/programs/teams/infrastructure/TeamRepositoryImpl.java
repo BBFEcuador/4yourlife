@@ -127,7 +127,7 @@ public class TeamRepositoryImpl implements TeamRepository {
 
     @Override
     public Optional<Team> findByTrainingId(String id) {
-        return Optional.empty();
+        return _jpaTeamRepository.findByTraining_id(id);
     }
 
     @Override

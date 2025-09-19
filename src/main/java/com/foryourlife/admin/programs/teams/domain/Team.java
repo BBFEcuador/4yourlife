@@ -33,7 +33,7 @@ public class Team extends AggregateRoot implements Serializable {
     private Integer trainingNumber;
 
 
-    @ManyToMany( fetch = FetchType.EAGER )
+    @ManyToMany( fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinTable(
             name = "team_users",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
@@ -193,5 +193,15 @@ public class Team extends AggregateRoot implements Serializable {
             put("curseLevel", training.getCourseLevel().name());
             put("sede", training.getCampus().getCity());
         }};
+    }
+
+    public void removeUser(Participant user) {
+        this.users.remove(user);
+        user.getTeams().remove(this);
+    }
+
+    public void addUser(Participant user) {
+        this.users.add(user);
+        user.getTeams().add(this);
     }
 }

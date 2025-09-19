@@ -15,10 +15,7 @@ import jakarta.persistence.*;
 import org.hibernate.Hibernate;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "participants")
@@ -92,7 +89,7 @@ public class Participant extends AggregateRoot implements Serializable {
         return contacts;
     }
 
-    private Participant(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken, Boolean isLingerer, Boolean isDesertor,Campus campus) {
+    private Participant(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken, Boolean isLingerer, Boolean isDesertor, Campus campus) {
         this.id = id;
         this.user = user;
         this.participantLevel = role;
@@ -172,5 +169,22 @@ public class Participant extends AggregateRoot implements Serializable {
 
     public MedicalRecord getMedicalRecord() {
         return medicalRecord;
+    }
+
+    public Set<Team> getTeams() {
+        return teams;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Participant that = (Participant) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

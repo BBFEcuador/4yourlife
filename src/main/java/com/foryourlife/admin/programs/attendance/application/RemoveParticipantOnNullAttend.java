@@ -40,7 +40,8 @@ public class RemoveParticipantOnNullAttend {
         var attendance = event.getAttendance();
         attendance.setActive(false);
         user.setIsDesertor(true);
-        team.getUsers().remove(user);
+        user.setIsLingerer(true);
+        team.removeUser(user);
         teamRepository.save(team);
         participantRepository.save(user);
         attendanceRepository.save(attendance);

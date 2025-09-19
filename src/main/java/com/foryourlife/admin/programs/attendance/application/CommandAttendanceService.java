@@ -33,8 +33,10 @@ public class CommandAttendanceService {
                 att.setSundayAttendance(attendance.attendanceStatus);
             }
         }
+        _attendanceRepository.save(att);
         if (att.HasUnAttendance()) {
-            this.bus.publish(att.pullDomainEvents());
+            var event = att.pullDomainEvents();
+            this.bus.publish(event);
         }
     }
 

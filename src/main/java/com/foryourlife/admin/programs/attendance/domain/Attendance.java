@@ -78,7 +78,7 @@ public class Attendance extends AggregateRoot {
         return training;
     }
 
-    public Boolean getActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 

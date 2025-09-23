@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PromiseRepository {
@@ -13,4 +14,5 @@ public interface PromiseRepository {
     Optional<Promise> findById(String id);
     void deleteById(String id);
     Page<Promise> findAll(Pageable pageable, Criteria criteria);
+    List<Promise> findByTrainingId(String trainingId);
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,5 +40,10 @@ public class JPAPromiseRepository implements PromiseRepository {
     @Override
     public Page<Promise> findAll(Pageable pageable, Criteria criteria) {
         return this.jpaImplPromiseRepository.findAll(criteriaConverter.getJpaSpecifications(criteria), pageable);
+    }
+
+    @Override
+    public List<Promise> findByTrainingId(String trainingId) {
+        return this.jpaImplPromiseRepository.findAllByTraining_Id(trainingId);
     }
 }

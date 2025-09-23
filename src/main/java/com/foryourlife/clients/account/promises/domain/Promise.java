@@ -11,12 +11,33 @@ import java.time.LocalDate;
 public class Promise {
     @Id
     private String id;
+    @Column(
+        name = "first_promise"
+    )
     private Integer firstPromise;
+    @Column(
+        name = "second_promise"
+    )
     private Integer secondPromise;
+    @Column(
+        name = "third_promise"
+    )
     private Integer thirdPromise;
+    @Column(
+        name = "achieved_count"
+    )
     private Integer achievedCount;
+    @Column(
+        name = "paid_count"
+    )
     private Integer paidCount;
+    @Column(
+        name = "start_date"
+    )
     private LocalDate startDate;
+    @Column(
+        name = "end_date"
+    )
     private LocalDate endDate;
     @ManyToOne
     @JoinColumn(

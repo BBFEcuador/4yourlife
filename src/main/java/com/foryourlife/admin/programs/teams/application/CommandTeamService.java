@@ -360,7 +360,7 @@ public class CommandTeamService {
         }
 
         var filteredUsers = participants.stream()
-                .filter(p -> p.getModules().getHasLife())
+                .filter(p -> p.getModules().getHasYour())
                 .toList();
 
         if (filteredUsers.isEmpty()) {

@@ -4,6 +4,7 @@ import com.foryourlife.clients.account.promises.application.PromiseCommandServic
 import com.foryourlife.clients.account.promises.application.PromiseQueryService;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,7 +26,7 @@ public class PromiseController {
     private PromiseQueryService promiseQueryService;
 
     @PostMapping("")
-    public ResponseEntity<Void> savePromise(PromiseRequest promiseRequest) {
+    public ResponseEntity<Void> savePromise(@Valid @RequestBody PromiseRequest promiseRequest) {
         promiseCommandService.savePromise(promiseRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -53,6 +54,11 @@ public class PromiseController {
         }
         criteria.filters = filters;
         return new ResponseEntity<>(promiseQueryService.findAll(p, criteria), HttpStatus.OK);
+    }
+
+    @GetMapping("training/{trainingId}")
+    public ResponseEntity<?> getPromisesByTrainingId(@PathVariable String trainingId) {
+        return new ResponseEntity<>(promiseQueryService.findByTrainingId(trainingId), HttpStatus.OK);
     }
 
     @PostMapping("training")

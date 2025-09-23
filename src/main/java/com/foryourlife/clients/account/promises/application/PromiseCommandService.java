@@ -53,9 +53,16 @@ public class PromiseCommandService {
         var promise = this.promiseRepository.findById(promiseRequest.id)
                 .orElseThrow(() -> new RuntimeException("La promesa no existe"));
 
-        if (LocalDate.EPOCH.isBefore(promise.getTraining().getStartDate()) && LocalDate.EPOCH.isAfter(promise.getTraining().getEndDate())) {
-            throw new BaseException("Fuera de tiempo", List.of("No se puede asignar promesas fuera del periodo del entrenamiento"));
+        LocalDate today = LocalDate.now();
+
+        if (today.isBefore(promise.getTraining().getStartDate()) ||
+                today.isAfter(promise.getTraining().getEndDate())) {
+            throw new BaseException(
+                    "Fuera de tiempo",
+                    List.of("No se puede asignar promesas fuera del periodo del entrenamiento")
+            );
         }
+
 
         if (promise.getFirstPromise() == null) {
             promise.setFirstPromise(promiseRequest.promise);

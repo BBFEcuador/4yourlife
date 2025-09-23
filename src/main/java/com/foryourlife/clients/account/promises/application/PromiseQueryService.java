@@ -27,4 +27,8 @@ public class PromiseQueryService {
                 () -> new BaseException("Promise not found", List.of())
         );
     }
+
+    public List<Promise> findByTrainingId(String trainingId) {
+        return promiseRepository.findByTrainingId(trainingId);
+    }
 }

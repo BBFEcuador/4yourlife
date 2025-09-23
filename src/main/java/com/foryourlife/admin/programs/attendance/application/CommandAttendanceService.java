@@ -43,10 +43,9 @@ public class CommandAttendanceService {
     public void closeAttendance(String id) {
         _attendanceRepository.findAttendanceByTraining(id).forEach(attendance -> {
             attendance.setActive(false);
-            if (attendance.getFridayAttendance() == null) attendance.setFridayAttendance(AttendanceStatus.NO_ASISTIO);
-            if (attendance.getSaturdayAttendance() == null)
-                attendance.setSaturdayAttendance(AttendanceStatus.NO_ASISTIO);
-            if (attendance.getSundayAttendance() == null) attendance.setSundayAttendance(AttendanceStatus.NO_ASISTIO);
+            if (attendance.getFridayAttendance() == null) attendance.setFridayAttendance(AttendanceStatus.ASISTIO);
+            if (attendance.getSaturdayAttendance() == null) attendance.setSaturdayAttendance(AttendanceStatus.ASISTIO);
+            if (attendance.getSundayAttendance() == null) attendance.setSundayAttendance(AttendanceStatus.ASISTIO);
             if (attendance.HasUnAttendance()) {
                 this.bus.publish(attendance.pullDomainEvents());
             }

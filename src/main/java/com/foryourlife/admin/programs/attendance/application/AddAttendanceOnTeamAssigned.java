@@ -36,17 +36,24 @@ public class AddAttendanceOnTeamAssigned {
         var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow(() -> new RuntimeException(""));
         var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException("Not team found"));
         team.getUsers().forEach(user -> {
-            switch (training.getCourseLevel()){
+            switch (training.getCourseLevel()) {
                 case CourseLevel.FOCUS:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(),null,null,null, FylStage.FOCUS,user,training));
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.FOCUS, user, training));
                     break;
                 case CourseLevel.YOUR:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(),null,null,null,FylStage.YOUR,user,training));
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.YOUR, user, training));
                     break;
                 case CourseLevel.LIFE:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(),null,null,null,FylStage.LIFE_1,user,training));
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(),null,null,null,FylStage.LIFE_2,user,training));
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(),null,null,null,FylStage.LIFE_3,user,training));
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_1, user, training));
+                    break;
+                case CourseLevel.LIFE_2:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_2, user, training));
+                    break;
+                case CourseLevel.LIFE_3:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_3, user, training));
+                    break;
+                case CourseLevel.LIFE_GRADUATE:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_GRADUATE, user, training));
                     break;
             }
         });

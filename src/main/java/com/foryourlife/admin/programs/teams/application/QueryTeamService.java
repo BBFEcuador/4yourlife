@@ -47,4 +47,9 @@ public class QueryTeamService {
         return this._teamRepository.findById(id).orElseThrow(
                 () -> new BaseException("Not found", List.of("The team with id " + id + " does not exist"))).getPhoto();
     }
+
+    public Team getByTrainingId(String trainingId) {
+        return this._teamRepository.findByTrainingId(trainingId).orElseThrow(
+                () -> new BaseException("Not found", List.of("The team with training id " + trainingId + " does not exist")));
+    }
 }

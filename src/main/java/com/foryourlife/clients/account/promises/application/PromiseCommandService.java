@@ -1,57 +1,61 @@
 package com.foryourlife.clients.account.promises.application;
 
-import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
+import com.foryourlife.admin.programs.teams.application.QueryTeamService;
 import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.clients.account.promises.infrastructure.http.PromiseRequest;
-import com.foryourlife.shared.domain.criteria.Criteria;
-import com.foryourlife.shared.domain.criteria.Filter;
+import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class PromiseCommandService {
     private final PromiseRepository promiseRepository;
-    private final ParticipantQueryService participantQueryService;
+    private final QueryTeamService queryTeamService;
 
-    public PromiseCommandService(PromiseRepository promiseRepository, ParticipantQueryService participantQueryService) {
+    public PromiseCommandService(PromiseRepository promiseRepository, QueryTeamService queryTeamService) {
         this.promiseRepository = promiseRepository;
-        this.participantQueryService = participantQueryService;
+        this.queryTeamService = queryTeamService;
     }
 
     public void deletePromiseById(String id) {
         this.promiseRepository.deleteById(id);
     }
 
-    public void createPromise() {
-        var criteria = new Criteria(List.of(
-                new Filter("courseLevel", CourseLevel.LIFE.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND)
-        ),
-                Optional.empty(),
-                Optional.empty()
-        );
+    public void createPromises(String trainingId) {
+        var team = queryTeamService.getByTrainingId(trainingId);
 
-        var lifeParticipants = this.participantQueryService.matchers(criteria);
+        EnumSet<CourseLevel> availableLevels = EnumSet.of(CourseLevel.LIFE, CourseLevel.LIFE_2, CourseLevel.LIFE_3);
 
-        lifeParticipants.forEach(participant ->
+        if (!availableLevels.contains(team.getTraining().getCourseLevel())) {
+            throw new BaseException("Nivel de curso inválido",
+                    List.of("Las promesas solo se pueden crear para promesas de nivel LIFE, LIFE 2 o LIFE 3"));
+        }
 
+        team.getUsers().forEach( it ->
                 this.promiseRepository.save(
                         new Promise(
                                 UUID.randomUUID().toString(),
-                                participant.getTeam().getTraining(),
-                                participant
+                                it.getTeam().getTraining(),
+                                it
                         )
                 )
         );
     }
 
     public void savePromise(PromiseRequest promiseRequest) {
+
         var promise = this.promiseRepository.findById(promiseRequest.id)
                 .orElseThrow(() -> new RuntimeException("La promesa no existe"));
+
+        if (LocalDate.EPOCH.isBefore(promise.getTraining().getStartDate()) && LocalDate.EPOCH.isAfter(promise.getTraining().getEndDate())) {
+            throw new BaseException("Fuera de tiempo", List.of("No se puede asignar promesas fuera del periodo del entrenamiento"));
+        }
 
         if (promise.getFirstPromise() == null) {
             promise.setFirstPromise(promiseRequest.promise);
@@ -59,12 +63,13 @@ public class PromiseCommandService {
             promise.setSecondPromise(promiseRequest.promise);
         } else if (promise.getThirdPromise() == null) {
             promise.setThirdPromise(promiseRequest.promise);
+            promise.setStartDate(LocalDate.now());
+            promise.setEndDate(promise.getStartDate().plusDays(5));
         } else {
             throw new IllegalStateException("Todas las promesas ya están asignadas");
         }
         this.promiseRepository.save(promise);
     }
-
 }
 
 

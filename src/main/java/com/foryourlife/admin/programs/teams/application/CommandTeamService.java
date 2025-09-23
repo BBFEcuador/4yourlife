@@ -155,7 +155,6 @@ public class CommandTeamService {
     }
 
 
-
     public void update(Team team) {
         this._teamRepository.findById(team.getId())
                 .orElseThrow(() -> new BaseException("Team not found", List.of("")));
@@ -282,8 +281,17 @@ public class CommandTeamService {
                 .map(u -> _participantRepository.findById(u.getId()).orElseThrow())
                 .toList();
 
+        var invalidParticipants = participants.stream()
+                .filter(p -> !p.getModules().getHasLife())
+                .map(p -> "El participante " + p.getUser().getName() + " no tiene el módulo LIFE")
+                .toList();
+
+        if (!invalidParticipants.isEmpty()) {
+            throw new BaseException("Participantes inválidos", invalidParticipants);
+        }
+
         var filteredUsers = participants.stream()
-                .filter(p -> p.getModules().getHasYour())
+                .filter(p -> p.getModules().getHasLife())
                 .toList();
 
         if (filteredUsers.isEmpty()) {
@@ -300,13 +308,19 @@ public class CommandTeamService {
 
         var masterLife = request.masterLife.stream().map(participant -> {
             var p = queryMasterLifeService.findById(participant.getId());
-            if (!queryMasterLifeService.isMasterLifeAvailable(p.getId(), training.getStartDate(), training.getEndDate(), training.getId())) {
-                throw new BaseException("Master life not available", List.of("The user " + p.getUser().getName() + " has team"));
+            if (!queryMasterLifeService.isMasterLifeAvailable(
+                    p.getId(),
+                    training.getStartDate(),
+                    training.getEndDate(),
+                    training.getId())) {
+                throw new BaseException("Master life not available",
+                        List.of("The user " + p.getUser().getName() + " has team"));
             }
             return p;
         }).toList();
 
-        team.setName(request.name != null ? request.name : training.getCourseLevel().name() + "-" + training.getNumber());
+        team.setName(request.name != null ? request.name
+                : training.getCourseLevel().name() + "-" + training.getNumber());
         team.setTraining(training);
         team.setTrainingNumber(training.getNumber());
         team.setTrainer(trainer);
@@ -336,8 +350,17 @@ public class CommandTeamService {
                 .map(u -> _participantRepository.findById(u.getId()).orElseThrow())
                 .toList();
 
+        var invalidParticipants = participants.stream()
+                .filter(p -> !p.getModules().getHasYour())
+                .map(p -> "Participante " + p.getUser().getName() + " no tiene el módulo YOUR")
+                .toList();
+
+        if (!invalidParticipants.isEmpty()) {
+            throw new BaseException("Participantes inválidos", invalidParticipants);
+        }
+
         var filteredUsers = participants.stream()
-                .filter(p -> p.getModules().getHasYour())
+                .filter(p -> p.getModules().getHasLife())
                 .toList();
 
         if (filteredUsers.isEmpty()) {

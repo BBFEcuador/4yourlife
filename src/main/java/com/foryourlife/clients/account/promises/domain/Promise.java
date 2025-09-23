@@ -16,6 +16,8 @@ public class Promise {
     private Integer thirdPromise;
     private Integer achievedCount;
     private Integer paidCount;
+    private LocalDate startDate;
+    private LocalDate endDate;
     @ManyToOne
     @JoinColumn(
         name = "participant_id",
@@ -27,7 +29,7 @@ public class Promise {
         name = "training_id",
         referencedColumnName = "id"
     )
-    private Training training;;
+    private Training training;
 
     protected Promise() {
     }
@@ -100,5 +102,21 @@ public class Promise {
 
     public void setTraining(Training training) {
         this.training = training;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }

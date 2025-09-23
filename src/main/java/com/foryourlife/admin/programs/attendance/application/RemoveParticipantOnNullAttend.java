@@ -2,6 +2,7 @@ package com.foryourlife.admin.programs.attendance.application;
 
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
+import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 import com.foryourlife.admin.programs.attendance.domain.FylStage;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
@@ -31,13 +32,17 @@ public class RemoveParticipantOnNullAttend {
         this.attendanceRepository = attendanceRepository;
     }
 
-    @Async
     @EventListener
     public void on(OnNullDesistedAttend event) {
         var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow();
         var team = teamRepository.findByTrainingId(training.getId()).orElseThrow();
         var user = event.getUser();
         var attendance = event.getAttendance();
+
+        if (attendance.getFridayAttendance() == null) attendance.setFridayAttendance(AttendanceStatus.NO_ASISTIO);
+        if (attendance.getSaturdayAttendance() == null) attendance.setSaturdayAttendance(AttendanceStatus.NO_ASISTIO);
+        if (attendance.getSundayAttendance() == null) attendance.setSundayAttendance(AttendanceStatus.NO_ASISTIO);
+
         attendance.setActive(false);
         user.setIsDesertor(true);
         user.setIsLingerer(true);

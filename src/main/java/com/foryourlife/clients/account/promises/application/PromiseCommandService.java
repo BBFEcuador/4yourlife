@@ -34,7 +34,7 @@ public class PromiseCommandService {
 
         if (!availableLevels.contains(team.getTraining().getCourseLevel())) {
             throw new BaseException("Nivel de curso inválido",
-                    List.of("Las promesas solo se pueden crear para promesas de nivel LIFE, LIFE 2 o LIFE 3"));
+                    List.of("Las promesas solo se pueden crear para entrenamientos de nivel LIFE, LIFE 2 o LIFE 3"));
         }
 
         team.getUsers().forEach( it ->

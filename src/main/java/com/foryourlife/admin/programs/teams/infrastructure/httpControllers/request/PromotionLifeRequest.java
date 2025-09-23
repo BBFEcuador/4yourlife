@@ -13,8 +13,6 @@ public class PromotionLifeRequest {
     @NotNull
     @Size(min = 1,message = "Minimo 1 participante")
     public List<Participant> users;
-    @NotNull
-    @Size(min = 1,message = "Minimo 1 master life")
     public List<MasterLife> masterLife;
     @NotNull(message = "Debe seleccionar un entrenador")
     public String trainer;

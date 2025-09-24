@@ -1,5 +1,7 @@
 package com.foryourlife.clients.account.promises.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import jakarta.persistence.*;
@@ -12,43 +14,47 @@ public class Promise {
     @Id
     private String id;
     @Column(
-        name = "first_promise"
+            name = "first_promise"
     )
     private Integer firstPromise;
     @Column(
-        name = "second_promise"
+            name = "second_promise"
     )
     private Integer secondPromise;
     @Column(
-        name = "third_promise"
+            name = "third_promise"
     )
     private Integer thirdPromise;
     @Column(
-        name = "achieved_count"
+            name = "achieved_count"
     )
     private Integer achievedCount;
     @Column(
-        name = "paid_count"
+            name = "paid_count"
     )
     private Integer paidCount;
     @Column(
-        name = "start_date"
+            name = "start_date"
     )
     private LocalDate startDate;
     @Column(
-        name = "end_date"
+            name = "end_date"
     )
     private LocalDate endDate;
+    @JsonIgnoreProperties(
+            {"participantLevel", "campus", "modules", "contacts", "medicalRecord", "teams", "team"}
+    )
     @ManyToOne
     @JoinColumn(
-        name = "participant_id",
-        referencedColumnName = "id"
+            name = "participant_id",
+            referencedColumnName = "id"
     )
     private Participant participant;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(
-        name = "training_id",
-        referencedColumnName = "id"
+            name = "training_id",
+            referencedColumnName = "id"
     )
     private Training training;
 

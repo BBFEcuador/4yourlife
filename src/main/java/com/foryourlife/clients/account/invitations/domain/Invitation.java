@@ -102,4 +102,8 @@ public class Invitation extends AggregateRoot {
     public Integer getQuantity() {
         return quantity;
     }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
+    }
 }

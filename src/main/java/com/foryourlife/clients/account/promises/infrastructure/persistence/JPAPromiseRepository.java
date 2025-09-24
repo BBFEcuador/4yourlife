@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,5 +46,11 @@ public class JPAPromiseRepository implements PromiseRepository {
     @Override
     public List<Promise> findByTrainingId(String trainingId) {
         return this.jpaImplPromiseRepository.findAllByTraining_Id(trainingId);
+    }
+
+    @Override
+    public Optional<Promise> findLastByParticipant(String participantId) {
+        LocalDate today = LocalDate.now();
+        return this.jpaImplPromiseRepository.findFirstByParticipant_IdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByStartDateDesc(participantId, today, today);
     }
 }

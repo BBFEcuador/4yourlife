@@ -31,4 +31,10 @@ public class PromiseQueryService {
     public List<Promise> findByTrainingId(String trainingId) {
         return promiseRepository.findByTrainingId(trainingId);
     }
+
+    public Promise findLastByParticipant(String participantId) {
+        return promiseRepository.findLastByParticipant(participantId).orElseThrow(
+                () -> new BaseException("No active promise found for this participant", List.of())
+        );
+    }
 }

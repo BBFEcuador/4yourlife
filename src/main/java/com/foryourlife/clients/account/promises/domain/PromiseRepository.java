@@ -1,10 +1,8 @@
 package com.foryourlife.clients.account.promises.domain;
 
-import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,4 +13,5 @@ public interface PromiseRepository {
     void deleteById(String id);
     Page<Promise> findAll(Pageable pageable, Criteria criteria);
     List<Promise> findByTrainingId(String trainingId);
+    Optional<Promise> findLastByParticipant(String participantId);
 }

@@ -38,15 +38,19 @@ public class PromiseCommandService {
                     List.of("Las promesas solo se pueden crear para entrenamientos de nivel LIFE, LIFE 2 o LIFE 3"));
         }
 
-        team.getUsers().forEach( it ->
-                this.promiseRepository.save(
-                        new Promise(
-                                UUID.randomUUID().toString(),
-                                it.getTeam().getTraining(),
-                                it
-                        )
-                )
-        );
+        team.getUsers().forEach(it -> {
+            Promise promise = new Promise(
+                    UUID.randomUUID().toString(),
+                    it.getTeam().getTraining(),
+                    it
+            );
+            LocalDate today = LocalDate.now();
+            promise.setStartDate(today);
+            promise.setEndDate(today.plusDays(5));
+
+            this.promiseRepository.save(promise);
+        });
+
     }
 
     public void savePromise(PromiseRequest promiseRequest) {
@@ -73,8 +77,6 @@ public class PromiseCommandService {
             promise.setSecondPromise(promiseRequest.promise);
         } else if (dayNumber == 3) {
             promise.setThirdPromise(promiseRequest.promise);
-            promise.setStartDate(today);
-            promise.setEndDate(today.plusDays(5));
         } else {
             throw new IllegalStateException("Solo se permiten promesas en los primeros 3 días del training.");
         }

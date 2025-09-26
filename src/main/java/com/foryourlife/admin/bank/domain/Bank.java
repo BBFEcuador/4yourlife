@@ -1,11 +1,12 @@
 package com.foryourlife.admin.bank.domain;
 
 import com.foryourlife.admin.programs.campus.domain.Campus;
+import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "banks")
-public class Bank {
+public class Bank extends AuditableEntity {
     @Id
     private String id;
     private String name;

@@ -30,7 +30,7 @@ public class PromiseCommandService {
     public void createPromises(String trainingId) {
         var team = queryTeamService.getByTrainingId(trainingId);
 
-        EnumSet<CourseLevel> availableLevels = EnumSet.of(CourseLevel.LIFE, CourseLevel.LIFE_2, CourseLevel.LIFE_3);
+        EnumSet<CourseLevel> availableLevels = EnumSet.of(CourseLevel.LIFE, CourseLevel.LIFE_2, CourseLevel.LIFE_3, CourseLevel.LIFE_GRADUATE);
 
         if (!availableLevels.contains(team.getTraining().getCourseLevel())) {
             throw new BaseException("Nivel de curso inválido",

@@ -6,25 +6,29 @@ import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
 import com.foryourlife.admin.sales.product.application.ProductFinderService;
+import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
+import com.foryourlife.clients.account.invitations.domain.EnrolledUsers;
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
+import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.bus.DomainEventSubscriber;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.shared.domain.user.User;
 import jakarta.transaction.Transactional;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @DomainEventSubscriber(value = {PaymentCreated.class})
@@ -37,8 +41,10 @@ public class OnPaymentCreated {
     private final ParticipantRepository participantRepository;
     private final ParticipantLevelService participantLevelRepository;
     private final ConfigContificoQueryService configContificoQueryService;
+    private final QueryInvitationServices queryInvitationServices;
+    private final PromiseRepository promiseRepository;
 
-    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, ConfigContificoQueryService configContificoQueryService) {
+    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, ConfigContificoQueryService configContificoQueryService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository) {
         this.productFinderService = productFinderService;
         this.clientModuleCreatorService = clientModuleCreatorService;
         this.commandInvoiceService = commandInvoiceService;
@@ -46,6 +52,8 @@ public class OnPaymentCreated {
         this.participantRepository = participantRepository;
         this.participantLevelRepository = participantLevelRepository;
         this.configContificoQueryService = configContificoQueryService;
+        this.queryInvitationServices = queryInvitationServices;
+        this.promiseRepository = promiseRepository;
     }
 
     @EventListener
@@ -53,6 +61,25 @@ public class OnPaymentCreated {
     public void on(PaymentCreated event) {
         Participant participant = participantRepository.findById(event.getPayment().getParticipant().getId()).orElseThrow(NullPointerException::new);
         event.getPayment().getProducts().forEach(product -> {
+
+            var invitation = queryInvitationServices.findInvitationByToken(participant.getInvitationToken());
+
+            var promiseOpt = promiseRepository.findLastByParticipant(invitation.getSenderId());
+
+            if (promiseOpt.isPresent()) {
+                var promise = promiseOpt.get();
+
+                LocalDate createdDate = participant.getCreatedDate().toLocalDate();
+                LocalDate startDate = promise.getStartDate();
+                LocalDate endDate = promise.getEndDate();
+
+                if ((createdDate.isEqual(startDate) || createdDate.isAfter(startDate)) &&
+                        (createdDate.isEqual(endDate) || createdDate.isBefore(endDate))) {
+
+                    promise.setPaidCount(promise.getPaidCount() + 1);
+                    promiseRepository.save(promise);
+                }
+            }
             var prod = productFinderService.findById(product.getId());
 
             prod.getPrograms().forEach(program -> {

@@ -1,21 +1,19 @@
 package com.foryourlife.admin.sales.payments.cashBox.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
-import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
 import com.foryourlife.admin.sales.payments.store.domain.Store;
 import com.foryourlife.shared.domain.user.User;
+import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "cash_boxes")
-public class CashBox {
+public class CashBox extends AuditableEntity {
     @Id
     private String id;
     private String number;
@@ -29,12 +27,6 @@ public class CashBox {
     )
     private User createdBy;
 
-    @CreatedDate
-    @Column(
-            name = "created_at",
-            updatable = false
-    )
-    private LocalDateTime created_at = LocalDateTime.now();
     @ManyToOne
     @JoinColumn(
             name = "store_id",
@@ -83,22 +75,6 @@ public class CashBox {
 
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
-    }
-
-    public LocalDateTime getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(LocalDateTime created_at) {
-        this.created_at = created_at;
-    }
-
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
     }
 
     public Store getStore() {

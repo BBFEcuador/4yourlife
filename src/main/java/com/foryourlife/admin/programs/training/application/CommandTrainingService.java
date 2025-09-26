@@ -32,7 +32,7 @@ public class CommandTrainingService {
 
     public void autoGenerateTraining(TrainingAutoGenerateRequest request) {
         var campus = campusService.findById(request.campusId);
-        Integer nextNumber = 1;
+        int nextNumber = 1;
         if (request.firstFocus != null) {
             nextNumber = request.firstFocus;
         } else {
@@ -65,7 +65,7 @@ public class CommandTrainingService {
         var focus = Training.create(
                 UUID.randomUUID().toString(),
                 request.firstFocus != null ? request.firstFocus : nextNumber,
-                campus.getCity() + "-" + (request.firstFocus != null ? request.firstFocus.toString() : nextNumber.toString()),
+                campus.getCity() + "-" + (request.firstFocus != null ? request.firstFocus.toString() : Integer.toString(nextNumber)),
                 request.startDate,
                 request.startDate.plusDays(2),
                 FOCUS,

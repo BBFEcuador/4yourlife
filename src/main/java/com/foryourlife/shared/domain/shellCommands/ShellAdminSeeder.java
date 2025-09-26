@@ -24,6 +24,7 @@ import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelR
 import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
 import com.foryourlife.masterLife.application.CommandMasterLifeService;
 import com.foryourlife.masterLife.domain.MasterLife;
+import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserEntities;
@@ -161,17 +162,22 @@ public class ShellAdminSeeder {
     }
 
     private void makeParticipants() {
-        var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600", "61d88b2a-a22e-4cb0-8e43-e036483039d6"));
-        for (int i = 0; i < 350; i++) {
-            var staffId = UUID.randomUUID().toString();
-            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), passwordEncoder.encode("focus2025"), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
-            var bd = faker.date().birthday().toInstant();
-            System.out.println(bd + "==================");
-            var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();
-            var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false, queryInvitationServices.findInvitationByToken(invitationToken).getCampus());
-            var medicalRecord = new MedicalRecordSaveRequest("N/A", "N/A", "N/A");
-            participantCommandService.createInitUser(trainer, medicalRecord, new SaveContactRequest(null, faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(), null), null);
-
+        try {
+            var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600", "61d88b2a-a22e-4cb0-8e43-e036483039d6"));
+            for (int i = 0; i < 350; i++) {
+                var staffId = UUID.randomUUID().toString();
+                var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), passwordEncoder.encode("focus2025"), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
+                var bd = faker.date().birthday().toInstant();
+                System.out.println(bd + "==================");
+                var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();
+                var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false, queryInvitationServices.findInvitationByToken(invitationToken).getCampus());
+                var medicalRecord = new MedicalRecordSaveRequest("N/A", "N/A", "N/A");
+                participantCommandService.createInitUser(trainer, medicalRecord, new SaveContactRequest(null, faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(), null), null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
+
     }
 }

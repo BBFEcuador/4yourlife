@@ -2,11 +2,12 @@ package com.foryourlife.clients.account.contact.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foryourlife.clients.account.participant.domain.Participant;
+import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "contacts")
-public class Contact {
+public class Contact extends AuditableEntity {
 
     @Id
     private String id;

@@ -16,6 +16,10 @@ CREATE TABLE IF NOT EXISTS cash_boxes
     created_by_user text not null,
     created_at timestamp not null default now(),
     first_number_invoice numeric not null,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_date TIMESTAMP,
+    created_by VARCHAR(50),
+    last_modified_by VARCHAR(50),
     CONSTRAINT fk_store_on_cash_box
     FOREIGN KEY (store_id)
     REFERENCES stores (id),

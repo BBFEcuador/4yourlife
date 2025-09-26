@@ -11,6 +11,7 @@ import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.UserCreated;
 import com.foryourlife.shared.domain.user.User;
+import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
 import org.hibernate.Hibernate;
 
@@ -20,7 +21,7 @@ import java.util.*;
 @Entity
 @Table(name = "participants")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Participant extends AggregateRoot implements Serializable {
+public class Participant extends AuditableEntity implements Serializable {
     @Id
     private String id;
     @OneToOne()

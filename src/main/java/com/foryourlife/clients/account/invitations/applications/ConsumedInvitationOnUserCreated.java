@@ -33,9 +33,10 @@ public class ConsumedInvitationOnUserCreated {
         token.setUsers(enrolledUserList);
         if (!token.getAdmin()){
             var promise = promiseRepository.findLastByParticipant(event.getUser().getId());
-//            if (promise.isPresent()) {
-//                token.setUsedForPromiseId(promise.get().getId());
-//            }
+            if (promise.isPresent()) {
+                promise.get().setAchievedCount(promise.get().getAchievedCount() + 1);
+                promiseRepository.save(promise.get());
+            }
         }
         repository.save(token);
     }

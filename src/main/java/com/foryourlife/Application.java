@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import java.util.TimeZone;
 
 @SpringBootApplication
-@EnableJpaAuditing
+@EnableJpaAuditing(auditorAwareRef = "auditorAwareImpl")
 @EnableAsync
 public class Application {
 

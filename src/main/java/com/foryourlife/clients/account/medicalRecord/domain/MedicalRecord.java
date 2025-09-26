@@ -1,11 +1,12 @@
 package com.foryourlife.clients.account.medicalRecord.domain;
 
 import com.foryourlife.clients.account.participant.domain.Participant;
+import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "medical_records")
-public class MedicalRecord {
+public class MedicalRecord extends AuditableEntity {
     @Id
     public String id;
 

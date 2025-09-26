@@ -32,7 +32,6 @@ public class AddAttendanceOnTeamAssigned {
         this.promiseCommandService = promiseCommandService;
     }
 
-    @Async
     @EventListener
     @Transactional
     public void on(TeamToTrainingAssigned event) {

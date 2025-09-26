@@ -12,6 +12,7 @@ import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.PaymentCreated;
+import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
@@ -25,7 +26,7 @@ import java.util.Locale;
 
 @Entity
 @Table(name = "payments")
-public class Payment extends AggregateRoot {
+public class Payment extends AuditableEntity {
     @Id
     private String id;
 

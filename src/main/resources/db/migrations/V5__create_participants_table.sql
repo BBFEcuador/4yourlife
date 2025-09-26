@@ -13,17 +13,21 @@ CREATE TABLE IF NOT EXISTS profile_details
 
 CREATE TABLE IF NOT EXISTS participants
 (
-        id text not null,
-        user_id text not null,
-        campus_id text not null,
-        invitationToken text not null,
-        participant_level_id text,
-        profile_id text,
-        isLingerer BOOLEAN,
-        isDesertor BOOLEAN,
-        CONSTRAINT fk_users_on_rol FOREIGN KEY (participant_level_id) REFERENCES participant_level (id),
-        CONSTRAINT fk_participant_on_user FOREIGN KEY (user_id) REFERENCES users (id),
-        CONSTRAINT fk_users_on_profile_details FOREIGN KEY (profile_id) REFERENCES profile_details (id),
-        CONSTRAINT fk_participant_on_campus FOREIGN KEY (campus_id) REFERENCES campus (id),
-        CONSTRAINT pk_participants PRIMARY KEY (id)
+    id text not null,
+    user_id text not null,
+    campus_id text not null,
+    invitationToken text not null,
+    participant_level_id text,
+    profile_id text,
+    isLingerer BOOLEAN,
+    isDesertor BOOLEAN,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_date TIMESTAMP,
+    created_by VARCHAR(50),
+    last_modified_by VARCHAR(50),
+    CONSTRAINT fk_users_on_rol FOREIGN KEY (participant_level_id) REFERENCES participant_level (id),
+    CONSTRAINT fk_participant_on_user FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_users_on_profile_details FOREIGN KEY (profile_id) REFERENCES profile_details (id),
+    CONSTRAINT fk_participant_on_campus FOREIGN KEY (campus_id) REFERENCES campus (id),
+    CONSTRAINT pk_participants PRIMARY KEY (id)
 );

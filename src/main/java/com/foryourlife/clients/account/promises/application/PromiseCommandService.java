@@ -9,6 +9,7 @@ import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
@@ -54,29 +55,33 @@ public class PromiseCommandService {
                 .orElseThrow(() -> new RuntimeException("La promesa no existe"));
 
         LocalDate today = LocalDate.now();
+        LocalDate start = promise.getTraining().getStartDate();
+        LocalDate end = promise.getTraining().getEndDate();
 
-        if (today.isBefore(promise.getTraining().getStartDate()) ||
-                today.isAfter(promise.getTraining().getEndDate())) {
+        if (today.isBefore(start) || today.isAfter(end)) {
             throw new BaseException(
                     "Fuera de tiempo",
                     List.of("No se puede asignar promesas fuera del periodo del entrenamiento")
             );
         }
 
+        long dayNumber = ChronoUnit.DAYS.between(start, today) + 1;
 
-        if (promise.getFirstPromise() == null) {
+        if (dayNumber == 1) {
             promise.setFirstPromise(promiseRequest.promise);
-        } else if (promise.getSecondPromise() == null) {
+        } else if (dayNumber == 2) {
             promise.setSecondPromise(promiseRequest.promise);
-        } else if (promise.getThirdPromise() == null) {
+        } else if (dayNumber == 3) {
             promise.setThirdPromise(promiseRequest.promise);
-            promise.setStartDate(LocalDate.now());
-            promise.setEndDate(promise.getStartDate().plusDays(5));
+            promise.setStartDate(today);
+            promise.setEndDate(today.plusDays(5));
         } else {
-            throw new IllegalStateException("Todas las promesas ya están asignadas");
+            throw new IllegalStateException("Solo se permiten promesas en los primeros 3 días del training.");
         }
+
         this.promiseRepository.save(promise);
     }
+
 }
 
 

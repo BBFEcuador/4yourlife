@@ -56,7 +56,10 @@ public class PromiseCommandService {
     public void savePromise(PromiseRequest promiseRequest) {
 
         var promise = this.promiseRepository.findById(promiseRequest.id)
-                .orElseThrow(() -> new RuntimeException("La promesa no existe"));
+                .orElseThrow(() -> new BaseException(
+                        "La promesa no existe",
+                        List.of("El ID proporcionado no corresponde a ninguna promesa existente")
+                ));
 
         LocalDate today = LocalDate.now();
         LocalDate start = promise.getTraining().getStartDate();
@@ -71,14 +74,41 @@ public class PromiseCommandService {
 
         long dayNumber = ChronoUnit.DAYS.between(start, today) + 1;
 
-        if (dayNumber == 1) {
-            promise.setFirstPromise(promiseRequest.promise);
-        } else if (dayNumber == 2) {
-            promise.setSecondPromise(promiseRequest.promise);
-        } else if (dayNumber == 3) {
-            promise.setThirdPromise(promiseRequest.promise);
-        } else {
-            throw new IllegalStateException("Solo se permiten promesas en los primeros 3 días del training.");
+        switch (promiseRequest.day) {
+            case FRIDAY -> {
+                if (dayNumber == 1) {
+                    promise.setFirstPromise(promiseRequest.promise);
+                } else {
+                    throw new BaseException(
+                            "Día incorrecto",
+                            List.of("La promesa del viernes solo se puede registrar el primer día del training.")
+                    );
+                }
+            }
+            case SATURDAY -> {
+                if (dayNumber == 2) {
+                    promise.setSecondPromise(promiseRequest.promise);
+                } else {
+                    throw new BaseException(
+                            "Día incorrecto",
+                            List.of("La promesa del sábado solo se puede registrar el segundo día del training.")
+                    );
+                }
+            }
+            case SUNDAY -> {
+                if (dayNumber == 3) {
+                    promise.setThirdPromise(promiseRequest.promise);
+                } else {
+                    throw new BaseException(
+                            "Día incorrecto",
+                            List.of("La promesa del domingo solo se puede registrar el tercer día del training.")
+                    );
+                }
+            }
+            default -> throw new BaseException(
+                    "Día inválido",
+                    List.of("El día proporcionado no es válido para promesas.")
+            );
         }
 
         this.promiseRepository.save(promise);

@@ -3,6 +3,7 @@ package com.foryourlife.admin.programs.attendance.application;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
+import com.foryourlife.admin.programs.attendance.infraestructure.httpController.DaysEnum;
 import com.foryourlife.admin.programs.attendance.infraestructure.httpController.SaveAttendanceRequest;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -29,26 +30,26 @@ public class CommandAttendanceService {
         LocalDate end = att.getTraining().getEndDate();
 
         long dayNumber = ChronoUnit.DAYS.between(start, today) + 1;
-
-        switch (attendance.day) {
+        var dayEnum = DaysEnum.fromString(attendance.day);
+        switch (dayEnum) {
             case FRIDAY -> {
                 if (dayNumber == 1) {
                     att.setFridayAttendance(attendance.attendanceStatus);
-                } else{
+                } else {
                     throw new BaseException("Solo se puede registrar la asistencia del viernes el primer día del entrenamiento", List.of());
                 }
             }
             case SATURDAY -> {
                 if (dayNumber == 2) {
                     att.setSaturdayAttendance(attendance.attendanceStatus);
-                } else{
+                } else {
                     throw new BaseException("Solo se puede registrar la asistencia del sábado el segundo día del entrenamiento", List.of());
                 }
             }
             case SUNDAY -> {
                 if (dayNumber == 3) {
                     att.setSundayAttendance(attendance.attendanceStatus);
-                } else{
+                } else {
                     throw new BaseException("Solo se puede registrar la asistencia del domingo el tercer día del entrenamiento", List.of());
                 }
             }

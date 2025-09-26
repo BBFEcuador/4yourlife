@@ -1,5 +1,6 @@
 package com.foryourlife.clients.account.promises.application;
 
+import com.foryourlife.admin.programs.attendance.infraestructure.httpController.DaysEnum;
 import com.foryourlife.admin.programs.teams.application.QueryTeamService;
 import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
@@ -73,8 +74,8 @@ public class PromiseCommandService {
         }
 
         long dayNumber = ChronoUnit.DAYS.between(start, today) + 1;
-
-        switch (promiseRequest.day) {
+        var dayEnum = DaysEnum.fromString(promiseRequest.day);
+        switch (dayEnum) {
             case FRIDAY -> {
                 if (dayNumber == 1) {
                     promise.setFirstPromise(promiseRequest.promise);

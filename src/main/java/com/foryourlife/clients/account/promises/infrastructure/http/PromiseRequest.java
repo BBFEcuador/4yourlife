@@ -11,5 +11,5 @@ public class PromiseRequest {
     public Integer promise;
     @NotNull(message = "El día al que corresponde la asistencia es requerido")
     @NotEmpty(message = "El día al que correpsonde la asistencia no puede estar vacío")
-    public DaysEnum day;
+    public String day;
 }

@@ -7,6 +7,7 @@ import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.clients.account.promises.infrastructure.http.PromiseRequest;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.admin.programs.training.application.TrainingValidationService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,10 +20,12 @@ import java.util.UUID;
 public class PromiseCommandService {
     private final PromiseRepository promiseRepository;
     private final QueryTeamService queryTeamService;
+    private final TrainingValidationService trainingValidationService;
 
-    public PromiseCommandService(PromiseRepository promiseRepository, QueryTeamService queryTeamService) {
+    public PromiseCommandService(PromiseRepository promiseRepository, QueryTeamService queryTeamService, TrainingValidationService trainingValidationService) {
         this.promiseRepository = promiseRepository;
         this.queryTeamService = queryTeamService;
+        this.trainingValidationService = trainingValidationService;
     }
 
     public void deletePromiseById(String id) {
@@ -46,8 +49,8 @@ public class PromiseCommandService {
                     it
             );
             LocalDate today = LocalDate.now();
-            promise.setStartDate(today);
-            promise.setEndDate(today.plusDays(5));
+            promise.setStartDate(team.getTraining().getEndDate().plusDays(1));
+            promise.setEndDate(team.getTraining().getEndDate().plusDays(5));
 
             this.promiseRepository.save(promise);
         });
@@ -56,65 +59,34 @@ public class PromiseCommandService {
 
     public void savePromise(PromiseRequest promiseRequest) {
 
-        var promise = this.promiseRepository.findById(promiseRequest.id)
+        var promise = promiseRepository.findById(promiseRequest.id)
                 .orElseThrow(() -> new BaseException(
                         "La promesa no existe",
-                        List.of("El ID proporcionado no corresponde a ninguna promesa existente")
+                        List.of("El ID proporcionado no corresponde a ninguna promesa existente.")
                 ));
 
         LocalDate today = LocalDate.now();
         LocalDate start = promise.getTraining().getStartDate();
         LocalDate end = promise.getTraining().getEndDate();
 
-        if (today.isBefore(start) || today.isAfter(end)) {
-            throw new BaseException(
-                    "Fuera de tiempo",
-                    List.of("No se puede asignar promesas fuera del periodo del entrenamiento")
-            );
-        }
-
+        trainingValidationService.validateDateInTrainingPeriod(today, start, end);
         long dayNumber = ChronoUnit.DAYS.between(start, today) + 1;
-        var dayEnum = DaysEnum.fromString(promiseRequest.day);
+        DaysEnum dayEnum = DaysEnum.fromString(promiseRequest.day);
+
+        trainingValidationService.validateDayConsistency(dayEnum, dayNumber);
+
         switch (dayEnum) {
-            case FRIDAY -> {
-                if (dayNumber == 1) {
-                    promise.setFirstPromise(promiseRequest.promise);
-                } else {
-                    throw new BaseException(
-                            "Día incorrecto",
-                            List.of("La promesa del viernes solo se puede registrar el primer día del training.")
-                    );
-                }
-            }
-            case SATURDAY -> {
-                if (dayNumber == 2) {
-                    promise.setSecondPromise(promiseRequest.promise);
-                } else {
-                    throw new BaseException(
-                            "Día incorrecto",
-                            List.of("La promesa del sábado solo se puede registrar el segundo día del training.")
-                    );
-                }
-            }
-            case SUNDAY -> {
-                if (dayNumber == 3) {
-                    promise.setThirdPromise(promiseRequest.promise);
-                } else {
-                    throw new BaseException(
-                            "Día incorrecto",
-                            List.of("La promesa del domingo solo se puede registrar el tercer día del training.")
-                    );
-                }
-            }
+            case FRIDAY -> promise.setFirstPromise(promiseRequest.promise);
+            case SATURDAY -> promise.setSecondPromise(promiseRequest.promise);
+            case SUNDAY -> promise.setThirdPromise(promiseRequest.promise);
             default -> throw new BaseException(
                     "Día inválido",
                     List.of("El día proporcionado no es válido para promesas.")
             );
         }
 
-        this.promiseRepository.save(promise);
+        promiseRepository.save(promise);
     }
-
 }
 
 

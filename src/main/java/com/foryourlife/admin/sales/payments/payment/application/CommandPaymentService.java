@@ -115,57 +115,51 @@ public class CommandPaymentService {
             }
         }
 
-        var payment = Payment.create(UUID.randomUUID().toString(), products, paymentReq.discount, participant, queryCampusService.findById(paymentReq.campus), paymentReq.paymentsHistory, paymentReq.total, paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING, paymentReq.note);
-
-        BigDecimal totalProduct = BigDecimal.valueOf(paymentReq.total);
-        BigDecimal divisor = BigDecimal.valueOf(1.15);
-        BigDecimal taxAmount = totalProduct.subtract(totalProduct.divide(divisor, 2, RoundingMode.HALF_UP));
-
-        var invoice = Invoice.create(
+        var payment = Payment.create(
                 UUID.randomUUID().toString(),
-                paymentReq.invoice.fullName,
-                paymentReq.invoice.address,
-                paymentReq.invoice.document,
-                paymentReq.invoice.phone,
-                paymentReq.invoice.email,
-                paymentReq.invoice.invoiceNumber,
-                LocalDateTime.now(),
                 products,
-                payment,
-                false,
-                taxAmount.doubleValue(),
-                paymentReq.totalDiscount,
-                15.0,
+                paymentReq.discount,
+                participant,
+                queryCampusService.findById(paymentReq.campus),
+                paymentReq.paymentsHistory,
                 paymentReq.total,
-                paymentReq.invoice.type);
-
-        var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
+                paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING,
+                paymentReq.note);
         _paymentRepository.save(payment);
-        var newInvoice = createInvoice(invoice, cashDrawer, payment);
 
-        cashDrawerDetailCommandService.save(null, paymentReq.cashDrawerId, payment);
+        BigDecimal totalInvoice = BigDecimal.valueOf(total);
+        BigDecimal divisor = BigDecimal.valueOf(1.15);
+        BigDecimal taxAmount = totalInvoice.subtract(totalInvoice.divide(divisor, 2, RoundingMode.HALF_UP));
 
-        if (!payment.getPaymentshistory().isEmpty()) {
-
-            payment.getPaymentshistory().forEach(
-                    paymentHistory -> {
-                        cashDrawerDetailCommandService.save(paymentHistory.getId(), paymentReq.cashDrawerId, payment);
-                    }
+        if (!paymentReq.paymentsHistory.isEmpty()) {
+            var invoice = Invoice.create(UUID.randomUUID().toString(),
+                    paymentReq.invoice.fullName,
+                    paymentReq.invoice.address,
+                    paymentReq.invoice.document,
+                    paymentReq.invoice.phone,
+                    paymentReq.invoice.email,
+                    paymentReq.invoice.invoiceNumber,
+                    LocalDateTime.now(),
+                    products,
+                    payment,
+                    false,
+                    taxAmount,
+                    paymentReq.totalDiscount,
+                    15.0,
+                    totalInvoice,
+                    paymentReq.invoice.type
             );
 
-            if (newInvoice.getContificoId() != null) {
-                payment.getPaymentshistory().forEach(
-                        paymentHistory -> {
-                            PaymentHistoryCreated event = new PaymentHistoryCreated(paymentHistory, newInvoice);
-                            eventBus.publish(List.of(event));
-                        }
-                );
-            }
+            payment.getPaymentshistory().forEach(paymentHistory -> {
+                cashDrawerDetailCommandService.save(paymentHistory.getId(), paymentReq.cashDrawerId, payment);
+            });
+            var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
+            _paymentRepository.save(payment);
+            var newInvoice = createInvoice(invoice, cashDrawer, payment);
+            eventBus.publish(List.of(new PaymentCreated(payment, newInvoice, cashDrawer)));
         }
-        _paymentRepository.save(payment);
 
-
-        eventBus.publish(List.of(new PaymentCreated(payment, invoice, cashDrawer)));
+        cashDrawerDetailCommandService.save(null, paymentReq.cashDrawerId, payment);
 
         return payment.getId();
     }
@@ -194,11 +188,17 @@ public class CommandPaymentService {
             var verificationDigit = generateModule(authorization);
 
             // Cliente Contifico
-            var client = new InvoiceContificoJson.Cliente(invoice.getDocument(), invoice.getFullName(), invoice.getPhone(), invoice.getAddress(), invoice.getClientType(), invoice.getEmail());
+            var client = new InvoiceContificoJson.Cliente(
+                    invoice.getDocument(),
+                    invoice.getFullName(),
+                    invoice.getPhone(),
+                    invoice.getAddress(),
+                    invoice.getClientType(),
+                    invoice.getEmail());
 
             // Subtotales
-            BigDecimal totalAmount = BigDecimal.valueOf(invoice.getAmount());
-            BigDecimal taxAmount = BigDecimal.valueOf(invoice.getTaxAmount());
+            BigDecimal totalAmount = invoice.getAmount();
+            BigDecimal taxAmount = invoice.getTaxAmount();
             BigDecimal subtotal = totalAmount.subtract(taxAmount).setScale(2, RoundingMode.HALF_UP);
 
             // Detalles del producto
@@ -209,14 +209,27 @@ public class CommandPaymentService {
             String sequential = storeCode + "-" + cashBoxCode + "-" + invoiceNumber;
             String claveAcceso = authorization + verificationDigit;
 
-            var invoiceContifico = new InvoiceContificoJson(config.getApiKey(), formattedInvoiceDate, "FAC", sequential, claveAcceso, client, 0, subtotal.doubleValue(), 0, taxAmount.doubleValue(), totalAmount.doubleValue(), productDetails, 0, "Generado en 4YourLife", "P");
+            var invoiceContifico = new InvoiceContificoJson(
+                    config.getApiKey(),
+                    formattedInvoiceDate,
+                    "FAC",
+                    sequential,
+                    claveAcceso,
+                    client,
+                    BigDecimal.valueOf(0),
+                    subtotal,
+                    BigDecimal.valueOf(0),
+                    taxAmount,
+                    totalAmount,
+                    productDetails,
+                    BigDecimal.valueOf(0),
+                    "Generado en 4YourLife",
+                    "P");
 
-            // Ajustar RUC si aplica
             adjustRucIfNeeded(invoiceContifico);
 
             invoice.setInvoiceContifico(invoiceContifico);
 
-            // Guardar y enviar
             Invoice savedInvoice = commandInvoiceService.save(invoice);
             commandInvoiceService.sendInvoiceToContifico(savedInvoice);
 

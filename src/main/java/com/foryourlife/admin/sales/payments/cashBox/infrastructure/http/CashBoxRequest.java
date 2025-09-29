@@ -13,11 +13,10 @@ public class CashBoxRequest {
     @NotNull(message = "The number field is required")
     @NotBlank(message = "The number field is required")
     public String number;
-    public User user;
     public Integer firstNumberInvoice;
     public Store store;
 
     public CashBox toDomain() {
-        return CashBox.create(id != null ? id : UUID.randomUUID().toString(), number, true, firstNumberInvoice != null ? firstNumberInvoice : 0, user, store);
+        return CashBox.create(id != null ? id : UUID.randomUUID().toString(), number, true, firstNumberInvoice != null ? firstNumberInvoice : 0, store);
     }
 }

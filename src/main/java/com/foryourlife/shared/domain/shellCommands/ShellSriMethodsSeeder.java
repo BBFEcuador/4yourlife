@@ -11,10 +11,10 @@ import java.util.List;
 
 @ShellComponent
 @Service
-public class ShellSriMethdsSeeder {
+public class ShellSriMethodsSeeder {
     private final SriPaymentMethodRepository sriPaymentMethodRepository;
 
-    public ShellSriMethdsSeeder(SriPaymentMethodRepository sriPaymentMethodRepository) {
+    public ShellSriMethodsSeeder(SriPaymentMethodRepository sriPaymentMethodRepository) {
         this.sriPaymentMethodRepository = sriPaymentMethodRepository;
     }
 

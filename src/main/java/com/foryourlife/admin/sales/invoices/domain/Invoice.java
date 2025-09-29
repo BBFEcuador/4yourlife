@@ -38,7 +38,7 @@ public class Invoice {
     private Boolean isSentContifico;
 
     @Column(name = "tax_amount")
-    private Double taxAmount;
+    private BigDecimal taxAmount;
     @Column(name = "total_discount")
     private BigDecimal totalDiscount;
     @Column(name = "contifico_id")
@@ -48,7 +48,7 @@ public class Invoice {
     @Column(name = "client_type")
     private String clientType;
     private Double tax;
-    private Double amount;
+    private BigDecimal amount;
     @Column(columnDefinition = "jsonb", name = "invoice_contifico_json")
     @Type(JsonType.class)
     private InvoiceContificoJson invoiceContifico;
@@ -56,7 +56,7 @@ public class Invoice {
     protected Invoice() {
     }
 
-    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDateTime invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, BigDecimal totalDiscount, Double tax, Double amount, String clientType) {
+    public Invoice(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDateTime invoiceDate, List<Product> products, Payment payment, Boolean sentSri, BigDecimal taxAmount, BigDecimal totalDiscount, Double tax, BigDecimal amount, String clientType) {
         this.id = id;
         this.fullName = fullName;
         this.address = address;
@@ -75,7 +75,7 @@ public class Invoice {
         this.clientType = clientType;
     }
 
-    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDateTime invoiceDate, List<Product> products, Payment payment, Boolean sentSri, Double taxAmount, BigDecimal totalDiscount, Double tax, Double amount, String clientType) {
+    public static Invoice create(String id, String fullName, String address, String document, String phone, String email, String invoiceNumber, LocalDateTime invoiceDate, List<Product> products, Payment payment, Boolean sentSri, BigDecimal taxAmount, BigDecimal totalDiscount, Double tax, BigDecimal amount, String clientType) {
         return new Invoice(id, fullName, address, document, phone, email, invoiceNumber, invoiceDate, products, payment, sentSri, taxAmount, totalDiscount, tax, amount, clientType);
     }
 
@@ -159,11 +159,11 @@ public class Invoice {
         this.email = email;
     }
 
-    public Double getTaxAmount() {
+    public BigDecimal getTaxAmount() {
         return taxAmount;
     }
 
-    public void setTaxAmount(Double taxAmount) {
+    public void setTaxAmount(BigDecimal taxAmount) {
         this.taxAmount = taxAmount;
     }
 
@@ -175,11 +175,11 @@ public class Invoice {
         this.tax = tax;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

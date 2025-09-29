@@ -3,12 +3,9 @@ package com.foryourlife.admin.sales.payments.cashBox.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.store.domain.Store;
-import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
-import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -17,16 +14,7 @@ public class CashBox extends AuditableEntity {
     @Id
     private String id;
     private String number;
-
     private Boolean isActive;
-    @ManyToOne
-    @JoinColumn(
-            name = "created_by_user",
-            referencedColumnName = "id",
-            nullable = false
-    )
-    private User createdBy;
-
     @ManyToOne
     @JoinColumn(
             name = "store_id",
@@ -44,11 +32,10 @@ public class CashBox extends AuditableEntity {
     protected CashBox() {
     }
 
-    public CashBox(String id, String number, Boolean isActive, Integer firstNumberInvoice, User createdBy, Store store) {
+    public CashBox(String id, String number, Boolean isActive, Integer firstNumberInvoice, Store store) {
         this.id = id;
         this.number = number;
         this.isActive = isActive;
-        this.createdBy = createdBy;
         this.store = store;
         this.firstNumberInvoice = firstNumberInvoice;
     }
@@ -93,7 +80,7 @@ public class CashBox extends AuditableEntity {
         this.firstNumberInvoice = firstNumberInvoice;
     }
 
-    public static CashBox create(String id, String number, Boolean isActive, Integer firstNumberInvoice, User createdBy, Store store) {
-        return new CashBox(id, number, isActive, firstNumberInvoice, createdBy, store);
+    public static CashBox create(String id, String number, Boolean isActive, Integer firstNumberInvoice, Store store) {
+        return new CashBox(id, number, isActive, firstNumberInvoice, store);
     }
 }

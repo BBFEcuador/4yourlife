@@ -46,7 +46,7 @@ public class InvoiceRequest {
     public Boolean sentSri;
     public String invoiceNumber;
     public LocalDateTime invoiceDate;
-    public Double amount;
+    public BigDecimal amount;
 
     public Invoice toDomain() {
         return Invoice.create(
@@ -61,7 +61,7 @@ public class InvoiceRequest {
                 products != null ? products : List.of(),
                 payment,
                 sentSri,
-                (amount*0.15),
+                amount != null ? amount.multiply(BigDecimal.valueOf(0.15)) : BigDecimal.ZERO,
                 totalDiscount,
                 15.0,
                 amount,

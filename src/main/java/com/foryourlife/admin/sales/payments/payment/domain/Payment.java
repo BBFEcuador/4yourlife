@@ -141,12 +141,11 @@ public class Payment extends AuditableEntity {
     }
 
     @JsonProperty("remainingBalance")
-    public double getRemainingBalance() {
-        double totalPayments = this.paymentshistory.stream()
+    public BigDecimal getRemainingBalance() {
+        BigDecimal totalPayments = BigDecimal.valueOf(this.paymentshistory.stream()
                 .mapToDouble(PaymentHistory::getAmount)
-                .sum();
-        double remaining = this.invoice.getAmount() - totalPayments;
-        return Math.round(remaining * 100.0) / 100.0;
+                .sum());
+        return this.invoice.getAmount().subtract(totalPayments);
     }
 
 

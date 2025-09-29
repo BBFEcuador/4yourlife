@@ -79,11 +79,12 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         context.setVariable("subtotal", BigDecimal.valueOf(payment.getTotal() / 1.15).setScale(2, RoundingMode.HALF_UP));
         context.setVariable("iva", BigDecimal.valueOf(payment.getTotal() - (payment.getTotal() / 1.15)).setScale(2, RoundingMode.HALF_UP));
         context.setVariable("config", config);
-        if (payment.getDiscount() != null) {
-            context.setVariable("discount", payment.getDiscount().getDiscountValue());
-        } else {
-            context.setVariable("discount", payment.getInvoice().getTotalDiscount());
-        }
+        context.setVariable(
+                "discount",
+                payment.getDiscount() != null && payment.getDiscount().getDiscountValue() != null
+                        ? payment.getDiscount().getDiscountValue()
+                        : 0
+        );
         return templateEngine.process("templates/Payment-pdf", context);
     }
 }

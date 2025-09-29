@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.invoices.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class InvoiceContificoJson implements Serializable {
@@ -10,13 +11,13 @@ public class InvoiceContificoJson implements Serializable {
     public String documento;
     public String autorizacion;
     public Cliente cliente;
-    public double subtotal_0;
-    public double subtotal_12;
-    public double ice;
-    public double iva;
-    public double total;
+    public BigDecimal subtotal_0;
+    public BigDecimal subtotal_12;
+    public BigDecimal ice;
+    public BigDecimal iva;
+    public BigDecimal total;
     public List<Detalle> detalles;
-    public double base_no_gravable;
+    public BigDecimal base_no_gravable;
     public String adicional1;
     public String estado;
 
@@ -64,7 +65,7 @@ public class InvoiceContificoJson implements Serializable {
         }
     }
 
-    public InvoiceContificoJson(String pos, String fecha_emision, String tipo_documento, String documento, String autorizacion, Cliente cliente, double subtotal_0, double subtotal_12, double ice, double iva, double total, List<Detalle> detalles, double base_no_gravable, String adicional1, String estado) {
+    public InvoiceContificoJson(String pos, String fecha_emision, String tipo_documento, String documento, String autorizacion, Cliente cliente, BigDecimal subtotal_0, BigDecimal subtotal_12, BigDecimal ice, BigDecimal iva, BigDecimal total, List<Detalle> detalles, BigDecimal base_no_gravable, String adicional1, String estado) {
         this.pos = pos;
         this.fecha_emision = fecha_emision;
         this.tipo_documento = tipo_documento;

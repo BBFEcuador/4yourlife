@@ -21,7 +21,6 @@ import com.foryourlife.admin.sales.programs.domain.Program;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
-import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,6 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -83,12 +81,12 @@ public class CommandPaymentService {
             }
         });
 
-        var total = paymentReq.paymentsHistory.stream().mapToDouble(PaymentHistory::getAmount).sum();
+        var total = BigDecimal.valueOf(paymentReq.paymentsHistory.stream().mapToDouble(PaymentHistory::getAmount).sum());
 
-        if (total > paymentReq.total) {
+        if (total.compareTo(paymentReq.total) > 0) {
             throw new BaseException("El pago no puede superar el total de la compra", List.of(""));
 
-        } else if (total == paymentReq.total) {
+        } else if (total.equals(paymentReq.total)) {
             paymentReq.status = PaymentStatus.COMPLETED;
         }
 
@@ -124,15 +122,16 @@ public class CommandPaymentService {
                 paymentReq.paymentsHistory,
                 paymentReq.total,
                 paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING,
-                paymentReq.note);
+                paymentReq.note
+        );
         _paymentRepository.save(payment);
 
-        BigDecimal totalInvoice = BigDecimal.valueOf(total);
         BigDecimal divisor = BigDecimal.valueOf(1.15);
-        BigDecimal taxAmount = totalInvoice.subtract(totalInvoice.divide(divisor, 2, RoundingMode.HALF_UP));
+        BigDecimal taxAmount = total.subtract(total.divide(divisor, 2, RoundingMode.HALF_UP));
 
         if (!paymentReq.paymentsHistory.isEmpty()) {
-            var invoice = Invoice.create(UUID.randomUUID().toString(),
+            var invoice = Invoice.create(
+                    UUID.randomUUID().toString(),
                     paymentReq.invoice.fullName,
                     paymentReq.invoice.address,
                     paymentReq.invoice.document,
@@ -146,7 +145,7 @@ public class CommandPaymentService {
                     taxAmount,
                     paymentReq.totalDiscount,
                     15.0,
-                    totalInvoice,
+                    total,
                     paymentReq.invoice.type
             );
 
@@ -302,39 +301,76 @@ public class CommandPaymentService {
 
     public void updatePaymentsHistory(PaymentHistory paymentHistory, String paymentId, String cashDrawerId) {
         var payment = _paymentRepository.findById(paymentId);
+
         if (!_paymentMethodRepository.exist(paymentHistory.getPaymentMethod().getId())) {
             throw new BaseException("El método de pago no existe", List.of(""));
         }
-        var total = payment.getPaymentshistory().stream().mapToDouble(PaymentHistory::getAmount).sum() + paymentHistory.getAmount();
+
+        double currentTotal = payment.getPaymentshistory().stream()
+                .mapToDouble(PaymentHistory::getAmount)
+                .sum();
+        double newTotal = currentTotal + paymentHistory.getAmount();
+
         if (payment.getStatus() == PaymentStatus.COMPLETED) {
             throw new BaseException("No se puede actualizar, el pago ya ha sido completado", List.of(""));
+        }
 
-        } else if (total > payment.getTotal()) {
-            throw new BaseException("El pago no puede superar el total de la compra: ", List.of("el total de pagos es: " + total + ", el total de la compra es: " + payment.getTotal()));
+        if (BigDecimal.valueOf(newTotal).compareTo(payment.getTotal()) > 0) {
+            throw new BaseException(
+                    "El pago no puede superar el total de la compra",
+                    List.of("Total actual: " + newTotal + ", Total de la compra: " + payment.getTotal())
+            );
+        }
 
-        } else if (total == payment.getTotal() && payment.getStatus() != PaymentStatus.COMPLETED) {
+        if (BigDecimal.valueOf(newTotal).compareTo(payment.getTotal()) == 0 && payment.getStatus() != PaymentStatus.COMPLETED) {
             payment.setStatus(PaymentStatus.COMPLETED);
         }
-        payment.getPaymentshistory().forEach(history -> {
-            if (history.getTransactionId().equals(paymentHistory.getTransactionId())) {
-                throw new BaseException("El pago con el codigo de transaccion: " + paymentHistory.getTransactionId() + " ya existe!", List.of(""));
-            }
-        });
+
+        boolean duplicateExists = payment.getPaymentshistory().stream()
+                .anyMatch(h -> h.getTransactionId().equals(paymentHistory.getTransactionId()));
+
+        if (duplicateExists) {
+            throw new BaseException(
+                    "El pago con el código de transacción: " + paymentHistory.getTransactionId() + " ya existe",
+                    List.of("")
+            );
+        }
+
+        var originalInvoice = queryInvoiceService.getByPaymentId(paymentId);
+        BigDecimal amount = BigDecimal.valueOf(paymentHistory.getAmount());
+        BigDecimal divisor = BigDecimal.valueOf(1.15);
+        BigDecimal taxAmount = amount.subtract(amount.divide(divisor, 2, RoundingMode.HALF_UP));
+
+        var newInvoice = Invoice.create(
+                UUID.randomUUID().toString(),
+                originalInvoice.getFullName(),
+                originalInvoice.getAddress(),
+                originalInvoice.getDocument(),
+                originalInvoice.getPhone(),
+                originalInvoice.getEmail(),
+                originalInvoice.getInvoiceNumber(),
+                LocalDateTime.now(),
+                originalInvoice.getProducts(),
+                payment,
+                false,
+                taxAmount,
+                BigDecimal.ZERO,
+                15.0,
+                amount,
+                originalInvoice.getClientType()
+        );
+
         paymentHistory.setId(UUID.randomUUID().toString());
         paymentHistory.setSent(false);
         payment.getPaymentshistory().add(paymentHistory);
 
-        var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);
-
-        var invoice = queryInvoiceService.getByPaymentId(paymentId);
-
-        cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
-
         _paymentRepository.save(payment);
 
-        PaymentHistoryCreated event = new PaymentHistoryCreated(paymentHistory, invoice);
+        var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);
+        cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
 
-        eventBus.publish(List.of(event));
+        var savedInvoice = createInvoice(newInvoice, cashDrawer, payment);
+        eventBus.publish(List.of(new PaymentCreated(payment, savedInvoice, cashDrawer)));
     }
 
     public void changeStatus(String id, String status) {

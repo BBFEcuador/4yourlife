@@ -49,7 +49,7 @@ public class Payment extends AuditableEntity {
     @Type(JsonType.class)
     private List<PaymentHistory> paymentshistory;
 
-    private Double total;
+    private BigDecimal total;
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
@@ -68,7 +68,7 @@ public class Payment extends AuditableEntity {
     protected Payment() {
     }
 
-    public Payment(String id, List<Product> products, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, Double total, PaymentStatus status, String note) {
+    public Payment(String id, List<Product> products, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, BigDecimal total, PaymentStatus status, String note) {
         this.id = id;
         this.products = products;
         this.discount = discount;
@@ -80,7 +80,7 @@ public class Payment extends AuditableEntity {
         this.note = note;
     }
 
-    public static Payment create(String id, List<Product> product, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, Double total, PaymentStatus status, String note) {
+    public static Payment create(String id, List<Product> product, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, BigDecimal total, PaymentStatus status, String note) {
         return new Payment(id, product, discount, participant, campus, paymentshistory, total, status, note);
     }
 
@@ -108,7 +108,7 @@ public class Payment extends AuditableEntity {
         return paymentshistory;
     }
 
-    public Double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
@@ -145,8 +145,6 @@ public class Payment extends AuditableEntity {
         BigDecimal totalPayments = BigDecimal.valueOf(this.paymentshistory.stream()
                 .mapToDouble(PaymentHistory::getAmount)
                 .sum());
-        return this.invoice.getAmount().subtract(totalPayments);
+        return this.total.subtract(totalPayments);
     }
-
-
 }

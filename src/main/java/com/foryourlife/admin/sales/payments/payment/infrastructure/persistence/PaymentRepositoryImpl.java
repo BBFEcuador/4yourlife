@@ -76,8 +76,8 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         Context context = new Context();
         context.setVariable("payment", payment);
         context.setVariable("date", payment.getCreated_at());
-        context.setVariable("subtotal", BigDecimal.valueOf(payment.getTotal() / 1.15).setScale(2, RoundingMode.HALF_UP));
-        context.setVariable("iva", BigDecimal.valueOf(payment.getTotal() - (payment.getTotal() / 1.15)).setScale(2, RoundingMode.HALF_UP));
+        context.setVariable("subtotal", payment.getTotal().divide(BigDecimal.valueOf(1.15), 2, RoundingMode.HALF_UP));
+        context.setVariable("iva", payment.getTotal().subtract(payment.getTotal().divide(BigDecimal.valueOf(1.15), 2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP));
         context.setVariable("config", config);
         context.setVariable(
                 "discount",

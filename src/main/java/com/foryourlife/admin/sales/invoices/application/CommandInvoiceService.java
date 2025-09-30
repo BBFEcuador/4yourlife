@@ -93,9 +93,10 @@ public class CommandInvoiceService {
             invoiceRepository.save(invoice);
 
             invoice.getPayment().getPaymentshistory().forEach(history -> {
-                PaymentHistoryCreated event = new PaymentHistoryCreated(history, invoice);
-
-                eventBus.publish(List.of(event));
+                if (!history.getSent()){
+                    PaymentHistoryCreated event = new PaymentHistoryCreated(history, invoice);
+                    eventBus.publish(List.of(event));
+                }
             });
 
         } catch (HttpClientErrorException e) {

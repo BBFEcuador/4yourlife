@@ -20,10 +20,10 @@ public class CreateAdminRequest {
     public String name2;
     @NotNull
     @NotBlank(message = "El primer apellido es requerido")
-    public String lastname1;
+    public String lastName1;
     @NotNull
     @NotBlank(message = "El segundo apellido es requerido")
-    public String lastname2;
+    public String lastName2;
     @NotNull
     @Email
     public String email;
@@ -33,6 +33,9 @@ public class CreateAdminRequest {
     public String phone;
     @NotNull
     public Set<Campus> campus;
+    @NotNull
+    @NotBlank(message = "La contraseña es requerida")
+    public String password;
 
     public String getId() {
         return id;

@@ -31,7 +31,7 @@ public class Invoice {
     @Column(columnDefinition = "jsonb")
     @Type(JsonType.class)
     private List<Product> products;
-    @JsonIgnore
+    @JsonIgnoreProperties("invoice, cashDrawerDetail, participant, campus, discount, createdBy, updatedBy, createdAt, updatedAt, paymentsHistory, status, note, total, totalDiscount")
     @ManyToOne
     @JoinColumn(name = "payment_id", referencedColumnName = "id")
     private Payment payment;

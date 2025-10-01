@@ -1,5 +1,7 @@
 package com.foryourlife.admin.sales.invoices.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.product.domain.Product;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -29,8 +31,8 @@ public class Invoice {
     @Column(columnDefinition = "jsonb")
     @Type(JsonType.class)
     private List<Product> products;
-
-    @OneToOne
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "payment_id", referencedColumnName = "id")
     private Payment payment;
 

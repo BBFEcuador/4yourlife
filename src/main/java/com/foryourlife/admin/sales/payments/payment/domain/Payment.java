@@ -59,8 +59,8 @@ public class Payment extends AuditableEntity {
     @JsonIgnoreProperties("payment")
     private List<CashDrawerDetail> cashDrawerDetail;
     @JsonIgnore
-    @OneToOne(mappedBy = "payment", fetch = FetchType.EAGER)
-    private Invoice invoice;
+    @OneToMany(mappedBy = "payment", fetch = FetchType.EAGER)
+    private List<Invoice> invoice;
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime created_at = LocalDateTime.now();
@@ -128,7 +128,7 @@ public class Payment extends AuditableEntity {
         return created_at.getDayOfMonth() + "/" + created_at.getMonthValue() + "/" + created_at.getYear();
     }
 
-    public Invoice getInvoice() {
+    public List<Invoice>  getInvoice() {
         return invoice;
     }
 

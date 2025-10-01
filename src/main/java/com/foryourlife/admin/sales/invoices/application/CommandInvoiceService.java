@@ -12,13 +12,11 @@ import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
-import java.security.SecureRandom;
 import java.util.List;
 
 @Service
@@ -118,16 +116,16 @@ public class CommandInvoiceService {
     }
 
     public void resendPaymentHistoryToContifico(String paymentId) {
-        var payment = paymentRepository.findById(paymentId);
-        if (payment.getInvoice().getContificoId() == null || payment.getInvoice().getContificoId().isEmpty()) {
-            throw new IllegalArgumentException("No se puede reenviar el historial de pagos, la factura no ha sido enviada a Contifico");
-        }
-        payment.getPaymentshistory().forEach(history -> {
-            if (!history.getSent()) {
-                PaymentHistoryCreated event = new PaymentHistoryCreated(history, payment.getInvoice());
-
-                eventBus.publish(List.of(event));
-            }
-        });
+//        var payment = paymentRepository.findById(paymentId);
+//        if (payment.getInvoice().getContificoId() == null || payment.getInvoice().getContificoId().isEmpty()) {
+//            throw new IllegalArgumentException("No se puede reenviar el historial de pagos, la factura no ha sido enviada a Contifico");
+//        }
+//        payment.getPaymentshistory().forEach(history -> {
+//            if (!history.getSent()) {
+//                PaymentHistoryCreated event = new PaymentHistoryCreated(history, payment.getInvoice());
+//
+//                eventBus.publish(List.of(event));
+//            }
+//        });
     }
 }

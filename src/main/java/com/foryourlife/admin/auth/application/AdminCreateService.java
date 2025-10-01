@@ -15,8 +15,6 @@ import com.foryourlife.shared.domain.user.UserEntities;
 import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.UserType;
 import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
-import com.foryourlife.shared.domain.user.infrastructure.GeneralUserRepositoryImpl;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,22 +43,21 @@ public class AdminCreateService {
     }
     @Transactional
     public void create(CreateAdminRequest admin) {
-        var password = RandomStringUtils.randomAlphabetic(10);
         var adminId = admin.id != null ? admin.id : UUID.randomUUID().toString();
         var user = new User(
                 UUID.randomUUID().toString(),
                 admin.email,
-                passwordEncoder.encode(password),
+                passwordEncoder.encode(admin.password),
                 admin.name1,
                 admin.name2,
-                admin.lastname1,
-                admin.lastname2,
-                admin.name1 + " " + admin.name2 + " " + admin.lastname1 + " " + admin.lastname2,
+                admin.lastName1,
+                admin.lastName2,
+                admin.name1 + " " + admin.name2 + " " + admin.lastName1 + " " + admin.lastName2,
                 admin.phone,
                 List.of(new UserEntities(adminId, UserType.ADMIN.toString()))
         );
         commandGeneralUserService.save(user);
-        var newAdmin = Admin.create(admin.id != null ? admin.id : UUID.randomUUID().toString(), user, admin.role, admin.campus, password);
+        var newAdmin = Admin.create(admin.id != null ? admin.id : UUID.randomUUID().toString(), user, admin.role, admin.campus, admin.password);
         this.repository.save(newAdmin);
     }
 

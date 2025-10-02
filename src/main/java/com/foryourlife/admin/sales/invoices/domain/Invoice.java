@@ -27,11 +27,12 @@ public class Invoice {
     private String invoiceNumber;
     @Column(name = "invoice_date")
     private LocalDateTime invoiceDate;
-
+    @JsonIgnoreProperties({"rules", "campus"})
     @Column(columnDefinition = "jsonb")
     @Type(JsonType.class)
     private List<Product> products;
-    @JsonIgnoreProperties("invoice, cashDrawerDetail, participant, campus, discount, createdBy, updatedBy, createdAt, updatedAt, paymentsHistory, status, note, total, totalDiscount")
+//    @JsonIgnoreProperties({"invoice", "cashDrawerDetail", "participant", "campus", "discount", "createdBy", "updatedBy", "createdAt","updatedAt", "paymentsHistory", "status", "note", "total", "totalDiscount"})
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "payment_id", referencedColumnName = "id")
     private Payment payment;
@@ -51,6 +52,7 @@ public class Invoice {
     private String clientType;
     private Double tax;
     private BigDecimal amount;
+    @JsonIgnore
     @Column(columnDefinition = "jsonb", name = "invoice_contifico_json")
     @Type(JsonType.class)
     private InvoiceContificoJson invoiceContifico;

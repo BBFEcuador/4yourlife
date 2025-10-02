@@ -27,40 +27,49 @@ import java.util.Locale;
 @Entity
 @Table(name = "payments")
 public class Payment extends AuditableEntity {
+
     @Id
     private String id;
 
+    @JsonIgnoreProperties({"rules", "campus"})
     @Column(columnDefinition = "jsonb")
     @Type(JsonType.class)
     private List<Product> products;
 
     @ManyToOne
     @JoinColumn(name = "discount_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"payments"})
     private ProductDiscount discount;
+
     @ManyToOne
     @JoinColumn(name = "participant_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"campus", "profile", "participantLevel", "invitationToken", "isLingerer", "isDesertor", "modules", "contacts", "team", "teams", "medicalRecord", "user.entityMap"})
     private Participant participant;
+
     @ManyToOne
     @JoinColumn(name = "campus_id", referencedColumnName = "id")
+    @JsonIgnore
     private Campus campus;
 
-    //    @Convert(converter = PaymentHistoryConverter.class)
     @Column(columnDefinition = "jsonb", name = "payments_history")
     @Type(JsonType.class)
     private List<PaymentHistory> paymentshistory;
 
     private BigDecimal total;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
     private String note;
 
-    @OneToMany(mappedBy = "payment")
-    @JsonIgnoreProperties("payment")
-    private List<CashDrawerDetail> cashDrawerDetail;
+    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY)
     @JsonIgnore
+    private List<CashDrawerDetail> cashDrawerDetail;
+
     @OneToMany(mappedBy = "payment", fetch = FetchType.EAGER)
-    private List<Invoice> invoice;
+    @JsonIgnoreProperties({"payment", "invoiceContifico", "products"})
+    private List<Invoice> invoices;
+
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime created_at = LocalDateTime.now();
@@ -128,8 +137,8 @@ public class Payment extends AuditableEntity {
         return created_at.getDayOfMonth() + "/" + created_at.getMonthValue() + "/" + created_at.getYear();
     }
 
-    public List<Invoice>  getInvoice() {
-        return invoice;
+    public List<Invoice> getInvoice() {
+        return invoices;
     }
 
     public Boolean getHasSomePaymentWithError() {

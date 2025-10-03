@@ -48,7 +48,6 @@ public class Payment extends AuditableEntity {
 
     @ManyToOne
     @JoinColumn(name = "campus_id", referencedColumnName = "id")
-    @JsonIgnore
     private Campus campus;
 
     @Column(columnDefinition = "jsonb", name = "payments_history")

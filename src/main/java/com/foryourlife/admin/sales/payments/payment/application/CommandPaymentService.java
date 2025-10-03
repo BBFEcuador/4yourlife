@@ -142,10 +142,10 @@ public class CommandPaymentService {
                     products,
                     payment,
                     false,
-                    taxAmount,
-                    paymentReq.totalDiscount,
+                    taxAmount.setScale(2, RoundingMode.HALF_UP),
+                    paymentReq.totalDiscount.setScale(2, RoundingMode.HALF_UP),
                     15.0,
-                    total,
+                    total.setScale(2, RoundingMode.HALF_UP),
                     paymentReq.invoice.type
             );
 
@@ -369,8 +369,7 @@ public class CommandPaymentService {
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);
         cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
 
-        var savedInvoice = createInvoice(newInvoice, cashDrawer, payment);
-        eventBus.publish(List.of(new PaymentCreated(payment, savedInvoice, cashDrawer)));
+        createInvoice(newInvoice, cashDrawer, payment);
     }
 
     public void changeStatus(String id, String status) {

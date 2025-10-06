@@ -151,7 +151,7 @@
             <div class="info-row"><span class="info-label">RUC:</span><span th:text="${config.ruc}"></span> </div>
             <div class="info-row"><span style="font-size: 16px; font-weight: bold; margin: 15px 0;">COBRO</span>
                 <span style="font-size: 16px; font-weight: bold;"
-                      th:text="${payment.invoice.invoiceNumber}"></span></div>
+                      th:text="${payment.invoice[0].invoiceNumber}"></span></div>
             <div class="info-row"><span class="info-label">FECHA:</span> <span th:text="${date}"></span>
             </div>
         </div>
@@ -160,19 +160,19 @@
 
 <div class="info-box">
     <div class="info-row"><span class="info-label">Razón Social / Nombres y Apellidos:</span>
-        <span th:text="${payment.invoice.fullName}"></span></div>
+        <span th:text="${payment.invoice[0].fullName}"></span></div>
     <div class="info-row"><span class="info-label">Identificación:</span>
         <span
-                th:text="${payment.invoice.document}"></span></div>
+                th:text="${payment.invoice[0].document}"></span></div>
     <div class="info-row"><span class="info-label">Teléfono:</span>
         <span
-                th:text="${payment.invoice.phone}"></span></div>
+                th:text="${payment.invoice[0].phone}"></span></div>
     <div class="info-row"><span class="info-label">Fecha de Emisión:</span>
         <span
-                th:text="${payment.invoice.invoiceDate}"></span></div>
+                th:text="${payment.invoice[0].invoiceDate}"></span></div>
     <div class="info-row"><span class="info-label">Dirección:</span>
         <span
-                th:text="${payment.invoice.address}"></span></div>
+                th:text="${payment.invoice[0].address}"></span></div>
 </div>
 
 <table class="main-table">
@@ -204,7 +204,7 @@
             </tr>
             <tr>
                 <td>Email:</td>
-                <td th:text="${payment.invoice.email}"></td>
+                <td th:text="${payment.invoice[0].email}"></td>
             </tr>
             <tr>
                 <td>Campus:</td>

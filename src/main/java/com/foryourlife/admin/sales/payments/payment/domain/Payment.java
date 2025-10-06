@@ -141,7 +141,7 @@ public class Payment extends AuditableEntity {
     }
 
     public Boolean getHasSomePaymentWithError() {
-        return this.paymentshistory.stream().anyMatch(PaymentHistory::getSent);
+        return this.invoices.stream().anyMatch(invoice -> !invoice.getSentContifico());
     }
 
     public void setPaymentshistory(List<PaymentHistory> paymentshistory) {

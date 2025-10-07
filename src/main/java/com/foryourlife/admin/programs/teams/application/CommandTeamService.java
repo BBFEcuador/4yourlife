@@ -3,7 +3,7 @@ package com.foryourlife.admin.programs.teams.application;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.*;
-import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
+import com.foryourlife.admin.programs.trainer.application.TrainerQueryService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.masterLife.application.QueryMasterLifeService;
@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -35,20 +34,20 @@ public class CommandTeamService {
     private final StaffRepository staffRepository;
     private final VisionaryRepository visionaryRepository;
     private final QueryTrainingService queryTrainingService;
-    private final TrainerFinderService trainerFinderService;
+    private final TrainerQueryService trainerQueryService;
     private final QueryMasterLifeService queryMasterLifeService;
     private final QueryTeamService queryTeamService;
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
 
 
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerFinderService trainerFinderService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService) {
+    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService) {
         this._teamRepository = _teamRepository;
         this.bus = bus;
         this._participantRepository = _participantRepository;
         this.staffRepository = staffRepository;
         this.visionaryRepository = visionaryRepository;
         this.queryTrainingService = queryTrainingService;
-        this.trainerFinderService = trainerFinderService;
+        this.trainerQueryService = trainerQueryService;
         this.queryMasterLifeService = queryMasterLifeService;
         this.queryTeamService = queryTeamService;
     }
@@ -60,7 +59,7 @@ public class CommandTeamService {
 
     public void saveLifeTeam(SaveLifeTeamRequest request) {
         var training = queryTrainingService.getTrainingById(request.training);
-        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+        var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
@@ -91,7 +90,7 @@ public class CommandTeamService {
 
     public void saveFocusTeam(SaveFocusTeamsRequest request) {
         var training = queryTrainingService.getTrainingById(request.training);
-        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+        var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
@@ -125,7 +124,7 @@ public class CommandTeamService {
 
     public void saveYourTeam(SaveYourTeamRequest request) {
         var training = queryTrainingService.getTrainingById(request.training);
-        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+        var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
@@ -274,7 +273,7 @@ public class CommandTeamService {
     @Transactional
     public void promotionLifeTeam(PromotionLifeRequest request) {
         var team = _teamRepository.findById(request.id).orElseThrow();
-        var trainer = trainerFinderService.findTrainerById(request.trainer).orElseThrow();
+        var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
         var training = team.getTraining().getNextLevel();
 
         var participants = request.users.stream()
@@ -341,7 +340,7 @@ public class CommandTeamService {
         var team = _teamRepository.findById(request.id)
                 .orElseThrow(() -> new BaseException("Team not found", List.of()));
 
-        var trainer = trainerFinderService.findTrainerById(request.trainer)
+        var trainer = trainerQueryService.findTrainerById(request.trainer)
                 .orElseThrow(() -> new BaseException("Trainer not found", List.of()));
 
         var training = team.getTraining().getNextLevel();

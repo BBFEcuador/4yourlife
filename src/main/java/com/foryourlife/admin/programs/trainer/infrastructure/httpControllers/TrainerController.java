@@ -1,13 +1,13 @@
 package com.foryourlife.admin.programs.trainer.infrastructure.httpControllers;
 
-import com.foryourlife.admin.auth.infrastructure.httpControllers.DisableAdminRequest;
 import com.foryourlife.admin.programs.trainer.application.TrainerCreatorService;
-import com.foryourlife.admin.programs.trainer.application.TrainerFinderService;
+import com.foryourlife.admin.programs.trainer.application.TrainerQueryService;
+import com.foryourlife.admin.programs.trainer.application.TrainerLoginService;
+import com.foryourlife.admin.programs.trainer.domain.LoginTrainerResponse;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/trainer")
+@RequestMapping("trainer")
 public class TrainerController {
 
     @Autowired
-    private TrainerFinderService trainerFinderService;
+    private TrainerQueryService trainerQueryService;
 
     @Autowired
     private TrainerCreatorService trainerCreateService;
@@ -51,7 +51,7 @@ public class TrainerController {
         Criteria criteria = new Criteria(
                 List.of(), Optional.empty(), Optional.empty()
         );
-        if (!search.isEmpty()){
+        if (!search.isEmpty()) {
             criteria.filters = List.of(
                     new Filter(
                             "name",
@@ -83,20 +83,21 @@ public class TrainerController {
                     )
             );
         }
-        return new ResponseEntity<>(trainerFinderService.findTrainers(p,criteria), HttpStatus.OK);
+        return new ResponseEntity<>(trainerQueryService.findTrainers(p, criteria), HttpStatus.OK);
     }
+
     @PostMapping("/available")
     public ResponseEntity<List<Trainer>> getTrainers(@Valid @RequestBody AvailableTrainerRequest request) {
-        return new ResponseEntity<>(trainerFinderService.findTrainersAvailable(request.startDate,request.endDate), HttpStatus.OK);
+        return new ResponseEntity<>(trainerQueryService.findTrainersAvailable(request.startDate, request.endDate), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Trainer>> getTrainerById(@PathVariable String id) {
-        return new ResponseEntity<>(trainerFinderService.findTrainerById(id), HttpStatus.OK);
+        return new ResponseEntity<>(trainerQueryService.findTrainerById(id), HttpStatus.OK);
     }
 
     @PutMapping("/disabled")
-    public ResponseEntity<?> disableAdmin(@RequestBody DisableTrainerRequest disabled){
+    public ResponseEntity<?> disableAdmin(@RequestBody DisableTrainerRequest disabled) {
         trainerCreateService.update(disabled);
         return new ResponseEntity<>(HttpStatus.OK);
     }

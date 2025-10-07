@@ -6,6 +6,7 @@ public class UnauthRoutes {
     public static final List<String> ROUTES = List.of(
             "/api/metric/**",
             "/api/public/**",
+            "/api/auth/trainer/login",
             "/api/server/**",
             "/api/actuator/**",
             "/api/auth/**",

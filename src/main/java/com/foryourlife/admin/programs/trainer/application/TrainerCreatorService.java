@@ -1,6 +1,5 @@
 package com.foryourlife.admin.programs.trainer.application;
 
-import com.foryourlife.admin.auth.infrastructure.httpControllers.DisableAdminRequest;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.trainer.domain.TrainerRepository;
 import com.foryourlife.admin.programs.trainer.infrastructure.httpControllers.DisableTrainerRequest;

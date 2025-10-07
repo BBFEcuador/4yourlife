@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TrainerFinderService {
+public class TrainerQueryService {
 
     private TrainerRepository repository;
 
-    public TrainerFinderService(TrainerRepository repository) {
+    public TrainerQueryService(TrainerRepository repository) {
         this.repository = repository;
     }
 

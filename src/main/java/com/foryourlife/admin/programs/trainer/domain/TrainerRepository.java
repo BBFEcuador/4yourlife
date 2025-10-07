@@ -16,6 +16,5 @@ public interface TrainerRepository {
     List<Trainer> getTrainers();
     Page<Trainer> getTrainers(Pageable pageable, Criteria criteria);
     List<Trainer> getAvailableTrainers(LocalDate startDate,LocalDate endDate);
-
-
+    LoginTrainerResponse loginTrainer(String email, String password);
 }

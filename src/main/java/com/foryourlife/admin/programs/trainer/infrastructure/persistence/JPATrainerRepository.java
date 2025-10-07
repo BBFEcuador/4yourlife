@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface JPATrainerRepository extends JpaRepository<Trainer, String>, JpaSpecificationExecutor<Trainer> {
@@ -45,4 +46,5 @@ public interface JPATrainerRepository extends JpaRepository<Trainer, String>, Jp
             """)
     boolean isTrainerAvailable(String trainerId, LocalDate startDate, LocalDate endDate, String newTrainingId);
 
+    Optional<Object> findByEmail(String email);
 }

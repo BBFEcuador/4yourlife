@@ -414,4 +414,8 @@ public class CommandTeamService {
         }
         _teamRepository.removeVisionaries(teamId, id);
     }
+
+    public List<Team> findByTrainerId(String trainerId) {
+        return this._teamRepository.findByTrainerId(trainerId);
+    }
 }

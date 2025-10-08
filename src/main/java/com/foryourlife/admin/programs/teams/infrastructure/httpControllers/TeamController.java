@@ -154,4 +154,9 @@ public class TeamController {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/byTraining/{trainingId}")
+    public ResponseEntity<?> getByTrainingId(@PathVariable String trainingId) {
+        return new ResponseEntity<>(this.queryTeamService.getByTrainingId(trainingId), HttpStatus.OK);
+    }
 }

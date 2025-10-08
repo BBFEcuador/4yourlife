@@ -1,12 +1,9 @@
 package com.foryourlife.admin.programs.trainer.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import jakarta.persistence.*;
-import net.datafaker.providers.food.Tea;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,7 +21,9 @@ public class Trainer {
     private String password;
 
     private Boolean isActive;
-    @OneToMany(mappedBy = "trainer")
+
+    @JsonIgnoreProperties({"trainer"})
+    @OneToMany(mappedBy = "trainer", fetch = FetchType.EAGER)
     private List<Team> teams;
 
     protected Trainer() {
@@ -92,8 +91,11 @@ public class Trainer {
         return new Trainer(id, name, email, phone, password, isActive);
     }
 
-    @JsonBackReference
     public List<Team> getTeams() {
         return teams;
+    }
+
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
     }
 }

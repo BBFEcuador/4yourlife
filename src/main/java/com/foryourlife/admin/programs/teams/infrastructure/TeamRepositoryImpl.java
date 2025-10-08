@@ -144,4 +144,9 @@ public class TeamRepositoryImpl implements TeamRepository {
     public List<Team> match(Criteria criteria) {
         return _jpaTeamRepository.findAll(criteriaConverter.getJpaSpecifications(criteria));
     }
+
+    @Override
+    public List<Team> findByTrainerId(String trainerId) {
+        return _jpaTeamRepository.findAllByTrainer_Id(trainerId);
+    }
 }

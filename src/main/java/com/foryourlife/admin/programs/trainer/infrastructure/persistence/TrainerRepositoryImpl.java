@@ -68,7 +68,6 @@ public class TrainerRepositoryImpl implements TrainerRepository {
         Authentication authentication = this.authenticate(email.toLowerCase(), password);
         var token = jwtUtils.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        var cashDrawer = repository.findByEmail(email).orElseThrow(() -> new BaseException("Trainer not found", List.of()));
         return new LoginTrainerResponse(this.loadTrainer , token);
     }
 
@@ -76,10 +75,10 @@ public class TrainerRepositoryImpl implements TrainerRepository {
         var userDetails = this.loadTrainerByEmail(username);
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         if (userDetails == null) {
-            throw new BadCredentialsException("Invalid username or password");
+            throw new BadCredentialsException("Email o contraseña incorrecta");
         }
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("Invalid username or password");
+            throw new BadCredentialsException("Email o contraseña incorrecta");
         }
         authorityList.add(new SimpleGrantedAuthority("trainer"));
         return new UsernamePasswordAuthenticationToken(username, password, authorityList);
@@ -87,7 +86,7 @@ public class TrainerRepositoryImpl implements TrainerRepository {
 
     public Trainer loadTrainerByEmail(String email) throws BaseException {
         var trainer = repository.findByEmail(email).orElseThrow(
-                () -> new BaseException("Login Error", List.of("Invalid credentials."))
+                () -> new BaseException("Login Error", List.of("Credenciales invalidas!."))
         );
         this.loadTrainer = (Trainer) trainer;
         return (Trainer) trainer;

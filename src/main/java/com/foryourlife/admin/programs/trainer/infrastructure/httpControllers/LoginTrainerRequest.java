@@ -1,11 +1,13 @@
 package com.foryourlife.admin.programs.trainer.infrastructure.httpControllers;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
 public class LoginTrainerRequest {
-    @NotNull(message = "Email is required")
+    @NotNull(message = "El email es requerido")
+    @Email(message = "El email no es válido")
     public String email;
-    @NotNull(message = "Password is required")
+    @NotNull(message = "La contraseña es requerida")
     public String password;
 
     public LoginTrainerRequest() {

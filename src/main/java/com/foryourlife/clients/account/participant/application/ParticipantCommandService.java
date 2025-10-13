@@ -104,7 +104,7 @@ public class ParticipantCommandService {
 
     public void save(Participant user) {
         if (this._participantRepository.findByEmail(user.getEmail()).isPresent())
-            throw new UserAlreadyCreatedException("The email " + user.getEmail() + " is already registered");
+            throw new UserAlreadyCreatedException("El email " + user.getEmail() + " ya esta registrado");
         try {
             var ensureRolExist = this._rolRepository.getRoleById(user.getRoleId());
             this._participantRepository.save(user);
@@ -117,12 +117,12 @@ public class ParticipantCommandService {
 
     public void update(Participant participant) {
         try {
-            _userRepository.findById(participant.getUser().getId()).orElseThrow(() -> new BaseException("User related to participant not found", List.of()));
+            _userRepository.findById(participant.getUser().getId()).orElseThrow(() -> new BaseException("No se encontró el usuario asociado al participante.", List.of()));
             var auxUser = participant.getUser();
             auxUser.setName(participant.getUser().getName1() + " " + participant.getUser().getName2() + " " + participant.getUser().getLastname1() + " " + participant.getUser().getLastname2());
             _userRepository.save(auxUser);
             participant.setCampus(participant.getCampus() != null ? participant.getCampus() : queryInvitationServices.findInvitationByToken(participant.getInvitationToken()).getCampus());
-            _profileDetailsRepository.findById(participant.getProfile().getId()).orElseThrow(() -> new BaseException("Profile related to participant not found", List.of()));
+            _profileDetailsRepository.findById(participant.getProfile().getId()).orElseThrow(() -> new BaseException("No se encontró el perfil asociado al participante.", List.of()));
             _profileDetailsRepository.save(participant.getProfile());
             this._participantRepository.save(participant);
         } catch (Exception e) {
@@ -135,7 +135,7 @@ public class ParticipantCommandService {
     }
 
     public Participant getUser(String id) {
-        return this._participantRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The Id: " + id + " doesn't exist."));
+        return this._participantRepository.findById(id).orElseThrow(() -> new UserNotFoundException("El usuario no existe"));
     }
 
     public void setLevel(String userId, String levelId) {
@@ -146,10 +146,10 @@ public class ParticipantCommandService {
 
     public void createFromAdmin(Participant participant) {
         if (_participantRepository.findByUserId(participant.getUser().getId()) != null) {
-            throw new BaseException("The user is already a Participant", List.of("Already exist as master life"));
+            throw new BaseException("El usuario ya es un Participante", List.of("El usuario ya es un Participante Master Life"));
         }
 
-        var admin = _adminRepository.findByUserId(participant.getUser().getId()).orElseThrow(() -> new BaseException("User not found", List.of("User does not exist")));
+        var admin = _adminRepository.findByUserId(participant.getUser().getId()).orElseThrow(() -> new BaseException("Usuario no encontrado", List.of("El usuario no existe")));
         var invitation = queryInvitationServices.findInvitationByToken(participant.getInvitationToken());
         var user = admin.getUser();
         participant.setCampus(invitation.getCampus());
@@ -158,7 +158,7 @@ public class ParticipantCommandService {
     }
 
     public void promotionToMasterLife(String id) {
-        var user = this._participantRepository.findById(id).orElseThrow(() -> new BaseException("User not found", List.of()));
+        var user = this._participantRepository.findById(id).orElseThrow(() -> new BaseException("Usuario no encontrado", List.of()));
 //        var role = this._rolRepository.getRolByLevel(CourseLevel.MASTER_LIFE);
 //        user.setParticipantLevel(role);
         this._participantRepository.save(user);

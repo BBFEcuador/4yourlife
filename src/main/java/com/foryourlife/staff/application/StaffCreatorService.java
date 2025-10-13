@@ -58,18 +58,18 @@ public class StaffCreatorService {
     }
 
     public void changeStatus(String visionaryId) {
-        var staff = _repository.findById(visionaryId).orElseThrow(() -> new BaseException("Not Found", List.of()));
+        var staff = _repository.findById(visionaryId).orElseThrow(() -> new BaseException("No encontrado", List.of()));
         staff.changeStatus();
         _repository.save(staff);
     }
 
     public void createFromAdmin(Staff staff) {
         if (_repository.findByUserId(staff.getUser().getId()) != null) {
-            throw new BaseException("The user is already a Staff", List.of("Already exist as staff"));
+            throw new BaseException("El usuario ya es Staff", List.of("Ya es un Staff"));
         }
 
         var admin = _adminRepository.findByUserId(staff.getUser().getId()).orElseThrow(() ->
-                new BaseException("User not found", List.of("User does not exist"))
+                new BaseException("Usuario no encontrado", List.of("El usuario no existe"))
         );
 
         var user = admin.getUser();
@@ -80,11 +80,11 @@ public class StaffCreatorService {
 
     public void createFromParticipant(String userId, String role) {
         if (_repository.findByUserId(userId) != null) {
-            throw new BaseException("The user is already a Staff", List.of("Already exist as staff"));
+            throw new BaseException("El usuario ya es Staff", List.of("Ya es un Staff"));
         }
 
         var user = _userRepository.findById(userId).orElseThrow(() ->
-                new BaseException("User not found", List.of("User with id: " + userId + " does not exist"))
+                new BaseException("Usuario no encontrado", List.of("El usuario no existe"))
         );
 
         var staff = Staff.create(userId, role, true, user);

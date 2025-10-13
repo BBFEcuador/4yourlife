@@ -17,4 +17,5 @@ public interface TrainingRepository {
     List<Training> findByStartDate(StartDate date);
     List<Training> findByStartDateAndCampus_id(StartDate date,String campusId);
     Optional<Training> findById(String id);
+    Optional<Training> findByNextLevel_Id(String id);
 }

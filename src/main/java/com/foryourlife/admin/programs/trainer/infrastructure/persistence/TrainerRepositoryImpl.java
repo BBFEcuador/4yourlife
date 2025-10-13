@@ -77,6 +77,9 @@ public class TrainerRepositoryImpl implements TrainerRepository {
         if (userDetails == null) {
             throw new BadCredentialsException("Email o contraseña incorrecta");
         }
+        if (!userDetails.getActive()){
+            throw new BadCredentialsException("El entrenador no está activo en la organización");
+        }
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException("Email o contraseña incorrecta");
         }

@@ -3,8 +3,10 @@ package com.foryourlife.admin.programs.trainer.infrastructure.httpControllers;
 import com.foryourlife.admin.programs.trainer.application.TrainerCreatorService;
 import com.foryourlife.admin.programs.trainer.application.TrainerQueryService;
 import com.foryourlife.admin.programs.trainer.application.TrainerLoginService;
+import com.foryourlife.admin.programs.trainer.application.TrainerViewQueryService;
 import com.foryourlife.admin.programs.trainer.domain.LoginTrainerResponse;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
+import com.foryourlife.admin.programs.trainer.domain.TrainerLifeView;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -28,6 +30,9 @@ public class TrainerController {
 
     @Autowired
     private TrainerCreatorService trainerCreateService;
+
+    @Autowired
+    private TrainerViewQueryService trainerViewQueryService;
 
     @PostMapping("")
     public ResponseEntity<?> createTrainer(@Valid @RequestBody TrainerRequest request) {
@@ -100,5 +105,10 @@ public class TrainerController {
     public ResponseEntity<?> disableAdmin(@RequestBody DisableTrainerRequest disabled) {
         trainerCreateService.update(disabled);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/view/life/{id}")
+    public ResponseEntity<TrainerLifeView> getTrainerViewById(@PathVariable String id) {
+        return new ResponseEntity<>(trainerViewQueryService.getTrainerView(id), HttpStatus.OK);
     }
 }

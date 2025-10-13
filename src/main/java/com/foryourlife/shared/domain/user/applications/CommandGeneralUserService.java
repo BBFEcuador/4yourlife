@@ -17,7 +17,7 @@ public class CommandGeneralUserService {
 
     public void save(User user){
         repository.findByEmail(user.getEmail()).ifPresent(user1 -> {
-            throw new BaseException("Email taken", List.of("The email "+user.getEmail()+" is already taken"));
+            throw new BaseException("Usuario ya registrado", List.of("El email "+user.getEmail()+" ya fue registrado"));
         });
         repository.save(user);
     }

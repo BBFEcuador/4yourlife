@@ -10,9 +10,12 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface JPATrainingRepository extends JpaRepository<Training, String> , JpaSpecificationExecutor<Training> {
     List<Training> findByStartDate(StartDate startDate);
     List<Training> findByStartDateAndCampus_id(StartDate startDate,String campusId);
+
+    Optional<Training> findByNextLevel_Id(String nextLevelId);
 }

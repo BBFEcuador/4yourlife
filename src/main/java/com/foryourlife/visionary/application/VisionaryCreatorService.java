@@ -48,18 +48,18 @@ public class VisionaryCreatorService {
     }
 
     public void changeStatus(String visionaryId) {
-        var visionary = repository.findById(visionaryId).orElseThrow(() -> new BaseException("Not Found", List.of()));
+        var visionary = repository.findById(visionaryId).orElseThrow(() -> new BaseException("No encontrado", List.of()));
         visionary.changeStatus();
         repository.save(visionary);
     }
 
     public void createFromAdmin(Visionary visionary) {
         if (repository.findByUserId(visionary.getUser().getId()).isPresent()) {
-            throw new BaseException("The user is already a Visionary", List.of("Already exist as visionary"));
+            throw new BaseException("El usuario ya es un Visionario", List.of("Ya es un Visionario"));
         }
 
         var admin = _adminRepository.findByUserId(visionary.getUser().getId()).orElseThrow(() ->
-                new BaseException("User not found", List.of("User does not exist"))
+                new BaseException("Usuario no encontrado", List.of("El usuario no existe"))
         );
 
         var user = admin.getUser();
@@ -70,11 +70,11 @@ public class VisionaryCreatorService {
 
     public void createFromParticipant(String userId, String role) {
         if (repository.findByUserId(userId).isPresent()) {
-            throw new BaseException("The user is already a Visionary", List.of("Already exist as visionary"));
+            throw new BaseException("El usuario ya es un Visionario", List.of("Ya es un Visionario"));
         }
 
         var user = userRepository.findById(userId).orElseThrow(() ->
-                new BaseException("User not found", List.of("User does not exist"))
+                new BaseException("Usuario no encontrado", List.of("El usuario no existe"))
         );
 
         var visionary = Visionary.create(userId, role, true, user);

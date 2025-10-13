@@ -64,4 +64,9 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     public Optional<Training> findById(String id) {
         return this.repository.findById(id);
     }
+
+    @Override
+    public Optional<Training> findByNextLevel_Id(String id) {
+        return this.repository.findByNextLevel_Id(id);
+    }
 }

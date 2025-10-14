@@ -26,9 +26,9 @@ public class AddOriginalTeamOnTeamAssigned {
     @Transactional
     public void on(TeamToTrainingAssigned event) {
         var training = trainingRepository.findById(event.getTraining().getId())
-                .orElseThrow(() -> new RuntimeException("Training not found: " + event.getTraining().getId()));
+                .orElseThrow(() -> new RuntimeException("Entrenamiento no encontrado: " + event.getTraining().getId()));
         var team = teamRepository.findById(event.getTeam().getId())
-                .orElseThrow(() -> new RuntimeException("Team not found: " + event.getTeam().getId()));
+                .orElseThrow(() -> new RuntimeException("Equipo no encontrado: " + event.getTeam().getId()));
 
         Hibernate.initialize(team.getStaffs());
         Hibernate.initialize(team.getVisionaries());

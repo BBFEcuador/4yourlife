@@ -25,7 +25,7 @@ public class QueryCampusService {
     public Campus findById(String id) {
         return this._campusRepository.findById(id)
                 .orElseThrow(() ->
-                    new BaseException("Not found",List.of("The campus with id "+id+" does not exist"))
+                    new BaseException("No encontrado",List.of("El campus no existe"))
                 );
     }
 }

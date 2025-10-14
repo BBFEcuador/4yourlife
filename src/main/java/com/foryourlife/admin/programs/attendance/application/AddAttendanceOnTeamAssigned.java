@@ -36,7 +36,7 @@ public class AddAttendanceOnTeamAssigned {
     @Transactional
     public void on(TeamToTrainingAssigned event) {
         var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow(() -> new RuntimeException(""));
-        var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException("Not team found"));
+        var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
         team.getUsers().forEach(user -> {
             switch (training.getCourseLevel()) {
                 case CourseLevel.FOCUS:

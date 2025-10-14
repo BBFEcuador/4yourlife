@@ -26,7 +26,7 @@ public class QueryTeamService {
     @Transactional
     public Team getTeamById(String id) {
         var team =  this._teamRepository.findById(id).orElseThrow(
-                () -> new BaseException("Not found", List.of("The team with id " + id + " does not exist")));
+                () -> new BaseException("No encontrado", List.of("El equipo no existe")) );
         Hibernate.initialize(team.getStaffs());
         Hibernate.initialize(team.getMasterLife());
         Hibernate.initialize(team.getVisionaries());

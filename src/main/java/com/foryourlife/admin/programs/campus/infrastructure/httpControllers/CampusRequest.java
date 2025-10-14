@@ -10,7 +10,7 @@ import java.util.UUID;
 public class CampusRequest {
     public String id;
     @NotNull
-    @NotBlank(message = "The country field is required")
+    @NotBlank(message = "El país es requerido")
     public String country;
     @NotNull
     @NotBlank(message = "La ciudad es requerida")

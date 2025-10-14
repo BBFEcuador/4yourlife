@@ -30,7 +30,7 @@ public class TrainerCreatorService {
     }
 
     public void update(DisableTrainerRequest adminReq) {
-        var admin = this.repository.findTrainerById(adminReq.getId()).orElseThrow(() -> new BaseException("Admin not found", List.of()));
+        var admin = this.repository.findTrainerById(adminReq.getId()).orElseThrow(() -> new BaseException("Entrenador no encontrado", List.of()));
         admin.setActive(adminReq.isActive());
         repository.saveTrainer(admin);
     }

@@ -63,7 +63,7 @@ public class CommandTeamService {
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
-                throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
+                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getName() + " ya tiene un equipo"));
             }
             if (p.getModules().getHasLife()) return p;
             return null;
@@ -94,7 +94,7 @@ public class CommandTeamService {
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
-                throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
+                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getName() + " ya tiene un equipo"));
             }
             return p;
         }).toList();
@@ -128,7 +128,7 @@ public class CommandTeamService {
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
-                throw new BaseException("User not available", List.of("The user " + p.getName() + " has team"));
+                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getName() + " ya tiene un equipo"));
             }
             if (p.getModules().getHasYour()) return p;
             return null;
@@ -156,20 +156,20 @@ public class CommandTeamService {
 
     public void update(Team team) {
         this._teamRepository.findById(team.getId())
-                .orElseThrow(() -> new BaseException("Team not found", List.of("")));
+                .orElseThrow(() -> new BaseException("Equipo no encontrado", List.of("")));
         this._teamRepository.save(team);
     }
 
     public void assignParticipants(String teamId, String userId) {
         var team = _teamRepository.findById(teamId);
         if (team.isEmpty()) {
-            throw new BaseException("Team not found", List.of(""));
+            throw new BaseException("Equipo no encontrado", List.of(""));
         } else if (_participantRepository.findById(userId).isEmpty()) {
-            throw new BaseException("User not found", List.of(""));
+            throw new BaseException("Usuario no encontrado", List.of(""));
         }
         team.orElseThrow().getUsers().forEach(user -> {
             if (user.getId().equals(userId)) {
-                throw new BaseException("User already assigned", List.of(""));
+                throw new BaseException("El usuario ya fue asignado", List.of(""));
             }
         });
         _teamRepository.assignParticipants(teamId, userId);
@@ -178,7 +178,7 @@ public class CommandTeamService {
 
     public void assignMastersLife(String teamId, String userId) {
         if (this._teamRepository.findById(teamId).isEmpty()) {
-            throw new BaseException("Team not found", List.of(""));
+            throw new BaseException("Equipo no encontrado", List.of(""));
         }
         MasterLife user = queryMasterLifeService.findById(userId);
         _teamRepository.assignMastersLife(teamId, userId);
@@ -186,9 +186,9 @@ public class CommandTeamService {
 
     public void removeParticipants(String teamId, String userId, Boolean lingerer, Boolean desertor) {
         if (this._teamRepository.findById(teamId).isEmpty()) {
-            throw new BaseException("Team not found", List.of(""));
+            throw new BaseException("Equipo no encontrado", List.of(""));
         } else if (_participantRepository.findById(userId).isEmpty()) {
-            throw new BaseException("User not found", List.of(""));
+            throw new BaseException("Usuario no encontrado", List.of(""));
         }
 
         var user = _participantRepository.findById(userId).get();
@@ -200,9 +200,9 @@ public class CommandTeamService {
 
     public void removeMastersLife(String teamId, String userId) {
         if (this._teamRepository.findById(teamId).isEmpty()) {
-            throw new BaseException("Team not found", List.of(""));
+            throw new BaseException("Equipo no encontrado", List.of(""));
         } else if (_participantRepository.findById(userId).isEmpty()) {
-            throw new BaseException("User not found", List.of(""));
+            throw new BaseException("Usuario no encontrado", List.of(""));
         }
         _teamRepository.removeMastersLife(teamId, userId);
     }

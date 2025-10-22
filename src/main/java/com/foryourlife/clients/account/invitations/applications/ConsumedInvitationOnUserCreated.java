@@ -32,7 +32,7 @@ public class ConsumedInvitationOnUserCreated {
         enrolledUserList.add(new EnrolledUsers(event.getUser().getId(), LocalDate.now(), event.getUser().getName()));
         token.setUsers(enrolledUserList);
         if (!token.getAdmin()){
-            var promise = promiseRepository.findLastByParticipant(event.getUser().getId());
+            var promise = promiseRepository.findLastByParticipant(token.getSenderId());
             if (promise.isPresent()) {
                 promise.get().setAchievedCount(promise.get().getAchievedCount() + 1);
                 promiseRepository.save(promise.get());

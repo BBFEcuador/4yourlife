@@ -62,7 +62,7 @@ public class OnPaymentCreated {
                     promiseRepository.save(promise);
                 }
             }
-            var prod = productFinderService.findById(product.getId());
+            var prod = event.getPayment().getProducts().getFirst();
 
             prod.getPrograms().forEach(program -> {
                 switch (program.getCourseLevel()) {

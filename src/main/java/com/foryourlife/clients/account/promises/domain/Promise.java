@@ -16,23 +16,23 @@ public class Promise {
     @Column(
             name = "first_promise"
     )
-    private Integer firstPromise;
+    private Integer firstPromise = 1;
     @Column(
             name = "second_promise"
     )
-    private Integer secondPromise;
+    private Integer secondPromise = 1;
     @Column(
             name = "third_promise"
     )
-    private Integer thirdPromise;
+    private Integer thirdPromise = 1;
     @Column(
             name = "achieved_count"
     )
-    private Integer achievedCount;
+    private Integer achievedCount = 0;
     @Column(
             name = "paid_count"
     )
-    private Integer paidCount;
+    private Integer paidCount = 0;
     @Column(
             name = "start_date"
     )

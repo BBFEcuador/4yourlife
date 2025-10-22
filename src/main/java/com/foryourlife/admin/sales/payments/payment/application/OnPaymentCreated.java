@@ -1,6 +1,5 @@
 package com.foryourlife.admin.sales.payments.payment.application;
 
-import com.foryourlife.admin.sales.product.application.ProductFinderService;
 import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.participant.domain.Participant;
@@ -22,15 +21,13 @@ import java.util.List;
 @DomainEventSubscriber(value = {PaymentCreated.class})
 public class OnPaymentCreated {
 
-    private final ProductFinderService productFinderService;
     private final ClientModuleCreatorService clientModuleCreatorService;
     private final ParticipantRepository participantRepository;
     private final ParticipantLevelService participantLevelRepository;
     private final QueryInvitationServices queryInvitationServices;
     private final PromiseRepository promiseRepository;
 
-    public OnPaymentCreated(ProductFinderService productFinderService, ClientModuleCreatorService clientModuleCreatorService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository) {
-        this.productFinderService = productFinderService;
+    public OnPaymentCreated(ClientModuleCreatorService clientModuleCreatorService, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository) {
         this.clientModuleCreatorService = clientModuleCreatorService;
         this.participantRepository = participantRepository;
         this.participantLevelRepository = participantLevelRepository;

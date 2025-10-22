@@ -144,7 +144,8 @@ public class CashDrawerCommandService {
             return pdf;
         } catch (Exception e) {
             throw new BaseException("Error generating invoice", List.of(e.getMessage()));
-        }    }
+        }
+    }
 
     public void forgetPin(String id){
         var cashDrawer = repository.getById(id).orElseThrow(

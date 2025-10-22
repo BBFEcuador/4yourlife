@@ -6,7 +6,6 @@ import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.PaymentMethodSummary;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.application.CashDrawerDetailQueryService;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
-import com.foryourlife.admin.sales.payments.payment.application.QueryPaymentService;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -15,9 +14,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import java.io.ByteArrayOutputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class JPACashDrawerRepository implements CashDrawerRepository {

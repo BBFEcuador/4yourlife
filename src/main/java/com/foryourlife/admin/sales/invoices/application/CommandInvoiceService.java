@@ -7,7 +7,6 @@ import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
-import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;

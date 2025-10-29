@@ -95,7 +95,7 @@ public class AdminRepositoryImpl implements AdminRepository {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BaseException("Login Error", List.of("El usuario " + email + " no existe.")));
         var admin = repository.findByUser_id(user.getId())
-                .orElseThrow(() -> new BaseException("Login Error", List.of("El usuario \" + email + \" no existe.")));
+                .orElseThrow(() -> new BaseException("Login Error", List.of("El usuario " + email + " no existe.")));
         loadAdmin = admin;
         return admin;
     }

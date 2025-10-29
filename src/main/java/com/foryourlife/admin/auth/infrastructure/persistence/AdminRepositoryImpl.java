@@ -88,6 +88,9 @@ public class AdminRepositoryImpl implements AdminRepository {
             throw new BadCredentialsException("Email o contraseña incorrecta");
         }
         authorityList.add(new SimpleGrantedAuthority(userDetails.getRole().getType()));
+        userDetails.getRole().getPermissions().forEach(permission -> {
+            authorityList.add(new SimpleGrantedAuthority(permission.getName()));
+        });
         return new UsernamePasswordAuthenticationToken(username, password, authorityList);
     }
 

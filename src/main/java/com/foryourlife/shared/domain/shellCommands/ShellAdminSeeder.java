@@ -167,12 +167,17 @@ public class ShellAdminSeeder {
     private void createAdminTestUser() {
         for (int i = 1; i < 21; i++) {
             var email = "adminuser" + i + "@admin.com";
-            if (repository.findByEmail(email).isEmpty()) {
+            var testUser = repository.findByEmail(email);
+            if (testUser.isEmpty()) {
                 repository.save(
                         new Admin(UUID.randomUUID().toString(), new User(UUID.randomUUID().toString(), email, passwordEncoder.encode("FocusYourLife2025--"), "Usuario", "", "Test", "", "Usuario test" + i, "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))),
-                        adminRoleRepository.findById("c1b2a3d4-e5f6-7890-1234-56789abcdef0").orElseThrow(),
-                        new HashSet<>(campusRepository.getAll()), true)
+                                adminRoleRepository.findById("c1b2a3d4-e5f6-7890-1234-56789abcdef0").orElseThrow(),
+                                new HashSet<>(campusRepository.getAll()), true)
                 );
+            } else {
+                new Admin(testUser.get().getId(), new User(UUID.randomUUID().toString(), email, passwordEncoder.encode("FocusYourLife2025--"), "Usuario", "", "Test", "", "Usuario test" + i, "0999999999", List.of(new UserEntities("3936ae5e-0cc1-4375-abc7-520d16999110", "ADMIN"))),
+                        adminRoleRepository.findById("c1b2a3d4-e5f6-7890-1234-56789abcdef0").orElseThrow(),
+                        new HashSet<>(campusRepository.getAll()), true);
             }
         }
     }

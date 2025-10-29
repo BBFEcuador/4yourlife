@@ -1,6 +1,5 @@
 package com.foryourlife.admin.auth.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.permission.domain.Permission;
 import jakarta.persistence.*;
 

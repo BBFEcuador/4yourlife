@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface JPAParticipantRepository extends JpaRepository<Participant, String>, JpaSpecificationExecutor<Participant> {
     Optional<Participant> findByUser_email(String email);
-    Participant findByUser_Id(String userId);
+    Optional<Participant> findByUser_Id(String userId);
 }

@@ -124,7 +124,8 @@ public class ShellAdminSeeder {
                                 List.of(
                                         new UserEntities(
                                                 "3936ae5e-0cc1-4375-abc7-520d16999110",
-                                                "ADMIN"))),
+                                                "ADMIN"))
+                        ),
                         adminRoleRepository.findById("f4dddf05-8fec-4551-8d93-d6309c17c206").orElseThrow(),
                         new HashSet<>(campusRepository.getAll()), true));
         repository.save(

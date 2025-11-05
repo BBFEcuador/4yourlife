@@ -69,7 +69,7 @@ public class CommandPaymentService {
     public String save(PaymentRequest paymentReq) {
 
         boolean hasPendingPayments = _paymentRepository.existsByParticipantIdAndStatus(paymentReq.participant, PaymentStatus.PENDING);
-        var participant = participantQueryService.getUserById(paymentReq.participant);
+        var participant = participantQueryService.getParticipantById(paymentReq.participant);
 
         if (hasPendingPayments) {
             throw new BaseException("No se puede adquirir el servicio, existen pagos pendientes", List.of(""));
@@ -288,7 +288,7 @@ public class CommandPaymentService {
         if (paymentReq.id == null || paymentReq.id.isEmpty()) {
             throw new IllegalArgumentException("No se puede actualizar, el id de pago es requerido");
         }
-        var participant = participantQueryService.getUserById(paymentReq.participant);
+        var participant = participantQueryService.getParticipantById(paymentReq.participant);
         List<Product> products = new ArrayList<>(List.of());
         paymentReq.products.forEach(productId -> {
             var product = _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));

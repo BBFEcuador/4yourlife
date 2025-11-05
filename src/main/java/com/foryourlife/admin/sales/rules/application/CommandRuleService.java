@@ -36,14 +36,14 @@ public class CommandRuleService {
     }
 
     public List<Rule> getApplicableRules(String userId, String productId, RuleContext context) {
-        Participant participant = participantRepository.findByUserId(userId);
-        if (participant == null) {
+        var participant = participantRepository.findByUserId(userId);
+        if (participant.isEmpty()) {
             throw new BaseException("No se encontró participante para el usuario.",
                     List.of("No se encontró participante con el id " + userId));
         }
 
-        User user = participant.getUser();
-        CourseLevel courseLevel = participant.getParticipantLevel().getCourseLevel();
+        var user = participant.get().getUser();
+        CourseLevel courseLevel = participant.get().getParticipantLevel().getCourseLevel();
 
         List<Rule> rules = _ruleRepository.findAllByProductIdAndEnabledTrue(productId);
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.participant.domain.Participant;
+import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -16,23 +17,23 @@ public class Promise {
     @Column(
             name = "first_promise"
     )
-    private Integer firstPromise;
+    private Integer firstPromise = 0;
     @Column(
             name = "second_promise"
     )
-    private Integer secondPromise;
+    private Integer secondPromise = 0;
     @Column(
             name = "third_promise"
     )
-    private Integer thirdPromise;
+    private Integer thirdPromise = 0;
     @Column(
             name = "achieved_count"
     )
-    private Integer achievedCount;
+    private Integer achievedCount = 0;
     @Column(
             name = "paid_count"
     )
-    private Integer paidCount;
+    private Integer paidCount = 0;
     @Column(
             name = "start_date"
     )
@@ -49,7 +50,7 @@ public class Promise {
             name = "participant_id",
             referencedColumnName = "id"
     )
-    private Participant participant;
+    private User user;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(
@@ -61,10 +62,10 @@ public class Promise {
     protected Promise() {
     }
 
-    public Promise(String id, Training training, Participant participant) {
+    public Promise(String id, Training training, User user) {
         this.id = id;
         this.training = training;
-        this.participant = participant;
+        this.user = user;
     }
 
     public String getId() {
@@ -115,12 +116,12 @@ public class Promise {
         this.paidCount = paidCount;
     }
 
-    public Participant getParticipant() {
-        return participant;
+    public User getUser() {
+        return user;
     }
 
-    public void setParticipant(Participant participant) {
-        this.participant = participant;
+    public void setUser(User participant) {
+        this.user = participant;
     }
 
     public Training getTraining() {

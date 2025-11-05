@@ -46,7 +46,7 @@ public class PromiseCommandService {
             Promise promise = new Promise(
                     UUID.randomUUID().toString(),
                     it.getTeam().getTraining(),
-                    it
+                    it.getUser()
             );
             LocalDate today = LocalDate.now();
             promise.setStartDate(team.getTraining().getEndDate().plusDays(1));

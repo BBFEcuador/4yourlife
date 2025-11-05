@@ -9,6 +9,7 @@ import com.foryourlife.clients.account.invitations.infrastructure.InvitationRequ
 import com.foryourlife.clients.account.participant.application.ParticipantCommandService;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.user.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,20 +21,22 @@ import java.util.UUID;
 public class CommandInvitationService {
     private final InvitationRepository repository;
     private final ParticipantQueryService participantQueryService;
+    private final UserRepository userRepository;
     private final QueryCampusService campusService;
     private final AdminFinderService adminFinderService;
     private final Logger logger = LoggerFactory.getLogger(ParticipantCommandService.class);
 
-    public CommandInvitationService(InvitationRepository repository, ParticipantQueryService participantQueryService, QueryCampusService campusService, AdminFinderService adminFinderService) {
+    public CommandInvitationService(InvitationRepository repository, ParticipantQueryService participantQueryService, UserRepository userRepository, QueryCampusService campusService, AdminFinderService adminFinderService) {
         this.repository = repository;
         this.participantQueryService = participantQueryService;
+        this.userRepository = userRepository;
         this.campusService = campusService;
         this.adminFinderService = adminFinderService;
     }
 
     public String createInvitationByUser(String id, String campusId) {
         try {
-            var user = participantQueryService.getUserById(id);
+            var user = participantQueryService.getParticipantById(id);
             var token = UUID.randomUUID().toString();
             var campus = campusService.findById(campusId);
             var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, id, new Sender(user.getId(), user.getName(), user.getPhone()), 1, campus);
@@ -58,7 +61,14 @@ public class CommandInvitationService {
         var user = adminFinderService.findById(request.id);
         var token = UUID.randomUUID().toString();
         var campus = campusService.findById(request.campusId);
-        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, request.id, new Sender(user.getId(), user.getName(), user.getEmail()), Integer.parseInt(request.quantity), campus);
+        var invitation = Invitation.create(
+                UUID.randomUUID().toString(),
+                token,
+                null,
+                true,
+                request.id,
+                new Sender(user.getId(), user.getName(), user.getEmail()), Integer.parseInt(request.quantity)
+                , campus);
         this.repository.save(invitation);
         return token;
     }
@@ -70,10 +80,20 @@ public class CommandInvitationService {
         if (invitations) {
             throw new BaseException("Tiene invitacion activa", List.of());
         }
-        var user = participantQueryService.getUserById(userId);
+        var user = userRepository.findById(userId).orElseThrow(
+                () -> new BaseException("Usuario no encontrado", List.of())
+        );
+        var participant = participantQueryService.getByUserId(userId);
         var token = UUID.randomUUID().toString();
-        var campus = campusService.findById(user.getCampus().getId());
-        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, userId, new Sender(user.getId(), user.getName(), user.getPhone()), Integer.parseInt(quantity),campus);
+        var campus = campusService.findById(participant.getCampus().getId());
+        var invitation = Invitation.create(
+                UUID.randomUUID().toString(),
+                token,
+                null,
+                false,
+                userId,
+                new Sender(user.getId(), user.getName(), user.getPhone()),
+                Integer.parseInt(quantity),campus);
         this.repository.save(invitation);
         return token;
     }

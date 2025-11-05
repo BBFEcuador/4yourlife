@@ -49,8 +49,8 @@ public class JPAPromiseRepository implements PromiseRepository {
     }
 
     @Override
-    public Optional<Promise> findLastByParticipant(String participantId) {
+    public Optional<Promise> findLastByUserId(String userId) {
         LocalDate today = LocalDate.now();
-        return this.jpaImplPromiseRepository.findFirstByParticipant_IdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByStartDateDesc(participantId, today, today);
+        return this.jpaImplPromiseRepository.findFirstByUser_IdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByStartDateDesc(userId, today, today);
     }
 }

@@ -22,5 +22,5 @@ public interface ParticipantRepository {
 
     void save(Participant user);
 
-    Participant findByUserId(String userId);
+    Optional<Participant> findByUserId(String userId);
 }

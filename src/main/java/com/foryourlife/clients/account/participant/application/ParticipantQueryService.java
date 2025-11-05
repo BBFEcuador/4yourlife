@@ -22,7 +22,7 @@ public class ParticipantQueryService {
         this._participantRepository = _participantRepository;
     }
 
-    public Participant getUserById(String id) {
+    public Participant getParticipantById(String id) {
         return this._participantRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The participant Id: " + id + " doesn't exist."));
 
     }
@@ -41,4 +41,7 @@ public class ParticipantQueryService {
         return this._participantRepository.match(criteria);
     }
 
+    public Participant getByUserId(String userId) {
+        return this._participantRepository.findByUserId(userId).orElseThrow(() -> new UserNotFoundException("The user Id: " + userId + " doesn't exist."));
+    }
 }

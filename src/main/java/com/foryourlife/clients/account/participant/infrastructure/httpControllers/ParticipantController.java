@@ -61,7 +61,7 @@ public class ParticipantController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> getUser(@PathVariable String id) {
-        return new ResponseEntity<>(participantQueryService.getUserById(id), HttpStatus.OK);
+        return new ResponseEntity<>(participantQueryService.getParticipantById(id), HttpStatus.OK);
     }
 
     @PutMapping("")

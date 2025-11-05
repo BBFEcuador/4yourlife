@@ -44,11 +44,14 @@ public class RemoveParticipantOnNullAttend {
         if (attendance.getSundayAttendance() == null) attendance.setSundayAttendance(AttendanceStatus.NO_ASISTIO);
 
         attendance.setActive(false);
-        user.setIsDesertor(true);
-        user.setIsLingerer(true);
-        team.removeUser(user);
+        var participant = participantRepository.findByUserId(user.getId());
+        if (participant.isPresent()) {
+            participant.get().setIsDesertor(true);
+            participant.get().setIsLingerer(true);
+            team.removeUser(participant.get());
+            participantRepository.save(participant.get());
+        }
         teamRepository.save(team);
-        participantRepository.save(user);
         attendanceRepository.save(attendance);
     }
 }

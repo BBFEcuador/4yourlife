@@ -6,6 +6,7 @@ import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.OnNullDesistedAttend;
+import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 
 @Entity
@@ -24,7 +25,7 @@ public class Attendance extends AggregateRoot {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"user", "participantLevel", "campus", "modules", "contacts", "medicalRecord"})
-    private Participant participant;
+    private User user;
     @ManyToOne
     @JoinColumn(name = "training_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"nextLevel", "campus", "originalTeam"})
@@ -36,17 +37,17 @@ public class Attendance extends AggregateRoot {
     public Attendance() {
     }
 
-    private Attendance(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, Participant userId, Training trainingId) {
+    private Attendance(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, User userId, Training trainingId) {
         this.id = id;
         this.fridayAttendance = fridayAttendance;
         this.saturdayAttendance = saturdayAttendance;
         this.sundayAttendance = sundayAttendance;
         this.stage = stage;
-        this.participant = userId;
+        this.user = userId;
         this.training = trainingId;
     }
 
-    public static Attendance create(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, Participant userId, Training trainingId) {
+    public static Attendance create(String id, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, FylStage stage, User userId, Training trainingId) {
         return new Attendance(id, fridayAttendance, saturdayAttendance, sundayAttendance, stage, userId, trainingId);
     }
 
@@ -70,8 +71,8 @@ public class Attendance extends AggregateRoot {
         return stage;
     }
 
-    public Participant getParticipant() {
-        return participant;
+    public User getUser() {
+        return user;
     }
 
     public Training getTraining() {
@@ -104,7 +105,7 @@ public class Attendance extends AggregateRoot {
             this.fridayAttendance = AttendanceStatus.NO_ASISTIO;
             this.saturdayAttendance = AttendanceStatus.NO_ASISTIO;
             this.sundayAttendance = AttendanceStatus.NO_ASISTIO;
-            this.record(new OnNullDesistedAttend(this.participant.getId(), this.participant, this.training, this));
+            this.record(new OnNullDesistedAttend(this.user.getId(), this.user, this.training, this));
         }
         return unAttendance;
     }

@@ -2,7 +2,6 @@ package com.foryourlife.clients.account.invitations.applications;
 
 import com.foryourlife.clients.account.invitations.domain.EnrolledUsers;
 import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
-import com.foryourlife.clients.account.promises.application.PromiseQueryService;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.bus.DomainEventSubscriber;
 import com.foryourlife.shared.domain.events.UserCreated;
@@ -32,7 +31,7 @@ public class ConsumedInvitationOnUserCreated {
         enrolledUserList.add(new EnrolledUsers(event.getUser().getId(), LocalDate.now(), event.getUser().getName()));
         token.setUsers(enrolledUserList);
         if (!token.getAdmin()){
-            var promise = promiseRepository.findLastByParticipant(event.getUser().getId());
+            var promise = promiseRepository.findLastByUserId(event.getUser().getId());
             if (promise.isPresent()) {
                 promise.get().setAchievedCount(promise.get().getAchievedCount() + 1);
                 promiseRepository.save(promise.get());

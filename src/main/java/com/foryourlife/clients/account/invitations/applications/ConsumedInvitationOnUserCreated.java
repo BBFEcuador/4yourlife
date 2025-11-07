@@ -25,13 +25,13 @@ public class ConsumedInvitationOnUserCreated {
     @Async
     @EventListener
     public void on(UserCreated event) {
-        var token = repository.findByToken(event.getUser().getInvitationToken()).orElseThrow();
+        var token = repository.findByToken(event.getParticipant().getInvitationToken()).orElseThrow();
         token.consumeToken();
         var enrolledUserList = token.getUsers();
-        enrolledUserList.add(new EnrolledUsers(event.getUser().getId(), LocalDate.now(), event.getUser().getName()));
+        enrolledUserList.add(new EnrolledUsers(event.getParticipant().getId(), LocalDate.now(), event.getParticipant().getName()));
         token.setUsers(enrolledUserList);
         if (!token.getAdmin()){
-            var promise = promiseRepository.findLastByUserId(event.getUser().getId());
+            var promise = promiseRepository.findLastByUserId(event.getParticipant().getUser().getId());
             if (promise.isPresent()) {
                 promise.get().setAchievedCount(promise.get().getAchievedCount() + 1);
                 promiseRepository.save(promise.get());

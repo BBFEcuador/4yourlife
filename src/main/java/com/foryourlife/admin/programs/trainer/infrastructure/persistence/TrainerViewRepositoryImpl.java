@@ -3,6 +3,7 @@ package com.foryourlife.admin.programs.trainer.infrastructure.persistence;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.trainer.domain.*;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
@@ -24,11 +25,13 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
     private final TrainingRepository jpaTrainingRepository;
     private final AttendanceRepository attendanceRepository;
     private final PromiseRepository promiseRepository;
+    private final TeamRepository teamRepository;
 
-    public TrainerViewRepositoryImpl(TrainingRepository jpaTrainingRepository, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository) {
+    public TrainerViewRepositoryImpl(TrainingRepository jpaTrainingRepository, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, TeamRepository teamRepository) {
         this.jpaTrainingRepository = jpaTrainingRepository;
         this.attendanceRepository = attendanceRepository;
         this.promiseRepository = promiseRepository;
+        this.teamRepository = teamRepository;
     }
 
     @Override
@@ -60,6 +63,7 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
     private TrainerLifeView buildTrainingDashboard(Training training) {
         if (training == null) return null;
 
+        var team = teamRepository.findByTrainingId(training.getId()).orElseThrow(() -> new BaseException("Equipo no encontrado para el entrenamiento: " + training.getName(), List.of()));
         List<Attendance> attendances = attendanceRepository.findAttendanceByTraining(training.getId());
         List<Promise> promises = promiseRepository.findByTrainingId(training.getId());
 
@@ -90,7 +94,7 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
 
         return new TrainerLifeView(
                 training.getName(),
-                training.getOriginalTeam().getTrainer().getName() != null ? training.getOriginalTeam().getTrainer().getName() : "Sin Asignar",
+                team.getTrainer().getName(),
                 attendanceDashboard,
                 promiseDashboard,
                 userDashboards

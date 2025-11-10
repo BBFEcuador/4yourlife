@@ -23,7 +23,7 @@ public class Trainer {
     private Boolean isActive;
 
     @JsonIgnoreProperties({"trainer"})
-    @OneToMany(mappedBy = "trainer", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY)
     private List<Team> teams;
 
     protected Trainer() {

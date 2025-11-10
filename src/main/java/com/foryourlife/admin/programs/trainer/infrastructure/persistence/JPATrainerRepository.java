@@ -46,5 +46,5 @@ public interface JPATrainerRepository extends JpaRepository<Trainer, String>, Jp
             """)
     boolean isTrainerAvailable(String trainerId, LocalDate startDate, LocalDate endDate, String newTrainingId);
 
-    Optional<Object> findByEmail(String email);
+    Optional<Trainer> findByEmail(String email);
 }

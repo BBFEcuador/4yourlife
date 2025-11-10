@@ -63,5 +63,23 @@ public class AddAttendanceOnTeamAssigned {
                     break;
             }
         });
+
+        team.getMasterLife().forEach(masterLife -> {
+            switch (training.getCourseLevel()) {
+                case CourseLevel.LIFE:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_1, masterLife.getUser(), training));
+                    break;
+                case CourseLevel.LIFE_2:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_2, masterLife.getUser(), training));
+                    break;
+                case CourseLevel.LIFE_3:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_3, masterLife.getUser(), training));
+                    break;
+                case CourseLevel.LIFE_GRADUATE:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_GRADUATE, masterLife.getUser(), training));
+                    break;
+            }
+        });
+
     }
 }

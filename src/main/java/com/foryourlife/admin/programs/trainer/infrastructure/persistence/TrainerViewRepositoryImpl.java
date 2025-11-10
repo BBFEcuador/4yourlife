@@ -10,11 +10,13 @@ import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.shared.domain.user.UserType;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,9 +90,7 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
 
         return new TrainerLifeView(
                 training.getName(),
-                training.getOriginalTeam() != null && training.getOriginalTeam().getTrainer() != null
-                        ? training.getOriginalTeam().getTrainer().getName()
-                        : "Sin entrenador",
+                training.getOriginalTeam().getTrainer().getName(),
                 attendanceDashboard,
                 promiseDashboard,
                 userDashboards
@@ -99,33 +99,81 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
 
     private AttendanceDashboard buildAttendanceDashboard(List<Attendance> attendances) {
         if (attendances == null || attendances.isEmpty()) {
-            return new AttendanceDashboard(0, 0, 0, 0);
+            return new AttendanceDashboard(0, 0, 0, 0, 0, 0, 0, 0);
         }
 
-        long fridayCount = attendances.stream()
-                .filter(a -> a.getFridayAttendance() == AttendanceStatus.ASISTIO)
-                .count();
-        long saturdayCount = attendances.stream()
-                .filter(a -> a.getSaturdayAttendance() == AttendanceStatus.ASISTIO)
-                .count();
-        long sundayCount = attendances.stream()
-                .filter(a -> a.getSundayAttendance() == AttendanceStatus.ASISTIO)
-                .count();
+        Predicate<Attendance> isParticipant = a ->
+                a.getUser() != null &&
+                        a.getUser().getEntityMap() != null &&
+                        a.getUser().getEntityMap().stream()
+                                .anyMatch(e -> e.getEntity().equals(UserType.PARTICIPANT.name()));
 
-        return new AttendanceDashboard(fridayCount, saturdayCount, sundayCount, attendances.size());
+        Predicate<Attendance> isMasterLife = a ->
+                a.getUser() != null &&
+                        a.getUser().getEntityMap() != null &&
+                        a.getUser().getEntityMap().stream()
+                                .anyMatch(e -> e.getEntity().equals(UserType.MASTER_LIFE.name()));
+
+        long fridayCount = attendances.stream().filter(isParticipant).filter(a -> a.getFridayAttendance() == AttendanceStatus.ASISTIO).count();
+        long saturdayCount = attendances.stream().filter(isParticipant).filter(a -> a.getSaturdayAttendance() == AttendanceStatus.ASISTIO).count();
+        long sundayCount = attendances.stream().filter(isParticipant).filter(a -> a.getSundayAttendance() == AttendanceStatus.ASISTIO).count();
+
+        long masterFridayCount = attendances.stream().filter(isMasterLife).filter(a -> a.getFridayAttendance() == AttendanceStatus.ASISTIO).count();
+        long masterSaturdayCount = attendances.stream().filter(isMasterLife).filter(a -> a.getSaturdayAttendance() == AttendanceStatus.ASISTIO).count();
+        long masterSundayCount = attendances.stream().filter(isMasterLife).filter(a -> a.getSundayAttendance() == AttendanceStatus.ASISTIO).count();
+
+        long totalParticipants = fridayCount + saturdayCount + sundayCount;
+        long totalMasterParticipants = masterFridayCount + masterSaturdayCount + masterSundayCount;
+
+        return new AttendanceDashboard(
+                fridayCount,
+                saturdayCount,
+                sundayCount,
+                totalParticipants,
+                masterFridayCount,
+                masterSaturdayCount,
+                masterSundayCount,
+                totalMasterParticipants
+        );
     }
 
     private PromiseDashboard buildPromiseDashboard(List<Promise> promises) {
         if (promises == null || promises.isEmpty()) {
-            return new PromiseDashboard(0, 0, 0, 0, 0);
+            return new PromiseDashboard(0, 0, 0, 0, 0, 0, 0, 0);
         }
 
-        int totalFirst = promises.stream().mapToInt(Promise::getFirstPromise).sum();
-        int totalSecond = promises.stream().mapToInt(Promise::getSecondPromise).sum();
-        int totalThird = promises.stream().mapToInt(Promise::getThirdPromise).sum();
-        int totalAchieved = promises.stream().mapToInt(Promise::getAchievedCount).sum();
-        int totalPaid = promises.stream().mapToInt(Promise::getPaidCount).sum();
+        Predicate<Promise> isParticipant = p ->
+                p.getUser() != null &&
+                        p.getUser().getEntityMap() != null &&
+                        p.getUser().getEntityMap().stream()
+                                .anyMatch(e -> e.getEntity().equals(UserType.PARTICIPANT.name()));
 
-        return new PromiseDashboard(totalFirst, totalSecond, totalThird, totalAchieved, totalPaid);
+        Predicate<Promise> isMasterLife = p ->
+                p.getUser() != null &&
+                        p.getUser().getEntityMap() != null &&
+                        p.getUser().getEntityMap().stream()
+                                .anyMatch(e -> e.getEntity().equals(UserType.MASTER_LIFE.name()));
+
+        int totalFirst = promises.stream().filter(isParticipant).mapToInt(Promise::getFirstPromise).sum();
+        int totalSecond = promises.stream().filter(isParticipant).mapToInt(Promise::getSecondPromise).sum();
+        int totalThird = promises.stream().filter(isParticipant).mapToInt(Promise::getThirdPromise).sum();
+        int totalAchieved = promises.stream().filter(isParticipant).mapToInt(Promise::getAchievedCount).sum();
+        int totalPaid = promises.stream().filter(isParticipant).mapToInt(Promise::getPaidCount).sum();
+
+        int totalThirdMaster = promises.stream().filter(isMasterLife).mapToInt(Promise::getThirdPromise).sum();
+        int totalAchievedMaster = promises.stream().filter(isMasterLife).mapToInt(Promise::getAchievedCount).sum();
+        int totalPaidMaster = promises.stream().filter(isMasterLife).mapToInt(Promise::getPaidCount).sum();
+
+        return new PromiseDashboard(
+                totalFirst,
+                totalSecond,
+                totalThird,
+                totalThirdMaster,
+                totalAchievedMaster,
+                totalPaidMaster,
+                totalAchieved,
+                totalPaid
+        );
     }
+
 }

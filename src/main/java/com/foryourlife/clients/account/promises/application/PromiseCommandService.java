@@ -48,7 +48,23 @@ public class PromiseCommandService {
                     it.getTeam().getTraining(),
                     it.getUser()
             );
-            LocalDate today = LocalDate.now();
+            promise.setStartDate(team.getTraining().getEndDate().plusDays(1));
+            promise.setEndDate(team.getTraining().getEndDate().plusDays(5));
+
+            this.promiseRepository.save(promise);
+        });
+
+        team.getMasterLife().forEach(it -> {
+            Promise promise = new Promise(
+                    UUID.randomUUID().toString(),
+                    it.getTeams().stream().filter(
+                            teamInMaster -> teamInMaster.getTraining().getId().equals(trainingId)
+                    ).findFirst().orElseThrow(() -> new BaseException(
+                            "El equipo no pertenece al entrenamiento",
+                            List.of("No se encontró el equipo asociado al entrenamiento para el master life.")
+                    )).getTraining(),
+                    it.getUser()
+            );
             promise.setStartDate(team.getTraining().getEndDate().plusDays(1));
             promise.setEndDate(team.getTraining().getEndDate().plusDays(5));
 

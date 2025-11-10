@@ -1,5 +1,6 @@
 package com.foryourlife.admin.programs.training.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.programs.teams.domain.Team;
@@ -73,7 +74,7 @@ public class Training extends AggregateRoot implements Serializable {
             Campus campus,
             Boolean state
     ) {
-        var training = new Training(
+        return new Training(
                 id,
                 number,
                 name,
@@ -84,7 +85,6 @@ public class Training extends AggregateRoot implements Serializable {
                 campus,
                 state
         );
-        return training;
     }
 
     public String getId() {

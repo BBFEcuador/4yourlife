@@ -1,19 +1,15 @@
 package com.foryourlife.admin.programs.trainer.domain;
 
 public class PromiseDashboard {
-    private int totalFirstPromise;
-    private int totalSecondPromise;
-    private int totalThirdPromise;
+    private int totalParticipantPromise;
     private int totalMasterLifePromise;
     private int totalMasterLifeAchieved;
     private int totalMasterLifePaid;
     private int totalAchieved;
     private int totalPaid;
 
-    public PromiseDashboard(int totalFirstPromise, int totalSecondPromise, int totalThirdPromise, int totalMasterLifePromise, int totalMasterLifeAchieved, int totalMasterLifePaid, int totalAchieved, int totalPaid) {
-        this.totalFirstPromise = totalFirstPromise;
-        this.totalSecondPromise = totalSecondPromise;
-        this.totalThirdPromise = totalThirdPromise;
+    public PromiseDashboard(int totalParticipantPromise, int totalMasterLifePromise, int totalMasterLifeAchieved, int totalMasterLifePaid, int totalAchieved, int totalPaid) {
+        this.totalParticipantPromise = totalParticipantPromise;
         this.totalMasterLifePromise = totalMasterLifePromise;
         this.totalMasterLifeAchieved = totalMasterLifeAchieved;
         this.totalMasterLifePaid = totalMasterLifePaid;
@@ -45,28 +41,13 @@ public class PromiseDashboard {
         this.totalMasterLifePaid = totalMasterLifePaid;
     }
 
-    public int getTotalFirstPromise() {
-        return totalFirstPromise;
+
+    public int getTotalParticipantPromise() {
+        return totalParticipantPromise;
     }
 
-    public void setTotalFirstPromise(int totalFirstPromise) {
-        this.totalFirstPromise = totalFirstPromise;
-    }
-
-    public int getTotalSecondPromise() {
-        return totalSecondPromise;
-    }
-
-    public void setTotalSecondPromise(int totalSecondPromise) {
-        this.totalSecondPromise = totalSecondPromise;
-    }
-
-    public int getTotalThirdPromise() {
-        return totalThirdPromise;
-    }
-
-    public void setTotalThirdPromise(int totalThirdPromise) {
-        this.totalThirdPromise = totalThirdPromise;
+    public void setTotalParticipantPromise(int totalParticipantPromise) {
+        this.totalParticipantPromise = totalParticipantPromise;
     }
 
     public int getTotalAchieved() {

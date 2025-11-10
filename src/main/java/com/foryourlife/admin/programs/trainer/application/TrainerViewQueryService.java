@@ -5,6 +5,8 @@ import com.foryourlife.admin.programs.trainer.domain.TrainerRepository;
 import com.foryourlife.admin.programs.trainer.domain.TrainerViewRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TrainerViewQueryService {
     private TrainerViewRepository trainerRepository;
@@ -13,7 +15,7 @@ public class TrainerViewQueryService {
         this.trainerRepository = trainerRepository;
     }
 
-    public TrainerLifeView getTrainerView(String id) {
+    public List<TrainerLifeView> getTrainerView(String id) {
         return trainerRepository.getTrainerLifeViewByTraining(id);
     }
 }

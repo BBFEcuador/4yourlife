@@ -108,7 +108,7 @@ public class TrainerController {
     }
 
     @GetMapping("/view/life/{id}")
-    public ResponseEntity<TrainerLifeView> getTrainerViewById(@PathVariable String id) {
+    public ResponseEntity<List<TrainerLifeView>> getTrainerViewById(@PathVariable String id) {
         return new ResponseEntity<>(trainerViewQueryService.getTrainerView(id), HttpStatus.OK);
     }
 }

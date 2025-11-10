@@ -1,5 +1,7 @@
 package com.foryourlife.admin.programs.trainer.domain;
 
+import java.util.List;
+
 public interface TrainerViewRepository {
-    TrainerLifeView getTrainerLifeViewByTraining(String trainingId);
+    List<TrainerLifeView> getTrainerLifeViewByTraining(String trainingId);
 }

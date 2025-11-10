@@ -1,22 +1,59 @@
 package com.foryourlife.admin.programs.trainer.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.foryourlife.admin.programs.training.domain.Training;
-
 import java.util.List;
 
 public class TrainerLifeView {
-    private List<TrainingDashboardDto> trainingInfo;
+    private String trainingName;
+    private String trainerName;
+    private AttendanceDashboard attendanceDashboard;
+    private PromiseDashboard promiseDashboard;
+    private List<UserDashboardDto> users;
 
-    public TrainerLifeView(List<TrainingDashboardDto> trainingInfo) {
-        this.trainingInfo = trainingInfo;
+    public TrainerLifeView(String trainingName, String trainerName, AttendanceDashboard attendanceDashboard, PromiseDashboard promiseDashboard, List<UserDashboardDto> users) {
+        this.trainingName = trainingName;
+        this.trainerName = trainerName;
+        this.attendanceDashboard = attendanceDashboard;
+        this.promiseDashboard = promiseDashboard;
+        this.users = users;
     }
 
-    public List<TrainingDashboardDto> getTrainingInfo() {
-        return trainingInfo;
+    public String getTrainingName() {
+        return trainingName;
     }
 
-    public void setTrainingInfo(List<TrainingDashboardDto> trainingInfo) {
-        this.trainingInfo = trainingInfo;
+    public void setTrainingName(String trainingName) {
+        this.trainingName = trainingName;
+    }
+
+    public String getTrainerName() {
+        return trainerName;
+    }
+
+    public void setTrainerName(String trainerName) {
+        this.trainerName = trainerName;
+    }
+
+    public AttendanceDashboard getAttendanceDashboard() {
+        return attendanceDashboard;
+    }
+
+    public void setAttendanceDashboard(AttendanceDashboard attendanceDashboard) {
+        this.attendanceDashboard = attendanceDashboard;
+    }
+
+    public PromiseDashboard getPromiseDashboard() {
+        return promiseDashboard;
+    }
+
+    public void setPromiseDashboard(PromiseDashboard promiseDashboard) {
+        this.promiseDashboard = promiseDashboard;
+    }
+
+    public List<UserDashboardDto> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<UserDashboardDto> users) {
+        this.users = users;
     }
 }

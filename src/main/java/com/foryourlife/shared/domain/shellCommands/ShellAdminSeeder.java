@@ -232,7 +232,7 @@ public class ShellAdminSeeder {
         for (int i = 0; i < 100; i++) {
             var staffId = UUID.randomUUID().toString();
             var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), faker.internet().password(), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
-            var trainer = Visionary.create(staffId, "VISIONARIO", true, user);
+            var trainer = Visionary.create(staffId, true, user);
             visionaryCreatorService.create(trainer);
         }
     }

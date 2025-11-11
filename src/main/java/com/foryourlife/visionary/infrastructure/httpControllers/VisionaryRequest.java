@@ -14,8 +14,6 @@ import java.util.UUID;
 public class VisionaryRequest {
     public String id;
     @NotNull
-    @NotBlank(message = "Role must not be null")
-    public String role;
     private Boolean active;
     @NotNull
     @Valid
@@ -23,10 +21,6 @@ public class VisionaryRequest {
 
     public String getId() {
         return id;
-    }
-
-    public String getRole() {
-        return role;
     }
 
     public Boolean getActive() {
@@ -39,6 +33,6 @@ public class VisionaryRequest {
 
     public Visionary toDomain() {
         var newId = id != null ? id : UUID.randomUUID().toString();
-        return Visionary.create(newId, role, active, user.toDomain(List.of(new UserEntities(newId, UserType.VISIONARY.toString()))));
+        return Visionary.create(newId, active, user.toDomain(List.of(new UserEntities(newId, UserType.VISIONARY.toString()))));
     }
 }

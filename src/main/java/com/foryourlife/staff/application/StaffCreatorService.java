@@ -79,6 +79,9 @@ public class StaffCreatorService {
     }
 
     public void createFromParticipant(String userId, String role) {
+        if (role.isEmpty()){
+            throw new BaseException("El rol no puede estar vacío", List.of("El rol es obligatorio"));
+        }
         if (_repository.findByUserId(userId) != null) {
             throw new BaseException("El usuario ya es Staff", List.of("Ya es un Staff"));
         }

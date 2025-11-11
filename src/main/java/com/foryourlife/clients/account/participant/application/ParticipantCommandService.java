@@ -67,7 +67,7 @@ public class ParticipantCommandService {
     public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest, SaveContactRequest contact, DataInvoice dataInvoice) {
         var token = queryInvitationServices.findInvitationByToken(user.getInvitationToken());
         if (token.getUsed())
-            throw new BaseException("Token expired", List.of("The token " + user.getInvitationToken() + " was used"));
+            throw new BaseException("Token expirado", List.of("El token ya fue utilizado"));
 
         commandGeneralUserService.save(user.getUser());
 

@@ -199,8 +199,8 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
         boolean isParticipant = user.getEntityMap().stream()
                 .anyMatch(e -> e.getEntity().equals(UserType.PARTICIPANT.name()));
 
-        if (isMasterLife) return UserType.MASTER_LIFE.name();
-        if (isParticipant) return UserType.PARTICIPANT.name();
+        if (isMasterLife) return UserType.MASTER_LIFE.getValue();
+        if (isParticipant) return UserType.PARTICIPANT.getValue();
         return null;
     }
 

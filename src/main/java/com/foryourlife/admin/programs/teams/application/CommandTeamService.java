@@ -317,8 +317,7 @@ public class CommandTeamService {
             return p;
         }).toList();
 
-        team.setName(request.name != null ? request.name
-                : training.getCourseLevel().name() + "-" + training.getNumber());
+        team.setName(training.getCourseLevel().name() + "-" + training.getNumber());
         team.setTraining(training);
         team.setTrainingNumber(training.getNumber());
         team.setTrainer(trainer);

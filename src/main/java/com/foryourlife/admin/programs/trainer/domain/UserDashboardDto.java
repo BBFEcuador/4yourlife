@@ -4,6 +4,7 @@ import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 
 public class UserDashboardDto {
     private String userName;
+    private String userEntity;
     private AttendanceStatus fridayAttendance;
     private AttendanceStatus saturdayAttendance;
     private AttendanceStatus sundayAttendance;
@@ -13,8 +14,9 @@ public class UserDashboardDto {
     private Integer achievedCount;
     private Integer paidCount;
 
-    public UserDashboardDto(String userName, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, Integer firstPromise, Integer secondPromise, Integer thirdPromise, Integer achievedCount, Integer paidCount) {
+    public UserDashboardDto(String userName, String userEntity, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance, Integer firstPromise, Integer secondPromise, Integer thirdPromise, Integer achievedCount, Integer paidCount) {
         this.userName = userName;
+        this.userEntity = userEntity;
         this.fridayAttendance = fridayAttendance;
         this.saturdayAttendance = saturdayAttendance;
         this.sundayAttendance = sundayAttendance;
@@ -23,6 +25,14 @@ public class UserDashboardDto {
         this.thirdPromise = thirdPromise;
         this.achievedCount = achievedCount;
         this.paidCount = paidCount;
+    }
+
+    public String getUserEntity() {
+        return userEntity;
+    }
+
+    public void setUserEntity(String userEntity) {
+        this.userEntity = userEntity;
     }
 
     public String getUserName() {

@@ -11,6 +11,7 @@ import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserType;
 import org.springframework.stereotype.Service;
 
@@ -71,13 +72,15 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
                 .filter(p -> p.getUser() != null)
                 .collect(Collectors.toMap(p -> p.getUser().getId(), p -> p, (a, b) -> a));
 
-
         List<UserDashboardDto> userDashboards = attendances.stream()
                 .filter(a -> a.getUser() != null)
                 .map(a -> {
+                    User user = a.getUser();
+                    String entity = resolveUserType(user);
                     Promise userPromise = promiseMap.get(a.getUser().getId());
                     return new UserDashboardDto(
-                            a.getUser().getName(),
+                            user.getName(),
+                            entity,
                             a.getFridayAttendance(),
                             a.getSaturdayAttendance(),
                             a.getSundayAttendance(),
@@ -183,6 +186,22 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
                 totalAchieved,
                 totalPaid
         );
+    }
+
+    private String resolveUserType(User user) {
+        if (user == null || user.getEntityMap() == null) {
+            return null;
+        }
+
+        boolean isMasterLife = user.getEntityMap().stream()
+                .anyMatch(e -> e.getEntity().equals(UserType.MASTER_LIFE.name()));
+
+        boolean isParticipant = user.getEntityMap().stream()
+                .anyMatch(e -> e.getEntity().equals(UserType.PARTICIPANT.name()));
+
+        if (isMasterLife) return UserType.MASTER_LIFE.name();
+        if (isParticipant) return UserType.PARTICIPANT.name();
+        return null;
     }
 
 }

@@ -64,7 +64,6 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
     private TrainerLifeView buildTrainingDashboard(Training training) {
         if (training == null) return null;
 
-        var team = teamRepository.findByTrainingId(training.getId()).orElseThrow(() -> new BaseException("Equipo no encontrado para el entrenamiento: " + training.getName(), List.of()));
         List<Attendance> attendances = attendanceRepository.findAttendanceByTraining(training.getId());
         List<Promise> promises = promiseRepository.findByTrainingId(training.getId());
 
@@ -97,7 +96,7 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
 
         return new TrainerLifeView(
                 training.getName(),
-                team.getTrainer().getName(),
+                training.getOriginalTeam().getTrainer().getName(),
                 attendanceDashboard,
                 promiseDashboard,
                 userDashboards

@@ -94,7 +94,6 @@ public class TrainerRepositoryImpl implements TrainerRepository {
         var trainer = repository.findByEmail(email).orElseThrow(
                 () -> new BaseException("Login Error", List.of("Credenciales invalidas!."))
         );
-        Hibernate.initialize(trainer.getTeams());
         this.loadTrainer = trainer;
         return trainer;
     }

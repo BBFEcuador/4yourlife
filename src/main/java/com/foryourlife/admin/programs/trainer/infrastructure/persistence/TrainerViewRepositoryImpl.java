@@ -143,7 +143,7 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
 
     private PromiseDashboard buildPromiseDashboard(List<Promise> promises) {
         if (promises == null || promises.isEmpty()) {
-            return new PromiseDashboard(0, 0, 0, 0, 0, 0);
+            return new PromiseDashboard(0, 0, 0, 0, 0, 0, 0, 0, 0,0,0 );
         }
 
         Predicate<Promise> isParticipant = p ->
@@ -158,17 +158,25 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
                         p.getUser().getEntityMap().stream()
                                 .anyMatch(e -> e.getEntity().equals(UserType.MASTER_LIFE.name()));
 
-
+        int totalFirst = promises.stream().filter(isParticipant).mapToInt(Promise::getFirstPromise).sum();
+        int totalSecond = promises.stream().filter(isParticipant).mapToInt(Promise::getSecondPromise).sum();
         int totalThird = promises.stream().filter(isParticipant).mapToInt(Promise::getThirdPromise).sum();
         int totalAchieved = promises.stream().filter(isParticipant).mapToInt(Promise::getAchievedCount).sum();
         int totalPaid = promises.stream().filter(isParticipant).mapToInt(Promise::getPaidCount).sum();
 
+        int totalFirstMaster = promises.stream().filter(isMasterLife).mapToInt(Promise::getFirstPromise).sum();
+        int totalSecondMaster = promises.stream().filter(isMasterLife).mapToInt(Promise::getSecondPromise).sum();
         int totalThirdMaster = promises.stream().filter(isMasterLife).mapToInt(Promise::getThirdPromise).sum();
         int totalAchievedMaster = promises.stream().filter(isMasterLife).mapToInt(Promise::getAchievedCount).sum();
         int totalPaidMaster = promises.stream().filter(isMasterLife).mapToInt(Promise::getPaidCount).sum();
 
         return new PromiseDashboard(
+                totalFirst,
+                totalSecond,
                 totalThird,
+                totalFirstMaster,
+                totalSecondMaster,
+                totalThirdMaster,
                 totalThirdMaster,
                 totalAchievedMaster,
                 totalPaidMaster,

@@ -47,19 +47,15 @@ public class AddAttendanceOnTeamAssigned {
                     break;
                 case CourseLevel.LIFE:
                     attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_1, user.getUser(), training));
-                    promiseCommandService.createPromises(training.getId());
                     break;
                 case CourseLevel.LIFE_2:
                     attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_2, user.getUser(), training));
-                    promiseCommandService.createPromises(training.getId());
                     break;
                 case CourseLevel.LIFE_3:
                     attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_3, user.getUser(), training));
-                    promiseCommandService.createPromises(training.getId());
                     break;
                 case CourseLevel.LIFE_GRADUATE:
                     attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_GRADUATE, user.getUser(), training));
-                    promiseCommandService.createPromises(training.getId());
                     break;
             }
         });
@@ -80,6 +76,6 @@ public class AddAttendanceOnTeamAssigned {
                     break;
             }
         });
-
+        promiseCommandService.createPromises(training.getId());
     }
 }

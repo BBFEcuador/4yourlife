@@ -38,8 +38,8 @@ public class PromiseCommandService {
         EnumSet<CourseLevel> availableLevels = EnumSet.of(CourseLevel.LIFE, CourseLevel.LIFE_2, CourseLevel.LIFE_3, CourseLevel.LIFE_GRADUATE);
 
         if (!availableLevels.contains(team.getTraining().getCourseLevel())) {
-            throw new BaseException("Nivel de curso inválido",
-                    List.of("Las promesas solo se pueden crear para entrenamientos de nivel LIFE, LIFE 2 o LIFE 3"));
+            System.err.println(team.getTraining().getCourseLevel() + " is not available");
+            return;
         }
 
         team.getUsers().forEach(it -> {
@@ -57,12 +57,7 @@ public class PromiseCommandService {
         team.getMasterLife().forEach(it -> {
             Promise promise = new Promise(
                     UUID.randomUUID().toString(),
-                    it.getTeams().stream().filter(
-                            teamInMaster -> teamInMaster.getTraining().getId().equals(trainingId)
-                    ).findFirst().orElseThrow(() -> new BaseException(
-                            "El equipo no pertenece al entrenamiento",
-                            List.of("No se encontró el equipo asociado al entrenamiento para el master life.")
-                    )).getTraining(),
+                    team.getTraining(),
                     it.getUser()
             );
             promise.setStartDate(team.getTraining().getEndDate().plusDays(1));

@@ -308,4 +308,8 @@ public class Training extends AggregateRoot implements Serializable {
         System.out.println(s);
         return s;
     }
+
+    public String getCourseLevelDisplay() {
+        return this.courseLevel.getValue();
+    }
 }

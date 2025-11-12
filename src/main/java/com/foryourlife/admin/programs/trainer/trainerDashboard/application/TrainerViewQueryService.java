@@ -1,7 +1,7 @@
-package com.foryourlife.admin.programs.trainer.application;
+package com.foryourlife.admin.programs.trainer.trainerDashboard.application;
 
-import com.foryourlife.admin.programs.trainer.domain.TrainerLifeView;
-import com.foryourlife.admin.programs.trainer.domain.TrainerViewRepository;
+import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.life.TrainerLifeView;
+import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.life.TrainerViewRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

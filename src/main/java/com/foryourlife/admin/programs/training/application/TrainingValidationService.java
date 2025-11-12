@@ -25,7 +25,7 @@ public class TrainingValidationService {
                 (dayEnum == DaysEnum.SUNDAY && dayNumber != 3)) {
 
             throw new BaseException(
-                    "Día incorrecto",
+                    "El día seleccionado no coincide con el día del entrenamiento.",
                     List.of("El día seleccionado no coincide con el día del entrenamiento.")
             );
         }

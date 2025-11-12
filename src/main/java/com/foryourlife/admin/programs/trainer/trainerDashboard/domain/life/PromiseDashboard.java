@@ -1,4 +1,4 @@
-package com.foryourlife.admin.programs.trainer.domain;
+package com.foryourlife.admin.programs.trainer.trainerDashboard.domain.life;
 
 public class PromiseDashboard {
     private int totalFirstPromise;

@@ -1,4 +1,4 @@
-package com.foryourlife.admin.auth.seeder;
+package com.foryourlife.shared.domain.shellCommands;
 
 import com.foryourlife.admin.auth.domain.AdminRole;
 import com.foryourlife.admin.auth.domain.AdminRoleRepository;

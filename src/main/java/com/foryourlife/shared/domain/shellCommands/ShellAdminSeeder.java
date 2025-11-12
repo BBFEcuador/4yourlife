@@ -63,8 +63,9 @@ public class ShellAdminSeeder {
     private final QueryInvitationServices queryInvitationServices;
     private final ParticipantLevelRepository participantLevelRepository;
     private final Faker faker = new Faker();
+    private final RolesAndPermissionSeederShell rolesAndPermissionSeederShell;
 
-    public ShellAdminSeeder(AdminRepository repository, PasswordEncoder passwordEncoder, ProgramRepository programRepository, CampusRepository campusRepository, TrainerCreatorService trainerCreatorService, CommandTrainingService commandTrainingService, StaffCreatorService staffCreatorService, VisionaryCreatorService visionaryCreatorService, ParticipantCommandService participantCommandService, CommandMasterLifeService commandMasterLifeService, AdminRoleRepository adminRoleRepository, CommandInvitationService commandInvitationService, QueryInvitationServices queryInvitationServices, ParticipantLevelRepository participantLevelRepository) {
+    public ShellAdminSeeder(AdminRepository repository, PasswordEncoder passwordEncoder, ProgramRepository programRepository, CampusRepository campusRepository, TrainerCreatorService trainerCreatorService, CommandTrainingService commandTrainingService, StaffCreatorService staffCreatorService, VisionaryCreatorService visionaryCreatorService, ParticipantCommandService participantCommandService, CommandMasterLifeService commandMasterLifeService, AdminRoleRepository adminRoleRepository, CommandInvitationService commandInvitationService, QueryInvitationServices queryInvitationServices, ParticipantLevelRepository participantLevelRepository, RolesAndPermissionSeederShell rolesAndPermissionSeederShell) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.programRepository = programRepository;
@@ -79,15 +80,24 @@ public class ShellAdminSeeder {
         this.commandInvitationService = commandInvitationService;
         this.queryInvitationServices = queryInvitationServices;
         this.participantLevelRepository = participantLevelRepository;
+        this.rolesAndPermissionSeederShell = rolesAndPermissionSeederShell;
     }
 
     @ShellMethod(key = "app:seed-admins")
-    private void seedAdmins() {
+     public void seedAdmins() {
+        rolesAndPermissionSeederShell.seedRoles();
+        List<Campus> campuses = List.of(
+                Campus.create("61d88b2a-a22e-4cb0-8e43-e036483039d6", "Ecuador", "Quito", "De los Cedros OE1-13 y Real Audiencia", "094456123"),
+                Campus.create("01a680a4-3bf6-4caf-98b8-f3d5c7a8811b", "Ecuador", "Guayaquil", "Alborada etapa 14 manzana 5", "094456123"),
+                Campus.create("a35d480e-f17a-4b5c-887e-2ba9ddd3b696", "Ecuador", "Cuenca", "Por definir", "094456123")
+        );
 
-        List<Campus> campuses = List.of(Campus.create("61d88b2a-a22e-4cb0-8e43-e036483039d6", "Ecuador", "Quito", "De los Cedros OE1-13 y Real Audiencia", "094456123"), Campus.create("01a680a4-3bf6-4caf-98b8-f3d5c7a8811b", "Ecuador", "Guayaquil", "Alborada etapa 14 manzana 5", "094456123"), Campus.create("a35d480e-f17a-4b5c-887e-2ba9ddd3b696", "Ecuador", "Cuenca", "Por definir", "094456123"));
-        campusRepository.save(campuses.get(0));
-        campusRepository.save(campuses.get(1));
-        campusRepository.save(campuses.get(2));
+        campuses.forEach(campus -> {
+            if (campusRepository.findById(campus.getId()).isEmpty()) {
+                campusRepository.save(campus);
+            }
+        });
+
         repository.save(
                 new Admin(
                         "3936ae5e-0cc1-4375-abc7-520d16999110",
@@ -105,10 +115,11 @@ public class ShellAdminSeeder {
                                         new UserEntities(
                                                 "3936ae5e-0cc1-4375-abc7-520d16999110",
                                                 "ADMIN")
-                                )),
+                                )
+                        ),
                         adminRoleRepository.findById("f4dddf05-8fec-4551-8d93-d6309c17c206").orElseThrow(),
-                        new HashSet<>(campusRepository.getAll()), true))
-        ;
+                        new HashSet<>(campusRepository.getAll()), true)
+        );
         repository.save(
                 new Admin(
                         "1a34e4df-33fa-4078-9acd-df7d04dde5f4",
@@ -124,7 +135,8 @@ public class ShellAdminSeeder {
                                 List.of(
                                         new UserEntities(
                                                 "3936ae5e-0cc1-4375-abc7-520d16999110",
-                                                "ADMIN"))
+                                                "ADMIN")
+                                )
                         ),
                         adminRoleRepository.findById("f4dddf05-8fec-4551-8d93-d6309c17c206").orElseThrow(),
                         new HashSet<>(campusRepository.getAll()), true));
@@ -149,18 +161,26 @@ public class ShellAdminSeeder {
                                 )
                         ),
                         adminRoleRepository.findById("f4dddf05-8fec-4551-8d93-d6309c17c206").orElseThrow(),
-                        new HashSet<>(List.of(campuses.get(2))), true));
+                        new HashSet<>(List.of(campuses.get(2))), true)
+        );
+
         List<ParticipantLevel> roles = Arrays.asList(
                 ParticipantLevel.create("6642e863-7f6f-40a3-80e2-934388ade735", "ROLE_INIT", true, CourseLevel.INIT),
                 ParticipantLevel.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "ROLE_FOCUS", false, CourseLevel.FOCUS),
                 ParticipantLevel.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "ROLE_YOUR", false, CourseLevel.YOUR),
                 ParticipantLevel.create("5b2da953-9791-47e6-a5b8-3442b52b8ebc", "ROLE_LIFE", false, CourseLevel.LIFE),
-                ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9", "ROLE_GRADUATE", false, CourseLevel.LIFE_GRADUATE));
+                ParticipantLevel.create("797eb700-4a0c-4334-a9c0-5eb5de18b1b9", "ROLE_GRADUATE", false, CourseLevel.LIFE_GRADUATE)
+        );
+
         this.participantLevelRepository.saveAll(roles);
-        createAdminTestUser();
 
+//        createAdminTestUser();
 
-        List<Program> programs = Arrays.asList(Program.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "Focus", CourseLevel.FOCUS), Program.create("bff32809-d719-4dfd-90b0-6f7a0f63e2fe", "Your", CourseLevel.YOUR), Program.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "Life", CourseLevel.LIFE));
+        List<Program> programs = Arrays.asList(
+                Program.create("55c3da1c-b516-4a55-9fdd-21317ee6e4c0", "Focus", CourseLevel.FOCUS),
+                Program.create("bff32809-d719-4dfd-90b0-6f7a0f63e2fe", "Your", CourseLevel.YOUR),
+                Program.create("3024c8f1-d603-47fc-8369-0e90cd2e703e", "Life", CourseLevel.LIFE)
+        );
 
         this.programRepository.saveAll(programs);
     }

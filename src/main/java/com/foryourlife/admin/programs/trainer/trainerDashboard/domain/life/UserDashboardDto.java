@@ -1,4 +1,4 @@
-package com.foryourlife.admin.programs.trainer.domain;
+package com.foryourlife.admin.programs.trainer.trainerDashboard.domain.life;
 
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 

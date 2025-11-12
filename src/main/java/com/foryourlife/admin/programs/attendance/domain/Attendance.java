@@ -15,11 +15,11 @@ public class Attendance extends AggregateRoot {
     @Id
     private String id;
     @Enumerated(EnumType.STRING)
-    private AttendanceStatus fridayAttendance = AttendanceStatus.ASISTIO;
+    private AttendanceStatus fridayAttendance;
     @Enumerated(EnumType.STRING)
-    private AttendanceStatus saturdayAttendance =  AttendanceStatus.ASISTIO;
+    private AttendanceStatus saturdayAttendance;
     @Enumerated(EnumType.STRING)
-    private AttendanceStatus sundayAttendance =  AttendanceStatus.ASISTIO;
+    private AttendanceStatus sundayAttendance;
     @Enumerated(EnumType.STRING)
     private FylStage stage;
     @ManyToOne

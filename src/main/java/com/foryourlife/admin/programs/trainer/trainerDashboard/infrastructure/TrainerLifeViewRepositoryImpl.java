@@ -1,10 +1,10 @@
-package com.foryourlife.admin.programs.trainer.infrastructure.persistence;
+package com.foryourlife.admin.programs.trainer.trainerDashboard.infrastructure;
 
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
-import com.foryourlife.admin.programs.trainer.domain.*;
+import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.life.*;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.clients.account.promises.domain.Promise;
@@ -22,13 +22,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
-public class TrainerViewRepositoryImpl implements TrainerViewRepository {
+public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
     private final TrainingRepository jpaTrainingRepository;
     private final AttendanceRepository attendanceRepository;
     private final PromiseRepository promiseRepository;
     private final TeamRepository teamRepository;
 
-    public TrainerViewRepositoryImpl(TrainingRepository jpaTrainingRepository, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, TeamRepository teamRepository) {
+    public TrainerLifeViewRepositoryImpl(TrainingRepository jpaTrainingRepository, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, TeamRepository teamRepository) {
         this.jpaTrainingRepository = jpaTrainingRepository;
         this.attendanceRepository = attendanceRepository;
         this.promiseRepository = promiseRepository;
@@ -187,7 +187,7 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
         );
     }
 
-    private String resolveUserType(User user) {
+    public String resolveUserType(User user) {
         if (user == null || user.getEntityMap() == null) {
             return null;
         }
@@ -202,5 +202,4 @@ public class TrainerViewRepositoryImpl implements TrainerViewRepository {
         if (isParticipant) return UserType.PARTICIPANT.getValue();
         return null;
     }
-
 }

@@ -71,6 +71,7 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                                 } else {
                                     totalFocus.getAndIncrement();
                                 }
+
                             }
                     );
                 }
@@ -140,6 +141,9 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
 
 
     public GenderDashboard buildGenderDashboard(List<Attendance> attendances) {
+//        int maleCount = attendances.stream().filter(a -> a.getUser().getEntityMap());
+//        long fridayCount = attendances.stream().filter(isParticipant).filter(a -> a.getFridayAttendance() == AttendanceStatus.ASISTIO).count();
+
         return null;
     }
 

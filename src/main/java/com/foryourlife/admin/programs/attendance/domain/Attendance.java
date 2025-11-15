@@ -28,7 +28,7 @@ public class Attendance extends AggregateRoot {
     private User user;
     @ManyToOne
     @JoinColumn(name = "training_id", referencedColumnName = "id")
-    @JsonIgnoreProperties({"nextLevel", "campus", "originalTeam"})
+    @JsonIgnoreProperties({"nextLevel", "campus", "originalTeam","courseLevelDisplay"})
     private Training training;
     @Column(name = "is_active")
     @JsonProperty("isActive")

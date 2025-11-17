@@ -39,7 +39,7 @@ public class JPAOrganizationChartRepository implements OrganizationChartReposito
 
     @Override
     public Optional<OrganizationChart> getOrganizationChartTrainingId(String trainingId) {
-        return jpaImplOrganizationChartRepository.findByTeam_Training_Id(trainingId);
+        return jpaImplOrganizationChartRepository.findRootNodesByTeamTrainingId(trainingId);
     }
 
     @Override

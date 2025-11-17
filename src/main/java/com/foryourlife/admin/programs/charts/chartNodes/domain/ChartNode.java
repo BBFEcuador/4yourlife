@@ -6,6 +6,7 @@ import com.foryourlife.admin.programs.charts.organizationChart.domain.Organizati
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,6 +24,13 @@ public class ChartNode {
         nullable = true
     )
     private String parentNodeId;
+    @OneToMany(
+            mappedBy = "parentNodeId",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    private List<ChartNode> children = new ArrayList<>();
     @ManyToOne
     @JoinColumn(
         name = "member_id",
@@ -90,6 +98,10 @@ public class ChartNode {
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public List<ChartNode> getChildren() {
+        return children;
     }
 
     public OrganizationChart getOrganizationChart() {

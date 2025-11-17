@@ -1,5 +1,7 @@
 package com.foryourlife.admin.programs.charts.chartNodes.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChart;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
@@ -11,7 +13,15 @@ import java.util.List;
 public class ChartNode {
     @Id
     private String id;
+    @Column(
+        name = "parent_id",
+        nullable = true
+    )
     private String parentId;
+    @Column(
+        name = "parent_node_id",
+        nullable = true
+    )
     private String parentNodeId;
     @ManyToOne
     @JoinColumn(
@@ -25,6 +35,7 @@ public class ChartNode {
         name = "organization_chart_id",
         referencedColumnName = "id"
     )
+    @JsonIgnore
     private OrganizationChart organizationChart;
 
 

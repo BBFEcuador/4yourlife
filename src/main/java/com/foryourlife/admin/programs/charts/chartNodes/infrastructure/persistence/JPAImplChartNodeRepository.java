@@ -5,6 +5,7 @@ import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNodeReposito
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class JPAImplChartNodeRepository implements ChartNodeRepository {
@@ -32,5 +33,15 @@ public class JPAImplChartNodeRepository implements ChartNodeRepository {
     @Override
     public List<ChartNode> findAllByOrganizationId(String organizationId) {
         return repository.findAllByOrganizationChart_Id(organizationId);
+    }
+
+    @Override
+    public void updateNode(ChartNode chartNode) {
+        repository.save(chartNode);
+    }
+
+    @Override
+    public Optional<ChartNode> findById(String chartNodeId) {
+        return repository.findById(chartNodeId);
     }
 }

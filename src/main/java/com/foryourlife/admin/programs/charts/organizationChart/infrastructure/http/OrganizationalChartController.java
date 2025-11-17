@@ -2,13 +2,15 @@ package com.foryourlife.admin.programs.charts.organizationChart.infrastructure.h
 
 import com.foryourlife.admin.programs.charts.organizationChart.application.OrganizationChartCommandService;
 import com.foryourlife.admin.programs.charts.organizationChart.application.OrganizationChartQueryService;
+import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChart;
+import jakarta.validation.Valid;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/organization")
@@ -23,8 +25,18 @@ public class OrganizationalChartController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> createOrganizationChart(OrganizationalChartRequest organizationalChartRequest) {
+    public ResponseEntity<?> createOrganizationChart(@RequestBody @Valid OrganizationalChartRequest organizationalChartRequest) {
         organizationChartCommandService.saveOrganizationChart(organizationalChartRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("team/{teamId}")
+    public ResponseEntity<List<OrganizationChart>> getOrganizationChart(@PathVariable("teamId") String teamId) {
+        return new ResponseEntity<>(organizationChartQueryService.getOrganizationChartByTeamId(teamId), HttpStatus.OK);
+    }
+
+    @GetMapping("training/{trainingId}")
+    public ResponseEntity<OrganizationChart> getOrganizationChartByTrainingId(@PathVariable("trainingId") String trainingId) {
+        return new ResponseEntity<>(organizationChartQueryService.getOrganizationChartByTrainingId(trainingId), HttpStatus.OK);
     }
 }

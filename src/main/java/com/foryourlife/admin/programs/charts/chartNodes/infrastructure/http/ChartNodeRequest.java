@@ -1,33 +1,38 @@
 package com.foryourlife.admin.programs.charts.chartNodes.infrastructure.http;
 
-import com.foryourlife.shared.domain.level.CourseLevel;
+import jakarta.validation.constraints.NotNull;
 
 public class ChartNodeRequest {
+    @NotNull(message = "El id del nodo es requerido")
+    private String nodeId;
+    @NotNull(message = "El usuario es requerido")
     private String userId;
-    private String organizationId;
+    private String parentNodeId;
+    private String parentId;
     private String level;
+    private String organizationChartId;
+
+    public String getNodeId() {
+        return nodeId;
+    }
 
     public String getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getParentNodeId() {
+        return parentNodeId;
     }
 
-    public String getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
+    public String getParentId() {
+        return parentId;
     }
 
     public String getLevel() {
         return level;
     }
 
-    public void setLevel(String level) {
-        this.level = level;
+    public String getOrganizationChartId() {
+        return organizationChartId;
     }
 }

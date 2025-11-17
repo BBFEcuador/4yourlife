@@ -2,6 +2,7 @@ package com.foryourlife.admin.programs.charts.organizationChart.infrastructure.p
 
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChart;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChartRepository;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,5 +34,21 @@ public class JPAOrganizationChartRepository implements OrganizationChartReposito
     @Override
     public Optional<OrganizationChart> findById(String id) {
         return jpaImplOrganizationChartRepository.findById(id);
+
+    }
+
+    @Override
+    public Optional<OrganizationChart> getOrganizationChartTrainingId(String trainingId) {
+        return jpaImplOrganizationChartRepository.findByTeam_Training_Id(trainingId);
+    }
+
+    @Override
+    public Optional<OrganizationChart> getOrganizationChartByTeamIdAndCourseLevel(String teamId, CourseLevel courseLevel) {
+        return jpaImplOrganizationChartRepository.findByTeam_IdAndCourseLevel(teamId, courseLevel);
+    }
+
+    @Override
+    public void deleteOrganizationChartById(String id) {
+
     }
 }

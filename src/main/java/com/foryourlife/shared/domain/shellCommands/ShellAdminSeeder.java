@@ -84,7 +84,7 @@ public class ShellAdminSeeder {
     }
 
     @ShellMethod(key = "app:seed-admins")
-     public void seedAdmins() {
+    public void seedAdmins() {
         rolesAndPermissionSeederShell.seedRoles();
         List<Campus> campuses = List.of(
                 Campus.create("61d88b2a-a22e-4cb0-8e43-e036483039d6", "Ecuador", "Quito", "De los Cedros OE1-13 y Real Audiencia", "094456123"),
@@ -230,6 +230,7 @@ public class ShellAdminSeeder {
         commandTrainingService.autoGenerateTraining(request);
     }
 
+    @ShellMethod(key = "app:seed-fake-staffs")
     private void makeStaffs() {
         for (int i = 0; i < 100; i++) {
             var staffId = UUID.randomUUID().toString();
@@ -239,30 +240,33 @@ public class ShellAdminSeeder {
         }
     }
 
+    @ShellMethod(key = "app:seed-fake-master-life")
     private void makeMasterLife() {
         for (int i = 0; i < 100; i++) {
             var staffId = UUID.randomUUID().toString();
-            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), faker.internet().password(), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
+            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), faker.internet().password(), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.MASTER_LIFE.toString())));
             var trainer = MasterLife.create(staffId, true, user);
             commandMasterLifeService.save(trainer);
         }
     }
 
+    @ShellMethod(key = "app:seed-fake-visionaries")
     private void makeVisionaries() {
         for (int i = 0; i < 100; i++) {
             var staffId = UUID.randomUUID().toString();
-            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), faker.internet().password(), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
+            var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), faker.internet().password(), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.VISIONARY.toString())));
             var trainer = Visionary.create(staffId, true, user);
             visionaryCreatorService.create(trainer);
         }
     }
 
+    @ShellMethod(key = "app:seed-fake-participants")
     private void makeParticipants() {
         try {
             var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600", "61d88b2a-a22e-4cb0-8e43-e036483039d6"));
             for (int i = 0; i < 350; i++) {
                 var staffId = UUID.randomUUID().toString();
-                var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), passwordEncoder.encode("focus2025"), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.STAFF.toString())));
+                var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), passwordEncoder.encode("focus2025"), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.PARTICIPANT.toString())));
                 var bd = faker.date().birthday().toInstant();
                 System.out.println(bd + "==================");
                 var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();

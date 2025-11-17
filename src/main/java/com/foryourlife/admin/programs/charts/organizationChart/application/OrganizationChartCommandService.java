@@ -1,21 +1,20 @@
 package com.foryourlife.admin.programs.charts.organizationChart.application;
 
 import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNode;
-import com.foryourlife.admin.programs.charts.chartNodes.infrastructure.http.ChartNodeRequest;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChart;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChartRepository;
 import com.foryourlife.admin.programs.charts.organizationChart.infrastructure.http.OrganizationalChartRequest;
+import com.foryourlife.admin.programs.charts.organizationChart.infrastructure.http.StaffNodeRequest;
+import com.foryourlife.admin.programs.charts.organizationChart.infrastructure.http.VisionaryNodeRequest;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class OrganizationChartCommandService {
@@ -35,59 +34,124 @@ public class OrganizationChartCommandService {
         organizationChart.setId(UUID.randomUUID().toString());
 
         Team team = teamRepository.findById(request.getTeamId())
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+                .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
+
+        if (organizationChartRepository.getOrganizationChartByTeamIdAndCourseLevel(
+                request.getTeamId(), team.getTraining().getCourseLevel()).isPresent()) {
+
+            throw new RuntimeException("Ya existe un organigrama para el equipo "+ team.getName() + " en el nivel " + team.getTraining().getCourseLevel());
+        }
 
         organizationChart.setTeam(team);
 
-        validateUniqueParents(request.getChartNodeRequests());
+        List<ChartNode> allNodes = new ArrayList<>();
 
-        List<ChartNode> nodes = request.getChartNodeRequests().stream()
-                .map(nodeRequest -> createValidatedNode(nodeRequest, organizationChart))
-                .collect(Collectors.toList());
+        if (request.getVisionaries() != null && !request.getVisionaries().isEmpty()) {
+            for (VisionaryNodeRequest vReq : request.getVisionaries()) {
 
-        organizationChart.setNodes(nodes);
+                ChartNode visionaryNode = createNode(
+                        vReq.getUserId(),
+                        null,
+                        "VISIONARY",
+                        organizationChart
+                );
+                allNodes.add(visionaryNode);
 
-        organizationChartRepository.save(organizationChart);
-    }
+                if (vReq.getStaff() != null) {
+                    for (StaffNodeRequest sReq : vReq.getStaff()) {
 
-    private void validateUniqueParents(List<ChartNodeRequest> requests) {
-        Set<String> parentIds = new HashSet<>();
+                        ChartNode staffNode = createNode(
+                                sReq.getUserId(),
+                                visionaryNode,
+                                "STAFF",
+                                organizationChart
+                        );
+                        allNodes.add(staffNode);
 
-        for (ChartNodeRequest req : requests) {
-            if (req.getOrganizationId() != null) {
-                if (!parentIds.add(req.getOrganizationId())) {
-                    throw new RuntimeException("El padre " + req.getOrganizationId() + " está repetido.");
+                        if (sReq.getParticipantsIds() != null) {
+                            for (String pId : sReq.getParticipantsIds()) {
+
+                                ChartNode participantNode = createNode(
+                                        pId,
+                                        staffNode,
+                                        "PARTICIPANT",
+                                        organizationChart
+                                );
+                                allNodes.add(participantNode);
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (request.getStaff() != null && !request.getStaff().isEmpty()) {
+
+            for (StaffNodeRequest sReq : request.getStaff()) {
+
+                ChartNode staffNode = createNode(
+                        sReq.getUserId(),
+                        null,
+                        "STAFF",
+                        organizationChart
+                );
+                allNodes.add(staffNode);
+
+                if (sReq.getParticipantsIds() != null) {
+                    for (String pId : sReq.getParticipantsIds()) {
+
+                        ChartNode participantNode = createNode(
+                                pId,
+                                staffNode,
+                                "PARTICIPANT",
+                                organizationChart
+                        );
+                        allNodes.add(participantNode);
+                    }
                 }
             }
         }
+
+        organizationChart.setNodes(allNodes);
+        organizationChart.setCourseLevel(team.getTraining().getCourseLevel());
+        organizationChartRepository.save(organizationChart);
     }
 
-    private ChartNode createValidatedNode(ChartNodeRequest request, OrganizationChart organizationChart) {
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    private ChartNode createNode(
+            String userId,
+            ChartNode parentNode,
+            String level,
+            OrganizationChart chart
+    ) {
 
-        validateUserLevel(request, user);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + userId));
+
+        validateUserLevel(user, level);
 
         ChartNode node = new ChartNode();
         node.setId(UUID.randomUUID().toString());
-        node.setParentNodeId(request.getOrganizationId());
-        node.setLevel(request.getLevel());
         node.setMembers(user);
-        node.setOrganizationChart(organizationChart);
+        node.setLevel(level);
+        node.setOrganizationChart(chart);
+
+        if (parentNode != null) {
+            node.setParentNodeId(parentNode.getId());
+            node.setParentId(parentNode.getMembers().getId());
+        } else {
+            node.setParentNodeId(null);
+            node.setParentId(null);
+        }
 
         return node;
     }
 
-    private void validateUserLevel(ChartNodeRequest req, User user) {
-
-        int level = Integer.parseInt(req.getLevel());
+    private void validateUserLevel(User user, String level) {
 
         String requiredEntity = switch (level) {
-            case 1 -> "VISIONARY";
-            case 2 -> "STAFF";
-            case 3 -> "PARTICIPANT";
-            default -> throw new RuntimeException("Nivel inválido: " + req.getLevel());
+            case "VISIONARY" -> "VISIONARY";
+            case "STAFF" -> "STAFF";
+            case "PARTICIPANT" -> "PARTICIPANT";
+            default -> throw new RuntimeException("Nivel inválido: " + level);
         };
 
         boolean hasEntity = user.getEntityMap().stream()
@@ -95,9 +159,14 @@ public class OrganizationChartCommandService {
 
         if (!hasEntity) {
             throw new RuntimeException(
-                    "El usuario " + user.getName() + " NO tiene el rol requerido: " + requiredEntity
+                    "El usuario " + user.getName() +
+                            " no tiene el rol requerido: " + requiredEntity
             );
         }
+    }
+
+    public void deleteOrganizationChartById(String id) {
+        organizationChartRepository.deleteOrganizationChartById(id);
     }
 
 }

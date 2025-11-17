@@ -1,5 +1,6 @@
 package com.foryourlife.admin.programs.charts.organizationChart.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNode;
 import com.foryourlife.admin.programs.teams.domain.Team;
@@ -14,7 +15,12 @@ import java.util.List;
 public class OrganizationChart {
     @Id
     private String id;
-    @OneToMany(mappedBy = "organizationChart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "organizationChart",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
     @JsonIgnoreProperties({"organizationChart"})
     private List<ChartNode> nodes = new ArrayList<>();
     @ManyToOne
@@ -22,7 +28,13 @@ public class OrganizationChart {
         name = "team_id",
         referencedColumnName = "id"
     )
+    @JsonIgnore
     private Team team;
+    @Column(
+        name = "course_level",
+        nullable = false
+    )
+    @Enumerated(EnumType.STRING)
     private CourseLevel courseLevel;
 
     public OrganizationChart(){

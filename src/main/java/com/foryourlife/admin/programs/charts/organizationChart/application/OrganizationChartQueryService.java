@@ -29,4 +29,13 @@ public class OrganizationChartQueryService {
     public List<OrganizationChart> getOrganizationChartByTeamId(String teamId){
         return organizationChartRepository.getOrganizationChartsByTeamId(teamId);
     }
+
+    public OrganizationChart getOrganizationChartByTrainingId(String trainingId){
+        return organizationChartRepository.getOrganizationChartTrainingId(trainingId).orElseThrow(
+                ()-> new BaseException(
+                        "Chart not found",
+                        List.of()
+                )
+        );
+    }
 }

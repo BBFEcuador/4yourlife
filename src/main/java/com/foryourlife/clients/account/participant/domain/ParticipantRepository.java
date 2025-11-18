@@ -23,4 +23,7 @@ public interface ParticipantRepository {
     void save(Participant user);
 
     Optional<Participant> findByUserId(String userId);
+
+    List<Participant> findAllByUserIds(List<String> userIds);
+
 }

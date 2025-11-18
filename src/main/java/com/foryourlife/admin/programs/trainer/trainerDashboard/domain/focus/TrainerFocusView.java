@@ -4,14 +4,12 @@ import java.util.List;
 
 public class TrainerFocusView {
     private GeneralAttendance focusAttendanceDashboard;
-    private List<CampusDashboard> campusDashboard;
-    private GenderDashboard genderDashboard;
-    private AgeDashboard ageDashboard;
+    private List<GenderDashboard> genderByDay;
+    private List<AgeDashboard> ageDashboard;
 
-    public TrainerFocusView(GeneralAttendance focusAttendanceDashboard, List<CampusDashboard> campusDashboard, GenderDashboard genderDashboard, AgeDashboard ageDashboard) {
+    public TrainerFocusView(GeneralAttendance focusAttendanceDashboard, List<GenderDashboard> genderByDay, List<AgeDashboard> ageDashboard) {
         this.focusAttendanceDashboard = focusAttendanceDashboard;
-        this.campusDashboard = campusDashboard;
-        this.genderDashboard = genderDashboard;
+        this.genderByDay = genderByDay;
         this.ageDashboard = ageDashboard;
     }
 
@@ -23,27 +21,19 @@ public class TrainerFocusView {
         this.focusAttendanceDashboard = focusAttendanceDashboard;
     }
 
-    public List<CampusDashboard> getCampusDashboard() {
-        return campusDashboard;
+    public List<GenderDashboard> getGenderByDay() {
+        return genderByDay;
     }
 
-    public void setCampusDashboard(List<CampusDashboard> campusDashboard) {
-        this.campusDashboard = campusDashboard;
+    public void setGenderByDay(List<GenderDashboard> genderByDay) {
+        this.genderByDay = genderByDay;
     }
 
-    public GenderDashboard getGenderDashboard() {
-        return genderDashboard;
-    }
-
-    public void setGenderDashboard(GenderDashboard genderDashboard) {
-        this.genderDashboard = genderDashboard;
-    }
-
-    public AgeDashboard getAgeDashboard() {
+    public List<AgeDashboard> getAgeDashboard() {
         return ageDashboard;
     }
 
-    public void setAgeDashboard(AgeDashboard ageDashboard) {
+    public void setAgeDashboard(List<AgeDashboard> ageDashboard) {
         this.ageDashboard = ageDashboard;
     }
 }

@@ -1,4 +1,4 @@
-package com.foryourlife.admin.programs.trainer.trainerDashboard.infrastructure;
+package com.foryourlife.admin.programs.trainer.trainerDashboard.infrastructure.persistence;
 
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;

@@ -28,8 +28,6 @@ public class TrainerController {
     @Autowired
     private TrainerCreatorService trainerCreateService;
 
-    @Autowired
-    private TrainerViewQueryService trainerViewQueryService;
 
     @PostMapping("")
     public ResponseEntity<?> createTrainer(@Valid @RequestBody TrainerRequest request) {
@@ -104,8 +102,4 @@ public class TrainerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/view/life/{id}")
-    public ResponseEntity<List<TrainerLifeView>> getTrainerViewById(@PathVariable String id) {
-        return new ResponseEntity<>(trainerViewQueryService.getTrainerView(id), HttpStatus.OK);
-    }
 }

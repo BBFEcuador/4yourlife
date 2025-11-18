@@ -5,6 +5,7 @@ import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
@@ -18,6 +19,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -86,5 +88,10 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                         : 0
         );
         return templateEngine.process("templates/Payment-pdf", context);
+    }
+
+    @Override
+    public List<Payment> findAllByParticipantIn(Collection<Participant> participantIds) {
+        return _jpaPaymentRepository.findAllByParticipantIn(participantIds);
     }
 }

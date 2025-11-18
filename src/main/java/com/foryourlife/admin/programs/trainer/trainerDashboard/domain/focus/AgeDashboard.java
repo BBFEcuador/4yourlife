@@ -8,6 +8,10 @@ public class AgeDashboard {
     public Integer age_41_65;
     public Integer age_above_65;
 
+    public AgeDashboard(){
+
+    }
+
     public AgeDashboard(String day, Integer age_less_18, Integer age_18_27, Integer age_28_40, Integer age_41_65, Integer age_above_65) {
         this.day = day;
         this.age_less_18 = age_less_18;

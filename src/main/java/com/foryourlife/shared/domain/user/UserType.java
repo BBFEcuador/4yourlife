@@ -16,4 +16,13 @@ public enum UserType {
     public String getValue() {
         return value;
     }
+
+    public static UserType fromValue(String value) {
+        for (UserType type : UserType.values()) {
+            if (type.getValue().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("No enum constant with value " + value);
+    }
 }

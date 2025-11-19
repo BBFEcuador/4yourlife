@@ -1,5 +1,7 @@
 package com.foryourlife.admin.programs.charts.organizationChart.application;
 
+import com.foryourlife.admin.programs.charts.chartNodes.application.ChartNodeCommandService;
+import com.foryourlife.admin.programs.charts.chartNodes.application.ChartNodeQueryService;
 import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNode;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChart;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChartRepository;
@@ -24,11 +26,15 @@ public class OrganizationChartCommandService {
     private final OrganizationChartRepository organizationChartRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+    private final ChartNodeCommandService chartNodeCommandService;
+    private final ChartNodeQueryService chartNodeQueryService;
 
-    public OrganizationChartCommandService(OrganizationChartRepository organizationChartRepository, TeamRepository teamRepository, UserRepository userRepository) {
+    public OrganizationChartCommandService(OrganizationChartRepository organizationChartRepository, TeamRepository teamRepository, UserRepository userRepository, ChartNodeCommandService chartNodeCommandService, ChartNodeQueryService chartNodeQueryService) {
         this.organizationChartRepository = organizationChartRepository;
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
+        this.chartNodeCommandService = chartNodeCommandService;
+        this.chartNodeQueryService = chartNodeQueryService;
     }
 
     @Transactional
@@ -61,12 +67,14 @@ public class OrganizationChartCommandService {
         }
 
         List<ChartNode> allNodes = new ArrayList<>();
+        var chartNodes = chartNodeQueryService.findAllByOrganizationId(organizationChart.getId());
+        chartNodes.forEach(chartNode -> {
+            chartNodeCommandService.deleteNode(chartNode.getId());
+        });
 
         if (request.getVisionaries() != null) {
             for (var vReq : request.getVisionaries()) {
-
                 ChartNode visionary = createNode(
-                        vReq.getId(),
                         vReq.getUserId(),
                         null,
                         UserType.VISIONARY,
@@ -78,7 +86,6 @@ public class OrganizationChartCommandService {
                     for (var sReq : vReq.getStaff()) {
 
                         ChartNode staff = createNode(
-                                sReq.getId(),
                                 sReq.getUserId(),
                                 visionary,
                                 UserType.STAFF,
@@ -89,7 +96,6 @@ public class OrganizationChartCommandService {
                         if (sReq.getParticipantsIds() != null) {
                             for (String pId : sReq.getParticipantsIds()) {
                                 ChartNode part = createNode(
-                                        null,
                                         pId,
                                         staff,
                                         UserType.PARTICIPANT,
@@ -101,13 +107,10 @@ public class OrganizationChartCommandService {
                     }
                 }
             }
-        }
-
-        else if (request.getStaff() != null) {
+        } else if (request.getStaff() != null) {
             for (var sReq : request.getStaff()) {
 
                 ChartNode staff = createNode(
-                        sReq.getId(),
                         sReq.getUserId(),
                         null,
                         UserType.STAFF,
@@ -118,7 +121,6 @@ public class OrganizationChartCommandService {
                 if (sReq.getParticipantsIds() != null) {
                     for (String pId : sReq.getParticipantsIds()) {
                         ChartNode part = createNode(
-                                null,
                                 pId,
                                 staff,
                                 UserType.PARTICIPANT,
@@ -135,7 +137,6 @@ public class OrganizationChartCommandService {
     }
 
     private ChartNode createNode(
-            String id,
             String userId,
             ChartNode parentNode,
             UserType level,
@@ -148,7 +149,7 @@ public class OrganizationChartCommandService {
         validateUserLevel(user, level);
 
         ChartNode node = new ChartNode();
-        node.setId(id != null ? id : UUID.randomUUID().toString());
+        node.setId(UUID.randomUUID().toString());
         node.setMembers(user);
         node.setLevel(level);
         node.setOrganizationChart(chart);

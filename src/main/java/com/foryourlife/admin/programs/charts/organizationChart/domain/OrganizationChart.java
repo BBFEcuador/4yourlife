@@ -18,8 +18,8 @@ public class OrganizationChart {
     @OneToMany(
             mappedBy = "organizationChart",
             cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
+            fetch = FetchType.EAGER,
+            targetEntity =  ChartNode.class
     )
     @JsonIgnoreProperties({"organizationChart"})
     private List<ChartNode> nodes = new ArrayList<>();

@@ -40,19 +40,14 @@ public class ChartNodeCommandService {
     }
 
     public void deleteNode(String id) {
-        var chartNode = repository.findById(id).orElseThrow(
-                () -> new BaseException(
-                        "Chart Node not found",
-                        List.of()
-                )
-        );
-        
-        var childNodes = repository.findAllByParentNodeId(chartNode.getId());
+        repository.findById(id).ifPresent(chartNode -> {
+            var childNodes = repository.findAllByParentNodeId(chartNode.getId());
 
-        for (var childNode : childNodes) {
-            deleteNode(childNode.getId());
-        }
+            for (var childNode : childNodes) {
+                deleteNode(childNode.getId());
+            }
 
-        repository.deleteNode(chartNode);
+            repository.deleteNode(chartNode);
+        });
     }
 }

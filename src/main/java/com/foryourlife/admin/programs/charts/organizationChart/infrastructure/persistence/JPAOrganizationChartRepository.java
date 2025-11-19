@@ -49,6 +49,6 @@ public class JPAOrganizationChartRepository implements OrganizationChartReposito
 
     @Override
     public void deleteOrganizationChartById(String id) {
-
+        jpaImplOrganizationChartRepository.deleteById(id);
     }
 }

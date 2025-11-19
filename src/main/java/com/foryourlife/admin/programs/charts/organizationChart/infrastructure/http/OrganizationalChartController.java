@@ -41,4 +41,10 @@ public class OrganizationalChartController {
     public ResponseEntity<Map<String, Optional<OrganizationChart>>> getOrganizationChartByTrainingId(@PathVariable("trainingId") String trainingId) {
         return new ResponseEntity<>(Map.of("OrganizationChart", organizationChartQueryService.getOrganizationChartByTrainingId(trainingId)), HttpStatus.OK);
     }
+
+    @PostMapping("/delete/{id}")
+    public ResponseEntity<?> deleteOrganizationChart(@PathVariable("id") String id) {
+        organizationChartCommandService.deleteOrganizationChartById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

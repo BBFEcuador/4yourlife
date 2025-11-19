@@ -28,7 +28,6 @@ public class ChartNode {
     @OneToMany(
             mappedBy = "parentNodeId",
             cascade = CascadeType.ALL,
-            orphanRemoval = true,
             fetch = FetchType.EAGER
     )
     private List<ChartNode> children = new ArrayList<>();
@@ -43,7 +42,8 @@ public class ChartNode {
     @ManyToOne
     @JoinColumn(
         name = "organization_chart_id",
-        referencedColumnName = "id"
+        referencedColumnName = "id",
+        nullable = false
     )
     @JsonIgnore
     private OrganizationChart organizationChart;

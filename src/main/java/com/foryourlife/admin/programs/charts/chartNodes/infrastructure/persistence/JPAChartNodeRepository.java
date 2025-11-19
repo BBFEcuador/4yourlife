@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface JPAChartNodeRepository extends JpaRepository<ChartNode, String> {
     List<ChartNode> findAllByOrganizationChart_Id(String organizationChartId);
+
+    List<ChartNode> findAllByParentNodeId(String parentNodeId);
 }

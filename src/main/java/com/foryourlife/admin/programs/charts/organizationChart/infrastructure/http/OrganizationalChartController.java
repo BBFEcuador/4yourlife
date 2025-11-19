@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/organization")
@@ -36,7 +38,7 @@ public class OrganizationalChartController {
     }
 
     @GetMapping("training/{trainingId}")
-    public ResponseEntity<OrganizationChart> getOrganizationChartByTrainingId(@PathVariable("trainingId") String trainingId) {
-        return new ResponseEntity<>(organizationChartQueryService.getOrganizationChartByTrainingId(trainingId), HttpStatus.OK);
+    public ResponseEntity<Map<String, Optional<OrganizationChart>>> getOrganizationChartByTrainingId(@PathVariable("trainingId") String trainingId) {
+        return new ResponseEntity<>(Map.of("OrganizationChart", organizationChartQueryService.getOrganizationChartByTrainingId(trainingId)), HttpStatus.OK);
     }
 }

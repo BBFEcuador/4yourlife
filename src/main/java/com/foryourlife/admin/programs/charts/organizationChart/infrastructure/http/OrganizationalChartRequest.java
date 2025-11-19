@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public class OrganizationalChartRequest {
+    private String id;
     @NotNull(message = "El equipo es requerido")
     private String teamId;
     private List<MasterLifeNodeRequest> masterLives;
@@ -13,6 +14,14 @@ public class OrganizationalChartRequest {
     private List<VisionaryNodeRequest> visionaries;
     @Valid
     private List<StaffNodeRequest> staff;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getTeamId() {
         return teamId;

@@ -12,4 +12,6 @@ public interface ChartNodeRepository {
     List<ChartNode> findAllByOrganizationId(String organizationId);
     void updateNode(ChartNode chartNode);
     Optional<ChartNode> findById(String chartNodeId);
+    void deleteNode(ChartNode chartNode);
+    List<ChartNode> findAllByParentNodeId(String parentNodeId);
 }

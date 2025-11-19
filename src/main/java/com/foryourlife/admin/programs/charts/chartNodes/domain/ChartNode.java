@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChart;
 import com.foryourlife.shared.domain.user.User;
+import com.foryourlife.shared.domain.user.UserType;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -37,7 +38,8 @@ public class ChartNode {
         referencedColumnName = "id"
     )
     private User members;
-    private String level;
+    @Enumerated(EnumType.STRING)
+    private UserType level;
     @ManyToOne
     @JoinColumn(
         name = "organization_chart_id",
@@ -51,7 +53,7 @@ public class ChartNode {
 
     }
 
-    public ChartNode(String id, String parentId, String parentNodeId, User members, String level, OrganizationChart organizationChart) {
+    public ChartNode(String id, String parentId, String parentNodeId, User members, UserType level, OrganizationChart organizationChart) {
         this.id = id;
         this.parentId = parentId;
         this.parentNodeId = parentNodeId;
@@ -92,11 +94,11 @@ public class ChartNode {
         this.members = members;
     }
 
-    public String getLevel() {
+    public UserType getLevel() {
         return level;
     }
 
-    public void setLevel(String level) {
+    public void setLevel(UserType level) {
         this.level = level;
     }
 

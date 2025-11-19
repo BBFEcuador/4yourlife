@@ -50,7 +50,8 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         return new TrainerFocusView(
                 this.buildGeneralAttendance(attendances, participants),
                 this.buildGenderDashboard(attendances, participants),
-                this.buildAgeDashboard(attendances, participants)
+                this.buildAgeDashboard(attendances, participants),
+                this.buildPaymentDashboard(attendances, participants)
         );
     }
 
@@ -215,15 +216,16 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
 
         if (organizationChart.isEmpty()) return List.of();
 
-        List<ChartNode> nodes = organizationChart.get().getNodes();
+        List<ChartNode> allNodes = flattenTree(organizationChart.get().getNodes());
 
-        List<ChartNode> staffNodes = nodes.stream()
-                .filter(n -> n.getLevel().equals(UserType.STAFF.getValue()))
+        List<ChartNode> staffNodes = allNodes.stream()
+                .filter(n -> n.getLevel() == UserType.STAFF)
                 .toList();
 
-        List<ChartNode> participantNodes = nodes.stream()
-                .filter(n -> n.getLevel().equals(UserType.PARTICIPANT.getValue()))
+        List<ChartNode> participantNodes = allNodes.stream()
+                .filter(n -> n.getLevel() == UserType.PARTICIPANT)
                 .toList();
+
 
         Map<String, List<String>> staffToParticipants = participantNodes.stream()
                 .collect(Collectors.groupingBy(
@@ -291,6 +293,17 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                         )
                 )
                 .count();
+    }
+
+    private List<ChartNode> flattenTree(List<ChartNode> nodes) {
+        List<ChartNode> all = new ArrayList<>();
+        for (ChartNode n : nodes) {
+            all.add(n);
+            if (n.getChildren() != null && !n.getChildren().isEmpty()) {
+                all.addAll(flattenTree(n.getChildren()));
+            }
+        }
+        return all;
     }
 
 }

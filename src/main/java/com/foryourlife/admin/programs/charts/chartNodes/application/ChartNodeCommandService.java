@@ -4,6 +4,7 @@ import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNodeReposito
 import com.foryourlife.admin.programs.charts.chartNodes.infrastructure.http.ChartNodeRequest;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.UserRepository;
+import com.foryourlife.shared.domain.user.UserType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public class ChartNodeCommandService {
         this.userRepository = userRepository;
     }
 
-    public void updateNode(ChartNodeRequest chartNodeRequest) {
-        var chartNode = repository.findById(chartNodeRequest.getNodeId()).orElseThrow(
+    public void updateNode(String id, ChartNodeRequest chartNodeRequest) {
+        var chartNode = repository.findById(id).orElseThrow(
                 () -> new BaseException(
                         "Chart Node not found",
                         List.of()
@@ -32,9 +33,26 @@ public class ChartNodeCommandService {
                 )
         );
         chartNode.setParentNodeId(chartNodeRequest.getParentNodeId());
-        chartNode.setLevel(chartNodeRequest.getLevel());
+        chartNode.setLevel(UserType.valueOf(chartNodeRequest.getLevel()));
         chartNode.setParentId(chartNodeRequest.getParentId());
         chartNode.setMembers(user);
         repository.updateNode(chartNode);
+    }
+
+    public void deleteNode(String id) {
+        var chartNode = repository.findById(id).orElseThrow(
+                () -> new BaseException(
+                        "Chart Node not found",
+                        List.of()
+                )
+        );
+        
+        var childNodes = repository.findAllByParentNodeId(chartNode.getId());
+
+        for (var childNode : childNodes) {
+            deleteNode(childNode.getId());
+        }
+
+        repository.deleteNode(chartNode);
     }
 }

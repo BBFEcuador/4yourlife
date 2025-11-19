@@ -6,11 +6,21 @@ public class TrainerFocusView {
     private GeneralAttendance focusAttendanceDashboard;
     private List<GenderDashboard> genderByDay;
     private List<AgeDashboard> ageDashboard;
+    private List<PaymentDashboard> paymentDashboard;
 
-    public TrainerFocusView(GeneralAttendance focusAttendanceDashboard, List<GenderDashboard> genderByDay, List<AgeDashboard> ageDashboard) {
+    public TrainerFocusView(GeneralAttendance focusAttendanceDashboard, List<GenderDashboard> genderByDay, List<AgeDashboard> ageDashboard, List<PaymentDashboard> paymentDashboard) {
         this.focusAttendanceDashboard = focusAttendanceDashboard;
         this.genderByDay = genderByDay;
         this.ageDashboard = ageDashboard;
+        this.paymentDashboard = paymentDashboard;
+    }
+
+    public List<PaymentDashboard> getPaymentDashboard() {
+        return paymentDashboard;
+    }
+
+    public void setPaymentDashboard(List<PaymentDashboard> paymentDashboard) {
+        this.paymentDashboard = paymentDashboard;
     }
 
     public GeneralAttendance getFocusAttendanceDashboard() {

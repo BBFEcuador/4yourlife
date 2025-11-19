@@ -6,6 +6,7 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrganizationChartQueryService {
@@ -30,12 +31,7 @@ public class OrganizationChartQueryService {
         return organizationChartRepository.getOrganizationChartsByTeamId(teamId);
     }
 
-    public OrganizationChart getOrganizationChartByTrainingId(String trainingId){
-        return organizationChartRepository.getOrganizationChartTrainingId(trainingId).orElseThrow(
-                ()-> new BaseException(
-                        "Chart not found",
-                        List.of()
-                )
-        );
+    public Optional<OrganizationChart> getOrganizationChartByTrainingId(String trainingId){
+        return organizationChartRepository.getOrganizationChartTrainingId(trainingId);
     }
 }

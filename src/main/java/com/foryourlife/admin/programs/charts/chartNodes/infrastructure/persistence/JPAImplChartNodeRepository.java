@@ -44,4 +44,14 @@ public class JPAImplChartNodeRepository implements ChartNodeRepository {
     public Optional<ChartNode> findById(String chartNodeId) {
         return repository.findById(chartNodeId);
     }
+
+    @Override
+    public void deleteNode(ChartNode chartNode) {
+        repository.delete(chartNode);
+    }
+
+    @Override
+    public List<ChartNode> findAllByParentNodeId(String parentNodeId) {
+        return repository.findAllByParentNodeId(parentNodeId);
+    }
 }

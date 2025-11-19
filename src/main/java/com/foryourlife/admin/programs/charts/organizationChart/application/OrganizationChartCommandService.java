@@ -8,8 +8,11 @@ import com.foryourlife.admin.programs.charts.organizationChart.infrastructure.ht
 import com.foryourlife.admin.programs.charts.organizationChart.infrastructure.http.VisionaryNodeRequest;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserRepository;
+import com.foryourlife.shared.domain.user.UserType;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,108 +31,124 @@ public class OrganizationChartCommandService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public void saveOrganizationChart(OrganizationalChartRequest request) {
 
-        OrganizationChart organizationChart = new OrganizationChart();
-        organizationChart.setId(UUID.randomUUID().toString());
+        OrganizationChart organizationChart;
 
-        Team team = teamRepository.findById(request.getTeamId())
-                .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
+        if (request.getId() != null) {
+            organizationChart = organizationChartRepository.findById(request.getId())
+                    .orElseThrow(() -> new RuntimeException("Organigrama no encontrado"));
 
-        if (organizationChartRepository.getOrganizationChartByTeamIdAndCourseLevel(
-                request.getTeamId(), team.getTraining().getCourseLevel()).isPresent()) {
+            organizationChart.getNodes().clear();
 
-            throw new RuntimeException("Ya existe un organigrama para el equipo "+ team.getName() + " en el nivel " + team.getTraining().getCourseLevel());
+        } else {
+            organizationChart = new OrganizationChart();
+            organizationChart.setId(UUID.randomUUID().toString());
+
+            Team team = teamRepository.findById(request.getTeamId())
+                    .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
+
+            if (organizationChartRepository.getOrganizationChartByTeamIdAndCourseLevel(
+                    request.getTeamId(),
+                    team.getTraining().getCourseLevel()
+            ).isPresent()) {
+                throw new RuntimeException("Ya existe un organigrama para ese equipo y nivel");
+            }
+
+            organizationChart.setTeam(team);
+            organizationChart.setCourseLevel(team.getTraining().getCourseLevel());
         }
-
-        organizationChart.setTeam(team);
 
         List<ChartNode> allNodes = new ArrayList<>();
 
-        if (request.getVisionaries() != null && !request.getVisionaries().isEmpty()) {
-            for (VisionaryNodeRequest vReq : request.getVisionaries()) {
+        if (request.getVisionaries() != null) {
+            for (var vReq : request.getVisionaries()) {
 
-                ChartNode visionaryNode = createNode(
+                ChartNode visionary = createNode(
+                        vReq.getId(),
                         vReq.getUserId(),
                         null,
-                        "VISIONARY",
+                        UserType.VISIONARY,
                         organizationChart
                 );
-                allNodes.add(visionaryNode);
+                allNodes.add(visionary);
 
                 if (vReq.getStaff() != null) {
-                    for (StaffNodeRequest sReq : vReq.getStaff()) {
+                    for (var sReq : vReq.getStaff()) {
 
-                        ChartNode staffNode = createNode(
+                        ChartNode staff = createNode(
+                                sReq.getId(),
                                 sReq.getUserId(),
-                                visionaryNode,
-                                "STAFF",
+                                visionary,
+                                UserType.STAFF,
                                 organizationChart
                         );
-                        allNodes.add(staffNode);
+                        allNodes.add(staff);
 
                         if (sReq.getParticipantsIds() != null) {
                             for (String pId : sReq.getParticipantsIds()) {
-
-                                ChartNode participantNode = createNode(
+                                ChartNode part = createNode(
+                                        null,
                                         pId,
-                                        staffNode,
-                                        "PARTICIPANT",
+                                        staff,
+                                        UserType.PARTICIPANT,
                                         organizationChart
                                 );
-                                allNodes.add(participantNode);
+                                allNodes.add(part);
                             }
                         }
                     }
                 }
             }
-        } else if (request.getStaff() != null && !request.getStaff().isEmpty()) {
+        }
 
-            for (StaffNodeRequest sReq : request.getStaff()) {
+        else if (request.getStaff() != null) {
+            for (var sReq : request.getStaff()) {
 
-                ChartNode staffNode = createNode(
+                ChartNode staff = createNode(
+                        sReq.getId(),
                         sReq.getUserId(),
                         null,
-                        "STAFF",
+                        UserType.STAFF,
                         organizationChart
                 );
-                allNodes.add(staffNode);
+                allNodes.add(staff);
 
                 if (sReq.getParticipantsIds() != null) {
                     for (String pId : sReq.getParticipantsIds()) {
-
-                        ChartNode participantNode = createNode(
+                        ChartNode part = createNode(
+                                null,
                                 pId,
-                                staffNode,
-                                "PARTICIPANT",
+                                staff,
+                                UserType.PARTICIPANT,
                                 organizationChart
                         );
-                        allNodes.add(participantNode);
+                        allNodes.add(part);
                     }
                 }
             }
         }
 
         organizationChart.setNodes(allNodes);
-        organizationChart.setCourseLevel(team.getTraining().getCourseLevel());
         organizationChartRepository.save(organizationChart);
     }
 
-
     private ChartNode createNode(
+            String id,
             String userId,
             ChartNode parentNode,
-            String level,
+            UserType level,
             OrganizationChart chart
     ) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + userId));
+                .orElseThrow(() -> new BaseException("Usuario no encontrado: " + userId, List.of()));
 
         validateUserLevel(user, level);
 
         ChartNode node = new ChartNode();
-        node.setId(UUID.randomUUID().toString());
+        node.setId(id != null ? id : UUID.randomUUID().toString());
         node.setMembers(user);
         node.setLevel(level);
         node.setOrganizationChart(chart);
@@ -145,12 +164,12 @@ public class OrganizationChartCommandService {
         return node;
     }
 
-    private void validateUserLevel(User user, String level) {
+    private void validateUserLevel(User user, UserType level) {
 
         String requiredEntity = switch (level) {
-            case "VISIONARY" -> "VISIONARY";
-            case "STAFF" -> "STAFF";
-            case "PARTICIPANT" -> "PARTICIPANT";
+            case UserType.VISIONARY -> "VISIONARY";
+            case UserType.STAFF -> "STAFF";
+            case UserType.PARTICIPANT -> "PARTICIPANT";
             default -> throw new RuntimeException("Nivel inválido: " + level);
         };
 

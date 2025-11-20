@@ -72,7 +72,7 @@ public class OrganizationChartCommandService {
             chartNodeCommandService.deleteNode(chartNode.getId());
         });
 
-        if (request.getVisionaries() != null) {
+        if (!request.getVisionaries().isEmpty()) {
             for (var vReq : request.getVisionaries()) {
                 ChartNode visionary = createNode(
                         vReq.getUserId(),
@@ -153,6 +153,9 @@ public class OrganizationChartCommandService {
         node.setMembers(user);
         node.setLevel(level);
         node.setOrganizationChart(chart);
+        if (level == UserType.STAFF) {
+
+        }
 
         if (parentNode != null) {
             node.setParentNodeId(parentNode.getId());
@@ -168,6 +171,7 @@ public class OrganizationChartCommandService {
     private void validateUserLevel(User user, UserType level) {
 
         String requiredEntity = switch (level) {
+            case UserType.MASTER_LIFE ->  "MASTER_LIFE";
             case UserType.VISIONARY -> "VISIONARY";
             case UserType.STAFF -> "STAFF";
             case UserType.PARTICIPANT -> "PARTICIPANT";

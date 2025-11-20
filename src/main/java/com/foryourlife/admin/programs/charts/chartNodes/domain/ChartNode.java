@@ -47,19 +47,25 @@ public class ChartNode {
     )
     @JsonIgnore
     private OrganizationChart organizationChart;
+    @Column(
+        name = "is_captain"
+    )
+    private Boolean isCaptain = false;
 
 
     public ChartNode(){
 
     }
 
-    public ChartNode(String id, String parentId, String parentNodeId, User members, UserType level, OrganizationChart organizationChart) {
+    public ChartNode(String id, String parentId, String parentNodeId, List<ChartNode> children, User members, UserType level, OrganizationChart organizationChart, Boolean isCaptain) {
         this.id = id;
         this.parentId = parentId;
         this.parentNodeId = parentNodeId;
+        this.children = children;
         this.members = members;
         this.level = level;
         this.organizationChart = organizationChart;
+        this.isCaptain = isCaptain;
     }
 
     public String getId() {
@@ -112,5 +118,17 @@ public class ChartNode {
 
     public void setOrganizationChart(OrganizationChart organizationChart) {
         this.organizationChart = organizationChart;
+    }
+
+    public void setChildren(List<ChartNode> children) {
+        this.children = children;
+    }
+
+    public Boolean getCaptain() {
+        return isCaptain;
+    }
+
+    public void setCaptain(Boolean captain) {
+        isCaptain = captain;
     }
 }

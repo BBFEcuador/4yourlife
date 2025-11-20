@@ -1,5 +1,6 @@
 package com.foryourlife.staff.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
@@ -22,6 +23,7 @@ public class Staff {
     private User user;
 
     @ManyToMany(mappedBy = "staffs", targetEntity = Team.class, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({"users", "trainer", "masterLife", "staffs"})
     private Set<Team> teams = new HashSet<>();
 
     protected Staff() {
@@ -65,5 +67,9 @@ public class Staff {
 
     public void changeStatus(){
         this.isActive = !this.isActive;
+    }
+
+    public Boolean isIsCaptain() {
+        return "CAPITAN".equalsIgnoreCase(this.rol);
     }
 }

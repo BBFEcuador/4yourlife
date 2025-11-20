@@ -78,15 +78,15 @@ public class OrganizationChartCommandService {
         chartNodes.forEach(chartNode -> {
             chartNodeCommandService.deleteNode(chartNode.getId());
         });
-        if (request.getMasterLives() != null) {
-            for (MasterLifeNodeRequest mlId : request.getMasterLives()) {
+        if (!request.getMasterLifes().isEmpty()) {
+            for (MasterLifeNodeRequest mlId : request.getMasterLifes()) {
                 ChartNode mlNode = createNode(
                         mlId.getUserId(),
                         null,
                         UserType.MASTER_LIFE,
                         organizationChart
                 );
-                organizationChart.getNodes().add(mlNode);
+                allNodes.add(mlNode);
                 if (!mlId.getParticipantsIds().isEmpty()) {
                     for (String pId : mlId.getParticipantsIds()) {
                         ChartNode part = createNode(

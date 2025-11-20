@@ -9,7 +9,7 @@ public class OrganizationalChartRequest {
     private String id;
     @NotNull(message = "El equipo es requerido")
     private String teamId;
-    private List<MasterLifeNodeRequest> masterLives;
+    private List<MasterLifeNodeRequest> masterLifes;
     @Valid
     private List<VisionaryNodeRequest> visionaries;
     @Valid
@@ -47,12 +47,8 @@ public class OrganizationalChartRequest {
         this.staff = staff;
     }
 
-    public List<MasterLifeNodeRequest> getMasterLives() {
-        return masterLives;
-    }
-
-    public void setMasterLives(List<MasterLifeNodeRequest> masterLives) {
-        this.masterLives = masterLives;
+    public List<MasterLifeNodeRequest> getMasterLifes() {
+        return masterLifes;
     }
 }
 

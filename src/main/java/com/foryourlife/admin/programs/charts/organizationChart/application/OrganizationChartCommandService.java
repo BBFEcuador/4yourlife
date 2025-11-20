@@ -5,6 +5,7 @@ import com.foryourlife.admin.programs.charts.chartNodes.application.ChartNodeQue
 import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNode;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChart;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChartRepository;
+import com.foryourlife.admin.programs.charts.organizationChart.infrastructure.http.MasterLifeNodeRequest;
 import com.foryourlife.admin.programs.charts.organizationChart.infrastructure.http.OrganizationalChartRequest;
 import com.foryourlife.admin.programs.charts.organizationChart.infrastructure.http.StaffNodeRequest;
 import com.foryourlife.admin.programs.charts.organizationChart.infrastructure.http.VisionaryNodeRequest;
@@ -14,11 +15,13 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.UserType;
+import com.foryourlife.staff.domain.StaffRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -28,13 +31,15 @@ public class OrganizationChartCommandService {
     private final UserRepository userRepository;
     private final ChartNodeCommandService chartNodeCommandService;
     private final ChartNodeQueryService chartNodeQueryService;
+    private final StaffRepository staffRepository;
 
-    public OrganizationChartCommandService(OrganizationChartRepository organizationChartRepository, TeamRepository teamRepository, UserRepository userRepository, ChartNodeCommandService chartNodeCommandService, ChartNodeQueryService chartNodeQueryService) {
+    public OrganizationChartCommandService(OrganizationChartRepository organizationChartRepository, TeamRepository teamRepository, UserRepository userRepository, ChartNodeCommandService chartNodeCommandService, ChartNodeQueryService chartNodeQueryService, StaffRepository staffRepository) {
         this.organizationChartRepository = organizationChartRepository;
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
         this.chartNodeCommandService = chartNodeCommandService;
         this.chartNodeQueryService = chartNodeQueryService;
+        this.staffRepository = staffRepository;
     }
 
     @Transactional
@@ -65,12 +70,39 @@ public class OrganizationChartCommandService {
             organizationChart.setTeam(team);
             organizationChart.setCourseLevel(team.getTraining().getCourseLevel());
         }
-
         List<ChartNode> allNodes = new ArrayList<>();
+
+
+
         var chartNodes = chartNodeQueryService.findAllByOrganizationId(organizationChart.getId());
         chartNodes.forEach(chartNode -> {
             chartNodeCommandService.deleteNode(chartNode.getId());
         });
+        if (request.getMasterLives() != null) {
+            for (MasterLifeNodeRequest mlId : request.getMasterLives()) {
+                ChartNode mlNode = createNode(
+                        mlId.getUserId(),
+                        null,
+                        UserType.MASTER_LIFE,
+                        organizationChart
+                );
+                organizationChart.getNodes().add(mlNode);
+                if (!mlId.getParticipantsIds().isEmpty()) {
+                    for (String pId : mlId.getParticipantsIds()) {
+                        ChartNode part = createNode(
+                                pId,
+                                mlNode,
+                                UserType.PARTICIPANT,
+                                organizationChart
+                        );
+                        allNodes.add(part);
+                    }
+                }
+            }
+            organizationChart.setNodes(allNodes);
+            organizationChartRepository.save(organizationChart);
+            return;
+        }
 
         if (!request.getVisionaries().isEmpty()) {
             for (var vReq : request.getVisionaries()) {
@@ -82,7 +114,7 @@ public class OrganizationChartCommandService {
                 );
                 allNodes.add(visionary);
 
-                if (vReq.getStaff() != null) {
+                if (!vReq.getStaff().isEmpty()) {
                     for (var sReq : vReq.getStaff()) {
 
                         ChartNode staff = createNode(
@@ -107,7 +139,7 @@ public class OrganizationChartCommandService {
                     }
                 }
             }
-        } else if (request.getStaff() != null) {
+        } else if (!request.getStaff().isEmpty()) {
             for (var sReq : request.getStaff()) {
 
                 ChartNode staff = createNode(
@@ -118,7 +150,7 @@ public class OrganizationChartCommandService {
                 );
                 allNodes.add(staff);
 
-                if (sReq.getParticipantsIds() != null) {
+                if (!sReq.getParticipantsIds().isEmpty()) {
                     for (String pId : sReq.getParticipantsIds()) {
                         ChartNode part = createNode(
                                 pId,
@@ -154,7 +186,10 @@ public class OrganizationChartCommandService {
         node.setLevel(level);
         node.setOrganizationChart(chart);
         if (level == UserType.STAFF) {
-
+            var staff = staffRepository.findByUserId(userId).getRol();
+            if (Objects.equals(staff, "CAPITAN")) {
+                node.setCaptain(true);
+            }
         }
 
         if (parentNode != null) {

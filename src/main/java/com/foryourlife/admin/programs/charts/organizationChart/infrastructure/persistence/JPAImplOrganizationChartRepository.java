@@ -18,7 +18,7 @@ public interface JPAImplOrganizationChartRepository extends JpaRepository<Organi
     @Query("""
     SELECT oc FROM OrganizationChart oc
     LEFT JOIN FETCH oc.nodes n
-    WHERE oc.team.training.id = :teamTrainingId
+    WHERE oc.team.training.id = :teamTrainingId AND oc.courseLevel = oc.team.training.courseLevel
       AND (n.parentNodeId IS NULL OR n IS NULL)
 """)
     Optional<OrganizationChart> findRootNodesByTeamTrainingId(String teamTrainingId);

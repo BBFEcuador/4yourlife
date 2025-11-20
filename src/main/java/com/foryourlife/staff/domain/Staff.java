@@ -1,6 +1,7 @@
 package com.foryourlife.staff.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
@@ -69,7 +70,8 @@ public class Staff {
         this.isActive = !this.isActive;
     }
 
-    public Boolean isIsCaptain() {
+    @JsonProperty(access =  JsonProperty.Access.READ_ONLY)
+    public Boolean getIsCaptain() {
         return "CAPITAN".equalsIgnoreCase(this.rol);
     }
 }

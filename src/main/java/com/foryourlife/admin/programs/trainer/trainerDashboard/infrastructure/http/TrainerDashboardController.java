@@ -1,6 +1,7 @@
 package com.foryourlife.admin.programs.trainer.trainerDashboard.infrastructure.http;
 
 import com.foryourlife.admin.programs.trainer.trainerDashboard.application.TrainerViewQueryService;
+import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.focus.TrainerFocusView;
 import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.life.TrainerLifeView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class TrainerDashboardController {
     }
 
     @GetMapping("/focus/{id}")
-    public ResponseEntity<?> getFocusDashboardById(@PathVariable String id) {
+    public ResponseEntity<TrainerFocusView> getFocusDashboardById(@PathVariable String id) {
         return new ResponseEntity<>(trainerViewQueryService.getFocusView(id), HttpStatus.OK);
     }
 }

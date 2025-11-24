@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class UserCreated extends DomainEvent {
 
-    private final Participant user;
+    private final Participant participant;
 
     public UserCreated(String aggregateId, Participant user) {
         super(
@@ -19,10 +19,10 @@ public class UserCreated extends DomainEvent {
                 UUID.randomUUID().toString(),
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
         );
-        this.user = user;
+        this.participant = user;
     }
-    public Participant getUser() {
-        return user;
+    public Participant getParticipant() {
+        return participant;
     }
     @Override
     public String eventName() {

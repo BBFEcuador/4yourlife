@@ -32,7 +32,7 @@ public class AttendanceRepositoryImpl implements AttendanceRepository {
 
     @Override
     public List<Attendance> findAttendanceByUser(String userId) {
-        return _jpaAttendanceRepository.findByParticipant_Id(userId);
+        return _jpaAttendanceRepository.findByUser_Id(userId);
     }
 
     @Override

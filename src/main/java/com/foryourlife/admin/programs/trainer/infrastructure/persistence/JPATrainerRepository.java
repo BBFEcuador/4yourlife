@@ -33,18 +33,18 @@ public interface JPATrainerRepository extends JpaRepository<Trainer, String>, Jp
                 )
             """)
     List<Trainer> findAvailableTrainers(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-    @Query("""
-                SELECT COUNT(s) > 0 FROM Trainer s
-                WHERE s.id = :trainerId
-                AND NOT EXISTS (
-                    SELECT t FROM Team t
-                    JOIN t.training tr
-                    WHERE t MEMBER OF s.teams
-                    AND tr.startDate BETWEEN :startDate AND :endDate
-                    AND tr.id <> :newTrainingId
-                )
-            """)
-    boolean isTrainerAvailable(String trainerId, LocalDate startDate, LocalDate endDate, String newTrainingId);
+//    @Query("""
+//                SELECT COUNT(s) > 0 FROM Trainer s
+//                WHERE s.id = :trainerId
+//                AND NOT EXISTS (
+//                    SELECT t FROM Team t
+//                    JOIN t.training tr
+//                    WHERE t MEMBER OF s.teams
+//                    AND tr.startDate BETWEEN :startDate AND :endDate
+//                    AND tr.id <> :newTrainingId
+//                )
+//            """)
+//    boolean isTrainerAvailable(String trainerId, LocalDate startDate, LocalDate endDate, String newTrainingId);
 
-    Optional<Object> findByEmail(String email);
+    Optional<Trainer> findByEmail(String email);
 }

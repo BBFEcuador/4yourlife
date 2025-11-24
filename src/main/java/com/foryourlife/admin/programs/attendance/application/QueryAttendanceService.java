@@ -4,6 +4,7 @@ import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -19,6 +20,12 @@ public class QueryAttendanceService {
     }
 
     public List<Attendance> getAttendancesByTraining(String trainingId) {
-        return _attendanceRepository.findAttendanceByTraining(trainingId);
+        try {
+            return _attendanceRepository.findAttendanceByTraining(trainingId);
+        }catch (Exception e){
+            System.out.println(e);
+            return Collections.emptyList();
+        }
+
     }
 }

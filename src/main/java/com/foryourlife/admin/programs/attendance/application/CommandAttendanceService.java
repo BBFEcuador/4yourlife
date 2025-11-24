@@ -49,7 +49,7 @@ public class CommandAttendanceService {
             case SATURDAY -> attendance.setSaturdayAttendance(attendanceRequest.attendanceStatus);
             case SUNDAY -> attendance.setSundayAttendance(attendanceRequest.attendanceStatus);
             default -> throw new BaseException(
-                    "Día inválido",
+                    "El día seleccionado no coincide con el día del entrenamiento",
                     List.of("El día proporcionado no es válido para registrar asistencia.")
             );
         }

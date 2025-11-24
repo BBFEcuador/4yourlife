@@ -11,6 +11,5 @@ import java.util.Optional;
 @Repository
 public interface JPATeamRepository extends JpaRepository<Team, String>, JpaSpecificationExecutor<Team> {
     Optional<Team> findByTraining_id(String s);
-
     List<Team> findAllByTrainer_Id(String trainerId);
 }

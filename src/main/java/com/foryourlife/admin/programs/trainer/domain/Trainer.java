@@ -1,10 +1,8 @@
 package com.foryourlife.admin.programs.trainer.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.foryourlife.admin.programs.teams.domain.Team;
-import jakarta.persistence.*;
-
-import java.util.List;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "trainers")
@@ -21,10 +19,6 @@ public class Trainer {
     private String password;
 
     private Boolean isActive;
-
-    @JsonIgnoreProperties({"trainer"})
-    @OneToMany(mappedBy = "trainer", fetch = FetchType.EAGER)
-    private List<Team> teams;
 
     protected Trainer() {
     }
@@ -89,13 +83,5 @@ public class Trainer {
 
     public static Trainer create(String id, String name, String email, String phone, String password, Boolean isActive) {
         return new Trainer(id, name, email, phone, password, isActive);
-    }
-
-    public List<Team> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(List<Team> teams) {
-        this.teams = teams;
     }
 }

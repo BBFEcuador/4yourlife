@@ -118,7 +118,7 @@ public class VisionaryController {
 
     @PostMapping("/visionary-participant")
     public ResponseEntity<?> createFromParticipant(@Valid @RequestBody ParticipantTypeRequest request) {
-        creatorService.createFromParticipant(request.userId, request.role);
+        creatorService.createFromParticipant(request.userId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

@@ -12,8 +12,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/attendance")
 public class AttendanceController {
-    private CommandAttendanceService _commandAttendanceService;
-    private QueryAttendanceService _queryAttedanceService;
+    private final CommandAttendanceService _commandAttendanceService;
+    private final QueryAttendanceService _queryAttedanceService;
 
     public AttendanceController(CommandAttendanceService _commandAttendanceService, QueryAttendanceService _queryAttedanceService) {
         this._commandAttendanceService = _commandAttendanceService;

@@ -1,8 +1,10 @@
 package com.foryourlife.admin.auth.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.foryourlife.admin.permission.domain.Permission;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "admin_roles")
@@ -11,15 +13,23 @@ public class AdminRole {
     private String id;
     private String name;
     private String type;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "roles_permissions",
+            joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id", referencedColumnName = "id")
+    )
+    private List<Permission> permissions = new ArrayList<>();
 
     protected AdminRole() {
 
     }
 
-    public AdminRole(String id, String name, String type) {
+    public AdminRole(String id, String name, String type, List<Permission> permissions) {
         this.id = id;
         this.name = name;
         this.type = type;
+        this.permissions = permissions;
     }
 
     public String getId() {
@@ -55,7 +65,15 @@ public class AdminRole {
                 '}';
     }
 
-    public static AdminRole create(String id, String name, String type){
-        return new AdminRole(id, name, type);
+    public static AdminRole create(String id, String name, String type, List<Permission> permissions) {
+        return new AdminRole(id, name, type, permissions);
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 }

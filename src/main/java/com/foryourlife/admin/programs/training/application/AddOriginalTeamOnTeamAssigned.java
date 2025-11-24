@@ -33,6 +33,7 @@ public class AddOriginalTeamOnTeamAssigned {
         Hibernate.initialize(team.getStaffs());
         Hibernate.initialize(team.getVisionaries());
         Hibernate.initialize(team.getMasterLife());
+        Hibernate.initialize(team.getTrainer());
 
         training.setOriginalTeam(team);
         trainingRepository.save(training);

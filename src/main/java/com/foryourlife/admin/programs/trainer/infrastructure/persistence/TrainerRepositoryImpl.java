@@ -7,6 +7,8 @@ import com.foryourlife.shared.JWTUtils;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
+import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -64,13 +66,14 @@ public class TrainerRepositoryImpl implements TrainerRepository {
     }
 
     @Override
+    @Transactional
     public LoginTrainerResponse loginTrainer(String email, String password) throws BaseException {
         Authentication authentication = this.authenticate(email.toLowerCase(), password);
         var token = jwtUtils.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return new LoginTrainerResponse(this.loadTrainer , token);
     }
-
+    @Transactional
     private Authentication authenticate(String username, String password) throws BaseException {
         var userDetails = this.loadTrainerByEmail(username);
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
@@ -86,12 +89,12 @@ public class TrainerRepositoryImpl implements TrainerRepository {
         authorityList.add(new SimpleGrantedAuthority("trainer"));
         return new UsernamePasswordAuthenticationToken(username, password, authorityList);
     }
-
+    @Transactional
     public Trainer loadTrainerByEmail(String email) throws BaseException {
         var trainer = repository.findByEmail(email).orElseThrow(
                 () -> new BaseException("Login Error", List.of("Credenciales invalidas!."))
         );
-        this.loadTrainer = (Trainer) trainer;
-        return (Trainer) trainer;
+        this.loadTrainer = trainer;
+        return trainer;
     }
 }

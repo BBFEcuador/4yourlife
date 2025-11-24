@@ -43,7 +43,7 @@ public class OnPaymentCreated {
 
             var invitation = queryInvitationServices.findInvitationByToken(participant.getInvitationToken());
 
-            var promiseOpt = promiseRepository.findLastByParticipant(invitation.getSenderId());
+            var promiseOpt = promiseRepository.findLastByUserId(invitation.getSenderId());
 
             if (promiseOpt.isPresent()) {
                 var promise = promiseOpt.get();

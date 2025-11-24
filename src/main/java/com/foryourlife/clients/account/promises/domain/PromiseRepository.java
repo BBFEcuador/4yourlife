@@ -13,5 +13,5 @@ public interface PromiseRepository {
     void deleteById(String id);
     Page<Promise> findAll(Pageable pageable, Criteria criteria);
     List<Promise> findByTrainingId(String trainingId);
-    Optional<Promise> findLastByParticipant(String participantId);
+    Optional<Promise> findLastByUserId(String userId);
 }

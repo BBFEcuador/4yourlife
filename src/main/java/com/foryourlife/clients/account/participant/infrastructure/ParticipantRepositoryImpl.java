@@ -98,7 +98,12 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
     }
 
     @Override
-    public Participant findByUserId(String userId) {
+    public Optional<Participant> findByUserId(String userId) {
         return repository.findByUser_Id(userId);
+    }
+
+    @Override
+    public List<Participant> findAllByUserIds(List<String> userIds) {
+        return repository.findAllByUserIds(userIds);
     }
 }

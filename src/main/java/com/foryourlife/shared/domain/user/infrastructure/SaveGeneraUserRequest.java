@@ -22,11 +22,11 @@ public class SaveGeneraUserRequest {
     @NotNull
     public String password;
     @NotNull
-    @NotBlank(message = "The name1 field is required")
+    @NotBlank(message = "El nombre es obligatorio")
     public String name1;
     public String name2;
     @NotNull
-    @NotBlank(message = "The lastname1 field is required")
+    @NotBlank(message = "El apellido es obligatorio")
     public String lastname1;
     public String lastname2;
     @NotNull

@@ -52,4 +52,8 @@ public class QueryTeamService {
         return this._teamRepository.findByTrainingId(trainingId).orElseThrow(
                 () -> new BaseException("Not found", List.of("The team with training id " + trainingId + " does not exist")));
     }
+
+    public List<Team> getByTrainerId(String trainerId) {
+        return this._teamRepository.findByTrainerId(trainerId);
+    }
 }

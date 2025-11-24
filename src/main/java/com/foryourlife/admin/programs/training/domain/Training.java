@@ -1,6 +1,9 @@
 package com.foryourlife.admin.programs.training.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.shared.domain.AggregateRoot;
@@ -37,6 +40,7 @@ public class Training extends AggregateRoot implements Serializable {
     @OneToOne(
             cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST}
     )
+    @JsonIncludeProperties({"originalTeam"})
     @JoinColumn(name = "nextLevel", referencedColumnName = "id")
     private Training nextLevel;
     @ManyToOne
@@ -73,7 +77,7 @@ public class Training extends AggregateRoot implements Serializable {
             Campus campus,
             Boolean state
     ) {
-        var training = new Training(
+        return new Training(
                 id,
                 number,
                 name,
@@ -84,7 +88,6 @@ public class Training extends AggregateRoot implements Serializable {
                 campus,
                 state
         );
-        return training;
     }
 
     public String getId() {
@@ -305,5 +308,9 @@ public class Training extends AggregateRoot implements Serializable {
                 '}';
         System.out.println(s);
         return s;
+    }
+    @JsonProperty(value = "courseLevelDisplay", access = JsonProperty.Access.READ_ONLY)
+    public String getCourseLevelDisplay() {
+        return this.courseLevel.getValue();
     }
 }

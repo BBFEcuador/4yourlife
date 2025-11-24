@@ -69,8 +69,7 @@ public class CommandTeamService {
             return null;
         }).toList();
         var masterLife = request.masterLife.stream().map(participant -> {
-            var p = queryMasterLifeService.findById(participant.getId());
-            return p;
+            return queryMasterLifeService.findById(participant.getId());
         }).toList();
         var team = Team.create(
                 request.id != null ? request.id : UUID.randomUUID().toString(),
@@ -318,8 +317,7 @@ public class CommandTeamService {
             return p;
         }).toList();
 
-        team.setName(request.name != null ? request.name
-                : training.getCourseLevel().name() + "-" + training.getNumber());
+        team.setName(training.getCourseLevel().name() + "-" + training.getNumber());
         team.setTraining(training);
         team.setTrainingNumber(training.getNumber());
         team.setTrainer(trainer);

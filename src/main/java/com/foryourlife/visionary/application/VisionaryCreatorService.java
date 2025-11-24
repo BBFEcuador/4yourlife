@@ -68,7 +68,7 @@ public class VisionaryCreatorService {
         repository.save(visionary);
     }
 
-    public void createFromParticipant(String userId, String role) {
+    public void createFromParticipant(String userId) {
         if (repository.findByUserId(userId).isPresent()) {
             throw new BaseException("El usuario ya es un Visionario", List.of("Ya es un Visionario"));
         }
@@ -77,7 +77,7 @@ public class VisionaryCreatorService {
                 new BaseException("Usuario no encontrado", List.of("El usuario no existe"))
         );
 
-        var visionary = Visionary.create(userId, role, true, user);
+        var visionary = Visionary.create(userId, true, user);
         user.getEntityMap().add(new UserEntities(visionary.getId(), UserType.VISIONARY.name()));
         userRepository.save(user);
         repository.save(visionary);

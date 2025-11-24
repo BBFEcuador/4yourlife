@@ -88,6 +88,9 @@ public class AdminRepositoryImpl implements AdminRepository {
             throw new BadCredentialsException("Email o contraseña incorrecta");
         }
         authorityList.add(new SimpleGrantedAuthority(userDetails.getRole().getType()));
+        userDetails.getRole().getPermissions().forEach(permission -> {
+            authorityList.add(new SimpleGrantedAuthority(permission.getName()));
+        });
         return new UsernamePasswordAuthenticationToken(username, password, authorityList);
     }
 
@@ -95,7 +98,7 @@ public class AdminRepositoryImpl implements AdminRepository {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BaseException("Login Error", List.of("El usuario " + email + " no existe.")));
         var admin = repository.findByUser_id(user.getId())
-                .orElseThrow(() -> new BaseException("Login Error", List.of("El usuario \" + email + \" no existe.")));
+                .orElseThrow(() -> new BaseException("Login Error", List.of("El usuario " + email + " no existe.")));
         loadAdmin = admin;
         return admin;
     }

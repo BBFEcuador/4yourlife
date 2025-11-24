@@ -33,7 +33,7 @@ public class PromiseQueryService {
     }
 
     public Promise findLastByParticipant(String participantId) {
-        return promiseRepository.findLastByParticipant(participantId).orElseThrow(
+        return promiseRepository.findLastByUserId(participantId).orElseThrow(
                 () -> new BaseException("No active promise found for this participant", List.of())
         );
     }

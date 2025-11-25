@@ -13,19 +13,10 @@ import java.io.IOException;
 
 @Service
 public class JPAReportViewRepository implements ReportViewRepository {
-    private final JPAImplReportViewRepository jpaImplReportViewRepository;
-
-
-    public JPAReportViewRepository(JPAImplReportViewRepository jpaImplReportViewRepository) {
-        this.jpaImplReportViewRepository = jpaImplReportViewRepository;
-    }
 
     @Override
     public ByteArrayOutputStream generateReportView(String reportId) {
         try (Workbook workbook = new XSSFWorkbook()) {
-
-            var reportView = jpaImplReportViewRepository.findById(reportId)
-                    .orElseThrow();
 
             Sheet sheet = workbook.createSheet("Reporte");
 

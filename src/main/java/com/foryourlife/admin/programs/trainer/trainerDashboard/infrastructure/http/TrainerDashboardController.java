@@ -29,4 +29,9 @@ public class TrainerDashboardController {
     public ResponseEntity<TrainerFocusView> getFocusDashboardById(@PathVariable String id) {
         return new ResponseEntity<>(trainerViewQueryService.getFocusView(id), HttpStatus.OK);
     }
+
+    @GetMapping("/your/{id}")
+    public ResponseEntity<?> getYourDashboardById(@PathVariable String id) {
+        return new ResponseEntity<>(trainerViewQueryService.getYourView(id), HttpStatus.OK);
+    }
 }

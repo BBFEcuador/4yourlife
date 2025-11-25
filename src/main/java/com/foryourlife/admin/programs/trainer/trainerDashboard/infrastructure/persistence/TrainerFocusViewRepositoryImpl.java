@@ -90,7 +90,7 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                 })
                 .count();
 
-        return new GeneralAttendance(totalLingerers, totalFocus, userAttendances);
+        return new GeneralAttendance(totalFocus,totalLingerers, userAttendances);
     }
 
 
@@ -186,7 +186,7 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
     }
 
 
-    private Map<String, Participant> loadParticipants(List<Attendance> attendances) {
+    public Map<String, Participant> loadParticipants(List<Attendance> attendances) {
         List<String> userIds = attendances.stream()
                 .map(a -> a.getUser().getId())
                 .distinct()

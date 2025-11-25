@@ -16,8 +16,8 @@ public class GeneralUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void save(User user) {
-        repository.save(user);
+    public User save(User user) {
+        return repository.save(user);
     }
 
     @Override

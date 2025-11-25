@@ -263,16 +263,51 @@ public class ShellAdminSeeder {
     @ShellMethod(key = "app:seed-fake-participants")
     private void makeParticipants() {
         try {
-            var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600", "61d88b2a-a22e-4cb0-8e43-e036483039d6"));
+            var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110",
+                    "600",
+                    "61d88b2a-a22e-4cb0-8e43-e036483039d6"));
             for (int i = 0; i < 350; i++) {
                 var staffId = UUID.randomUUID().toString();
-                var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), passwordEncoder.encode("focus2025"), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.PARTICIPANT.toString())));
+                var user = new User(UUID.randomUUID().toString(),
+                        faker.internet().emailAddress(),
+                        passwordEncoder.encode("focus2025"),
+                        faker.name().firstName(),
+                        faker.name().firstName(),
+                        faker.name().lastName(),
+                        faker.name().lastName(),
+                        faker.name().fullName(),
+                        faker.phoneNumber().phoneNumber(),
+                        List.of(new UserEntities(staffId,
+                                UserType.PARTICIPANT.toString())));
                 var bd = faker.date().birthday().toInstant();
                 System.out.println(bd + "==================");
-                var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes().toUpperCase(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();
-                var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false, queryInvitationServices.findInvitationByToken(invitationToken).getCampus());
-                var medicalRecord = new MedicalRecordSaveRequest("N/A", "N/A", "N/A");
-                participantCommandService.createInitUser(trainer, medicalRecord, new SaveContactRequest(null, faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(), null), null);
+                var profile = new ProfileDetailRequest(null,
+                        Date.from(bd),
+                        faker.address().fullAddress(),
+                        faker.job().position(),
+                        faker.gender().shortBinaryTypes().toUpperCase(),
+                        "SOLTERO",
+                        faker.idNumber().inValidEnZaSsn(),
+                        faker.address().city()).toDomain();
+                var participant = Participant.create(staffId,
+                        user,
+                        null,
+                        profile,
+                        invitationToken,
+                        false,
+                        false,
+                        queryInvitationServices.findInvitationByToken(invitationToken).getCampus());
+                var medicalRecord = new MedicalRecordSaveRequest("N/A",
+                        "N/A",
+                        "N/A");
+                participantCommandService.createInitUser(participant,
+                        medicalRecord,
+                        new SaveContactRequest(null,
+                                faker.name().fullName(),
+                                "FAMILY",
+                                faker.phoneNumber().phoneNumber(),
+                                null),
+                        null);
             }
         } catch (Exception e) {
             e.printStackTrace();

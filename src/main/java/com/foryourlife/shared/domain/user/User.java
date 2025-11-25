@@ -105,6 +105,10 @@ public class User {
     protected User() {
     }
 
+    public void setEntityMap(List<UserEntities> entityMap) {
+        this.entityMap = entityMap;
+    }
+
     public List<UserEntities> getEntityMap() {
         return entityMap;
     }

@@ -16,7 +16,7 @@ public enum CallType {
 
     public static CallType fromValue(final String value) {
         for (CallType type : CallType.values()) {
-            if (type.getValue().equalsIgnoreCase(value)) {
+            if (type.value.equalsIgnoreCase(value)) {
                 return type;
             }
         }

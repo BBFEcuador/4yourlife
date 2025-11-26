@@ -1,5 +1,7 @@
 package com.foryourlife.admin.programs.attendance.application;
 
+import com.foryourlife.admin.crm.call.domain.Call;
+import com.foryourlife.admin.crm.call.domain.CallRepository;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.FylStage;
@@ -24,12 +26,14 @@ public class AddAttendanceOnTeamAssigned {
     private final TeamRepository teamRepository;
     private final AttendanceRepository attendanceRepository;
     private final PromiseCommandService promiseCommandService;
+    private final CallRepository callRepository;
 
-    public AddAttendanceOnTeamAssigned(TrainingRepository trainingRepository, TeamRepository teamRepository, AttendanceRepository attendanceRepository, PromiseCommandService promiseCommandService) {
+    public AddAttendanceOnTeamAssigned(TrainingRepository trainingRepository, TeamRepository teamRepository, AttendanceRepository attendanceRepository, PromiseCommandService promiseCommandService, CallRepository callRepository) {
         this.trainingRepository = trainingRepository;
         this.teamRepository = teamRepository;
         this.attendanceRepository = attendanceRepository;
         this.promiseCommandService = promiseCommandService;
+        this.callRepository = callRepository;
     }
 
     @EventListener
@@ -41,21 +45,57 @@ public class AddAttendanceOnTeamAssigned {
             switch (training.getCourseLevel()) {
                 case CourseLevel.FOCUS:
                     attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.FOCUS, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
                     break;
                 case CourseLevel.YOUR:
                     attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.YOUR, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
                     break;
                 case CourseLevel.LIFE:
                     attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_1, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
                     break;
                 case CourseLevel.LIFE_2:
                     attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_2, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
                     break;
                 case CourseLevel.LIFE_3:
                     attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_3, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
                     break;
                 case CourseLevel.LIFE_GRADUATE:
                     attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_GRADUATE, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
                     break;
             }
         });

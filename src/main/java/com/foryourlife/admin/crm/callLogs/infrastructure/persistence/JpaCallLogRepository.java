@@ -1,7 +1,7 @@
-package com.foryourlife.admin.crm.call.infrastructure.persistence;
+package com.foryourlife.admin.crm.callLogs.infrastructure.persistence;
 
-import com.foryourlife.admin.crm.call.domain.CallLog;
-import com.foryourlife.admin.crm.call.domain.CallLogRepository;
+import com.foryourlife.admin.crm.callLogs.domain.CallLog;
+import com.foryourlife.admin.crm.callLogs.domain.CallLogRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.data.domain.Page;
@@ -37,11 +37,6 @@ public class JpaCallLogRepository implements CallLogRepository {
     @Override
     public List<CallLog> getAllCallLogsByCalledBy_Id(String userId) {
         return jpaImplCallLogRepository.findAllByCalledBy_Id(userId);
-    }
-
-    @Override
-    public List<CallLog> getAllCallLogsByCalledUser_Id(String userId) {
-        return jpaImplCallLogRepository.findAllByCalledUser_Id(userId);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.foryourlife.admin.crm.call.domain;
+package com.foryourlife.admin.crm.callLogs.domain;
 
 public enum CallStatus {
     DONE("Realizada"),

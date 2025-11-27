@@ -5,6 +5,7 @@ import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,7 +22,7 @@ public class CallLog extends AuditableEntity {
     @Column(
             name = "date"
     )
-    private LocalDateTime date;
+    private LocalDate date;
     @Enumerated(EnumType.STRING)
     private CallType type;
     @Enumerated(EnumType.STRING)
@@ -38,7 +39,7 @@ public class CallLog extends AuditableEntity {
 
     }
 
-    public CallLog(String id, User calledBy, LocalDateTime date, CallType type, CallStatus status, String notes, Call call) {
+    public CallLog(String id, User calledBy, LocalDate date, CallType type, CallStatus status, String notes, Call call) {
         this.id = id;
         this.calledBy = calledBy;
         this.date = date;
@@ -64,11 +65,11 @@ public class CallLog extends AuditableEntity {
         this.calledBy = calledBy;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

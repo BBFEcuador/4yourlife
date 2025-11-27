@@ -17,7 +17,7 @@ public enum CallStatus {
 
     public static CallStatus fromValue(String value) {
         for (CallStatus status : CallStatus.values()) {
-            if (status.value.equalsIgnoreCase(value)) {
+            if (status.name().equalsIgnoreCase(value)) {
                 return status;
             }
         }

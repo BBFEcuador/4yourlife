@@ -5,9 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/report")
@@ -15,8 +13,8 @@ public class ReportViewController {
     @Autowired
     private ReportCommandService reportCommandService;
 
-    @PostMapping("generate")
-    public ResponseEntity<byte[]> generateReport() {
+    @PostMapping("generate/{trainingId}")
+    public ResponseEntity<byte[]> generateReport(@PathVariable String trainingId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(
                 MediaType.parseMediaType(
@@ -28,7 +26,7 @@ public class ReportViewController {
                 "attachment; filename=.xlsx"
         );
 
-        byte[] excelBytes = reportCommandService.generateReport("").toByteArray();
+        byte[] excelBytes = reportCommandService.generateReport(trainingId).toByteArray();
 
         return ResponseEntity
                 .ok()

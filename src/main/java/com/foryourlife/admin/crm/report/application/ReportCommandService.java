@@ -13,7 +13,7 @@ public class ReportCommandService {
         this.reportViewRepository = reportViewRepository;
     }
 
-    public ByteArrayOutputStream generateReport(String reportId) {
-        return reportViewRepository.generateReportView(reportId);
+    public ByteArrayOutputStream generateReport(String trainingId) {
+        return reportViewRepository.generateReportView(trainingId);
     }
 }

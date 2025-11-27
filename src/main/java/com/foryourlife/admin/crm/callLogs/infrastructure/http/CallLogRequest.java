@@ -1,5 +1,6 @@
 package com.foryourlife.admin.crm.callLogs.infrastructure.http;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class CallLogRequest {
@@ -7,7 +8,7 @@ public class CallLogRequest {
     private String callStatus;
     private String notes;
     private String calledById;
-    private LocalDateTime date;
+    private LocalDate date;
     private String callId;
 
     public String getCallType() {
@@ -26,7 +27,7 @@ public class CallLogRequest {
         return calledById;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 

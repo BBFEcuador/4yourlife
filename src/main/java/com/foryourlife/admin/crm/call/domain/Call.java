@@ -33,7 +33,7 @@ public class Call {
             mappedBy = "call",
             cascade = CascadeType.ALL,
             orphanRemoval = true,
-            fetch = FetchType.LAZY
+            fetch = FetchType.EAGER
     )
     @JsonIgnoreProperties({"call"})
     private List<CallLog> callLogs = new ArrayList<>();

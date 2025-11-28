@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.invoices.application;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.foryourlife.admin.contifico.config.domain.ConfigContificoRepository;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
@@ -73,7 +74,13 @@ public class CommandInvoiceService {
     public void sendInvoiceToContifico(Invoice invoice) {
         var configContifico = configContificoRepository.findByCampusId(invoice.getPayment().getCampus().getId()).orElseThrow(() -> new BaseException("Config for the campus not found", List.of("")));
         try {
-            var json = new ObjectMapper().writeValueAsString(invoice.getInvoiceContifico());
+            ObjectMapper mapper = new ObjectMapper();
+
+            ObjectNode node = mapper.valueToTree(invoice.getInvoiceContifico());
+
+            node.put("electronico", true);
+
+            String json = mapper.writeValueAsString(node);
             ResponseEntity<String> response = httpClient.post().uri("https://api.contifico.com/sistema/api/v1/documento/").body(json).header("Api-Token", configContifico.getApiKey()).header("Authorization", configContifico.getApiSecret()).retrieve().toEntity(String.class);
             ObjectMapper objectMapper = new ObjectMapper();
             var status = response.getStatusCode();

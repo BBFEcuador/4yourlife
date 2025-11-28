@@ -93,19 +93,21 @@ public class ShellAddEntitiesFromTemplate {
 
             Row row = sheet.getRow(i);
             if (row == null) continue;
+            if (row.getRowNum() < 2) continue;
             var cell = row.getCell(0);
             if (cell == null) continue;
-            String nombre1 = getCellString(row.getCell(0));
-            String nombre2 = getCellString(row.getCell(1));
-            String apellido1 = getCellString(row.getCell(2));
-            String apellido2 = getCellString(row.getCell(3));
+            String nombre1 = getCellString(row.getCell(2));
+            String nombre2 = getCellString(row.getCell(3));
+            String apellido1 = getCellString(row.getCell(0));
+            String apellido2 = getCellString(row.getCell(1));
             String telefono = getCellString(row.getCell(4));
             String direccion = getCellString(row.getCell(5));
-            String email = getCellString(row.getCell(6));
-            String genero = getCellString(row.getCell(7));
+            String email = "participange"+i+1"@gmail.com";
+            val g = getCellString(row.getCell(7));
+            String genero = if(g == "H") H else "M";
             String ci = getCellString(row.getCell(8));
             String ciudad = getCellString(row.getCell(9));
-            String fecha = getCellString(row.getCell(10)); // "2000-07-21"
+            String fecha = "2001-09-11"; // "2000-07-21"
 
             LocalDate localDate = LocalDate.parse(fecha);
             Date fechaNacimiento = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());

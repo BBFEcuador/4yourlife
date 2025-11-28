@@ -132,7 +132,12 @@ public class JPAReportViewRepository implements ReportViewRepository {
 
             var calls = callRepository.findAllByTrainingId(trainingId);
 
+            calls.forEach(call -> {
+//               var
+            });
+            Row crmHeader = operativeSheet.createRow(0);
 
+            crmHeader.createCell(0).setCellValue("ID Llamada");
             // === Guardar ===
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
@@ -140,7 +145,5 @@ public class JPAReportViewRepository implements ReportViewRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 }

@@ -68,7 +68,7 @@ public class ShellAddEntitiesFromTemplate {
         try {
 
             InputStream is = getClass().getClassLoader()
-                    .getResourceAsStream("plantilla.xlsx");
+                    .getResourceAsStream("plantillav2.xlsx");
 
             if (is == null) {
                 throw new RuntimeException("Archivo no encontrado en resources");
@@ -102,9 +102,9 @@ public class ShellAddEntitiesFromTemplate {
             String apellido2 = getCellString(row.getCell(1));
             String telefono = getCellString(row.getCell(4));
             String direccion = getCellString(row.getCell(5));
-            String email = "participange"+i+1"@gmail.com";
-            val g = getCellString(row.getCell(7));
-            String genero = if(g == "H") H else "M";
+            String email = "participane"+(i+1)+"@gmail.com";
+            var g = getCellString(row.getCell(7));
+            String genero = g == "H" ? "H" : "M";
             String ci = getCellString(row.getCell(8));
             String ciudad = getCellString(row.getCell(9));
             String fecha = "2001-09-11"; // "2000-07-21"
@@ -206,7 +206,7 @@ public class ShellAddEntitiesFromTemplate {
             String apellido1 = getCellString(row.getCell(2));
             String apellido2 = getCellString(row.getCell(3));
             String telefono = getCellString(row.getCell(4));
-            String email = getCellString(row.getCell(6));
+            String email = getCellString(row.getCell(5));
 
             var userOptional = userRepository.findByEmail(email);
 
@@ -266,8 +266,8 @@ public class ShellAddEntitiesFromTemplate {
             String apellido1 = getCellString(row.getCell(2));
             String apellido2 = getCellString(row.getCell(3));
             String telefono = getCellString(row.getCell(4));
-            String email = getCellString(row.getCell(6));
-            String rol = getCellString(row.getCell(7));
+            String email = getCellString(row.getCell(5));
+            String rol = getCellString(row.getCell(6));
 
             var userOptional = userRepository.findByEmail(email);
 

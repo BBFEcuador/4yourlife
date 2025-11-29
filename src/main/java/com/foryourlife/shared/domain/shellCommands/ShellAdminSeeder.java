@@ -103,13 +103,13 @@ public class ShellAdminSeeder {
                         "3936ae5e-0cc1-4375-abc7-520d16999110",
                         new User(
                                 "72efe963-52b5-439a-ada2-3ea7b0258b89",
-                                "diegofyl@admin.com",
+                                "manager.general@focusyourlife.org",
                                 passwordEncoder.encode("FocusYourLife2025--"),
                                 "DIEGO",
                                 "",
-                                "FYL",
+                                "Coronel",
                                 "",
-                                "Diego FYL",
+                                "Diego Coronel",
                                 "0999999999",
                                 List.of(
                                         new UserEntities(
@@ -124,13 +124,13 @@ public class ShellAdminSeeder {
                 new Admin(
                         "1a34e4df-33fa-4078-9acd-df7d04dde5f4",
                         new User("93030dda-f43f-44bb-a500-991cda675aa7",
-                                "jairo@admin.com",
+                                "director.business@focusyourlife.org",
                                 passwordEncoder.encode("FocusYourLife2025--"),
                                 "JAIRO",
                                 "",
-                                "FYL",
+                                "Sanchez",
                                 "",
-                                "Jairo FYL",
+                                "Jairo Sanchez",
                                 "0999999999",
                                 List.of(
                                         new UserEntities(
@@ -138,20 +138,20 @@ public class ShellAdminSeeder {
                                                 "ADMIN")
                                 )
                         ),
-                        adminRoleRepository.findById("f4dddf05-8fec-4551-8d93-d6309c17c206").orElseThrow(),
+                        adminRoleRepository.findById("a3b2c1d4-e5f6-7890-1234-56789abcdef0").orElseThrow(),
                         new HashSet<>(campusRepository.getAll()), true));
         repository.save(
                 new Admin(
                         "b85430d1-e9fc-4c8d-8dd0-6c483511f0b8",
                         new User(
                                 "4f158ff7-3584-4c1b-abce-d1cbee0ced26",
-                                "coordinacion@admin.com",
+                                "training@focusyourlife.org",
                                 passwordEncoder.encode("FocusYourLife2025--"),
-                                "COORDINACION",
+                                "Dayse",
                                 "",
-                                "FYL",
+                                "Espinosa",
                                 "",
-                                "Coordinacion FYL",
+                                "Dayse Espinosa",
                                 "0999999999",
                                 List.of(
                                         new UserEntities(
@@ -160,8 +160,175 @@ public class ShellAdminSeeder {
                                         )
                                 )
                         ),
-                        adminRoleRepository.findById("f4dddf05-8fec-4551-8d93-d6309c17c206").orElseThrow(),
+                        adminRoleRepository.findById("d2c3b4a5-6e7f-8901-2345-6789abcdef01").orElseThrow(),
+                        new HashSet<>(campusRepository.getAll()), true)
+        );
+
+        repository.save(
+                new Admin(
+                        "b85430d1-e9fc-4c8d-8dd0-6c483511f0b1",
+                        new User(
+                                "4f158ff7-3584-4c1b-abce-d1cbee0ced27",
+                                "asistente.ops.cue2@focusyourlife.org",
+                                passwordEncoder.encode("FocusYourLife2025--"),
+                                "Angeles",
+                                "",
+                                "Delgado",
+                                "",
+                                "Angeles Delgado",
+                                "0999999999",
+                                List.of(
+                                        new UserEntities(
+                                                "3936ae5e-0cc1-4375-abc7-520d16999110",
+                                                "ADMIN"
+                                        )
+                                )
+                        ),
+                        adminRoleRepository.findById("c1b2a3d4-e5f6-7890-1234-56789abcdef0").orElseThrow(),
                         new HashSet<>(List.of(campuses.get(2))), true)
+        );
+
+        repository.save(
+                new Admin(
+                        "b85430d1-e9fc-4c8d-8dd0-6c483511f0b2",
+                        new User(
+                                "4f158ff7-3584-4c1b-abce-d1cbee0ced28",
+                                "asistente.ops.uio1@focusyourlife.org",
+                                passwordEncoder.encode("FocusYourLife2025--"),
+                                "Verónica",
+                                "",
+                                "Rosania",
+                                "",
+                                "Verónica Rosania",
+                                "0999999999",
+                                List.of(
+                                        new UserEntities(
+                                                "3936ae5e-0cc1-4375-abc7-520d16999110",
+                                                "ADMIN"
+                                        )
+                                )
+                        ),
+                        adminRoleRepository.findById("c1b2a3d4-e5f6-7890-1234-56789abcdef0").orElseThrow(),
+                        new HashSet<>(List.of(campuses.get(0))), true)
+        );
+        repository.save(
+                new Admin(
+                        "b85430d1-e9fc-4c8d-8dd0-6c483511f0b3",
+                        new User(
+                                "4f158ff7-3584-4c1b-abce-d1cbee0ced29",
+                                "coordinacion.uio@focusyourlife.org",
+                                passwordEncoder.encode("FocusYourLife2025--"),
+                                "Nayelhi",
+                                "",
+                                "Benavides",
+                                "",
+                                "Nayelhi Benavides",
+                                "0999999999",
+                                List.of(
+                                        new UserEntities(
+                                                "3936ae5e-0cc1-4375-abc7-520d16999110",
+                                                "ADMIN"
+                                        )
+                                )
+                        ),
+                        adminRoleRepository.findById("b0a1b2c3-d4e5-6789-0123-456789abcdef").orElseThrow(),
+                        new HashSet<>(List.of(campuses.get(0))), true)
+        );
+
+        repository.save(
+                new Admin(
+                        "b85430d1-e9fc-4c8d-8dd0-6c483511f0b4",
+                        new User(
+                                "4f158ff7-3584-4c1b-abce-d1cbee0ced30",
+                                "coordinacion.cue@focusyourlife.org",
+                                passwordEncoder.encode("FocusYourLife2025--"),
+                                "Samantha",
+                                "",
+                                "Lima",
+                                "",
+                                "Samantha Lima",
+                                "0999999999",
+                                List.of(
+                                        new UserEntities(
+                                                "3936ae5e-0cc1-4375-abc7-520d16999110",
+                                                "ADMIN"
+                                        )
+                                )
+                        ),
+                        adminRoleRepository.findById("b0a1b2c3-d4e5-6789-0123-456789abcdef").orElseThrow(),
+                        new HashSet<>(List.of(campuses.get(2))), true)
+        );
+
+        repository.save(
+                new Admin(
+                        "b85430d1-e9fc-4c8d-8dd0-6c483511f0b5",
+                        new User(
+                                "4f158ff7-3584-4c1b-abce-d1cbee0ced31",
+                                "asistente.admin.gye@focusyourlife.org",
+                                passwordEncoder.encode("FocusYourLife2025--"),
+                                "Lourdes",
+                                "",
+                                "Santos",
+                                "",
+                                "Lourdes Santos",
+                                "0999999999",
+                                List.of(
+                                        new UserEntities(
+                                                "3936ae5e-0cc1-4375-abc7-520d16999110",
+                                                "ADMIN"
+                                        )
+                                )
+                        ),
+                        adminRoleRepository.findById("a9b8c7d6-e5f4-3210-9876-54321fedcba0").orElseThrow(),
+                        new HashSet<>(campusRepository.getAll()), true)
+        );
+
+        repository.save(
+                new Admin(
+                        "b85430d1-e9fc-4c8d-8dd0-6c483511f0b6",
+                        new User(
+                                "4f158ff7-3584-4c1b-abce-d1cbee0ced32",
+                                "asistente.log.cue@focusyourlife.org",
+                                passwordEncoder.encode("FocusYourLife2025--"),
+                                "Vanessa",
+                                "",
+                                "Iñiguez",
+                                "",
+                                "Vanessa Iñiguez",
+                                "0999999999",
+                                List.of(
+                                        new UserEntities(
+                                                "3936ae5e-0cc1-4375-abc7-520d16999110",
+                                                "ADMIN"
+                                        )
+                                )
+                        ),
+                        adminRoleRepository.findById("a9b8c7d6-e5f4-3210-9876-54321fedcba0").orElseThrow(),
+                        new HashSet<>(List.of(campuses.get(2))), true)
+        );
+
+        repository.save(
+                new Admin(
+                        "b85430d1-e9fc-4c8d-8dd0-6c483511f0b7",
+                        new User(
+                                "4f158ff7-3584-4c1b-abce-d1cbee0ced33",
+                                "asistente.log.uio@focusyourlife.org",
+                                passwordEncoder.encode("FocusYourLife2025--"),
+                                "Yolanda",
+                                "",
+                                "Morales",
+                                "",
+                                "Yolanda Morales",
+                                "0999999999",
+                                List.of(
+                                        new UserEntities(
+                                                "3936ae5e-0cc1-4375-abc7-520d16999110",
+                                                "ADMIN"
+                                        )
+                                )
+                        ),
+                        adminRoleRepository.findById("a9b8c7d6-e5f4-3210-9876-54321fedcba0").orElseThrow(),
+                        new HashSet<>(List.of(campuses.get(0))), true)
         );
 
         List<ParticipantLevel> roles = Arrays.asList(
@@ -263,16 +430,51 @@ public class ShellAdminSeeder {
     @ShellMethod(key = "app:seed-fake-participants")
     private void makeParticipants() {
         try {
-            var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110", "600", "61d88b2a-a22e-4cb0-8e43-e036483039d6"));
+            var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110",
+                    "600",
+                    "61d88b2a-a22e-4cb0-8e43-e036483039d6"));
             for (int i = 0; i < 350; i++) {
                 var staffId = UUID.randomUUID().toString();
-                var user = new User(UUID.randomUUID().toString(), faker.internet().emailAddress(), passwordEncoder.encode("focus2025"), faker.name().firstName(), faker.name().firstName(), faker.name().lastName(), faker.name().lastName(), faker.name().fullName(), faker.phoneNumber().phoneNumber(), List.of(new UserEntities(staffId, UserType.PARTICIPANT.toString())));
+                var user = new User(UUID.randomUUID().toString(),
+                        faker.internet().emailAddress(),
+                        passwordEncoder.encode("focus2025"),
+                        faker.name().firstName(),
+                        faker.name().firstName(),
+                        faker.name().lastName(),
+                        faker.name().lastName(),
+                        faker.name().fullName(),
+                        faker.phoneNumber().phoneNumber(),
+                        List.of(new UserEntities(staffId,
+                                UserType.PARTICIPANT.toString())));
                 var bd = faker.date().birthday().toInstant();
                 System.out.println(bd + "==================");
-                var profile = new ProfileDetailRequest(null, Date.from(bd), faker.address().fullAddress(), faker.job().position(), faker.gender().shortBinaryTypes().toUpperCase(), "SOLTERO", faker.idNumber().inValidEnZaSsn(), faker.address().city()).toDomain();
-                var trainer = Participant.create(staffId, user, null, profile, invitationToken, false, false, queryInvitationServices.findInvitationByToken(invitationToken).getCampus());
-                var medicalRecord = new MedicalRecordSaveRequest("N/A", "N/A", "N/A");
-                participantCommandService.createInitUser(trainer, medicalRecord, new SaveContactRequest(null, faker.name().fullName(), "FAMILY", faker.phoneNumber().phoneNumber(), null), null);
+                var profile = new ProfileDetailRequest(null,
+                        Date.from(bd),
+                        faker.address().fullAddress(),
+                        faker.job().position(),
+                        faker.gender().shortBinaryTypes().toUpperCase(),
+                        "SOLTERO",
+                        faker.idNumber().inValidEnZaSsn(),
+                        faker.address().city()).toDomain();
+                var participant = Participant.create(staffId,
+                        user,
+                        null,
+                        profile,
+                        invitationToken,
+                        false,
+                        false,
+                        queryInvitationServices.findInvitationByToken(invitationToken).getCampus());
+                var medicalRecord = new MedicalRecordSaveRequest("N/A",
+                        "N/A",
+                        "N/A");
+                participantCommandService.createInitUser(participant,
+                        medicalRecord,
+                        new SaveContactRequest(null,
+                                faker.name().fullName(),
+                                "FAMILY",
+                                faker.phoneNumber().phoneNumber(),
+                                null),
+                        null);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,9 +1,11 @@
-package com.foryourlife.admin.crm.call.domain;
+package com.foryourlife.admin.crm.callLogs.domain;
 
+import com.foryourlife.admin.crm.call.domain.Call;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,43 +15,38 @@ public class CallLog extends AuditableEntity {
     private String id;
     @ManyToOne
     @JoinColumn(
-            name = "called_user_id",
-            referencedColumnName = "id"
-    )
-    private User calledUser;
-    @ManyToOne
-    @JoinColumn(
             name = "called_by_user_id",
             referencedColumnName = "id"
     )
     private User calledBy;
     @Column(
-            name = "call_start_time"
+            name = "date"
     )
-    private LocalDateTime startTime;
-    @Column(
-            name = "call_end_time"
-    )
-    private LocalDateTime endTime;
+    private LocalDate date;
     @Enumerated(EnumType.STRING)
     private CallType type;
     @Enumerated(EnumType.STRING)
     private CallStatus status;
     private String notes;
+    @ManyToOne
+    @JoinColumn(
+            name = "call_id",
+            referencedColumnName = "id"
+    )
+    private Call call;
 
     protected CallLog() {
 
     }
 
-    public CallLog(String id, User calledUser, User calledBy, LocalDateTime startTime, LocalDateTime endTime, CallType type, CallStatus status, String notes) {
+    public CallLog(String id, User calledBy, LocalDate date, CallType type, CallStatus status, String notes, Call call) {
         this.id = id;
-        this.calledUser = calledUser;
         this.calledBy = calledBy;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.date = date;
         this.type = type;
         this.status = status;
         this.notes = notes;
+        this.call = call;
     }
 
     public String getId() {
@@ -60,14 +57,6 @@ public class CallLog extends AuditableEntity {
         this.id = id;
     }
 
-    public User getCalledUser() {
-        return calledUser;
-    }
-
-    public void setCalledUser(User calledUser) {
-        this.calledUser = calledUser;
-    }
-
     public User getCalledBy() {
         return calledBy;
     }
@@ -76,20 +65,12 @@ public class CallLog extends AuditableEntity {
         this.calledBy = calledBy;
     }
 
-    public LocalDateTime getStartTime() {
-        return startTime;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public CallType getType() {
@@ -114,5 +95,13 @@ public class CallLog extends AuditableEntity {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public Call getCall() {
+        return call;
+    }
+
+    public void setCall(Call call) {
+        this.call = call;
     }
 }

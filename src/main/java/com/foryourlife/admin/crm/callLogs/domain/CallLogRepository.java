@@ -1,4 +1,4 @@
-package com.foryourlife.admin.crm.call.domain;
+package com.foryourlife.admin.crm.callLogs.domain;
 
 import com.foryourlife.shared.domain.criteria.Criteria;
 import org.springframework.data.domain.Page;
@@ -10,6 +10,5 @@ public interface CallLogRepository {
     void save(CallLog callLog);
     Page<CallLog> getCallLogs(Criteria criteria);
     List<CallLog> getAllCallLogsByCalledBy_Id(String userId);
-    List<CallLog> getAllCallLogsByCalledUser_Id(String userId);
     Optional<CallLog> getCallLogById(String id);
 }

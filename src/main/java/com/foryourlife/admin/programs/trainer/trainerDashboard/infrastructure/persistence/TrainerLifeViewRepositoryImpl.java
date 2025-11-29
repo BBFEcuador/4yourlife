@@ -3,7 +3,6 @@ package com.foryourlife.admin.programs.trainer.trainerDashboard.infrastructure.p
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
-import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.life.*;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
@@ -26,13 +25,11 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
     private final TrainingRepository jpaTrainingRepository;
     private final AttendanceRepository attendanceRepository;
     private final PromiseRepository promiseRepository;
-    private final TeamRepository teamRepository;
 
-    public TrainerLifeViewRepositoryImpl(TrainingRepository jpaTrainingRepository, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, TeamRepository teamRepository) {
+    public TrainerLifeViewRepositoryImpl(TrainingRepository jpaTrainingRepository, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository) {
         this.jpaTrainingRepository = jpaTrainingRepository;
         this.attendanceRepository = attendanceRepository;
         this.promiseRepository = promiseRepository;
-        this.teamRepository = teamRepository;
     }
 
     @Override

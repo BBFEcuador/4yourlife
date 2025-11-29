@@ -1,8 +1,8 @@
-package com.foryourlife.admin.crm.call.infrastructure.http;
+package com.foryourlife.admin.crm.callLogs.infrastructure.http;
 
-import com.foryourlife.admin.crm.call.application.CallLogCommandService;
-import com.foryourlife.admin.crm.call.application.CallLogQueryService;
-import com.foryourlife.admin.crm.call.domain.CallLog;
+import com.foryourlife.admin.crm.callLogs.application.CallLogCommandService;
+import com.foryourlife.admin.crm.callLogs.application.CallLogQueryService;
+import com.foryourlife.admin.crm.callLogs.domain.CallLog;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import jakarta.validation.Valid;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/call")
+@RequestMapping("/call-log")
 public class CallLogController {
     @Autowired
     private CallLogQueryService callLogQueryService;

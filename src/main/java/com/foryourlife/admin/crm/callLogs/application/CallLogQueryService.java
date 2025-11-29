@@ -1,7 +1,7 @@
-package com.foryourlife.admin.crm.call.application;
+package com.foryourlife.admin.crm.callLogs.application;
 
-import com.foryourlife.admin.crm.call.domain.CallLog;
-import com.foryourlife.admin.crm.call.domain.CallLogRepository;
+import com.foryourlife.admin.crm.callLogs.domain.CallLog;
+import com.foryourlife.admin.crm.callLogs.domain.CallLogRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -27,9 +27,5 @@ public class CallLogQueryService {
 
     public List<CallLog> findAllByCalledById(String calledById) {
         return callLogRepository.getAllCallLogsByCalledBy_Id(calledById);
-    }
-
-    public List<CallLog> findAllByCalledUserId(String calledUserId) {
-        return callLogRepository.getAllCallLogsByCalledUser_Id(calledUserId);
     }
 }

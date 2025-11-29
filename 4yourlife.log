@@ -18,3 +18,9 @@
 1758819446034:app:seed-fake-data
 1758823350340:app:seed-admins
 1758823396287:app:seed-fake-data
+1764381261763:app:seed-permissions
+1764381273926:app:seed-admins
+1764381347723:app:init-seed
+1764381387948:app:import-entities
+1764382287250:app:init-seed
+1764382297396:app:import-entities

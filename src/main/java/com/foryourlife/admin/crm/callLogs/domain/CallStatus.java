@@ -1,10 +1,9 @@
-package com.foryourlife.admin.crm.call.domain;
+package com.foryourlife.admin.crm.callLogs.domain;
 
 public enum CallStatus {
     DONE("Realizada"),
     NOT_ANSWERED("No Contestada"),
-    RE_SCHEDULED("Reprogramada"),
-    IN_PROGRESS("En Progreso");
+    RE_SCHEDULED("Reprogramada");
 
     private final String value;
 
@@ -18,7 +17,7 @@ public enum CallStatus {
 
     public static CallStatus fromValue(String value) {
         for (CallStatus status : CallStatus.values()) {
-            if (status.getValue().equalsIgnoreCase(value)) {
+            if (status.name().equalsIgnoreCase(value)) {
                 return status;
             }
         }

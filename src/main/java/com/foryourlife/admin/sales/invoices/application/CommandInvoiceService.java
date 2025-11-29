@@ -2,34 +2,40 @@ package com.foryourlife.admin.sales.invoices.application;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.foryourlife.admin.contifico.config.domain.ConfigContificoRepository;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 public class CommandInvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final ConfigContificoRepository configContificoRepository;
+    private final ObjectMapper objectMapper;
     @Qualifier("restClient")
     private final RestClient httpClient;
     private final EventBus eventBus;
 
-    public CommandInvoiceService(InvoiceRepository invoiceRepository, ConfigContificoRepository configContificoRepository, RestClient httpClient, EventBus eventBus) {
+    public CommandInvoiceService(InvoiceRepository invoiceRepository, ConfigContificoRepository configContificoRepository, ObjectMapper objectMapper, RestClient httpClient, EventBus eventBus) {
         this.invoiceRepository = invoiceRepository;
         this.configContificoRepository = configContificoRepository;
+        this.objectMapper = objectMapper;
         this.httpClient = httpClient;
         this.eventBus = eventBus;
     }
@@ -72,51 +78,96 @@ public class CommandInvoiceService {
     }
 
     public void sendInvoiceToContifico(Invoice invoice) {
-        var configContifico = configContificoRepository.findByCampusId(invoice.getPayment().getCampus().getId()).orElseThrow(() -> new BaseException("Config for the campus not found", List.of("")));
+        var configContifico = configContificoRepository
+                .findByCampusId(invoice.getPayment().getCampus().getId())
+                .orElseThrow(() -> new BaseException("Config for the campus not found", List.of("")));
+
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            ObjectNode node = mapper.valueToTree(invoice.getInvoiceContifico());
+            String json = mapper.writeValueAsString(invoice.getInvoiceContifico());
 
-            node.put("electronico", true);
+            System.out.println("JSON enviado a Contifico:");
+            System.out.println(json);
 
-            String json = mapper.writeValueAsString(node);
-            ResponseEntity<String> response = httpClient.post().uri("https://api.contifico.com/sistema/api/v1/documento/").body(json).header("Api-Token", configContifico.getApiKey()).header("Authorization", configContifico.getApiSecret()).retrieve().toEntity(String.class);
-            ObjectMapper objectMapper = new ObjectMapper();
+            ResponseEntity<String> response = httpClient.post()
+                    .uri("https://api.contifico.com/sistema/api/v1/documento/")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .header("Api-Token", configContifico.getApiKey())
+                    .header("Authorization", configContifico.getApiSecret())
+                    .retrieve()
+                    .toEntity(String.class);
+
             var status = response.getStatusCode();
-            System.out.println(status);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                JsonNode rootNode = objectMapper.readTree(response.getBody());
-                invoice.setSentContifico(true);
-                invoice.setContificoId(rootNode.get("id").asText());
-                System.out.println("Invoice sent to contifico successfully.");
-            }
-            invoiceRepository.save(invoice);
+            System.out.println("Contifico response: " + status);
 
-            invoice.getPayment().getPaymentshistory().forEach(history -> {
-                if (!history.getSent()){
-                    PaymentHistoryCreated event = new PaymentHistoryCreated(history, invoice);
-                    eventBus.publish(List.of(event));
+            if (status.is2xxSuccessful()) {
+                if (status.is2xxSuccessful()) {
+
+                    JsonNode rootNode = mapper.readTree(response.getBody());
+                    String contificoId = rootNode.get("id").asText();
+
+                    invoice.setSentContifico(true);
+                    var contificoJson = invoice.getInvoiceContifico();
+                    contificoJson.autorizacion = rootNode.get("autorizacion").asText();
+                    invoice.setInvoiceContifico(contificoJson);
+                    invoice.setContificoId(contificoId);
+
+                    System.out.println("Invoice sent to Contifico successfully. ID: " + contificoId);
+
+                    try {
+                        String sriUrl = "https://api.contifico.com/sistema/api/v1/documento/"
+                                + contificoId + "/sri/";
+
+                        System.out.println("Enviando al SRI: " + sriUrl);
+
+                        ResponseEntity<String> sriResponse = httpClient.put()
+                                .uri(sriUrl)
+                                .header("Api-Token", configContifico.getApiKey())
+                                .header("Authorization", configContifico.getApiSecret())
+                                .retrieve()
+                                .toEntity(String.class);
+
+                        System.out.println("SRI response: " + sriResponse.getStatusCode());
+
+                        if (sriResponse.getStatusCode().is2xxSuccessful()) {
+                            System.out.println("Factura enviada al SRI correctamente.");
+                        }
+
+                    } catch (Exception e) {
+                        System.err.println("Error enviando al SRI: " + e.getMessage());
+                    }
                 }
-            });
+
+            }
+
+            invoiceRepository.save(invoice);
 
         } catch (HttpClientErrorException e) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode errorNode = objectMapper.readTree(e.getResponseBodyAsString());
-                String errorMessage = errorNode.has("mensaje") ? errorNode.get("mensaje").asText() : "Error desconocido";
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode errorNode = mapper.readTree(e.getResponseBodyAsString());
+                String errorMessage = errorNode.has("mensaje")
+                        ? errorNode.get("mensaje").asText()
+                        : "Error desconocido";
+
                 invoice.setContificoError(errorMessage);
                 invoiceRepository.save(invoice);
+
             } catch (Exception jsonException) {
-                invoice.setContificoError("Error al procesar la respuesta de error: " + e.getMessage());
+                invoice.setContificoError("Error al procesar respuesta de error: " + e.getMessage());
                 invoiceRepository.save(invoice);
             }
-            System.err.println("Error sending invoice to contifico: " + e.getResponseBodyAsString());
+
+            System.err.println("Error sending invoice to Contifico: " + e.getResponseBodyAsString());
+
         } catch (Exception e) {
-            System.err.println("Error sending invoice to contifico second: " + e.getMessage());
+            System.err.println("Error sending invoice to Contifico (second): " + e.getMessage());
             e.printStackTrace();
         }
     }
+
 
     public void resendPaymentHistoryToContifico(String paymentId) {
 //        var payment = paymentRepository.findById(paymentId);

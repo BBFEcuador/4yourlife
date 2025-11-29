@@ -31,10 +31,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -154,7 +151,7 @@ public class CommandPaymentService {
             });
             var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
             _paymentRepository.save(payment);
-            var newInvoice = createInvoice(invoice, cashDrawer, payment);
+            var newInvoice = createInvoice(invoice, cashDrawer, payment, payment.getPaymentshistory());
             eventBus.publish(List.of(new PaymentCreated(payment, newInvoice, cashDrawer)));
         }
 
@@ -163,83 +160,96 @@ public class CommandPaymentService {
         return payment.getId();
     }
 
-    public Invoice createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment payment) {
-        if (invoice == null) {
-            throw new BaseException("No se puede crear factura: el campo dataInvoice está vacío.", List.of(""));
-        }
+    public Invoice createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment payment, List<PaymentHistory> paymentHistories) {
         try {
             String invoiceNumber = getNextInvoiceNumber(cashDrawer);
-
             invoice.setInvoiceNumber(invoiceNumber);
 
-            // Obtener configuración Contifico
             var config = configContificoQueryService.findConfigContificoByCampusId(payment.getCampus().getId());
-            if (config == null) {
-                System.err.println("No se encontró la configuración de Contifico para el campus.");
-                return commandInvoiceService.save(invoice);
-            }
+            if (config == null) return commandInvoiceService.save(invoice);
 
-            // Generar autorización
-            String formattedDate = invoice.getInvoiceDate().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
             String storeCode = cashDrawer.getCashBox().getStore().getNumber();
             String cashBoxCode = cashDrawer.getCashBox().getNumber();
-            String authorization = formattedDate + "01" + config.getRuc() + "2" + storeCode + cashBoxCode + invoiceNumber + "12345678" + "1";
-            var verificationDigit = generateModule(authorization);
+            String formattedInvoiceDate = invoice.getInvoiceDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-            // Cliente Contifico
-            var client = new InvoiceContificoJson.Cliente(
+            InvoiceContificoJson.Cliente client = new InvoiceContificoJson.Cliente(
                     invoice.getDocument(),
                     invoice.getFullName(),
                     invoice.getPhone(),
                     invoice.getAddress(),
                     invoice.getClientType(),
-                    invoice.getEmail());
+                    invoice.getEmail()
+            );
 
-            // Subtotales
             BigDecimal totalAmount = invoice.getAmount();
             BigDecimal taxAmount = invoice.getTaxAmount();
             BigDecimal subtotal = totalAmount.subtract(taxAmount).setScale(2, RoundingMode.HALF_UP);
 
-            // Detalles del producto
-            List<InvoiceContificoJson.Detalle> productDetails = buildProductDetails(payment, subtotal);
+            List<InvoiceContificoJson.Detalle> details = buildProductDetails(payment, subtotal);
 
-            // Crear objeto Contifico
-            String formattedInvoiceDate = invoice.getInvoiceDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            List<InvoiceContificoJson.Cobros> cobros = buildCobros(paymentHistories, formattedInvoiceDate);
+
             String sequential = storeCode + "-" + cashBoxCode + "-" + invoiceNumber;
-            String claveAcceso = authorization + verificationDigit;
 
-            var invoiceContifico = new InvoiceContificoJson(
+            InvoiceContificoJson json = new InvoiceContificoJson(
                     config.getApiKey(),
                     formattedInvoiceDate,
                     "FAC",
                     sequential,
-                    claveAcceso,
+                    "",
                     client,
-                    BigDecimal.valueOf(0),
+                    BigDecimal.ZERO,
                     subtotal,
-                    BigDecimal.valueOf(0),
+                    BigDecimal.ZERO,
                     taxAmount,
                     totalAmount,
-                    productDetails,
-                    BigDecimal.valueOf(0),
+                    details,
+                    BigDecimal.ZERO,
                     "Generado en 4YourLife",
-                    "P");
+                    "P",
+                    true,
+                    cobros
+            );
 
-            adjustRucIfNeeded(invoiceContifico);
+            adjustRucIfNeeded(json);
+            invoice.setInvoiceContifico(json);
 
-            invoice.setInvoiceContifico(invoiceContifico);
+            Invoice saved = commandInvoiceService.save(invoice);
+            commandInvoiceService.sendInvoiceToContifico(saved);
 
-            Invoice savedInvoice = commandInvoiceService.save(invoice);
-            commandInvoiceService.sendInvoiceToContifico(savedInvoice);
+            return saved;
 
-            System.out.println("Factura creada y enviada correctamente.");
-
-            return savedInvoice;
         } catch (Exception e) {
-            System.err.println("Error al crear o guardar la factura: " + e.getMessage());
             e.printStackTrace();
+            return invoice;
         }
-        return invoice;
+    }
+
+    private List<InvoiceContificoJson.Cobros> buildCobros(List<PaymentHistory> paymentHistories, String formattedDate) {
+        Set<String> unique = new HashSet<>();
+        List<InvoiceContificoJson.Cobros> result = new ArrayList<>();
+
+        paymentHistories.forEach(sh -> {
+            String key = sh.getPaymentMethod().getCode() + "|" + sh.getAmount() + "|" + sh.getTransactionId();
+
+            if (unique.contains(key)) return;
+            unique.add(key);
+
+            InvoiceContificoJson.Cobros c = new InvoiceContificoJson.Cobros();
+
+            c.setForma_cobro(sh.getPaymentMethod().getCode());
+            c.setMonto(BigDecimal.valueOf(sh.getAmount()));
+            c.setFecha(formattedDate);
+
+            if (sh.getPaymentMethod().getCode().equals("TRA")) {
+                c.setCuenta_bancaria_id(sh.getPaymentMethod().getBank().getContificoId());
+                c.setNumero_comprobante(sh.getTransactionId());
+            }
+
+            result.add(c);
+        });
+
+        return result;
     }
 
     public static int generateModule(String claveAcceso) {
@@ -369,7 +379,7 @@ public class CommandPaymentService {
         var cashDrawer = cashDrawerQueryService.getCashDrawerById(cashDrawerId);
         cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
 
-        createInvoice(newInvoice, cashDrawer, payment);
+        createInvoice(newInvoice, cashDrawer, payment, List.of(paymentHistory));
     }
 
     public void changeStatus(String id, String status) {

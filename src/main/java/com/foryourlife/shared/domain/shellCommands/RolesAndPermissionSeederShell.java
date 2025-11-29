@@ -25,7 +25,7 @@ public class RolesAndPermissionSeederShell {
             List<AdminRole> adminRoles = new ArrayList<>();
 
             adminRoles.add(new AdminRole("f4dddf05-8fec-4551-8d93-d6309c17c206", "Gerente", "ROLE_ADMIN", new ArrayList<>(permissions)));
-            adminRoles.add(new AdminRole("a3b2c1d4-e5f6-7890-1234-56789abcdef0", "Directivo Financiero", "ROLE_FINANCIAL_DIRECTIVE", List.of(
+            adminRoles.add(new AdminRole("a3b2c1d4-e5f6-7890-1234-56789abcdef0", "Directivo Financiero Administrativo", "ROLE_FINANCIAL_DIRECTIVE", List.of(
                             permissions.stream().filter(p -> "SEE_EMISSION_POINTS".equals(p.getName())).findAny().orElseThrow(),
                             permissions.stream().filter(p -> "SEE_USERS".equals(p.getName())).findAny().orElseThrow(),
                             permissions.stream().filter(p -> "SEE_CAMPUS".equals(p.getName())).findAny().orElseThrow(),
@@ -69,7 +69,7 @@ public class RolesAndPermissionSeederShell {
                             permissions.stream().filter(p -> "UPDATE_CONFIGURATIONS".equals(p.getName())).findAny().orElseThrow()
                     ))
             );
-            adminRoles.add(new AdminRole("d2c3b4a5-6e7f-8901-2345-6789abcdef01", "Directivo Financiero Administrativo", "ROLE_FINANCIAL_ADMINISTRATIVE_DIRECTIVE", List.of(
+            adminRoles.add(new AdminRole("d2c3b4a5-6e7f-8901-2345-6789abcdef01", "Directo Entrenamiento", "ROLE_FINANCIAL_ADMINISTRATIVE_DIRECTIVE", List.of(
                     permissions.stream().filter(p -> "SEE_EMISSION_POINTS".equals(p.getName())).findAny().orElseThrow(),
                     permissions.stream().filter(p -> "CREATE_EMISSION_POINTS".equals(p.getName())).findAny().orElseThrow(),
                     permissions.stream().filter(p -> "UPDATE_EMISSION_POINTS".equals(p.getName())).findAny().orElseThrow(),

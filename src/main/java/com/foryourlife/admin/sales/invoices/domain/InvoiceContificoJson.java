@@ -20,6 +20,9 @@ public class InvoiceContificoJson implements Serializable {
     public BigDecimal base_no_gravable;
     public String adicional1;
     public String estado;
+    public boolean electronico = true;
+    public List<Cobros> cobros;
+
 
     public static class Cliente {
         public String ruc;
@@ -65,7 +68,7 @@ public class InvoiceContificoJson implements Serializable {
         }
     }
 
-    public InvoiceContificoJson(String pos, String fecha_emision, String tipo_documento, String documento, String autorizacion, Cliente cliente, BigDecimal subtotal_0, BigDecimal subtotal_12, BigDecimal ice, BigDecimal iva, BigDecimal total, List<Detalle> detalles, BigDecimal base_no_gravable, String adicional1, String estado) {
+    public InvoiceContificoJson(String pos, String fecha_emision, String tipo_documento, String documento, String autorizacion, Cliente cliente, BigDecimal subtotal_0, BigDecimal subtotal_12, BigDecimal ice, BigDecimal iva, BigDecimal total, List<Detalle> detalles, BigDecimal base_no_gravable, String adicional1, String estado, boolean electronico, List<Cobros> cobros) {
         this.pos = pos;
         this.fecha_emision = fecha_emision;
         this.tipo_documento = tipo_documento;
@@ -81,9 +84,59 @@ public class InvoiceContificoJson implements Serializable {
         this.base_no_gravable = base_no_gravable;
         this.adicional1 = adicional1;
         this.estado = estado;
+        this.electronico = electronico;
+        this.cobros = cobros;
     }
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
+    }
+
+    public static class Cobros {
+        public String forma_cobro;
+        public BigDecimal monto;
+        public String cuenta_bancaria_id;
+        public String numero_comprobante;
+        public String fecha;
+
+        public String getForma_cobro() {
+            return forma_cobro;
+        }
+
+        public void setForma_cobro(String forma_cobro) {
+            this.forma_cobro = forma_cobro;
+        }
+
+        public BigDecimal getMonto() {
+            return monto;
+        }
+
+        public void setMonto(BigDecimal monto) {
+            this.monto = monto;
+        }
+
+        public String getCuenta_bancaria_id() {
+            return cuenta_bancaria_id;
+        }
+
+        public void setCuenta_bancaria_id(String cuenta_bancaria_id) {
+            this.cuenta_bancaria_id = cuenta_bancaria_id;
+        }
+
+        public String getNumero_comprobante() {
+            return numero_comprobante;
+        }
+
+        public void setNumero_comprobante(String numero_comprobante) {
+            this.numero_comprobante = numero_comprobante;
+        }
+
+        public String getFecha() {
+            return fecha;
+        }
+
+        public void setFecha(String fecha) {
+            this.fecha = fecha;
+        }
     }
 }

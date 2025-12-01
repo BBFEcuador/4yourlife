@@ -37,7 +37,7 @@ public class CashDrawerCommandService {
         return repository.save(cashDrawer);
     }
 
-    public ByteArrayOutputStream closeDrawer(String id, String userId) {
+    public ByteArrayOutputStream closeDrawer(String id) {
         var existingDrawer = repository.findByCashBoxIdAndStatus(id, CashDrawerStatus.OPEN).orElseThrow(
                 () -> new BaseException("No hay cajas abiertas para el cash box", List.of(""))
         );
@@ -45,13 +45,9 @@ public class CashDrawerCommandService {
         if (existingDrawer.getStatus() == CashDrawerStatus.CLOSED) {
             throw new BaseException("La caja esta cerrada", List.of(""));
         }
-        var user = userRepository.findById(userId).orElseThrow(
-                () -> new BaseException("User not found", List.of(""))
-        );
-
         existingDrawer.setStatus(CashDrawerStatus.CLOSED);
         existingDrawer.setCloseDate(LocalDateTime.now());
-        existingDrawer.setClosedByUser(user);
+        existingDrawer.setClosedByUser(existingDrawer.getOpenedByUser());
         existingDrawer.setClosedBalance(getActualBalance(existingDrawer));
         repository.save(existingDrawer);
         ByteArrayOutputStream pdf = new ByteArrayOutputStream();

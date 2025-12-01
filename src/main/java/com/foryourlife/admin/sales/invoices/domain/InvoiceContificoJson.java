@@ -16,6 +16,7 @@ public class InvoiceContificoJson implements Serializable {
     public BigDecimal ice;
     public BigDecimal iva;
     public BigDecimal total;
+    public String descripcion = null;
     public List<Detalle> detalles;
     public BigDecimal base_no_gravable;
     public String adicional1;
@@ -68,7 +69,7 @@ public class InvoiceContificoJson implements Serializable {
         }
     }
 
-    public InvoiceContificoJson(String pos, String fecha_emision, String tipo_documento, String documento, String autorizacion, Cliente cliente, BigDecimal subtotal_0, BigDecimal subtotal_12, BigDecimal ice, BigDecimal iva, BigDecimal total, List<Detalle> detalles, BigDecimal base_no_gravable, String adicional1, String estado, boolean electronico, List<Cobros> cobros) {
+    public InvoiceContificoJson(String pos, String fecha_emision, String tipo_documento, String documento, String autorizacion, Cliente cliente, BigDecimal subtotal_0, BigDecimal subtotal_12, BigDecimal ice, BigDecimal iva, BigDecimal total, String descripcion, List<Detalle> detalles, BigDecimal base_no_gravable, String adicional1, String estado, boolean electronico, List<Cobros> cobros) {
         this.pos = pos;
         this.fecha_emision = fecha_emision;
         this.tipo_documento = tipo_documento;
@@ -80,6 +81,7 @@ public class InvoiceContificoJson implements Serializable {
         this.ice = ice;
         this.iva = iva;
         this.total = total;
+        this.descripcion = descripcion;
         this.detalles = detalles;
         this.base_no_gravable = base_no_gravable;
         this.adicional1 = adicional1;

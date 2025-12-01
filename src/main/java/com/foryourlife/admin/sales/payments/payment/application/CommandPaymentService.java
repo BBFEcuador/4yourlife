@@ -18,6 +18,8 @@ import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethodRe
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.admin.sales.programs.domain.Program;
+import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
+import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
@@ -49,8 +51,9 @@ public class CommandPaymentService {
     private final CashDrawerQueryService cashDrawerQueryService;
     private final ConfigContificoQueryService configContificoQueryService;
     private final CommandInvoiceService commandInvoiceService;
+    private final ClientModuleCreatorService clientModuleCreatorService;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService) {
         this._paymentRepository = _paymentRepository;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
@@ -62,6 +65,7 @@ public class CommandPaymentService {
         this.cashDrawerQueryService = cashDrawerQueryService;
         this.configContificoQueryService = configContificoQueryService;
         this.commandInvoiceService = commandInvoiceService;
+        this.clientModuleCreatorService = clientModuleCreatorService;
     }
 
     @Transactional
@@ -98,6 +102,15 @@ public class CommandPaymentService {
             if (Boolean.TRUE.equals(modules.getHasFocus())) activeLevels.add(CourseLevel.FOCUS);
             if (Boolean.TRUE.equals(modules.getHasYour())) activeLevels.add(CourseLevel.YOUR);
             if (Boolean.TRUE.equals(modules.getHasLife())) activeLevels.add(CourseLevel.LIFE);
+        } else {
+            ClientModule clientModule = new ClientModule(
+                    UUID.randomUUID().toString(),
+                    false,
+                    false,
+                    false,
+                    participant
+            );
+            clientModuleCreatorService.createClientModule(clientModule);
         }
 
         for (Product product : products) {

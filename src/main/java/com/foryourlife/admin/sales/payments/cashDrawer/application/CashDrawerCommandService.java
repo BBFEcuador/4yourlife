@@ -11,6 +11,7 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.email.DispatchNotification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
@@ -69,27 +70,59 @@ public class CashDrawerCommandService {
         }
     }
 
-    public CashDrawer openDrawer(String cashBoxId, String userId, Double openingBalance,String detail) {
+    @Transactional
+    public CashDrawer openDrawer(String cashBoxId, String userId, Double openingBalance, String detail) {
+
         var cashBox = cashBoxRepository.findById(cashBoxId).orElseThrow(
                 () -> new BaseException("Cash box not found", List.of(""))
         );
+
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new BaseException("User not found", List.of(""))
         );
 
-        var existingDrawer = repository.getByIsOpenAndByUserId(userId);
+        var userOpenDrawer = repository.findByStatusAndOpenedByUserId(CashDrawerStatus.OPEN, userId);
 
-        if (existingDrawer.isPresent()) {
-            throw new BaseException("Caja abierta!", List.of("El usuario " + user.getName() + " tiene la caja °N" + existingDrawer.get().getCashBox().getNumber()));
+        if (userOpenDrawer.isPresent()) {
+            var drawer = userOpenDrawer.get();
+            throw new BaseException(
+                    "Caja abierta!",
+                    List.of("El usuario " + user.getName() +
+                            " ya tiene abierta la caja Nº " + drawer.getCashBox().getNumber())
+            );
         }
 
-        return save(new CashDrawer(UUID.randomUUID().toString(), CashDrawerStatus.OPEN, user, null, LocalDateTime.now(), null, openingBalance, null, detail, cashBox));
+        var openDrawerForBox = repository.findByCashBoxIdAndStatus(cashBoxId, CashDrawerStatus.OPEN);
+
+        if (openDrawerForBox.isPresent()) {
+            var drawer = openDrawerForBox.get();
+            throw new BaseException(
+                    "Caja ya abierta",
+                    List.of("La caja Nº " + cashBox.getNumber() +
+                            " está abierta por " + drawer.getOpenedByUser().getName())
+            );
+        }
+
+        var newDrawer = new CashDrawer(
+                UUID.randomUUID().toString(),
+                CashDrawerStatus.OPEN,
+                user,
+                null,
+                LocalDateTime.now(),
+                null,
+                openingBalance,
+                null,
+                detail,
+                cashBox
+        );
+
+        return save(newDrawer);
     }
 
 
     public Double getActualBalance(CashDrawer cashDrawer) {
         Double totalPayments = 0.0;
-        if (cashDrawer.getCashDrawerDetails()==null || cashDrawer.getCashDrawerDetails().isEmpty()){
+        if (cashDrawer.getCashDrawerDetails() == null || cashDrawer.getCashDrawerDetails().isEmpty()) {
             return cashDrawer.getOpeningBalance();
         }
         for (CashDrawerDetail detail : cashDrawer.getCashDrawerDetails()) {
@@ -105,27 +138,27 @@ public class CashDrawerCommandService {
         return cashDrawer.getOpeningBalance() + totalPayments;
     }
 
-    public void lockCashDrawer(String id, String pin){
+    public void lockCashDrawer(String id, String pin) {
         var cashDrawer = repository.getById(id).orElseThrow(
                 () -> new BaseException("Cash drawer not found", List.of(""))
         );
 
-        if(cashDrawer.getStatus()==CashDrawerStatus.OPEN){
+        if (cashDrawer.getStatus() == CashDrawerStatus.OPEN) {
             cashDrawer.setStatus(CashDrawerStatus.LOCKED);
             cashDrawer.setPin(pin);
             repository.save(cashDrawer);
-        }else if (cashDrawer.getStatus()==CashDrawerStatus.LOCKED){
-            if(pin.equals(cashDrawer.getPin())){
+        } else if (cashDrawer.getStatus() == CashDrawerStatus.LOCKED) {
+            if (pin.equals(cashDrawer.getPin())) {
                 cashDrawer.setStatus(CashDrawerStatus.OPEN);
                 cashDrawer.setPin(null);
                 repository.save(cashDrawer);
-            }else{
+            } else {
                 throw new BaseException("Pin incorrecto", List.of(""));
             }
         }
     }
 
-    public ByteArrayOutputStream getCloseReport(String id){
+    public ByteArrayOutputStream getCloseReport(String id) {
         var existingDrawer = repository.getById(id).orElseThrow(
                 () -> new BaseException("La caja no existe", List.of(""))
         );
@@ -143,7 +176,7 @@ public class CashDrawerCommandService {
         }
     }
 
-    public void forgetPin(String id){
+    public void forgetPin(String id) {
         var cashDrawer = repository.getById(id).orElseThrow(
                 () -> new BaseException("Cash drawer not found", List.of(""))
         );
@@ -152,7 +185,7 @@ public class CashDrawerCommandService {
                 cashDrawer.getOpenedByUser().getEmail(),
                 "Verificación de correo",
                 "Este es tu token de recuperación de contraseña: "
-            );
+        );
 
 //                Email toEmail = new Email(
 //                cashDrawer.getOpenedByUser().getEmail());

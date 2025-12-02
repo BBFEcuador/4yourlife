@@ -44,8 +44,8 @@ public class CashDrawerController {
     }
 
     @PutMapping("/close/{id}")
-    public ResponseEntity<?> closeDrawer(@PathVariable String id) {
-        ByteArrayOutputStream pdfBytes = commandService.closeDrawer(id);
+    public ResponseEntity<?> closeDrawer(@PathVariable String id, @RequestParam @Valid String userId) {
+        ByteArrayOutputStream pdfBytes = commandService.closeDrawer(id, userId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

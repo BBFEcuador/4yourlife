@@ -37,8 +37,8 @@ public class CashDrawerCommandService {
         return repository.save(cashDrawer);
     }
 
-    public ByteArrayOutputStream closeDrawer(String id) {
-        var existingDrawer = repository.findByCashBoxIdAndStatus(id, CashDrawerStatus.OPEN).orElseThrow(
+    public ByteArrayOutputStream closeDrawer(String id, String userId) {
+        var existingDrawer = repository.findByCashBoxIdAndStatusAndUserId(id, CashDrawerStatus.OPEN, userId).orElseThrow(
                 () -> new BaseException("No hay cajas abiertas para el cash box", List.of(""))
         );
 
@@ -80,7 +80,7 @@ public class CashDrawerCommandService {
         var existingDrawer = repository.getByIsOpenAndByUserId(userId);
 
         if (existingDrawer.isPresent()) {
-            throw new BaseException("La caja ya esta abierta", List.of(""));
+            throw new BaseException("Caja abierta!", List.of("El usuario " + user.getName() + " tiene la caja °N" + existingDrawer.get().getCashBox().getNumber()));
         }
 
         return save(new CashDrawer(UUID.randomUUID().toString(), CashDrawerStatus.OPEN, user, null, LocalDateTime.now(), null, openingBalance, null, detail, cashBox));
@@ -148,11 +148,10 @@ public class CashDrawerCommandService {
                 () -> new BaseException("Cash drawer not found", List.of(""))
         );
 
-
         sendgrid.send(
                 cashDrawer.getOpenedByUser().getEmail(),
                 "Verificación de correo",
-                "Este es tu token de recuperación de contraseña: ${builder.toString()}"
+                "Este es tu token de recuperación de contraseña: "
             );
 
 //                Email toEmail = new Email(

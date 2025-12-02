@@ -11,6 +11,7 @@ public interface CashDrawerRepository {
     List<CashDrawer> getByCashBoxId(String id);
     List<CashDrawer> getByUserIdAndStatusOpenOrLock(String userId);
     Optional<CashDrawer> getByIsOpenAndByUserId(String userId);
-    Optional<CashDrawer> findByCashBoxIdAndStatus(String id, CashDrawerStatus status);
+    Optional<CashDrawer> findByCashBoxIdAndStatus(String cashBoxId, CashDrawerStatus status);
+    Optional<CashDrawer> findByCashBoxIdAndStatusAndUserId(String cashBoxId, CashDrawerStatus status, String userId);
     String generatePdfReport(CashDrawer cashDrawer);
 }

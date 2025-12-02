@@ -72,6 +72,11 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     }
 
     @Override
+    public Optional<CashDrawer> findByStatusAndOpenedByUserId(CashDrawerStatus cashDrawerStatus, String userId) {
+        return this.repository.findByStatusAndOpenedByUser_Id(cashDrawerStatus, userId);
+    }
+
+    @Override
     public String generatePdfReport(CashDrawer cashDrawer) {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setSuffix(".html");

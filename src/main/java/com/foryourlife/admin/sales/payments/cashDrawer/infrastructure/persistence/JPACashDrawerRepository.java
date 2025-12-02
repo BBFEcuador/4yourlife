@@ -57,13 +57,18 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     }
 
     @Override
-    public Optional<CashDrawer> findByCashBoxIdAndStatus(String id, CashDrawerStatus status) {
-        return repository.findByStatusIsAndCashBox_Id(status, id);
+    public Optional<CashDrawer> findByCashBoxIdAndStatus(String cashBoxId, CashDrawerStatus status) {
+        return repository.findByStatusIsAndCashBox_Id(status, cashBoxId);
     }
 
     @Override
     public List<CashDrawer> getByCashBoxId(String id) {
         return this.repository.findAllByCashBox_Id(id);
+    }
+
+    @Override
+    public Optional<CashDrawer> findByCashBoxIdAndStatusAndUserId(String cashBoxId, CashDrawerStatus status, String userId) {
+        return this.repository.findByStatusIsAndCashBox_IdAndOpenedByUser_Id(status, cashBoxId, userId);
     }
 
     @Override

@@ -148,11 +148,18 @@
     </div>
     <div class="header-right">
         <div class="info-box" style="height: 100%;">
-            <div class="info-row"><span class="info-label">RUC:</span><span th:text="${config.ruc}"></span> </div>
+            <div class="info-row"><span class="info-label">RUC:</span><span th:text="${config.ruc}"></span></div>
             <div class="info-row"><span style="font-size: 16px; font-weight: bold; margin: 15px 0;">COBRO</span>
                 <span style="font-size: 16px; font-weight: bold;"
                       th:text="${payment.invoice[0].invoiceNumber}"></span></div>
             <div class="info-row"><span class="info-label">FECHA:</span> <span th:text="${date}"></span>
+            </div>
+            <div class="info-row"><span class="info-label">Otorgado a:</span><span
+                    th:text="${payment.participant.user.name}"></span></div>
+            <div class="info-row">
+                <span class="info-label">
+                    Producto: <span th:text="${payment.products[0].name}"></span>
+                </span>
             </div>
         </div>
     </div>
@@ -192,6 +199,29 @@
         <td th:text="${product.description}"></td>
         <td th:text="${product.basePrice}"></td>
         <td th:text="${product.basePrice}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<table class="main-table">
+    <thead>
+    <tr>
+        <th style="width: 30%;">Fecha de pago</th>
+        <th style="width: 8%;">Metodo de pago</th>
+        <th style="width: 8%;">Transaccion</th>
+        <th style="width: 10%;">Valor pagado</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="paymentDetail: ${paymentList}">
+        <td th:text="${#strings.toString(paymentDetail.date)}"></td>
+        <td th:text="${paymentDetail.paymentMethod.type}"></td>
+        <td th:text="${paymentDetail.transactionId}"></td>
+        <td th:text="${paymentDetail.amount}"></td>
+    </tr>
+    <tr>
+        <td colspan="3" style="text-align: right; font-weight: bold;">Total pagado:</td>
+        <td th:text="${totalPaid}"></td>
     </tr>
     </tbody>
 </table>

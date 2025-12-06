@@ -15,6 +15,8 @@ import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 

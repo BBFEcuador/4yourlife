@@ -5,6 +5,8 @@ import com.foryourlife.clients.account.invitations.applications.QueryInvitationS
 import com.foryourlife.clients.account.invitations.infrastructure.InvitationRequest;
 import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
 import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecordRepository;
+import com.foryourlife.clients.account.module.domain.ClientModule;
+import com.foryourlife.clients.account.module.domain.ClientModuleRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
@@ -39,6 +41,7 @@ import java.util.UUID;
 @Service
 public class ShellAddEntitiesFromTemplate {
     private final ParticipantRepository participantRepository;
+    private final ClientModuleRepository clientModuleRepository;
     private final VisionaryRepository visionaryRepository;
     private final StaffRepository staffRepository;
     private final MasterLifeRepository masterLifeRepository;
@@ -50,8 +53,9 @@ public class ShellAddEntitiesFromTemplate {
     private final UserRepository userRepository;
 
 
-    public ShellAddEntitiesFromTemplate(ParticipantRepository participantRepository, VisionaryRepository visionaryRepository, StaffRepository staffRepository, MasterLifeRepository masterLifeRepository, CommandInvitationService commandInvitationService, PasswordEncoder passwordEncoder, QueryInvitationServices queryInvitationServices, MedicalRecordRepository medicalRecordRepository, ParticipantLevelService participantLevelRepository, UserRepository userRepository) {
+    public ShellAddEntitiesFromTemplate(ParticipantRepository participantRepository, ClientModuleRepository clientModuleRepository, VisionaryRepository visionaryRepository, StaffRepository staffRepository, MasterLifeRepository masterLifeRepository, CommandInvitationService commandInvitationService, PasswordEncoder passwordEncoder, QueryInvitationServices queryInvitationServices, MedicalRecordRepository medicalRecordRepository, ParticipantLevelService participantLevelRepository, UserRepository userRepository) {
         this.participantRepository = participantRepository;
+        this.clientModuleRepository = clientModuleRepository;
         this.visionaryRepository = visionaryRepository;
         this.staffRepository = staffRepository;
         this.masterLifeRepository = masterLifeRepository;
@@ -68,7 +72,7 @@ public class ShellAddEntitiesFromTemplate {
         try {
 
             InputStream is = getClass().getClassLoader()
-                    .getResourceAsStream("plantillav2.xlsx");
+                    .getResourceAsStream("plantillav3.xlsx");
 
             if (is == null) {
                 throw new RuntimeException("Archivo no encontrado en resources");
@@ -102,7 +106,7 @@ public class ShellAddEntitiesFromTemplate {
             String apellido2 = getCellString(row.getCell(1));
             String telefono = getCellString(row.getCell(4));
             String direccion = getCellString(row.getCell(5));
-            String email = "participane"+(i+1)+"@gmail.com";
+            String email = "participane.cue"+(i+1)+"@gmail.com";
             var g = getCellString(row.getCell(7));
             String genero = g == "H" ? "H" : "M";
             String ci = getCellString(row.getCell(8));
@@ -189,6 +193,14 @@ public class ShellAddEntitiesFromTemplate {
                     "N/A",
                     participant
             );
+            var clientModule = new ClientModule(
+                    UUID.randomUUID().toString(),
+                    true,
+                    false,
+                    false,
+                    participant
+            );
+            clientModuleRepository.save(clientModule);
             medicalRecordRepository.save(medicalRecord);
         }
 

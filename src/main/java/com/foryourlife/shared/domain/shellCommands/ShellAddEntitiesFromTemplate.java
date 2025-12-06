@@ -121,7 +121,7 @@ public class ShellAddEntitiesFromTemplate {
             var invitationToken = commandInvitationService.createInvitationByAdminWithQuantity(
                     new InvitationRequest("3936ae5e-0cc1-4375-abc7-520d16999110",
                             "600",
-                            "61d88b2a-a22e-4cb0-8e43-e036483039d6")
+                            "a35d480e-f17a-4b5c-887e-2ba9ddd3b696")
             );
 
             var userOptional = userRepository.findByEmail(email);

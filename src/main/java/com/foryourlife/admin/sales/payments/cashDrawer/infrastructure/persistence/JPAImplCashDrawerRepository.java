@@ -17,4 +17,6 @@ interface JPAImplCashDrawerRepository extends JpaRepository<CashDrawer, String> 
     List<CashDrawer> findAllByStatusIsNotAndOpenedByUser_Id(CashDrawerStatus status, String openedByUserId);
 
     Optional<CashDrawer> findByStatusAndOpenedByUser_Id(CashDrawerStatus status, String openedByUserId);
+
+    Optional<CashDrawer> findByStatusIsAndCashBox_IdAndOpenedByUser_Id(CashDrawerStatus status, String cashBoxId, String openedByUserId);
 }

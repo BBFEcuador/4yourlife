@@ -6,6 +6,8 @@ import com.foryourlife.clients.account.participant.domain.UserNotFoundException;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.exception.DomainExceptionsWrapper;
 import jakarta.annotation.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,9 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalControllerHandlerException extends ResponseEntityExceptionHandler {
+    private final Logger log = LoggerFactory.getLogger(GlobalControllerHandlerException.class);
+
+
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -55,6 +60,7 @@ public class GlobalControllerHandlerException extends ResponseEntityExceptionHan
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<Object> handleBaseException(BaseException ex) {
         DomainExceptionsWrapper errors = new DomainExceptionsWrapper(ex.getMessage(), ex.getErrors());
+        this.logger.error(ex.getMessage(), ex);
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
@@ -85,6 +91,7 @@ public class GlobalControllerHandlerException extends ResponseEntityExceptionHan
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         DomainExceptionsWrapper errors = new DomainExceptionsWrapper(ex.getMessage(), List.of(ex.getMessage()));
+        this.logger.error(ex.getMessage(), ex);
         return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

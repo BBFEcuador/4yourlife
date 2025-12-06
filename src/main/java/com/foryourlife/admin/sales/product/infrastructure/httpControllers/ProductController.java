@@ -2,7 +2,6 @@ package com.foryourlife.admin.sales.product.infrastructure.httpControllers;
 
 import com.foryourlife.admin.sales.product.application.ProductCreateService;
 import com.foryourlife.admin.sales.product.application.ProductFinderService;
-import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import jakarta.validation.Valid;
@@ -44,12 +43,29 @@ public class ProductController {
     }
 
     @GetMapping("/available")
-    public ResponseEntity<?> getAllProducts(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search) {
+    public ResponseEntity<?> getAllProductsAvailable(
+            @RequestParam(value = "page", defaultValue = "0")
+            int page,
+            @RequestParam(value = "perPage", defaultValue = "10")
+            int perPage,
+            @RequestParam(value = "search", defaultValue = "")
+            String search,
+            @RequestParam(value = "campusId", defaultValue = "")
+            String campusId
+    ) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
         List<Filter> filters = new ArrayList<>();
 
         if (!search.isEmpty()) {
-            filters.addAll(List.of(new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR), new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)));
+            filters.addAll(List.of(
+                    new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)
+                    )
+            );
+        }
+        if (!campusId.isEmpty()) {
+            filters.add(new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND));
         }
         filters.add(new Filter("isActive", "true", null, Filter.Operation.IS_TRUE, Filter.LogicalOperator.AND));
         var criteria = new Criteria(filters, Optional.empty(), Optional.empty());

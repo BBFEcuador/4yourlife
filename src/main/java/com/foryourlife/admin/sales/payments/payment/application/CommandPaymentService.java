@@ -18,12 +18,15 @@ import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethodRe
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.admin.sales.programs.domain.Program;
+import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
+import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
@@ -48,8 +51,9 @@ public class CommandPaymentService {
     private final CashDrawerQueryService cashDrawerQueryService;
     private final ConfigContificoQueryService configContificoQueryService;
     private final CommandInvoiceService commandInvoiceService;
+    private final ClientModuleCreatorService clientModuleCreatorService;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService) {
         this._paymentRepository = _paymentRepository;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
@@ -61,8 +65,10 @@ public class CommandPaymentService {
         this.cashDrawerQueryService = cashDrawerQueryService;
         this.configContificoQueryService = configContificoQueryService;
         this.commandInvoiceService = commandInvoiceService;
+        this.clientModuleCreatorService = clientModuleCreatorService;
     }
 
+    @Transactional
     public String save(PaymentRequest paymentReq) {
 
         boolean hasPendingPayments = _paymentRepository.existsByParticipantIdAndStatus(paymentReq.participant, PaymentStatus.PENDING);
@@ -96,6 +102,15 @@ public class CommandPaymentService {
             if (Boolean.TRUE.equals(modules.getHasFocus())) activeLevels.add(CourseLevel.FOCUS);
             if (Boolean.TRUE.equals(modules.getHasYour())) activeLevels.add(CourseLevel.YOUR);
             if (Boolean.TRUE.equals(modules.getHasLife())) activeLevels.add(CourseLevel.LIFE);
+        } else {
+            ClientModule clientModule = new ClientModule(
+                    UUID.randomUUID().toString(),
+                    false,
+                    false,
+                    false,
+                    participant
+            );
+            clientModuleCreatorService.createClientModule(clientModule);
         }
 
         for (Product product : products) {
@@ -160,6 +175,7 @@ public class CommandPaymentService {
         return payment.getId();
     }
 
+    @Transactional
     public Invoice createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment payment, List<PaymentHistory> paymentHistories) {
         try {
             String invoiceNumber = getNextInvoiceNumber(cashDrawer);
@@ -203,6 +219,7 @@ public class CommandPaymentService {
                     BigDecimal.ZERO,
                     taxAmount,
                     totalAmount,
+                    invoice.getPayment().getNote(),
                     details,
                     BigDecimal.ZERO,
                     "Generado en 4YourLife",
@@ -252,17 +269,6 @@ public class CommandPaymentService {
         return result;
     }
 
-    public static int generateModule(String claveAcceso) {
-        int factor = 2;
-        int suma = 0;
-        for (int i = claveAcceso.length() - 1; i >= 0; i--) {
-            suma += factor * Character.getNumericValue(claveAcceso.charAt(i));
-            factor = factor % 7 == 0 ? 2 : factor + 1;
-        }
-        int dv = 11 - suma % 11;
-        return dv == 11 ? 0 : (dv == 10 ? 1 : dv);
-    }
-
     private String getNextInvoiceNumber(CashDrawer cashDrawer) {
         try {
             Invoice lastInvoice = queryInvoiceService.findLastInvoice();
@@ -293,7 +299,6 @@ public class CommandPaymentService {
         }
     }
 
-
     public void update(PaymentRequest paymentReq) {
         if (paymentReq.id == null || paymentReq.id.isEmpty()) {
             throw new IllegalArgumentException("No se puede actualizar, el id de pago es requerido");
@@ -309,6 +314,7 @@ public class CommandPaymentService {
         _paymentRepository.save(payment);
     }
 
+    @Transactional
     public void updatePaymentsHistory(PaymentHistory paymentHistory, String paymentId, String cashDrawerId) {
         var payment = _paymentRepository.findById(paymentId);
 
@@ -411,12 +417,6 @@ public class CommandPaymentService {
             renderer.setDocumentFromString(_paymentRepository.generatePdf(payment));
             renderer.layout();
             renderer.createPDF(pdf);
-            /*String fileName = "invoice_" + paymentId + ".pdf";
-            String filePath = Paths.get("").toAbsolutePath().toString() + File.separator + fileName;
-
-            try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                fos.write(pdf.toByteArray());
-            }*/
             return pdf;
         } catch (Exception e) {
             throw new BaseException("Error generating invoice", List.of(e.getMessage()));

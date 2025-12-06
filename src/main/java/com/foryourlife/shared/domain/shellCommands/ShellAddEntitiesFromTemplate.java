@@ -108,7 +108,7 @@ public class ShellAddEntitiesFromTemplate {
             String direccion = getCellString(row.getCell(5));
             String email = "participane.cue"+(i+1)+"@gmail.com";
             var g = getCellString(row.getCell(7));
-            String genero = g == "H" ? "H" : "M";
+            String genero = g.equals("H") ? "H" : "M";
             String ci = getCellString(row.getCell(8));
             String ciudad = getCellString(row.getCell(9));
             String fecha = "2001-09-11"; // "2000-07-21"

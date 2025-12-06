@@ -1,33 +1,43 @@
 package com.foryourlife.admin.crm.report.infrastructure.persistence;
 
 import com.foryourlife.admin.crm.call.domain.CallRepository;
+import com.foryourlife.admin.crm.callLogs.domain.CallLog;
 import com.foryourlife.admin.crm.report.domain.ReportViewRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
+import com.foryourlife.admin.programs.trainer.trainerDashboard.infrastructure.persistence.TrainerFocusViewRepositoryImpl;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.shared.domain.user.UserEntities;
+import com.foryourlife.shared.domain.user.UserType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xddf.usermodel.chart.*;
 import org.apache.poi.xssf.usermodel.*;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class JPAReportViewRepository implements ReportViewRepository {
     private final TrainingRepository trainingRepository;
     private final AttendanceRepository attendanceRepository;
     private final PromiseRepository promiseRepository;
+    private final TrainerFocusViewRepositoryImpl trainerFocusViewRepository;
     private final CallRepository callRepository;
 
-    public JPAReportViewRepository(TrainingRepository trainingRepository, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, CallRepository callRepository) {
+    public JPAReportViewRepository(TrainingRepository trainingRepository, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, TrainerFocusViewRepositoryImpl trainerFocusViewRepository, CallRepository callRepository) {
         this.trainingRepository = trainingRepository;
         this.attendanceRepository = attendanceRepository;
         this.promiseRepository = promiseRepository;
+        this.trainerFocusViewRepository = trainerFocusViewRepository;
         this.callRepository = callRepository;
     }
 
@@ -132,13 +142,109 @@ public class JPAReportViewRepository implements ReportViewRepository {
 
             var calls = callRepository.findAllByTrainingId(trainingId);
 
-            calls.forEach(call -> {
-//               var
-            });
-            Row crmHeader = operativeSheet.createRow(0);
+            List<CallLog> logs = new ArrayList<>();
 
-            crmHeader.createCell(0).setCellValue("ID Llamada");
-            // === Guardar ===
+            calls.forEach(call -> logs.addAll(call.getCallLogs()));
+
+            logs.sort(
+                    Comparator.comparing(CallLog::getDate)
+                            .thenComparing(log -> log.getType().getValue())
+                            .thenComparing(log -> log.getStatus().getValue())
+            );
+
+            Row headerRows = operativeSheet.createRow(0);
+
+            headerRows.createCell(0).setCellValue("Fecha de Llamada");
+            headerRows.createCell(1).setCellValue("Usuario que Llama");
+            headerRows.createCell(2).setCellValue("Tipo de Llamada");
+            headerRows.createCell(3).setCellValue("Estado de Llamada");
+            headerRows.createCell(4).setCellValue("Notas");
+
+            var ref = new Object() {
+                int rowIdx = 1;
+            };
+
+            logs.forEach(log -> {
+                Row row = operativeSheet.createRow(ref.rowIdx);
+                row.createCell(0).setCellValue(log.getDate().toString());
+                row.createCell(1).setCellValue(log.getCalledBy().getName());
+                row.createCell(2).setCellValue(log.getType().getValue());
+                row.createCell(3).setCellValue(log.getStatus().getValue());
+                row.createCell(4).setCellValue(log.getNotes());
+                ref.rowIdx++;
+            });
+            ref.rowIdx++;
+
+            List<String> userIds = attendances.stream()
+                    .map(a -> a.getUser().getId())
+                    .distinct()
+                    .toList();
+            var participants = training.getOriginalTeam().getUsers()
+            .stream()
+                    .collect(Collectors.toMap(
+                            p -> p.getUser().getId(),
+                            p -> p
+                    ));
+
+            var payments = trainerFocusViewRepository.buildPaymentDashboard(attendances, participants);
+
+            Row paymentHeader = operativeSheet.createRow(ref.rowIdx);
+            paymentHeader.createCell(0).setCellValue("Staff");
+            paymentHeader.createCell(1).setCellValue("Pago Total Your");
+            paymentHeader.createCell(2).setCellValue("Pago Parcial Your");
+            paymentHeader.createCell(3).setCellValue("Pago Total Life");
+            paymentHeader.createCell(4).setCellValue("Pago Parcial Life");
+            paymentHeader.createCell(5).setCellValue("Pagos Parciales");
+            paymentHeader.createCell(6).setCellValue("Pagos Totales");
+            ref.rowIdx++;
+
+            payments.forEach(payment -> {
+                Row row = operativeSheet.createRow(ref.rowIdx);
+                row.createCell(0).setCellValue(payment.getStaffName());
+                row.createCell(1).setCellValue(payment.getYourCompletedPaymentsCount());
+                row.createCell(2).setCellValue(payment.getYourPartialPaymentsCount());
+                row.createCell(3).setCellValue(payment.getLifeCompletedPaymentsCount());
+                row.createCell(4).setCellValue(payment.getLifePartialPaymentsCount());
+                row.createCell(5).setCellValue(payment.getPartialPaymentCount());
+                row.createCell(6).setCellValue(payment.getCompletedPaymentCount());
+                ref.rowIdx++;
+            });
+
+            ref.rowIdx++;
+
+            if (!training.getOriginalTeam().getMasterLife().isEmpty()){
+                Row promiseHeader = operativeSheet.createRow(ref.rowIdx);
+                promiseHeader.createCell(0).setCellValue("Declaraciones de Pago Life Master");
+                Row promiseColumns = operativeSheet.createRow(ref.rowIdx);
+                promiseColumns.createCell(0).setCellValue("Rol");
+                promiseColumns.createCell(1).setCellValue("Usuario");
+                promiseColumns.createCell(2).setCellValue("Viernes");
+                promiseColumns.createCell(3).setCellValue("Sábado");
+                promiseColumns.createCell(4).setCellValue("Domingo");
+                ref.rowIdx++;
+
+                var promises = promiseRepository.findByTrainingId(trainingId);
+                promises.forEach(promise -> {
+                    Row row = operativeSheet.createRow(ref.rowIdx);
+                    var user = promise.getUser();
+                    boolean isMaster = false;
+
+                    if (user != null && user.getEntityMap() != null) {
+                        isMaster = user.getEntityMap().stream()
+                                .map(UserEntities::getEntity)
+                                .anyMatch(entity -> Objects.equals(entity, UserType.MASTER_LIFE.getValue()));
+                    }
+
+                    row.createCell(0).setCellValue(isMaster ? "Master Life" : "Participante");
+                    row.createCell(1).setCellValue(promise.getUser().getName());
+                    row.createCell(2).setCellValue(promise.getFirstPromise());
+                    row.createCell(3).setCellValue(promise.getSecondPromise());
+                    row.createCell(4).setCellValue(promise.getThirdPromise());
+                    ref.rowIdx++;
+                });
+
+            }
+            operativeSheet.createRow(ref.rowIdx);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
             return out;

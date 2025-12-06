@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.payments.cashBox.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.store.domain.Store;
 import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
@@ -82,5 +83,16 @@ public class CashBox extends AuditableEntity {
 
     public static CashBox create(String id, String number, Boolean isActive, Integer firstNumberInvoice, Store store) {
         return new CashBox(id, number, isActive, firstNumberInvoice, store);
+    }
+
+    @JsonProperty(value = "opened", access = JsonProperty.Access.READ_ONLY)
+    public Boolean isOpened() {
+        for (CashDrawer drawer : this.cashDrawer) {
+            if (drawer.getStatus() == com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus.OPEN ||
+                drawer.getStatus() == com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus.LOCKED) {
+                return true;
+            }
+        }
+        return false;
     }
 }

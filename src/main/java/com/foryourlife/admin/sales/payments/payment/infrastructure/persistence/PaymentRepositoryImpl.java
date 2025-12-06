@@ -87,6 +87,11 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                         ? payment.getDiscount().getDiscountValue()
                         : 0
         );
+        context.setVariable("paymentList", payment.getPaymentshistory());
+        BigDecimal total = payment.getPaymentshistory().stream()
+                .map(p -> BigDecimal.valueOf(p.getAmount()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        context.setVariable("totalPaid", total.setScale(2, RoundingMode.HALF_UP));
         return templateEngine.process("templates/Payment-pdf", context);
     }
 

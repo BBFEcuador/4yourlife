@@ -97,4 +97,9 @@ public class TrainerRepositoryImpl implements TrainerRepository {
         this.loadTrainer = trainer;
         return trainer;
     }
+
+    @Override
+    public Long countTrainers() {
+        return this.repository.count();
+    }
 }

@@ -149,4 +149,9 @@ public class TeamRepositoryImpl implements TeamRepository {
     public List<Team> findByTrainerId(String trainerId) {
         return _jpaTeamRepository.findAllByTrainer_Id(trainerId);
     }
+
+    @Override
+    public Long countTeams() {
+        return _jpaTeamRepository.count();
+    }
 }

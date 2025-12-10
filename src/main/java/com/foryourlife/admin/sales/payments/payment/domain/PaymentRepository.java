@@ -5,6 +5,7 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,4 +18,5 @@ public interface PaymentRepository {
     String generatePdf(Payment payment);
     boolean existsByParticipantIdAndStatus(String participantId, PaymentStatus status);
     List<Payment> findAllByParticipantIn(Collection<Participant> participantIds);
+    List<Payment> findAllBetweenDates(LocalDateTime startDate, LocalDateTime endDate);
 }

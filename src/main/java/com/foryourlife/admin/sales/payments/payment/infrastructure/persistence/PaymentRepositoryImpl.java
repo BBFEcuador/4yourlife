@@ -19,6 +19,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -98,5 +99,10 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public List<Payment> findAllByParticipantIn(Collection<Participant> participantIds) {
         return _jpaPaymentRepository.findAllByParticipantIn(participantIds);
+    }
+
+    @Override
+    public List<Payment> findAllBetweenDates(LocalDateTime startDate, LocalDateTime endDate) {
+        return _jpaPaymentRepository.findAllByCreatedDateBetween(startDate, endDate);
     }
 }

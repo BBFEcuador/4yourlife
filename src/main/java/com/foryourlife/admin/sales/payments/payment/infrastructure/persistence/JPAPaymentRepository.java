@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,4 +20,6 @@ public interface JPAPaymentRepository extends JpaRepository<Payment, String>, Jp
     boolean existsByParticipant_IdAndStatus(String participantId, PaymentStatus status);
 
     List<Payment> findAllByParticipantIn(Collection<Participant> participants);
+
+    List<Payment> findAllByCreatedDateBetween(LocalDateTime createdDateAfter, LocalDateTime createdDateBefore);
 }

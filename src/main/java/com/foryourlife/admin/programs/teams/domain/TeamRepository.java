@@ -24,4 +24,5 @@ public interface TeamRepository {
     void removeStaffs(String teamId, String userId);
     List<Team> findByTrainerId(String trainerId);
     void removeVisionaries(String teamId, String id);
+    Long countTeams();
 }

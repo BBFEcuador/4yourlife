@@ -2,6 +2,7 @@ package com.foryourlife.admin.dashboard.operativeAssitantDashboard.infrastructur
 
 import com.foryourlife.admin.crm.call.domain.CallRepository;
 import com.foryourlife.admin.crm.callLogs.domain.CallStatus;
+import com.foryourlife.admin.crm.callLogs.domain.CallType;
 import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.*;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
@@ -106,57 +107,69 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
 
         enrolmentsDeclarations = participantDeclarations + masterLifesDeclarations;
 
-        List<CallsInfo> callsInfoList = new ArrayList<>();
+        Map<CallType, Map<CallStatus, CallsInfo>> callsByType = new HashMap<>();
 
-        for (CallStatus status : CallStatus.values()) {
-            CallsInfo info = new CallsInfo();
-            info.setStatus(status);
-            info.setTotalCalls(0);
-            callsInfoList.add(info);
+        for (CallType type : CallType.values()) {
+
+            Map<CallStatus, CallsInfo> statusMap = new HashMap<>();
+
+            for (CallStatus status : CallStatus.values()) {
+                CallsInfo info = new CallsInfo();
+                info.setStatus(status);
+                info.setTotalCalls(0);
+                statusMap.put(status, info);
+            }
+
+            callsByType.put(type, statusMap);
         }
 
-        Map<CallStatus, CallsInfo> map = callsInfoList.stream()
-                .collect(Collectors.toMap(CallsInfo::getStatus, ci -> ci));
-
         callRepository.findAllByTrainingId(training.getId())
-                .forEach(call ->
-                        call.getCallLogs().forEach(callLog -> {
-                            map.get(callLog.getStatus())
-                                    .setTotalCalls(map.get(callLog.getStatus()).getTotalCalls() + 1);
-                        })
-                );
+                .forEach(call -> call.getCallLogs().forEach(callLog -> {
 
+                    CallType type = callLog.getType();
+                    CallStatus status = callLog.getStatus();
+
+                    CallsInfo info = callsByType.get(type).get(status);
+                    info.setTotalCalls(info.getTotalCalls() + 1);
+                }));
+
+        List<CallTypeStats> finalList = new ArrayList<>();
+
+        for (CallType type : callsByType.keySet()) {
+            CallTypeStats stats = new CallTypeStats();
+            stats.setCallType(type);
+            stats.setStatuses(new ArrayList<>(callsByType.get(type).values()));
+            finalList.add(stats);
+        }
+
+
+        var participantAttendances = attendances.stream()
+                .filter(attendance -> training.getOriginalTeam().getUsers().stream()
+                        .anyMatch(participant -> participant.getUser().getId().equals(attendance.getUser().getId()))
+                ).count();
+        var masterLifeAttendances = attendances.stream()
+                .filter(attendance -> training.getOriginalTeam().getMasterLife().stream()
+                        .anyMatch(ml -> ml.getUser().getId().equals(attendance.getUser().getId()))
+                ).count();
+        List<WeeklyPaymentStats> weeklyTable;
+        weeklyTable = buildWeeklyTable(training);
         return new TrainingInfo(
                 training.getCourseLevel(),
                 training.getOriginalTeam().getTrainer().getName(),
                 training.getOriginalTeam().getName(),
                 training.getOriginalTeam().getTrainingNumber().toString(),
                 training.getOriginalTeam().getUsers().size(),
-                (int) attendances.stream().filter(attendance -> attendance.getSundayAttendance() == AttendanceStatus.ASISTIO).count(),
+                (int) participantAttendances,
                 participantDeclarations,
                 training.getOriginalTeam().getMasterLife().size(),
-                (int) attendances.stream().filter(attendance -> attendance.getSundayAttendance() == AttendanceStatus.ASISTIO && training.getOriginalTeam().getMasterLife().stream().anyMatch(ml -> ml.getUser().getId().equals(attendance.getUser().getId()))).count(),
+                (int) masterLifeAttendances,
                 masterLifesDeclarations,
                 training.getOriginalTeam().getUsers().size() + training.getOriginalTeam().getMasterLife().size(),
-                (int) attendances.stream().filter(attendance -> attendance.getSundayAttendance() == AttendanceStatus.ASISTIO).count(),
+                (int) (participantAttendances + masterLifeAttendances),
                 enrolmentsDeclarations,
-                callsInfoList,
-                buildWeeklyTable(training)
+                finalList,
+                weeklyTable
         );
-    }
-
-    private long countByCourseLevel(List<Payment> payments, CourseLevel level, boolean completed) {
-        return payments.stream()
-                .filter(p -> (completed && p.getStatus() == PaymentStatus.COMPLETED)
-                        || (!completed && p.getStatus() == PaymentStatus.PENDING))
-                .filter(p -> p.getProducts() != null && p.getProducts().stream()
-                        .anyMatch(prod -> prod.getPrograms() != null &&
-                                prod.getPrograms().stream().anyMatch(prg ->
-                                        prg.getCourseLevel() == level
-                                )
-                        )
-                )
-                .count();
     }
 
     private List<LocalDate> getFridayBoundaries(LocalDate start, LocalDate nextFriday) {
@@ -179,7 +192,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
         List<LocalDate> fridayBoundaries = getFridayBoundaries(startFriday, nextFriday);
 
         List<Payment> payments = new java.util.ArrayList<>(List.of());
-            training.getOriginalTeam().getUsers().forEach(participant ->
+        training.getOriginalTeam().getUsers().forEach(participant ->
                 paymentRepository.findAllBetweenDates(training.getStartDate().atStartOfDay(), training.getNextLevel().getStartDate().atStartOfDay()).forEach(
                         payment -> {
                             if (payment.getParticipant().getId().equals(participant.getId())) {

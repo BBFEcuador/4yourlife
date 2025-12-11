@@ -18,10 +18,10 @@ public class TrainingInfo {
     int totalEnrolments;
     int totalEnrolmentsAssistants;
     int totalEnrolmentsDeclarations;
-    List<CallsInfo> callsInfoList;
+    List<CallTypeStats> callsInfoList;
     List<WeeklyPaymentStats> weeklyPaymentStatsList;
 
-    public TrainingInfo(CourseLevel courseLevel, String trainerName, String teamName, String teamNumber, int totalParticipants, int totalParticipantAssistants, int totalParticipantsDeclarations, int totalMasterLifes, int totalMasterLifesAssistants, int totalMasterLifesDeclarations, int totalEnrolments, int totalEnrolmentsAssistants, int totalEnrolmentsDeclarations, List<CallsInfo> callsInfoList, List<WeeklyPaymentStats> weeklyPaymentStatsList) {
+    public TrainingInfo(CourseLevel courseLevel, String trainerName, String teamName, String teamNumber, int totalParticipants, int totalParticipantAssistants, int totalParticipantsDeclarations, int totalMasterLifes, int totalMasterLifesAssistants, int totalMasterLifesDeclarations, int totalEnrolments, int totalEnrolmentsAssistants, int totalEnrolmentsDeclarations, List<CallTypeStats> callsInfoList, List<WeeklyPaymentStats> weeklyPaymentStatsList) {
         this.courseLevel = courseLevel;
         this.trainerName = trainerName;
         this.teamName = teamName;
@@ -71,12 +71,20 @@ public class TrainingInfo {
         this.courseLevel = courseLevel;
     }
 
-    public List<CallsInfo> getCallsInfoList() {
+    public List<CallTypeStats> getCallsInfoList() {
         return callsInfoList;
     }
 
-    public void setCallsInfoList(List<CallsInfo> callsInfoList) {
+    public void setCallsInfoList(List<CallTypeStats> callsInfoList) {
         this.callsInfoList = callsInfoList;
+    }
+
+    public List<WeeklyPaymentStats> getWeeklyPaymentStatsList() {
+        return weeklyPaymentStatsList;
+    }
+
+    public void setWeeklyPaymentStatsList(List<WeeklyPaymentStats> weeklyPaymentStatsList) {
+        this.weeklyPaymentStatsList = weeklyPaymentStatsList;
     }
 
     public String getTrainerName() {

@@ -32,6 +32,12 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
                 )
         );
 
+        if (training.getOriginalTeam() == null) {
+            return new FinancialAdministratorDashboard(
+                    BigDecimal.valueOf(0),
+                    List.of()
+            );
+        }
         List<Payment> payments = new java.util.ArrayList<>(List.of());
         training.getOriginalTeam().getUsers().forEach(participant ->
                 paymentRepository.findAllBetweenDates(training.getStartDate().atStartOfDay(), training.getNextLevel().getStartDate().atStartOfDay()).forEach(

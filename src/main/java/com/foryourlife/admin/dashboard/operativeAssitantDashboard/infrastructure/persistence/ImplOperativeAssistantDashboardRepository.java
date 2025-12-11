@@ -128,7 +128,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
 
         return new TrainingInfo(
                 training.getCourseLevel(),
-                training.getName(),
+                training.getOriginalTeam().getTrainer().getName(),
                 training.getOriginalTeam().getName(),
                 training.getOriginalTeam().getTrainingNumber().toString(),
                 training.getOriginalTeam().getUsers().size(),

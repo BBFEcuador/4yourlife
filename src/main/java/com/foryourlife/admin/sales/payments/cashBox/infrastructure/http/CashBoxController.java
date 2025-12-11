@@ -22,8 +22,9 @@ public class CashBoxController {
     private CashBoxQueryService queryService;
 
     @PostMapping("")
-    public ResponseEntity<CashBox> saveCashDrawer(@RequestBody @Valid CashBoxRequest cashDrawer) {
-        return new ResponseEntity<>(commandService.addCashBox(cashDrawer.toDomain()), HttpStatus.CREATED);
+    public ResponseEntity<?> saveCashDrawer(@RequestBody @Valid CashBoxRequest cashDrawer) {
+        commandService.addCashBox(cashDrawer.toDomain());
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("{id}")

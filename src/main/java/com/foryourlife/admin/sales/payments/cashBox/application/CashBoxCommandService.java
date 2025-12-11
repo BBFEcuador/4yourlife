@@ -15,7 +15,7 @@ public class CashBoxCommandService {
         this.repository = repository;
     }
 
-    public CashBox addCashBox(CashBox cashBox) {
+    public void addCashBox(CashBox cashBox) {
 
         cashBox.setNumber(String.format("%03d", Integer.parseInt(cashBox.getNumber())));
 
@@ -27,6 +27,6 @@ public class CashBoxCommandService {
             );
         }
 
-        return repository.save(cashBox);
+        repository.save(cashBox);
     }
 }

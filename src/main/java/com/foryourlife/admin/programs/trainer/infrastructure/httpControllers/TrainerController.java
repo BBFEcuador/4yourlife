@@ -86,9 +86,9 @@ public class TrainerController {
         return new ResponseEntity<>(trainerQueryService.findTrainers(p, criteria), HttpStatus.OK);
     }
 
-    @PostMapping("/available")
-    public ResponseEntity<List<Trainer>> getTrainers(@Valid @RequestBody AvailableTrainerRequest request) {
-        return new ResponseEntity<>(trainerQueryService.findTrainersAvailable(request.startDate, request.endDate), HttpStatus.OK);
+    @PostMapping("/available/{trainingId}")
+    public ResponseEntity<List<Trainer>> getTrainers(@PathVariable String trainingId) {
+        return new ResponseEntity<>(trainerQueryService.findTrainersAvailable(trainingId), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

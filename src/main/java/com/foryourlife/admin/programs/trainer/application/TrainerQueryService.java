@@ -2,6 +2,7 @@ package com.foryourlife.admin.programs.trainer.application;
 
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.trainer.domain.TrainerRepository;
+import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,10 +15,13 @@ import java.util.Optional;
 @Service
 public class TrainerQueryService {
 
+    private final TrainingRepository trainingRepository;
     private TrainerRepository repository;
 
-    public TrainerQueryService(TrainerRepository repository) {
+
+    public TrainerQueryService(TrainerRepository repository, TrainingRepository trainingRepository) {
         this.repository = repository;
+        this.trainingRepository = trainingRepository;
     }
 
     public List<Trainer> findTrainers(){
@@ -26,8 +30,9 @@ public class TrainerQueryService {
     public Page<Trainer> findTrainers(Pageable pageable, Criteria criteria){
         return repository.getTrainers(pageable,criteria);
     }
-    public List<Trainer> findTrainersAvailable(LocalDate startDate, LocalDate endDate){
-        return repository.getAvailableTrainers(startDate,endDate);
+    public List<Trainer> findTrainersAvailable(String trainingId){
+        var training = trainingRepository.findById(trainingId).orElseThrow();
+        return repository.getAvailableTrainers(training.getNextLevel().getStartDate(), training.getNextLevel().getEndDate());
     }
 
     public Optional<Trainer> findTrainerById(String trainerId) {

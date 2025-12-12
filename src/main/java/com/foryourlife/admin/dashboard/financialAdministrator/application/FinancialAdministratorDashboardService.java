@@ -4,6 +4,8 @@ import com.foryourlife.admin.dashboard.financialAdministrator.domain.FinancialAd
 import com.foryourlife.admin.dashboard.financialAdministrator.domain.FinancialAdministratorDashboardRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+
 @Service
 public class FinancialAdministratorDashboardService {
     private final FinancialAdministratorDashboardRepository repository;
@@ -14,6 +16,10 @@ public class FinancialAdministratorDashboardService {
 
     public FinancialAdministratorDashboard getDashboard(String trainingId) {
         return repository.findByTrainingId(trainingId);
+    }
+
+    public ByteArrayOutputStream generateReport(String trainingId) {
+        return repository.generateReport(trainingId);
     }
 }
 

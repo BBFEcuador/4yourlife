@@ -10,6 +10,7 @@ import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -87,5 +88,11 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
             }
         }
         return summaryMap;
+    }
+
+    @Override
+    public ByteArrayOutputStream generateReport(String trainingId) {
+
+        return null;
     }
 }

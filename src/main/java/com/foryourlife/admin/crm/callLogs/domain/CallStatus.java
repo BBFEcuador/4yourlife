@@ -3,6 +3,11 @@ package com.foryourlife.admin.crm.callLogs.domain;
 public enum CallStatus {
     DONE("Realizada"),
     NOT_ANSWERED("No Contestada"),
+    NOT_INTERESTED("No Interesa"),
+    ANOTHER_CAMPUS("Otra Sede"),
+    NEXT_DATE("Proxima Fecha"),
+    FOR_CONFIRMATION("Por confirmar"),
+    CONFIRMED("Confirmado"),
     RE_SCHEDULED("Reprogramada");
 
     private final String value;

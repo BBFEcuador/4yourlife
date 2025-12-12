@@ -14,8 +14,8 @@ public interface TrainingRepository {
     Page<Training> getAll(Pageable pageable, Criteria criteria);
     List<Training> match(Criteria criteria);
     Training matchOne(Criteria criteria);
-    List<Training> findByStartDate(StartDate date);
-    List<Training> findByStartDateAndCampus_id(StartDate date,String campusId);
+    List<Training> findByStartDate(LocalDate date);
+    List<Training> findByStartDateAndCampus_id(LocalDate date,String campusId);
     Optional<Training> findById(String id);
     Optional<Training> findByNextLevel_Id(String id);
 }

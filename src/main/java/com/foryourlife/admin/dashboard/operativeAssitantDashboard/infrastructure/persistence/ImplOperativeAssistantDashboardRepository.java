@@ -16,6 +16,7 @@ import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
 
         Training focus = null, your = null, life1 = null, life2 = null, life3 = null;
 
-        if (training.getCourseLevel().equals(CourseLevel.YOUR)) {
+        if (training.getCourseLevel().equals(CourseLevel.FOCUS)) {
             focus = training;
         }
         if (training.getCourseLevel().equals(CourseLevel.YOUR)) {
@@ -101,7 +102,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
             headerFont.setBold(true);
             headerFont.setColor(IndexedColors.WHITE.getIndex());
             headerStyle.setFont(headerFont);
-            headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+            headerStyle.setFillForegroundColor(IndexedColors.VIOLET.getIndex());
             headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             headerStyle.setAlignment(HorizontalAlignment.CENTER);
             headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -152,7 +153,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
                 Row row = trainingSheet.createRow(rowIndex++);
                 int c = 0;
 
-                row.createCell(c).setCellValue(t.getCourseLevel().name());
+                row.createCell(c).setCellValue(t.getCourseLevel().getValue().toUpperCase());
                 row.getCell(c++).setCellStyle(cellStyle);
 
                 row.createCell(c).setCellValue(t.getTrainerName());
@@ -188,15 +189,27 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
                 trainingSheet.autoSizeColumn(i);
             }
 
-
             // ============================
             //  HOJA 2: CALLS
             // ============================
+            // Estilo para secciones (Nivel)
+            CellStyle levelStyle = workbook.createCellStyle();
+            levelStyle.cloneStyleFrom(headerStyle);
+            levelStyle.setFillForegroundColor(IndexedColors.VIOLET.getIndex());
+            levelStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            // Estilo para subtítulos (Tipo de llamada)
+            CellStyle subLevelStyle = workbook.createCellStyle();
+            subLevelStyle.cloneStyleFrom(headerStyle);
+            subLevelStyle.setFillForegroundColor(IndexedColors.ORANGE.getIndex());
+            subLevelStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
             Sheet callSheet = workbook.createSheet("Llamadas");
             rowIndex = 0;
 
             String[] callHeaders = {"Nivel", "Tipo de Llamada", "Estado", "Total de llamadas"};
 
+            // ENCABEZADO
             Row callHeader = callSheet.createRow(rowIndex++);
             for (int i = 0; i < callHeaders.length; i++) {
                 Cell cell = callHeader.createCell(i);
@@ -205,21 +218,43 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
             }
 
             for (TrainingInfo t : dashboard.getTrainingInfo()) {
+
+                // ➤ SEPARADOR POR NIVEL
+                Row levelRow = callSheet.createRow(rowIndex++);
+                Cell levelCell = levelRow.createCell(0);
+                levelCell.setCellValue("Nivel: " + t.getCourseLevel().getValue().toUpperCase());
+                levelCell.setCellStyle(levelStyle);  // ← estilo especial para secciones
+                callSheet.addMergedRegion(new CellRangeAddress(rowIndex - 1, rowIndex - 1, 0, 3));
+
                 for (CallTypeStats stats : t.getCallsInfoList()) {
+
+                    // SUB-SEPARADOR POR TIPO DE LLAMADA
+                    Row typeRow = callSheet.createRow(rowIndex++);
+                    Cell typeCell = typeRow.createCell(0);
+                    typeCell.setCellValue("Tipo de llamada: " + stats.getCallType().getValue());
+                    typeCell.setCellStyle(subLevelStyle);
+                    callSheet.addMergedRegion(new CellRangeAddress(rowIndex - 1, rowIndex - 1, 0, 3));
+
+                    // DETALLE POR ESTADO
                     for (CallsInfo info : stats.getStatuses()) {
 
                         Row row = callSheet.createRow(rowIndex++);
                         int c = 0;
 
-                        row.createCell(c).setCellValue(t.getCourseLevel().name());
+                        // Nivel
+                        row.createCell(c).setCellValue(t.getCourseLevel().getValue());
                         row.getCell(c++).setCellStyle(cellStyle);
 
-                        row.createCell(c).setCellValue(stats.getCallType().name());
+                        // Tipo de llamada
+                        row.createCell(c).setCellValue(stats.getCallType().getValue());
                         row.getCell(c++).setCellStyle(cellStyle);
 
-                        row.createCell(c).setCellValue(info.getStatus().name());
+                        // Estado
+                        String estado = info.getStatus().getValue();
+                        row.createCell(c).setCellValue(estado);
                         row.getCell(c++).setCellStyle(cellStyle);
 
+                        // Total
                         Cell totalCell = row.createCell(c);
                         totalCell.setCellValue(info.getTotalCalls());
                         totalCell.setCellStyle(numberStyle);
@@ -227,6 +262,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
                 }
             }
 
+            // Autosize
             for (int i = 0; i < callHeaders.length; i++) {
                 callSheet.autoSizeColumn(i);
             }
@@ -236,40 +272,74 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
             //  HOJA 3: WEEKLY PAYMENTS
             // ============================
             Sheet paymentsSheet = workbook.createSheet("Pagos Semanales");
-            rowIndex = 0;
+            int rowIndexPayment = 0;
 
+            // Estilo para títulos grandes
+            CellStyle titleStyle = workbook.createCellStyle();
+            Font titleFont = workbook.createFont();
+            titleFont.setBold(true);
+            titleFont.setFontHeightInPoints((short) 14);
+            titleStyle.setFont(titleFont);
+
+            // Estilo para subtítulos (semana)
+            CellStyle subtitleStyle = workbook.createCellStyle();
+            Font subtitleFont = workbook.createFont();
+            subtitleFont.setBold(true);
+            subtitleFont.setFontHeightInPoints((short) 12);
+            subtitleStyle.setFont(subtitleFont);
+
+            // Encabezados
             String[] payHeaders = {
-                    "Nivel", "Numero de seman", "Dia de la semana",
-                    "Participantes", "Pagos Your", "Pagos Your+Life",
-                    "Total de pagos", "Pagos parciales", "Porcentaje aprobado", "Porcentaje Proyectado"
+                    "Día", "Participantes", "Pagos Your", "Pagos Your+Life",
+                    "Total de pagos", "Pagos parciales", "% aprobado", "% proyectado"
             };
 
-            Row payHeader = paymentsSheet.createRow(rowIndex++);
-            for (int i = 0; i < payHeaders.length; i++) {
-                Cell cell = payHeader.createCell(i);
-                cell.setCellValue(payHeaders[i]);
-                cell.setCellStyle(headerStyle);
-            }
-
+            // Recorremos por nivel
             for (TrainingInfo t : dashboard.getTrainingInfo()) {
+
+                // ====================
+                // TÍTULO DEL NIVEL
+                // ====================
+                Row levelRow = paymentsSheet.createRow(rowIndexPayment++);
+                Cell levelCell = levelRow.createCell(0);
+                levelCell.setCellValue("NIVEL: " + t.getCourseLevel().getValue().toUpperCase());
+                levelCell.setCellStyle(titleStyle);
+
+                rowIndexPayment++; // línea en blanco
+
+                // Recorremos las semanas
                 for (WeeklyPaymentStats week : t.getWeeklyPaymentStatsList()) {
+
+                    // ======================
+                    // SUBTÍTULO DE SEMANA
+                    // ======================
+                    Row weekRow = paymentsSheet.createRow(rowIndexPayment++);
+                    Cell weekCell = weekRow.createCell(0);
+                    weekCell.setCellValue("Semana " + week.getWeekNumber());
+                    weekCell.setCellStyle(subtitleStyle);
+
+                    // Encabezado de la tabla
+                    Row headerRowPayment = paymentsSheet.createRow(rowIndexPayment++);
+                    for (int i = 0; i < payHeaders.length; i++) {
+                        Cell cell = headerRowPayment.createCell(i);
+                        cell.setCellValue(payHeaders[i]);
+                        cell.setCellStyle(headerStyle);
+                    }
+
+                    // ======================
+                    // FILAS POR DÍA
+                    // ======================
                     for (DayOfWeek day : week.getStatsPerDay().keySet()) {
 
                         DailyStats d = week.getStatsPerDay().get(day);
-                        Row row = paymentsSheet.createRow(rowIndex++);
+
+                        Row row = paymentsSheet.createRow(rowIndexPayment++);
                         int c = 0;
 
-                        row.createCell(c).setCellValue(t.getCourseLevel().name());
-                        row.getCell(c++).setCellStyle(cellStyle);
-
-                        Cell weekCell = row.createCell(c);
-                        weekCell.setCellValue(week.getWeekNumber());
-                        weekCell.setCellStyle(numberStyle);
-                        c++;
+                        // Día en español
                         String dia = day.getDisplayName(TextStyle.FULL, new Locale("es", "ES"));
                         dia = Character.toUpperCase(dia.charAt(0)) + dia.substring(1);
-                        row.createCell(c).setCellValue(dia);
-                        row.getCell(c++).setCellStyle(cellStyle);
+                        row.createCell(c++).setCellValue(dia);
 
                         int[] numberValues = {
                                 d.getParticipantsFinal(),
@@ -285,17 +355,22 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
                             numCell.setCellStyle(numberStyle);
                         }
 
-                        Cell pass = row.createCell(c++);
-                        pass.setCellValue(d.getPassPercent());
-                        pass.setCellStyle(percentStyle);
+                        Cell passCell = row.createCell(c++);
+                        passCell.setCellValue(d.getPassPercent());
+                        passCell.setCellStyle(percentStyle);
 
-                        Cell projected = row.createCell(c++);
-                        projected.setCellValue(d.getProjectedPercent());
-                        projected.setCellStyle(percentStyle);
+                        Cell projCell = row.createCell(c++);
+                        projCell.setCellValue(d.getProjectedPercent());
+                        projCell.setCellStyle(percentStyle);
                     }
+
+                    rowIndexPayment++; // espacio entre semanas
                 }
+
+                rowIndexPayment++; // espacio entre niveles
             }
 
+            // Autosize
             for (int i = 0; i < payHeaders.length; i++) {
                 paymentsSheet.autoSizeColumn(i);
             }
@@ -328,7 +403,6 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
                 cell.setCellValue(summaryHeaders[i]);
                 cell.setCellStyle(headerStyle);
             }
-
 
             // AGRUPAR INFORMACIÓN
             for (TrainingInfo t : dashboard.getTrainingInfo()) {

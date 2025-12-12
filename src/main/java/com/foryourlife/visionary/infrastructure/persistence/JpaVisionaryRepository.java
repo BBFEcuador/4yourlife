@@ -28,10 +28,10 @@ public interface JpaVisionaryRepository extends JpaRepository<Visionary, String>
                     JOIN s2.teams t2
                     JOIN t2.training tr
                     WHERE (
-                        (:startDate BETWEEN tr.startDate.value AND tr.endDate.value)
-                        OR (:endDate BETWEEN tr.startDate.value AND tr.endDate.value) 
-                        OR (tr.startDate.value BETWEEN :startDate AND :endDate)
-                        OR (tr.endDate.value BETWEEN :startDate AND :endDate)
+                        (:startDate BETWEEN tr.startDate AND tr.endDate)
+                        OR (:endDate BETWEEN tr.startDate AND tr.endDate) 
+                        OR (tr.startDate BETWEEN :startDate AND :endDate)
+                        OR (tr.endDate BETWEEN :startDate AND :endDate)
                     )
                 )
             """)
@@ -44,10 +44,10 @@ public interface JpaVisionaryRepository extends JpaRepository<Visionary, String>
                     JOIN t.training tr
                     WHERE t MEMBER OF s.teams
                     AND (
-                        (:startDate BETWEEN tr.startDate.value AND tr.endDate.value)
-                        OR (:endDate BETWEEN tr.startDate.value AND tr.endDate.value)
-                        OR (tr.startDate.value BETWEEN :startDate AND :endDate)
-                        OR (tr.endDate.value BETWEEN :startDate AND :endDate)
+                        (:startDate BETWEEN tr.startDate AND tr.endDate)
+                        OR (:endDate BETWEEN tr.startDate AND tr.endDate)
+                        OR (tr.startDate BETWEEN :startDate AND :endDate)
+                        OR (tr.endDate BETWEEN :startDate AND :endDate)
                     )
                     AND tr.id <> :newTrainingId
                 )

@@ -11,8 +11,10 @@ import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.visionary.domain.Visionary;
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -186,13 +188,23 @@ public class Team extends AggregateRoot implements Serializable {
     }
 
     public Map<String, String> getTrainingData() {
-        return new HashMap<String, String>() {{
-            put("startDate", training.getStartDate().toString());
-            put("endDate", training.getEndDate().toString());
-            put("name", training.getName());
-            put("curseLevel", training.getCourseLevel().name());
-            put("sede", training.getCampus().getCity());
-        }};
+        if (training != null){
+            return new HashMap<String, String>() {{
+                put("startDate", training.getStartDate().toString());
+                put("endDate", training.getEndDate().toString());
+                put("name", training.getName());
+                put("curseLevel", training.getCourseLevel().name());
+                put("sede", training.getCampus().getCity());
+            }};
+        }else{
+            return new HashMap<String, String>() {{
+                put("startDate", "");
+                put("endDate", "");
+                put("name", "");
+                put("curseLevel","");
+                put("sede", "");
+            }};
+        }
     }
 
     public void removeUser(Participant user) {

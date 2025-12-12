@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,12 +52,12 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     }
 
     @Override
-    public List<Training> findByStartDate(StartDate date) {
+    public List<Training> findByStartDate(LocalDate date) {
         return repository.findByStartDate(date);
     }
 
     @Override
-    public List<Training> findByStartDateAndCampus_id(StartDate date, String campusId) {
+    public List<Training> findByStartDateAndCampus_id(LocalDate date, String campusId) {
         return repository.findByStartDateAndCampus_id(date, campusId);
     }
 

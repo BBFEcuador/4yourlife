@@ -12,6 +12,7 @@ import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.staff.domain.StaffRepository;
 import com.foryourlife.visionary.domain.VisionaryRepository;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -340,7 +341,7 @@ public class CommandTeamService {
 
         var trainer = trainerQueryService.findTrainerById(request.trainer)
                 .orElseThrow(() -> new BaseException("Trainer not found", List.of()));
-
+        Hibernate.initialize(team.getTraining().getNextLevel());
         var training = team.getTraining().getNextLevel();
 
         var participants = request.users.stream()

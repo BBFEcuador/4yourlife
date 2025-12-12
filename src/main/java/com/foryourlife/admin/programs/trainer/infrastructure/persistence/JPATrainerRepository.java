@@ -25,10 +25,10 @@ public interface JPATrainerRepository extends JpaRepository<Trainer, String>, Jp
                     SELECT DISTINCT tm.trainer.id FROM Team tm
                     JOIN tm.training tr
                     WHERE (
-                        (:startDate BETWEEN tr.startDate.value AND tr.endDate.value)
-                        OR (:endDate BETWEEN tr.startDate.value AND tr.endDate.value)
-                        OR (tr.startDate.value BETWEEN :startDate AND :endDate)
-                        OR (tr.endDate.value BETWEEN :startDate AND :endDate)
+                        (:startDate BETWEEN tr.startDate AND tr.endDate)
+                        OR (:endDate BETWEEN tr.startDate AND tr.endDate)
+                        OR (tr.startDate BETWEEN :startDate AND :endDate)
+                        OR (tr.endDate BETWEEN :startDate AND :endDate)
                     )
                 )
             """)

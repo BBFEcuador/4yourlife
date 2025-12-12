@@ -27,17 +27,16 @@ public class Training extends AggregateRoot implements Serializable {
     private String id;
     private Integer number;
     private String name;
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "startDate"))
-    private StartDate startDate;
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "endDate"))
-    private EndDate endDate;
+    @Column(name = "startdate")
+    private LocalDate startDate;
+    @Column(name = "enddate")
+    private LocalDate endDate;
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private CourseLevel courseLevel;
     @OneToOne(
-            cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST}
+            cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST},
+            fetch = FetchType.EAGER
     )
     @JsonIncludeProperties({"originalTeam"})
     @JoinColumn(name = "nextLevel", referencedColumnName = "id")
@@ -54,11 +53,13 @@ public class Training extends AggregateRoot implements Serializable {
     }
 
     private Training(String id, Integer number, String name, LocalDate startDate, LocalDate endDate, CourseLevel courseLevel, Training nextLevel, Campus campus, Boolean state) {
+        var sd = new StartDate(startDate);
+        var ed = new EndDate(endDate);
         this.id = id;
         this.number = number;
         this.name = name;
-        this.startDate = new StartDate(startDate);
-        this.endDate = new EndDate(endDate);
+        this.startDate = sd.getValue();
+        this.endDate = ed.getValue();
         this.courseLevel = courseLevel;
         this.nextLevel = nextLevel;
         this.campus = campus;
@@ -101,20 +102,13 @@ public class Training extends AggregateRoot implements Serializable {
         return name;
     }
 
-    public void setStartDate(StartDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public void setEndDate(EndDate endDate) {
-        this.endDate = endDate;
-    }
 
     public LocalDate getEndDate() {
-        return endDate.getValue();
+        return endDate;
     }
 
     public LocalDate getStartDate() {
-        return startDate.getValue();
+        return startDate;
     }
 
     public CourseLevel getCourseLevel() {
@@ -142,8 +136,8 @@ public class Training extends AggregateRoot implements Serializable {
                 UUID.randomUUID().toString(),
                 this.number,
                 computedLifeName(this.number,4),
-                computedDate(this.startDate.getValue(), 15),
-                computedDate(this.endDate.getValue(), 15),
+                computedDate(this.startDate, 15),
+                computedDate(this.endDate, 15),
                 CourseLevel.LIFE_GRADUATE,
                 null,
                 campus,
@@ -153,8 +147,8 @@ public class Training extends AggregateRoot implements Serializable {
                 UUID.randomUUID().toString(),
                 this.number,
                 computedLifeName(this.number,3),
-                computedDate(this.startDate.getValue(), 13),
-                computedDate(this.endDate.getValue(), 13),
+                computedDate(this.startDate, 13),
+                computedDate(this.endDate, 13),
                 CourseLevel.LIFE_3,
                 lifeG,
                 campus,
@@ -164,8 +158,8 @@ public class Training extends AggregateRoot implements Serializable {
                 UUID.randomUUID().toString(),
                 this.number,
                 computedLifeName(this.number,2),
-                computedDate(this.startDate.getValue(), 8),
-                computedDate(this.endDate.getValue(), 8),
+                computedDate(this.startDate, 8),
+                computedDate(this.endDate, 8),
                 CourseLevel.LIFE_2,
                 life3,
                 campus,
@@ -175,8 +169,8 @@ public class Training extends AggregateRoot implements Serializable {
                 UUID.randomUUID().toString(),
                 this.number,
                 computedLifeName(this.number,1),
-                computedDate(this.startDate.getValue(), 3),
-                computedDate(this.endDate.getValue(), 3),
+                computedDate(this.startDate, 3),
+                computedDate(this.endDate, 3),
                 CourseLevel.LIFE,
                 life2,
                 campus,
@@ -187,8 +181,8 @@ public class Training extends AggregateRoot implements Serializable {
                 UUID.randomUUID().toString(),
                 this.number,
                 computedName(this.number),
-                computedDate(this.startDate.getValue(), 2),
-                computedDate(this.endDate.getValue(), 2),
+                computedDate(this.startDate, 2),
+                computedDate(this.endDate, 2),
                 CourseLevel.YOUR,
                 life,
                 campus,
@@ -196,9 +190,17 @@ public class Training extends AggregateRoot implements Serializable {
         );
         trainingList.add(this);
         for (int i = 1; i < numberOfFocus; i++) {
-            trainingList.add(this.geneNext(this.startDate.getValue().plusWeeks(i * 5L), i + this.number));
+            trainingList.add(this.geneNext(this.startDate.plusWeeks(i * 5L), i + this.number));
         }
         return trainingList;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     private Training geneNext(LocalDate startDate, Integer nexFocusNumber) {
@@ -289,6 +291,10 @@ public class Training extends AggregateRoot implements Serializable {
 
     public void setOriginalTeam(Team originalTeam) {
         this.originalTeam = originalTeam;
+    }
+
+    public void setNextLevel(Training nextLevel) {
+        this.nextLevel = nextLevel;
     }
 
     @Override

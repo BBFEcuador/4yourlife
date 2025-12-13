@@ -32,7 +32,6 @@ public class TrainingController {
         this.queryTrainingService = queryTrainingService;
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'USER')")
     @PostMapping("generate")
     public ResponseEntity<?> autoGenerate(@Valid @RequestBody TrainingAutoGenerateRequest request) {
         commandTrainingService.autoGenerateTraining(request);

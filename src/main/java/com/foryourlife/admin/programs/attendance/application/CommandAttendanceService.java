@@ -37,12 +37,12 @@ public class CommandAttendanceService {
         LocalDate start = attendance.getTraining().getStartDate();
         LocalDate end = attendance.getTraining().getEndDate();
 
-        trainingValidationService.validateDateInTrainingPeriod(today, start, end);
+//        trainingValidationService.validateDateInTrainingPeriod(today, start, end);
 
         long dayNumber = ChronoUnit.DAYS.between(start, today) + 1;
         DaysEnum dayEnum = DaysEnum.fromString(attendanceRequest.day);
 
-        trainingValidationService.validateDayConsistency(dayEnum, dayNumber);
+//        trainingValidationService.validateDayConsistency(dayEnum, dayNumber);
 
         switch (dayEnum) {
             case FRIDAY -> attendance.setFridayAttendance(attendanceRequest.attendanceStatus);

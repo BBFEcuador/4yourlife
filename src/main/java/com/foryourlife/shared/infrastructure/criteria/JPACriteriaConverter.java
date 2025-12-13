@@ -13,6 +13,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,8 +56,24 @@ public class JPACriteriaConverter<T> {
                     case GREATER_THAN -> criteriaBuilder.greaterThan(join.get(filter.getColumn()), filter.getValue());
                     case LESS_THAN -> criteriaBuilder.lessThan(join.get(filter.getColumn()), filter.getValue());
                     case BETWEEN -> {
-                        String[] split1 = filter.getValue().split(",");
-                        yield criteriaBuilder.between(join.get(filter.getColumn()), criteriaBuilder.literal(split1[0]), criteriaBuilder.literal(split1[1]));
+                        String[] parts = filter.getValue().split(",");
+                        String start = parts[0];
+                        String end = parts[1];
+
+                        Expression<? extends Comparable> path =
+                                join.get(filter.getColumn());
+
+                        Comparable convertedStart =
+                                (Comparable) convertValue(start, path.getJavaType());
+
+                        Comparable convertedEnd =
+                                (Comparable) convertValue(end, path.getJavaType());
+
+                        yield criteriaBuilder.between(
+                                path,
+                                convertedStart,
+                                convertedEnd
+                        );
                     }
                     case JOIN -> {
                         yield criteriaBuilder.equal(join.get(filter.getColumn()), criteriaBuilder.literal(filter.getValue()));
@@ -91,5 +112,55 @@ public class JPACriteriaConverter<T> {
             }
             return finalPredicate;
         };
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T convertValue(String value, Class<T> targetType) {
+
+        if (targetType == String.class) {
+            return (T) value;
+        }
+
+        if (targetType == Integer.class || targetType == int.class) {
+            return (T) Integer.valueOf(value);
+        }
+
+        if (targetType == Long.class || targetType == long.class) {
+            return (T) Long.valueOf(value);
+        }
+
+        if (targetType == Double.class || targetType == double.class) {
+            return (T) Double.valueOf(value);
+        }
+
+        if (targetType == Float.class || targetType == float.class) {
+            return (T) Float.valueOf(value);
+        }
+
+        if (targetType == Boolean.class || targetType == boolean.class) {
+            return (T) Boolean.valueOf(value);
+        }
+
+        if (targetType == BigDecimal.class) {
+            return (T) new BigDecimal(value);
+        }
+
+        if (targetType == LocalDate.class) {
+            return (T) LocalDate.parse(value);
+        }
+
+        if (targetType == LocalDateTime.class) {
+            try {
+                return (T) LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            } catch (DateTimeParseException ex) {
+                // fallback: si solo viene la fecha -> se asume 00:00:00
+                return (T) LocalDate
+                        .parse(value, DateTimeFormatter.ISO_LOCAL_DATE)
+                        .atStartOfDay();
+            }
+        }
+
+        // fallback por defecto
+        return (T) value;
     }
 }

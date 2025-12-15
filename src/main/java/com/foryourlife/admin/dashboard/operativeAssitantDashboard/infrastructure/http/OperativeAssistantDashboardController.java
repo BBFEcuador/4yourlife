@@ -23,8 +23,8 @@ public class OperativeAssistantDashboardController {
         return ResponseEntity.ok(dashboard);
     }
 
-    @PostMapping("generate/{trainingId}")
-    public ResponseEntity<byte[]> generateReport(@PathVariable String trainingId) {
+    @PostMapping("generate/{teamId}")
+    public ResponseEntity<byte[]> generateReport(@PathVariable String teamId) {
 
         String timestamp = LocalDateTime.now().format(
                 DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
@@ -41,7 +41,7 @@ public class OperativeAssistantDashboardController {
         );
 
         byte[] excelBytes = operativeAssistantDashboardService
-                .generateReport(trainingId)
+                .generateReport(teamId)
                 .toByteArray();
 
         return ResponseEntity

@@ -164,4 +164,10 @@ public class TeamController {
     public ResponseEntity<?> getByTrainerId(@PathVariable String trainerId) {
         return new ResponseEntity<>(this.queryTeamService.getByTrainerId(trainerId), HttpStatus.OK);
     }
+
+    @PutMapping("/add-users/{teamId}")
+    public ResponseEntity<?> addUsersToTeam(@PathVariable String teamId, @RequestBody AddUsersToTeamRequest request) {
+        commandTeamService.addParticipants(teamId, request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

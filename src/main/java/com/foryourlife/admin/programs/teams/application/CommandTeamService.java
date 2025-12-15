@@ -1,15 +1,26 @@
 package com.foryourlife.admin.programs.teams.application;
 
+import com.foryourlife.admin.crm.call.domain.Call;
+import com.foryourlife.admin.crm.call.domain.CallRepository;
+import com.foryourlife.admin.crm.callLogs.infrastructure.persistence.JpaCallLogRepository;
+import com.foryourlife.admin.programs.attendance.domain.Attendance;
+import com.foryourlife.admin.programs.attendance.domain.FylStage;
+import com.foryourlife.admin.programs.attendance.infraestructure.AttendanceRepositoryImpl;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.AddUsersToTeamRequest;
 import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.*;
 import com.foryourlife.admin.programs.trainer.application.TrainerQueryService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
+import com.foryourlife.clients.account.promises.domain.Promise;
+import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.masterLife.application.QueryMasterLifeService;
 import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.staff.domain.StaffRepository;
 import com.foryourlife.visionary.domain.VisionaryRepository;
 import org.hibernate.Hibernate;
@@ -28,9 +39,12 @@ import java.util.UUID;
 @Service
 public class CommandTeamService {
 
+    private final AttendanceRepositoryImpl attendanceRepository;
+    private final CallRepository callRepository;
     private String baseUrl;
     private final TeamRepository _teamRepository;
     private final EventBus bus;
+    private final PromiseRepository promiseRepository;
     private final ParticipantRepository _participantRepository;
     private final StaffRepository staffRepository;
     private final VisionaryRepository visionaryRepository;
@@ -41,7 +55,7 @@ public class CommandTeamService {
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
 
 
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService) {
+    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, PromiseRepository promiseRepository) {
         this._teamRepository = _teamRepository;
         this.bus = bus;
         this._participantRepository = _participantRepository;
@@ -51,6 +65,9 @@ public class CommandTeamService {
         this.trainerQueryService = trainerQueryService;
         this.queryMasterLifeService = queryMasterLifeService;
         this.queryTeamService = queryTeamService;
+        this.attendanceRepository = attendanceRepository;
+        this.callRepository = callRepository;
+        this.promiseRepository = promiseRepository;
     }
 
     public void save(Team team) {
@@ -414,7 +431,148 @@ public class CommandTeamService {
         _teamRepository.removeVisionaries(teamId, id);
     }
 
-    public List<Team> findByTrainerId(String trainerId) {
-        return this._teamRepository.findByTrainerId(trainerId);
+    @Transactional
+    public void addParticipants(String teamId, AddUsersToTeamRequest request) {
+        var team = _teamRepository.findById(teamId).orElseThrow(
+                () -> new BaseException("Team not found", List.of(""))
+        );
+
+        if (request.getUserIds() != null) {
+            var listParticipants = request.getUserIds().stream().map(userId -> {
+                var participant = _participantRepository.findById(userId).orElseThrow(
+                        () -> new BaseException("Participant not found", List.of(""))
+                );
+                team.getUsers().forEach(user -> {
+                    if (user.getId().equals(userId)) {
+                        throw new BaseException("El usuario" + user.getUser().getName() + " ya se encuentra en el equipo asignado", List.of(""));
+                    }
+                });
+                if (team.getTraining().getCourseLevel().equals(CourseLevel.LIFE)) {
+                    Promise promise = new Promise(
+                            UUID.randomUUID().toString(),
+                            team.getTraining(),
+                            participant.getUser()
+                    );
+                    promise.setStartDate(team.getTraining().getEndDate().plusDays(1));
+                    promise.setEndDate(team.getTraining().getEndDate().plusDays(5));
+                    promiseRepository.save(promise);
+                }
+
+                attendanceRepository.save(
+                        Attendance.create(
+                                UUID.randomUUID().toString(),
+                                null,
+                                null,
+                                null,
+                                FylStage.LIFE_GRADUATE,
+                                participant.getUser(),
+                                team.getTraining()
+                        )
+                );
+                callRepository.save(
+                        new Call(
+                                UUID.randomUUID().toString(),
+                                participant.getUser(),
+                                team.getTraining()
+                        )
+                );
+                return participant;
+            }).toList();
+            team.getUsers().addAll(listParticipants);
+        }
+
+        if (request.getStaffIds()  != null) {
+            var listStaffs = request.getStaffIds().stream().map(staffId -> {
+                var staff = staffRepository.findById(staffId).orElseThrow(
+                        () -> new BaseException("Staff not found", List.of(""))
+                );
+                team.getStaffs().forEach(s -> {
+                    if (s.getId().equals(staffId)) {
+                        throw new BaseException("El staff " + staff.getUser().getName() + " ya se encuentra en el equipo asignado", List.of(""));
+                    }
+                });
+                return staff;
+            }).toList();
+            team.getStaffs().addAll(listStaffs);
+        }
+
+        if (request.getVisitorIds() != null) {
+            var listVisionaries = request.getVisitorIds().stream().map(visionaryId -> {
+                var visionary = visionaryRepository.findById(visionaryId).orElseThrow(
+                        () -> new BaseException("Visionary not found", List.of(""))
+                );
+                team.getVisionaries().forEach(v -> {
+                    if (v.getId().equals(visionaryId)) {
+                        throw new BaseException("El visionario " + visionary.getUser().getName() + " ya se encuentra en el equipo asignado", List.of(""));
+                    }
+                });
+                return visionary;
+            }).toList();
+            team.getVisionaries().addAll(listVisionaries);
+        }
+
+        if (request.getMasterLifeIds() != null) {
+            var listMasterLife = request.getMasterLifeIds().stream().map(masterLifeId -> {
+                var masterLife = queryMasterLifeService.findById(masterLifeId);
+                team.getMasterLife().forEach(m -> {
+                    if (m.getId().equals(masterLifeId)) {
+                        throw new BaseException("El master life " + masterLife.getUser().getName() + " ya se encuentra en el equipo asignado", List.of(""));
+                    }
+                });
+                if (team.getTraining().getCourseLevel().equals(CourseLevel.LIFE)) {
+                    attendanceRepository.save(
+                            Attendance.create(
+                                    UUID.randomUUID().toString(),
+                                    null,
+                                    null,
+                                    null,
+                                    FylStage.LIFE_1,
+                                    masterLife.getUser(),
+                                    team.getTraining()
+                            )
+                    );
+                }
+                if (team.getTraining().getCourseLevel().equals(CourseLevel.LIFE_2)) {
+
+                    attendanceRepository.save(
+                            Attendance.create(
+                                    UUID.randomUUID().toString(),
+                                    null,
+                                    null,
+                                    null,
+                                    FylStage.LIFE_2,
+                                    masterLife.getUser(),
+                                    team.getTraining()
+                            )
+                    );
+                }
+                if (team.getTraining().getCourseLevel().equals(CourseLevel.LIFE_3)) {
+                    attendanceRepository.save(
+                            Attendance.create(
+                                    UUID.randomUUID().toString(),
+                                    null,
+                                    null,
+                                    null,
+                                    FylStage.LIFE_3,
+                                    masterLife.getUser(),
+                                    team.getTraining()
+                            )
+                    );
+                }
+                Promise promise = new Promise(
+                        UUID.randomUUID().toString(),
+                        team.getTraining(),
+                        masterLife.getUser()
+                );
+                promise.setStartDate(team.getTraining().getEndDate().plusDays(1));
+                promise.setEndDate(team.getTraining().getEndDate().plusDays(5));
+                promiseRepository.save(promise);
+                return masterLife;
+            }).toList();
+
+            team.getMasterLife().addAll(listMasterLife);
+        }
+
+        _teamRepository.save(team);
     }
 }

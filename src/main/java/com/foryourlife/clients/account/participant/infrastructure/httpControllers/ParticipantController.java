@@ -83,21 +83,57 @@ public class ParticipantController {
     }
 
     @PostMapping("/participants-available/{lvl}")
-    public ResponseEntity<?> getForTeam(@PathVariable String lvl) {
-
+    public ResponseEntity<?> getForTeam(
+            @RequestParam(value = "campusId", defaultValue = "") String campusId,
+            @PathVariable String lvl) {
         switch (lvl) {
             case "FOCUS" -> {
-                var criteria = new Criteria(List.of(
+                var filters = List.of(
                         new Filter("courseLevel", CourseLevel.FOCUS.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND),
-                        new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
+                        new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)
+
+                );
+                if (!campusId.isBlank()){
+                    new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND);
+                }
+                var criteria = new Criteria(
+                        filters,
+                        Optional.empty(),
+                        Optional.empty()
+                );
+
                 return new ResponseEntity<>(participantQueryService.matchers(criteria), HttpStatus.OK);
             }
             case "YOUR" -> {
-                var criteria = new Criteria(List.of(new Filter("courseLevel", CourseLevel.YOUR.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
+                var filters = List.of(
+                        new Filter("courseLevel", CourseLevel.YOUR.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND),
+                        new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND),
+                        new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND)
+                );
+                if (!campusId.isBlank()){
+                    new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND);
+                }
+                var criteria = new Criteria(
+                        filters,
+                        Optional.empty(),
+                        Optional.empty()
+                );
                 return new ResponseEntity<>(participantQueryService.matchers(criteria), HttpStatus.OK);
             }
             case "LIFE" -> {
-                var criteria = new Criteria(List.of(new Filter("courseLevel", CourseLevel.LIFE.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND), new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)), Optional.empty(), Optional.empty());
+                var filter = List.of(
+                        new Filter("courseLevel", CourseLevel.LIFE.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND),
+                        new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND),
+                        new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND)
+                );
+                if (!campusId.isBlank()){
+                    new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND);
+                }
+                var criteria = new Criteria(
+                        filter,
+                        Optional.empty(),
+                        Optional.empty()
+                );
                 return new ResponseEntity<>(participantQueryService.matchers(criteria), HttpStatus.OK);
             }
             default -> throw new BaseException("Illegal argument", List.of("Type must be FOCUS, YOUR or LIFE"));

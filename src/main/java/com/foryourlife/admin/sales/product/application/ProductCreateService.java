@@ -7,6 +7,7 @@ import com.foryourlife.admin.programs.campus.domain.CampusRepository;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.shared.domain.bus.EventBus;
+import com.foryourlife.shared.domain.events.ProductCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,18 @@ public class ProductCreateService {
 
     public void saveProduct(Product product) {
         this.repository.save(product);
-//        eventBus.publish(product.pullDomainEvents());
+        if(configContificoRepository.findByCampusId(product.getCampus().getId()).isPresent()){
+            eventBus.publish(product.pullDomainEvents());
+        }
+    }
+
+    public void syncProductsToContifico(String campusId) {
+        repository.findAllByCampusId(campusId).forEach(product -> {
+            if (!product.getContificoId().isBlank()){
+                product.record(new ProductCreated(product));
+                eventBus.publish(product.pullDomainEvents());
+            }
+        });
     }
 
     public void disableProductById(String id) {

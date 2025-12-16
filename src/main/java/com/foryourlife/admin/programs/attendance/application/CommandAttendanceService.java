@@ -16,12 +16,10 @@ import java.util.List;
 @Service
 public class CommandAttendanceService {
     private final AttendanceRepository _attendanceRepository;
-    private final TrainingValidationService trainingValidationService;
     private EventBus bus;
 
-    public CommandAttendanceService(AttendanceRepository _attendanceRepository, TrainingValidationService trainingValidationService, EventBus bus) {
+    public CommandAttendanceService(AttendanceRepository _attendanceRepository, EventBus bus) {
         this._attendanceRepository = _attendanceRepository;
-        this.trainingValidationService = trainingValidationService;
         this.bus = bus;
     }
 
@@ -33,20 +31,27 @@ public class CommandAttendanceService {
                         List.of("El ID proporcionado no corresponde a ningún registro de asistencia.")
                 ));
 
-        LocalDate today = LocalDate.now();
-        LocalDate start = attendance.getTraining().getStartDate();
-        LocalDate end = attendance.getTraining().getEndDate();
-
-//        trainingValidationService.validateDateInTrainingPeriod(today, start, end);
-
-        long dayNumber = ChronoUnit.DAYS.between(start, today) + 1;
         DaysEnum dayEnum = DaysEnum.fromString(attendanceRequest.day);
 
-//        trainingValidationService.validateDayConsistency(dayEnum, dayNumber);
-
         switch (dayEnum) {
-            case FRIDAY -> attendance.setFridayAttendance(attendanceRequest.attendanceStatus);
-            case SATURDAY -> attendance.setSaturdayAttendance(attendanceRequest.attendanceStatus);
+            case FRIDAY -> {
+                    attendance.setFridayAttendance(attendanceRequest.attendanceStatus);
+                    if (attendance.getFridayAttendance().equals(AttendanceStatus.ASISTIO)) {
+                        attendance.setSaturdayAttendance(AttendanceStatus.ASISTIO);
+                        attendance.setSundayAttendance(AttendanceStatus.ASISTIO);
+                    }else if (attendance.getFridayAttendance().equals(AttendanceStatus.NO_ASISTIO)) {
+                        attendance.setSaturdayAttendance(AttendanceStatus.DESERTO);
+                        attendance.setSundayAttendance(AttendanceStatus.DESERTO);
+                    }
+            }
+            case SATURDAY -> {
+                attendance.setSaturdayAttendance(attendanceRequest.attendanceStatus);
+                if (attendance.getSaturdayAttendance().equals(AttendanceStatus.ASISTIO)) {
+                    attendance.setSundayAttendance(AttendanceStatus.ASISTIO);
+                }else if (attendance.getSaturdayAttendance().equals(AttendanceStatus.NO_ASISTIO) || attendance.getSaturdayAttendance().equals(AttendanceStatus.DESERTO)) {
+                    attendance.setSundayAttendance(AttendanceStatus.DESERTO);
+                }
+            }
             case SUNDAY -> attendance.setSundayAttendance(attendanceRequest.attendanceStatus);
             default -> throw new BaseException(
                     "El día seleccionado no coincide con el día del entrenamiento",

@@ -18,22 +18,24 @@ public interface JPATrainerRepository extends JpaRepository<Trainer, String>, Jp
     @Query("""
                 SELECT t FROM Trainer t
                 WHERE NOT EXISTS (
-                    SELECT tm FROM Team tm
-                    WHERE tm.trainer = t
-                )
-                OR t.id NOT IN (
-                    SELECT DISTINCT tm.trainer.id FROM Team tm
-                    JOIN tm.training tr
-                    WHERE (
-                        (:startDate BETWEEN tr.startDate AND tr.endDate)
-                        OR (:endDate BETWEEN tr.startDate AND tr.endDate)
-                        OR (tr.startDate BETWEEN :startDate AND :endDate)
-                        OR (tr.endDate BETWEEN :startDate AND :endDate)
+                        SELECT tm FROM Team tm
+                        WHERE tm.trainer = t
                     )
-                )
+                    OR t.id NOT IN (
+                        SELECT DISTINCT tm.trainer.id
+                        FROM Team tm
+                        JOIN tm.training tr
+                        WHERE (
+                            (:startDate BETWEEN tr.startDate AND tr.endDate)
+                            OR (:endDate BETWEEN tr.startDate AND tr.endDate)
+                            OR (tr.startDate BETWEEN :startDate AND :endDate)
+                            OR (tr.endDate BETWEEN :startDate AND :endDate)
+                        )
+                    )
+                AND t.isActive = true
             """)
     List<Trainer> findAvailableTrainers(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-//    @Query("""
+    //    @Query("""
 //                SELECT COUNT(s) > 0 FROM Trainer s
 //                WHERE s.id = :trainerId
 //                AND NOT EXISTS (

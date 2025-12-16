@@ -15,6 +15,7 @@ public interface ProductRepository {
     Page<Product> findAll(Pageable pageable, Criteria criteria);
     Page<Product> findAll(Pageable pageable);
     Page<Product> findAllAvailable(Pageable pageable);
+    List<Product> findAllByCampusId(String campusId);
 
     void saveAll(List<Product> products);
 }

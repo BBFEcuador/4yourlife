@@ -56,4 +56,9 @@ public class ProductRepositoryImpl implements ProductRepository {
     public Optional<Product> findByContificoId(String contificoId) {
         return this.impl.findByContificoId(contificoId);
     }
+
+    @Override
+    public List<Product> findAllByCampusId(String campusId) {
+        return impl.findAllByCampus_Id(campusId);
+    }
 }

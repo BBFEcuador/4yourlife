@@ -35,23 +35,25 @@ public class RemoveParticipantOnNullAttend {
     @EventListener
     public void on(OnNullDesistedAttend event) {
         var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow();
-        var team = teamRepository.findByTrainingId(training.getId()).orElseThrow();
+        var team = teamRepository.findByTrainingId(training.getId());
         var user = event.getUser();
         var attendance = event.getAttendance();
 
-        if (attendance.getFridayAttendance() == null) attendance.setFridayAttendance(AttendanceStatus.NO_ASISTIO);
-        if (attendance.getSaturdayAttendance() == null) attendance.setSaturdayAttendance(AttendanceStatus.NO_ASISTIO);
-        if (attendance.getSundayAttendance() == null) attendance.setSundayAttendance(AttendanceStatus.NO_ASISTIO);
+        if (attendance.getFridayAttendance() == null) attendance.setFridayAttendance(AttendanceStatus.DESERTO);
+        if (attendance.getSaturdayAttendance() == null) attendance.setSaturdayAttendance(AttendanceStatus.DESERTO);
+        if (attendance.getSundayAttendance() == null) attendance.setSundayAttendance(AttendanceStatus.DESERTO);
 
         attendance.setActive(false);
         var participant = participantRepository.findByUserId(user.getId());
         if (participant.isPresent()) {
             participant.get().setIsDesertor(true);
             participant.get().setIsLingerer(true);
-            team.removeUser(participant.get());
+            if (team.isPresent()){
+                team.get().removeUser(participant.get());
+                teamRepository.save(team.get());
+            }
             participantRepository.save(participant.get());
         }
-        teamRepository.save(team);
         attendanceRepository.save(attendance);
     }
 }

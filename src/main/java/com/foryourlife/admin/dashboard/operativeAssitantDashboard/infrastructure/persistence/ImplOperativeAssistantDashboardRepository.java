@@ -1,6 +1,7 @@
 package com.foryourlife.admin.dashboard.operativeAssitantDashboard.infrastructure.persistence;
 
 import com.foryourlife.admin.crm.call.domain.CallRepository;
+import com.foryourlife.admin.crm.callLogs.domain.CallLog;
 import com.foryourlife.admin.crm.callLogs.domain.CallStatus;
 import com.foryourlife.admin.crm.callLogs.domain.CallType;
 import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.*;
@@ -416,6 +417,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
                 int notAnsweredCalls = 0;
                 int rescheduledCalls = 0;
 
+
                 for (CallTypeStats callTypeStats : t.getCallsInfoList()) {
                     for (CallsInfo info : callTypeStats.getStatuses()) {
                         totalCalls += info.getTotalCalls();
@@ -566,24 +568,87 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
         }
 
         callRepository.findAllByTrainingId(training.getId())
-                .forEach(call -> call.getCallLogs().forEach(callLog -> {
+                .forEach(call -> {
 
-                    CallType type = callLog.getType();
-                    CallStatus status = callLog.getStatus();
+                    if (call.getCallLogs() == null || call.getCallLogs().isEmpty()) {
+                        CallsInfo info = callsByType
+                                .get(CallType.LOGISTIC)
+                                .get(CallStatus.NO_CALLED);
 
-                    CallsInfo info = callsByType.get(type).get(status);
+                        info.setTotalCalls(info.getTotalCalls() + 1);
+                        return;
+                    }
+
+                    CallLog lastCallLog = call.getCallLogs().stream()
+                            .filter(Objects::nonNull)
+                            .max(Comparator.comparing(CallLog::getDate))
+                            .orElse(null);
+
+                    if (lastCallLog == null) {
+                        CallsInfo info = callsByType
+                                .get(CallType.LOGISTIC)
+                                .get(CallStatus.NO_CALLED);
+
+                        info.setTotalCalls(info.getTotalCalls() + 1);
+                        return;
+                    }
+
+                    CallType type = lastCallLog.getType();
+                    CallStatus status = lastCallLog.getStatus();
+
+                    CallsInfo info = callsByType
+                            .get(type)
+                            .get(status);
+
                     info.setTotalCalls(info.getTotalCalls() + 1);
-                }));
+                });
 
         List<CallTypeStats> finalList = new ArrayList<>();
 
         for (CallType type : callsByType.keySet()) {
+
+            Collection<CallsInfo> infos = callsByType.get(type).values();
+
+            int totalCalls = infos.stream()
+                    .mapToInt(CallsInfo::getTotalCalls)
+                    .sum();
+
+            int done = callsByType.get(type)
+                    .get(CallStatus.DONE)
+                    .getTotalCalls();
+
+            int anotherCampus = callsByType.get(type)
+                    .get(CallStatus.ANOTHER_CAMPUS)
+                    .getTotalCalls();
+
+            int notInterested = callsByType.get(type)
+                    .get(CallStatus.NOT_INTERESTED)
+                    .getTotalCalls();
+
+            int nextDate = callsByType.get(type)
+                    .get(CallStatus.NEXT_DATE)
+                    .getTotalCalls();
+
             CallTypeStats stats = new CallTypeStats();
             stats.setCallType(type);
-            stats.setStatuses(new ArrayList<>(callsByType.get(type).values()));
+            stats.setStatuses(new ArrayList<>(infos));
+
+            stats.setCuadre(totalCalls - totalCalls);
+
+            float effectiveness = totalCalls == 0
+                    ? 0
+                    : ((float) (done + anotherCampus) / totalCalls) * 100;
+
+            stats.setEffectivenessPercentage(effectiveness);
+
+            float projectedCalls = totalCalls == 0
+                    ? 0
+                    : ((float) (totalCalls - notInterested - nextDate) / totalCalls) * 100;
+
+            stats.setProjectedCallsPercentage(projectedCalls);
+
             finalList.add(stats);
         }
-
 
         var participantAttendances = attendances.stream()
                 .filter(attendance -> training.getOriginalTeam().getUsers().stream()
@@ -609,6 +674,8 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
                 training.getOriginalTeam().getUsers().size() + training.getOriginalTeam().getMasterLife().size(),
                 (int) (participantAttendances + masterLifeAttendances),
                 enrolmentsDeclarations,
+                training.getOriginalTeam().getVisionaries().size(),
+                training.getOriginalTeam().getStaffs().size(),
                 finalList,
                 weeklyTable
         );

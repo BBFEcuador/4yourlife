@@ -18,10 +18,12 @@ public class TrainingInfo {
     int totalEnrolments;
     int totalEnrolmentsAssistants;
     int totalEnrolmentsDeclarations;
+    int totalVisionaries;
+    int totalStaffs;
     List<CallTypeStats> callsInfoList;
     List<WeeklyPaymentStats> weeklyPaymentStatsList;
 
-    public TrainingInfo(CourseLevel courseLevel, String trainerName, String teamName, String teamNumber, int totalParticipants, int totalParticipantAssistants, int totalParticipantsDeclarations, int totalMasterLifes, int totalMasterLifesAssistants, int totalMasterLifesDeclarations, int totalEnrolments, int totalEnrolmentsAssistants, int totalEnrolmentsDeclarations, List<CallTypeStats> callsInfoList, List<WeeklyPaymentStats> weeklyPaymentStatsList) {
+    public TrainingInfo(CourseLevel courseLevel, String trainerName, String teamName, String teamNumber, int totalParticipants, int totalParticipantAssistants, int totalParticipantsDeclarations, int totalMasterLifes, int totalMasterLifesAssistants, int totalMasterLifesDeclarations, int totalEnrolments, int totalEnrolmentsAssistants, int totalEnrolmentsDeclarations, int totalVisionaries, int totalStaffs, List<CallTypeStats> callsInfoList, List<WeeklyPaymentStats> weeklyPaymentStatsList) {
         this.courseLevel = courseLevel;
         this.trainerName = trainerName;
         this.teamName = teamName;
@@ -35,6 +37,8 @@ public class TrainingInfo {
         this.totalEnrolments = totalEnrolments;
         this.totalEnrolmentsAssistants = totalEnrolmentsAssistants;
         this.totalEnrolmentsDeclarations = totalEnrolmentsDeclarations;
+        this.totalVisionaries = totalVisionaries;
+        this.totalStaffs = totalStaffs;
         this.callsInfoList = callsInfoList;
         this.weeklyPaymentStatsList = weeklyPaymentStatsList;
     }

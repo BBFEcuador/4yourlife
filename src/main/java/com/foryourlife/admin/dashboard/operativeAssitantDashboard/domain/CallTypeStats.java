@@ -7,6 +7,9 @@ import java.util.List;
 public class CallTypeStats {
     private CallType callType;
     private List<CallsInfo> statuses;
+    private int cuadre;
+    private float effectivenessPercentage;
+    private float projectedCallsPercentage;
 
     public CallType getCallType() {
         return callType;
@@ -22,5 +25,29 @@ public class CallTypeStats {
 
     public void setStatuses(List<CallsInfo> statuses) {
         this.statuses = statuses;
+    }
+
+    public int getCuadre() {
+        return cuadre;
+    }
+
+    public void setCuadre(int cuadre) {
+        this.cuadre = cuadre;
+    }
+
+    public float getEffectivenessPercentage() {
+        return effectivenessPercentage;
+    }
+
+    public void setEffectivenessPercentage(float effectivenessPercentage) {
+        this.effectivenessPercentage = effectivenessPercentage;
+    }
+
+    public float getProjectedCallsPercentage() {
+        return projectedCallsPercentage;
+    }
+
+    public void setProjectedCallsPercentage(float projectedCallsPercentage) {
+        this.projectedCallsPercentage = projectedCallsPercentage;
     }
 }

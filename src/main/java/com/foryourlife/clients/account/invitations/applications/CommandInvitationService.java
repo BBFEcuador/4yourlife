@@ -39,7 +39,20 @@ public class CommandInvitationService {
             var user = participantQueryService.getParticipantById(id);
             var token = UUID.randomUUID().toString();
             var campus = campusService.findById(campusId);
-            var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, false, id, new Sender(user.getId(), user.getName(), user.getPhone()), 1, campus);
+            var invitation = Invitation.create(
+                    UUID.randomUUID().toString(),
+                    token,
+                    null,
+                    false,
+                    id,
+                    new Sender(
+                            user.getId(),
+                            user.getName(),
+                            user.getTeam().getTraining().getName(),
+                            user.getPhone()
+                    ),
+                    1,
+                    campus);
             this.repository.save(invitation);
             return token;
         } catch (Exception e) {
@@ -52,7 +65,7 @@ public class CommandInvitationService {
         var user = adminFinderService.findById(id);
         var token = UUID.randomUUID().toString();
         var campus = campusService.findById(campusId);
-        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getId(), user.getName(), user.getEmail()), 1, campus);
+        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getId(), user.getName(), "Administrativo", user.getEmail()), 1, campus);
         this.repository.save(invitation);
         return token;
     }
@@ -67,7 +80,7 @@ public class CommandInvitationService {
                 null,
                 true,
                 request.id,
-                new Sender(user.getId(), user.getName(), user.getEmail()), Integer.parseInt(request.quantity)
+                new Sender(user.getId(), user.getName(), "Administrativo", user.getEmail()), Integer.parseInt(request.quantity)
                 , campus);
         this.repository.save(invitation);
         return token;
@@ -92,7 +105,7 @@ public class CommandInvitationService {
                 null,
                 false,
                 userId,
-                new Sender(user.getId(), user.getName(), user.getPhone()),
+                new Sender(user.getId(), user.getName(),participant.getTeam().getTraining().getName(), user.getPhone()),
                 Integer.parseInt(quantity),campus);
         this.repository.save(invitation);
         return token;

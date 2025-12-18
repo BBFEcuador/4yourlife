@@ -8,6 +8,7 @@ public enum CallStatus {
     NEXT_DATE("Proxima Fecha"),
     FOR_CONFIRMATION("Por confirmar"),
     CONFIRMED("Confirmado"),
+    NO_CALLED("Sin llamar"),
     RE_SCHEDULED("Reprogramada");
 
     private final String value;

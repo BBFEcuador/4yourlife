@@ -3,14 +3,16 @@ package com.foryourlife.clients.account.invitations.domain;
 public class Sender {
     private String id;
     private String name;
+    private String trainingName = null;
     private String contact;
 
     protected Sender() {
     }
 
-    public Sender(String id, String name, String contact) {
+    public Sender(String id, String name, String trainingName, String contact) {
         this.id = id;
         this.name = name;
+        this.trainingName = trainingName;
         this.contact = contact;
     }
 
@@ -36,5 +38,13 @@ public class Sender {
 
     public void setContact(String contact) {
         this.contact = contact;
+    }
+
+    public String getTrainingName() {
+        return trainingName;
+    }
+
+    public void setTrainingName(String trainingName) {
+        this.trainingName = trainingName;
     }
 }

@@ -4,7 +4,6 @@ import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNode;
-import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChart;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChartRepository;
 import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.focus.*;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
@@ -114,15 +113,15 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         return List.of(
                 new GenderDashboard("Viernes",
                         count.apply(Attendance::getFridayAttendance, "H").intValue(),
-                        count.apply(Attendance::getFridayAttendance, "F").intValue()
+                        count.apply(Attendance::getFridayAttendance, "M").intValue()
                 ),
                 new GenderDashboard("Sábado",
                         count.apply(Attendance::getSaturdayAttendance, "H").intValue(),
-                        count.apply(Attendance::getSaturdayAttendance, "F").intValue()
+                        count.apply(Attendance::getSaturdayAttendance, "M").intValue()
                 ),
                 new GenderDashboard("Domingo",
                         count.apply(Attendance::getSundayAttendance, "H").intValue(),
-                        count.apply(Attendance::getSundayAttendance, "F").intValue()
+                        count.apply(Attendance::getSundayAttendance, "M").intValue()
                 )
         );
     }

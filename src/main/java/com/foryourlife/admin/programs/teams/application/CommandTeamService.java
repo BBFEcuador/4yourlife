@@ -2,7 +2,6 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.crm.call.domain.Call;
 import com.foryourlife.admin.crm.call.domain.CallRepository;
-import com.foryourlife.admin.crm.callLogs.infrastructure.persistence.JpaCallLogRepository;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.FylStage;
 import com.foryourlife.admin.programs.attendance.infraestructure.AttendanceRepositoryImpl;
@@ -12,13 +11,13 @@ import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.AddUs
 import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.*;
 import com.foryourlife.admin.programs.trainer.application.TrainerQueryService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
-import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.masterLife.application.QueryMasterLifeService;
 import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.bus.EventBus;
+import com.foryourlife.shared.domain.events.TeamCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.staff.domain.StaffRepository;
@@ -213,6 +212,8 @@ public class CommandTeamService {
         user.setIsDesertor(desertor);
         _participantRepository.save(user);
         _teamRepository.removeParticipants(teamId, userId);
+        user.getTeam().record(new TeamCreated(user.getTeam().getId(), user.getTeam()));
+        bus.publish(user.getTeam().pullDomainEvents());
     }
 
     public void removeMastersLife(String teamId, String userId) {
@@ -572,7 +573,8 @@ public class CommandTeamService {
 
             team.getMasterLife().addAll(listMasterLife);
         }
-
         _teamRepository.save(team);
+        team.record(new TeamCreated(team.getId(), team));
+        bus.publish(team.pullDomainEvents());
     }
 }

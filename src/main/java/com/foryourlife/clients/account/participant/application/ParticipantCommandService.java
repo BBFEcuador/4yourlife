@@ -1,6 +1,8 @@
 package com.foryourlife.clients.account.participant.application;
 
 import com.foryourlife.admin.auth.domain.AdminRepository;
+import com.foryourlife.admin.programs.campus.domain.CampusRepository;
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.clients.account.contact.domain.ContactRepository;
 import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
 import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
@@ -10,10 +12,10 @@ import com.foryourlife.clients.account.medicalRecord.application.MedicalRecordCr
 import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.module.domain.ClientModule;
-import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
-import com.foryourlife.clients.account.profileDetails.domain.ProfileDetailsRepository;
 import com.foryourlife.clients.account.participant.domain.*;
 import com.foryourlife.clients.account.participant.infrastructure.httpControllers.MedicalRecordSaveRequest;
+import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
+import com.foryourlife.clients.account.profileDetails.domain.ProfileDetailsRepository;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
@@ -41,8 +43,10 @@ public class ParticipantCommandService {
     private final AdminRepository _adminRepository;
     private final MedicalRecordCreatorService medicalRecordCreatorService;
     private final InvoiceDataCommandService invoiceDataCommandService;
+    private final CampusRepository campusRepository;
+    private final TeamRepository teamRepository;
 
-    public ParticipantCommandService(ParticipantRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, ContactRepository contactRepository, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService) {
+    public ParticipantCommandService(ParticipantRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, ContactRepository contactRepository, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService, CampusRepository campusRepository, TeamRepository teamRepository) {
         this._participantRepository = _participantRepository;
         this._userRepository = _userRepository;
         this.commandGeneralUserService = commandGeneralUserService;
@@ -56,6 +60,8 @@ public class ParticipantCommandService {
         this._adminRepository = _adminRepository;
         this.medicalRecordCreatorService = medicalRecordCreatorService;
         this.invoiceDataCommandService = invoiceDataCommandService;
+        this.campusRepository = campusRepository;
+        this.teamRepository = teamRepository;
     }
 
 //    @Transactional
@@ -162,5 +168,43 @@ public class ParticipantCommandService {
 //        var role = this._rolRepository.getRolByLevel(CourseLevel.MASTER_LIFE);
 //        user.setParticipantLevel(role);
         this._participantRepository.save(user);
+    }
+
+    public void changeParticipantCampus(String participantId, String campusId) {
+        var participant = this._participantRepository.findById(participantId)
+                .orElseThrow(() -> new BaseException("Participante no encontrado", List.of("El participante con id " + participantId + " no existe")));
+        if (participant.getTeam() != null) {
+            throw new BaseException("No se puede cambiar el campus", List.of("El participante ya pertenece a un equipo"));
+        }
+        var campus = campusRepository.findById(campusId).orElseThrow(
+                () -> new BaseException("Campus no encontrado", List.of("El campus con id " + campusId + " no existe"))
+        );
+        participant.setCampus(campus);
+        this._participantRepository.save(participant);
+    }
+
+    @Transactional
+    public void changeParticipantTeam(String participantId, String teamId) {
+        var participant = this._participantRepository.findById(participantId)
+                .orElseThrow(() -> new BaseException("Participante no encontrado", List.of("El participante con id " + participantId + " no existe")));
+
+        var team = participant.getTeam();
+        if (team == null || !team.getId().equals(teamId)) {
+            throw new BaseException("El participante no pertenece a este equipo", List.of("El participante no pertenece al equipo con id " + teamId));
+        }
+
+        var newTeam = teamRepository.findById(teamId).orElseThrow(
+                () -> new BaseException("Equipo no encontrado", List.of("El equipo con id " + teamId + " no existe"))
+        );
+
+        team.getUsers().stream().filter( u -> u.getId().equals(participantId) ).findFirst().ifPresent( u -> {
+            team.getUsers().remove(u);
+        });
+
+        participant.getTeams().remove(team);
+
+        participant.getTeams().add(newTeam);
+        newTeam.getUsers().add(participant);
+        this._participantRepository.save(participant);
     }
 }

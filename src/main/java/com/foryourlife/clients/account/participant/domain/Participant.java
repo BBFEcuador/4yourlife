@@ -8,7 +8,6 @@ import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
 import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.profileDetails.domain.ProfileDetails;
-import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.UserCreated;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;

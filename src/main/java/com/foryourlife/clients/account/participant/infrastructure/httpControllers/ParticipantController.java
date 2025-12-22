@@ -151,4 +151,10 @@ public class ParticipantController {
         participantCommandService.promotionToMasterLife(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("/change-campus/{participantId}/{campusId}")
+    public ResponseEntity<?> changeParticipantCampus(@PathVariable String participantId, @PathVariable String campusId) {
+        participantCommandService.changeParticipantCampus(participantId, campusId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

@@ -2,16 +2,13 @@ package com.foryourlife.shared.domain.shellCommands;
 
 import com.foryourlife.admin.auth.domain.Admin;
 import com.foryourlife.admin.auth.domain.AdminRepository;
-import com.foryourlife.admin.auth.domain.AdminRole;
 import com.foryourlife.admin.auth.domain.AdminRoleRepository;
-import com.foryourlife.admin.permission.domain.Permission;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.programs.campus.domain.CampusRepository;
 import com.foryourlife.admin.programs.trainer.application.TrainerCreatorService;
 import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.application.CommandTrainingService;
 import com.foryourlife.admin.programs.training.infrastructure.httpControllers.TrainingAutoGenerateRequest;
-import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.admin.sales.programs.domain.Program;
 import com.foryourlife.admin.sales.programs.domain.ProgramRepository;
 import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
@@ -26,7 +23,6 @@ import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelR
 import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
 import com.foryourlife.masterLife.application.CommandMasterLifeService;
 import com.foryourlife.masterLife.domain.MasterLife;
-import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserEntities;
@@ -43,7 +39,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 @ShellComponent
 @Service

@@ -2,8 +2,8 @@ package com.foryourlife.clients.account.participant.infrastructure.httpControlle
 
 import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
 import com.foryourlife.clients.account.invoiceData.infrastructure.httpControllers.InvoiceDataRequest;
-import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
 import com.foryourlife.clients.account.participant.domain.Participant;
+import com.foryourlife.clients.account.profileDetails.infrastructure.ProfileDetailRequest;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserEntities;
 import com.foryourlife.shared.domain.user.UserType;

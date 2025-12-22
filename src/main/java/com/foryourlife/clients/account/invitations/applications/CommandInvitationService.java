@@ -9,6 +9,7 @@ import com.foryourlife.clients.account.invitations.infrastructure.InvitationRequ
 import com.foryourlife.clients.account.participant.application.ParticipantCommandService;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,6 +100,14 @@ public class CommandInvitationService {
         var participant = participantQueryService.getByUserId(userId);
         var token = UUID.randomUUID().toString();
         var campus = campusService.findById(participant.getCampus().getId());
+        var team = participant.getTeam();
+        if (team == null) {
+            throw new BaseException("El participante no tiene equipo asignado", List.of());
+        }
+        if (team.getTraining().getCourseLevel().equals(CourseLevel.FOCUS) ||  team.getTraining().getCourseLevel().equals(CourseLevel.YOUR)) {
+            throw new BaseException("El participante no puede crear invitaciones en este nivel", List.of());
+        }
+
         var invitation = Invitation.create(
                 UUID.randomUUID().toString(),
                 token,

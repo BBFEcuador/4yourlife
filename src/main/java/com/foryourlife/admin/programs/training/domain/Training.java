@@ -38,7 +38,7 @@ public class Training extends AggregateRoot implements Serializable {
             cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST},
             fetch = FetchType.EAGER
     )
-    @JsonIncludeProperties({"originalTeam"})
+    @JsonIncludeProperties({"originalTeam", "courseLevel", "name"})
     @JoinColumn(name = "nextLevel", referencedColumnName = "id")
     private Training nextLevel;
     @ManyToOne

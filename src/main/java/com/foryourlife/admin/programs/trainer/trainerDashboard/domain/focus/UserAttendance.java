@@ -9,6 +9,7 @@ public class UserAttendance {
     private String userName;
     @Enumerated(EnumType.STRING)
     private UserType userEntity;
+    private String forTrainingName;
     private AttendanceStatus fridayAttendance;
     private AttendanceStatus saturdayAttendance;
     private AttendanceStatus sundayAttendance;

@@ -8,4 +8,5 @@ public interface InvitationRepository {
     Optional<Invitation> findByToken(String token);
     List<Invitation> findBySenderId(String token);
     Optional<Invitation> findTopBySenderIdOrderByQuantityDesc(String id);
+    List<Invitation> findAllByUsersIds(List<String> ids);
 }

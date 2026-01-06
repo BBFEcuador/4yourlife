@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +19,6 @@ public interface JPAInvitationRepository extends JpaRepository<Invitation, Strin
 
     @Query("SELECT i FROM Invitation i WHERE i.senderId = :senderId AND i.quantity > 0 ORDER BY i.quantity DESC LIMIT 1")
     Optional<Invitation> findTopBySenderIdOrderByQuantityDesc(@Param("senderId") String senderId);
+
+    List<Invitation> findAllByTokenIn(Collection<String> tokens);
 }

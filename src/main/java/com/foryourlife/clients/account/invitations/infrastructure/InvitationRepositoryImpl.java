@@ -41,34 +41,7 @@ public class InvitationRepositoryImpl implements InvitationRepository {
         return this.repository.findTopBySenderIdOrderByQuantityDesc(id);
     }
 
-    public List<Invitation> findAllByUsersIds(List<String> ids) {
-        Criteria c = new Criteria(
-                List.of(
-                        new Filter(
-                                "senderId",
-                                String.join(",", ids),
-                                null,
-                                Filter.Operation.IN,
-                                Filter.LogicalOperator.AND
-                        )
-                ),
-                Optional.of(0),
-                Optional.of(1)
-        );
-        var temp = repository.findAll(converter.getJpaSpecifications(c), converter.getJpaPageable(c));
-        Criteria cc = new Criteria(
-                List.of(
-                        new Filter(
-                                "senderId",
-                                String.join(",", ids),
-                                null,
-                                Filter.Operation.IN,
-                                Filter.LogicalOperator.AND
-                        )
-                ),
-                Optional.of(0),
-                Optional.of((int) temp.getTotalElements())
-        );
-        return repository.findAll(converter.getJpaSpecifications(cc), converter.getJpaPageable(cc)).getContent();
+    public List<Invitation> findAllByTokenIn(List<String> ids) {
+        return repository.findAllByTokenIn(ids);
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.programs.campus.domain.Campus;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.clients.account.contact.domain.Contact;
+import com.foryourlife.clients.account.invitations.domain.Invitation;
 import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
 import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
@@ -47,6 +48,8 @@ public class Participant extends AuditableEntity implements Serializable {
     @OneToOne(mappedBy = "participant", targetEntity = MedicalRecord.class, fetch = FetchType.EAGER)
     @JsonIgnoreProperties("participant")
     private MedicalRecord medicalRecord;
+    @Transient
+    private Invitation invitation;
 
     public Team getTeam() {
         if (teams != null && !teams.isEmpty()) {
@@ -186,5 +189,13 @@ public class Participant extends AuditableEntity implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public void setInvitation(Invitation invitation) {
+        this.invitation = invitation;
+    }
+
+    public Invitation getInvitation() {
+        return invitation;
     }
 }

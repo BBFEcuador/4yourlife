@@ -66,7 +66,9 @@ public class RolesAndPermissionSeederShell {
                             permissions.stream().filter(p -> "UPDATE_STAFF".equals(p.getName())).findAny().orElseThrow(),
                             permissions.stream().filter(p -> "DELETE_STAFF".equals(p.getName())).findAny().orElseThrow(),
                             permissions.stream().filter(p -> "SEE_CONFIGURATIONS".equals(p.getName())).findAny().orElseThrow(),
-                            permissions.stream().filter(p -> "UPDATE_CONFIGURATIONS".equals(p.getName())).findAny().orElseThrow()
+                            permissions.stream().filter(p -> "UPDATE_CONFIGURATIONS".equals(p.getName())).findAny().orElseThrow(),
+                            permissions.stream().filter(p -> "SEE_FINANCIAL_DASHBOARD".equals(p.getName())).findAny().orElseThrow()
+
                     ))
             );
             adminRoles.add(new AdminRole("d2c3b4a5-6e7f-8901-2345-6789abcdef01", "Director Entrenamiento", "ROLE_FINANCIAL_ADMINISTRATIVE_DIRECTIVE", List.of(
@@ -124,7 +126,9 @@ public class RolesAndPermissionSeederShell {
                     permissions.stream().filter(p -> "CREATE_STAFF".equals(p.getName())).findAny().orElseThrow(),
                     permissions.stream().filter(p -> "UPDATE_STAFF".equals(p.getName())).findAny().orElseThrow(),
                     permissions.stream().filter(p -> "DELETE_STAFF".equals(p.getName())).findAny().orElseThrow(),
-                    permissions.stream().filter(p -> "SEE_CONFIGURATIONS".equals(p.getName())).findAny().orElseThrow()
+                    permissions.stream().filter(p -> "SEE_CONFIGURATIONS".equals(p.getName())).findAny().orElseThrow(),
+                    permissions.stream().filter(p -> "SEE_TRAINER_DASHBOARD".equals(p.getName())).findAny().orElseThrow()
+
             )));
             adminRoles.add(new AdminRole("c1b2a3d4-e5f6-7890-1234-56789abcdef0", "Asistente Operativo", "ROLE_OPERATIVE_ASSISTANT", List.of(
                     permissions.stream().filter(p -> "SEE_EMISSION_POINTS".equals(p.getName())).findAny().orElseThrow(),
@@ -143,7 +147,9 @@ public class RolesAndPermissionSeederShell {
                     permissions.stream().filter(p -> "CREATE_PARTICIPANTS".equals(p.getName())).findAny().orElseThrow(),
                     permissions.stream().filter(p -> "SEE_MASTER_LIFES".equals(p.getName())).findAny().orElseThrow(),
                     permissions.stream().filter(p -> "SEE_VISIONARIES".equals(p.getName())).findAny().orElseThrow(),
-                    permissions.stream().filter(p -> "SEE_STAFF".equals(p.getName())).findAny().orElseThrow()
+                    permissions.stream().filter(p -> "SEE_STAFF".equals(p.getName())).findAny().orElseThrow(),
+                    permissions.stream().filter(p -> "SEE_OPERATIVE_DASHBOARD".equals(p.getName())).findAny().orElseThrow()
+
             )));
             adminRoles.add(new AdminRole("b0a1b2c3-d4e5-6789-0123-456789abcdef", "Coordinación Life ", "ROLE_LIFE_COORDINATOR", List.of(
                     permissions.stream().filter(p -> "SEE_TRAINERS".equals(p.getName())).findAny().orElseThrow(),
@@ -258,7 +264,10 @@ public class RolesAndPermissionSeederShell {
                     new Permission("4a5b6c7d-8e9f-0a1b-2c3d-4e5f6a7b8c9d", "UPDATE_STAFF", "Actualizar Staffs", true),
                     new Permission("5b6c7d8e-9f0a-1b2c-3d4e-5f6a7b8c9d0e", "DELETE_STAFF", "Eliminar Staffs", true),
                     new Permission("6c7d8e9f-0a1b-2c3d-4e5f-6a7b8c9d0e1f", "SEE_CONFIGURATIONS", "Ver configuraciones", true),
-                    new Permission("8e9f0a1b-2c3d-4e5f-6a7b-8c9d0e1f2a3b", "UPDATE_CONFIGURATIONS", "Actualizar configuraciones", true)
+                    new Permission("8e9f0a1b-2c3d-4e5f-6a7b-8c9d0e1f2a3b", "UPDATE_CONFIGURATIONS", "Actualizar configuraciones", true),
+                    new Permission("a8ba6306-6302-4099-a41c-9716a2f392fc", "SEE_TRAINER_DASHBOARD", "Ver el dashboard de entrenador", true),
+                    new Permission("9c85b2b8-4cd0-4692-9c20-ff74d90cfe41", "SEE_FINANCIAL_DASHBOARD", "Ver el dashboard de administrador financiero", true),
+                    new Permission("b9cb7417-7413-51aa-b52d-0827b3f4a03d", "SEE_OPERATIVE_DASHBOARD", "Ver el dashboard de director operativo", true)
             );
 
             for (Permission permission : permissions) {

@@ -9,6 +9,8 @@ import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.focus.*;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
+import com.foryourlife.clients.account.invitations.domain.Invitation;
+import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -17,9 +19,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -30,13 +35,15 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
     private final TrainerLifeViewRepositoryImpl trainerLifeViewRepositoryImpl;
     private final ParticipantRepository participantRepository;
     private final OrganizationChartRepository organizationChartRepository;
+    private final InvitationRepository invitationRepository;
     private final PaymentRepository paymentRepository;
 
-    public TrainerFocusViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainerLifeViewRepositoryImpl trainerLifeViewRepositoryImpl, ParticipantRepository participantRepository, OrganizationChartRepository organizationChartRepository, PaymentRepository paymentRepository) {
+    public TrainerFocusViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainerLifeViewRepositoryImpl trainerLifeViewRepositoryImpl, ParticipantRepository participantRepository, OrganizationChartRepository organizationChartRepository, InvitationRepository invitationRepository, PaymentRepository paymentRepository) {
         this.attendanceRepository = attendanceRepository;
         this.trainerLifeViewRepositoryImpl = trainerLifeViewRepositoryImpl;
         this.participantRepository = participantRepository;
         this.organizationChartRepository = organizationChartRepository;
+        this.invitationRepository = invitationRepository;
         this.paymentRepository = paymentRepository;
     }
 
@@ -46,14 +53,47 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
 
         Map<String, Participant> participants = loadParticipants(attendances);
 
+        List<String> invitationTokens = participants.values().stream()
+                .map(Participant::getInvitationToken)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        Map<String, Invitation> invitationsByToken = invitationTokens.isEmpty()
+                ? Map.of()
+                : invitationRepository.findAllByTokenIn(invitationTokens)
+                .stream()
+                .collect(Collectors.toMap(
+                        Invitation::getToken,
+                        i -> i
+                ));
+
+        participants.values().forEach(participant -> {
+            String token = participant.getInvitationToken();
+            if (token != null) {
+                participant.setInvitation(invitationsByToken.get(token));
+            }
+        });
+
+        List<String> trainingNames = new ArrayList<>();
+
+        invitationsByToken.values().forEach(invitation -> {
+            if (invitation.getEnrolled() != null && invitation.getEnrolled().getTrainingName() != null) {
+                String name = invitation.getEnrolled().getTrainingName();
+                if (!trainingNames.contains(name)) {
+                    trainingNames.add(name);
+                }
+            }
+        });
+
         return new TrainerFocusView(
                 this.buildGeneralAttendance(attendances, participants),
                 this.buildGenderDashboard(attendances, participants),
                 this.buildAgeDashboard(attendances, participants),
-                this.buildPaymentDashboard(attendances, participants)
+                this.buildPaymentDashboard(attendances, participants),
+                trainingNames
         );
     }
-
 
     public GeneralAttendance buildGeneralAttendance(
             List<Attendance> attendances,
@@ -62,12 +102,22 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         List<UserAttendance> userAttendances = attendances.stream()
                 .filter(a -> a.getUser() != null)
                 .map(a -> {
+
+                    Participant participant = participants.get(a.getUser().getId());
+
                     String entity = trainerLifeViewRepositoryImpl.resolveUserType(a.getUser());
                     UserType userType = UserType.fromValue(entity);
+
+                    String invitationInfo = null;
+                    if (participant != null && participant.getInvitation() != null) {
+                        invitationInfo = participant.getInvitation().getEnrolled().getTrainingName();
+
+                    }
 
                     return new UserAttendance(
                             a.getUser().getName(),
                             userType,
+                            invitationInfo,
                             a.getFridayAttendance(),
                             a.getSaturdayAttendance(),
                             a.getSundayAttendance()
@@ -78,18 +128,18 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         int totalLingerers = (int) attendances.stream()
                 .filter(a -> {
                     Participant p = participants.get(a.getUser().getId());
-                    return p != null && p.getIsLingerer();
+                    return p != null && Boolean.TRUE.equals(p.getIsLingerer());
                 })
                 .count();
 
         int totalFocus = (int) attendances.stream()
                 .filter(a -> {
                     Participant p = participants.get(a.getUser().getId());
-                    return p != null && !p.getIsLingerer();
+                    return p != null && !Boolean.TRUE.equals(p.getIsLingerer());
                 })
                 .count();
 
-        return new GeneralAttendance(totalFocus,totalLingerers, userAttendances);
+        return new GeneralAttendance(totalFocus, totalLingerers, userAttendances);
     }
 
 
@@ -146,7 +196,7 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                 .collect(Collectors.toMap(
                         p -> p.getUser().getId(),
                         p -> {
-                            Integer age = calculateAge(LocalDate.ofInstant(p.getProfile().getBirthday().toInstant(), java.time.ZoneId.systemDefault()));
+                            Integer age = calculateAge(LocalDate.ofInstant(p.getProfile().getBirthday().toInstant(), ZoneId.systemDefault()));
                             return classifyAge.apply(age);
                         }
                 ));

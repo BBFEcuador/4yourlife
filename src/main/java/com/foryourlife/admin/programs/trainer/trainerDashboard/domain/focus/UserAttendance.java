@@ -9,13 +9,15 @@ public class UserAttendance {
     private String userName;
     @Enumerated(EnumType.STRING)
     private UserType userEntity;
+    private String forTrainingName;
     private AttendanceStatus fridayAttendance;
     private AttendanceStatus saturdayAttendance;
     private AttendanceStatus sundayAttendance;
 
-    public UserAttendance(String userName, UserType userEntity, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance) {
+    public UserAttendance(String userName, UserType userEntity, String forTrainingName, AttendanceStatus fridayAttendance, AttendanceStatus saturdayAttendance, AttendanceStatus sundayAttendance) {
         this.userName = userName;
         this.userEntity = userEntity;
+        this.forTrainingName = forTrainingName;
         this.fridayAttendance = fridayAttendance;
         this.saturdayAttendance = saturdayAttendance;
         this.sundayAttendance = sundayAttendance;
@@ -59,5 +61,13 @@ public class UserAttendance {
 
     public void setSundayAttendance(AttendanceStatus sundayAttendance) {
         this.sundayAttendance = sundayAttendance;
+    }
+
+    public String getForTrainingName() {
+        return forTrainingName;
+    }
+
+    public void setForTrainingName(String forTrainingName) {
+        this.forTrainingName = forTrainingName;
     }
 }

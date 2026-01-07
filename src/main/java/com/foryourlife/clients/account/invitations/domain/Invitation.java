@@ -106,4 +106,6 @@ public class Invitation extends AggregateRoot {
     public void setAdmin(Boolean admin) {
         isAdmin = admin;
     }
+
+
 }

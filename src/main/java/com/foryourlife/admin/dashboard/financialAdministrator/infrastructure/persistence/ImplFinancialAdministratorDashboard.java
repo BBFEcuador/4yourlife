@@ -2,26 +2,34 @@ package com.foryourlife.admin.dashboard.financialAdministrator.infrastructure.pe
 
 import com.foryourlife.admin.dashboard.financialAdministrator.domain.FinancialAdministratorDashboard;
 import com.foryourlife.admin.dashboard.financialAdministrator.domain.FinancialAdministratorDashboardRepository;
+import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.WeeklyPaymentStats;
+import com.foryourlife.admin.dashboard.operativeAssitantDashboard.infrastructure.persistence.ImplOperativeAssistantDashboardRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.PaymentMethodSummary;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ImplFinancialAdministratorDashboard implements FinancialAdministratorDashboardRepository {
     private final PaymentRepository paymentRepository;
     private final TrainingRepository trainingRepository;
+    private final ImplOperativeAssistantDashboardRepository operativeAssistantDashboardRepository;
 
-    public ImplFinancialAdministratorDashboard(PaymentRepository paymentRepository, TrainingRepository trainingRepository) {
+    public ImplFinancialAdministratorDashboard(PaymentRepository paymentRepository, TrainingRepository trainingRepository, ImplOperativeAssistantDashboardRepository operativeAssistantDashboardRepository) {
         this.paymentRepository = paymentRepository;
         this.trainingRepository = trainingRepository;
+        this.operativeAssistantDashboardRepository = operativeAssistantDashboardRepository;
     }
 
     @Override
@@ -36,33 +44,68 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
         if (training.getOriginalTeam() == null) {
             return new FinancialAdministratorDashboard(
                     BigDecimal.valueOf(0),
-                    List.of()
+                    List.of(),
+                    List.of(),
+                    BigDecimal.valueOf(0),
+                    0,
+                    BigDecimal.valueOf(0),
+                    0
             );
         }
-        List<Payment> payments = new java.util.ArrayList<>(List.of());
+
+        List<Payment> payments = new ArrayList<>();
         training.getOriginalTeam().getUsers().forEach(participant ->
-                paymentRepository.findAllBetweenDates(training.getStartDate().atStartOfDay(), training.getNextLevel().getStartDate().atStartOfDay()).forEach(
-                        payment -> {
-                            if (payment.getParticipant().getId().equals(participant.getId())) {
-                                payments.add(payment);
-                            }
-                        }
-                )
+                paymentRepository.findAllBetweenDates(
+                                training.getStartDate().atStartOfDay(),
+                                training.getNextLevel().getStartDate().atStartOfDay()
+                        ).stream()
+                        .filter(payment -> payment.getParticipant() != null && payment.getParticipant().getId().equals(participant.getId()))
+                        .forEach(payments::add)
         );
+
+        AtomicInteger totalPendingPayments = new AtomicInteger(0);
+        AtomicInteger totalCompletedPayments = new AtomicInteger(0);
+        AtomicReference<BigDecimal> pendingPaymentsAmount = new AtomicReference<>(BigDecimal.ZERO);
+        AtomicReference<BigDecimal> totalPaymentsAmount = new AtomicReference<>(BigDecimal.ZERO);
+
+        for (Payment payment : payments) {
+            BigDecimal totalPaid = payment.getPaymentshistory().stream()
+                    .map(ph -> BigDecimal.valueOf(ph.getAmount()))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            if (PaymentStatus.PENDING.equals(payment.getStatus())) {
+                totalPendingPayments.incrementAndGet();
+                BigDecimal remaining = payment.getTotal().subtract(totalPaid);
+                totalPaymentsAmount.updateAndGet(v -> v.add(totalPaid));
+                if (remaining.compareTo(BigDecimal.ZERO) > 0) {
+                    pendingPaymentsAmount.updateAndGet(v -> v.add(remaining));
+                }
+            } else if (PaymentStatus.COMPLETED.equals(payment.getStatus())) {
+                totalCompletedPayments.incrementAndGet();
+                totalPaymentsAmount.updateAndGet(v -> v.add(totalPaid));
+            }
+        }
 
         Map<String, PaymentMethodSummary> paymentMethodMap = getPaymentMethodSummaryMap(payments);
-
         List<PaymentMethodSummary> paymentMethods = new ArrayList<>(paymentMethodMap.values());
 
-        double totalIncome = paymentMethods.stream()
-                .mapToDouble(PaymentMethodSummary::getTotalAmount)
-                .sum();
+        BigDecimal totalIncome = paymentMethods.stream()
+                .map(pm -> BigDecimal.valueOf(pm.getTotalAmount()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<WeeklyPaymentStats> weeklyTable = operativeAssistantDashboardRepository.buildWeeklyTable(training);
 
         return new FinancialAdministratorDashboard(
-                BigDecimal.valueOf(totalIncome),
-                paymentMethods
+                totalIncome,
+                paymentMethods,
+                weeklyTable,
+                pendingPaymentsAmount.get(),
+                totalPendingPayments.get(),
+                totalPaymentsAmount.get(),
+                totalCompletedPayments.get()
         );
     }
+
 
     private static Map<String, PaymentMethodSummary> getPaymentMethodSummaryMap(List<Payment> payments) {
 
@@ -92,7 +135,6 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
 
     @Override
     public ByteArrayOutputStream generateReport(String trainingId) {
-
         return null;
     }
 }

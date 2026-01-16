@@ -43,7 +43,7 @@ public class OnCreatedProduct {
             jsonNode.put("codigo", event.getProduct().getId().substring(0, 21));
             jsonNode.put("tipo", "SER");
             jsonNode.put("para_pos", true);
-            jsonNode.put("porcentaje_iva", event.getProduct().getDescription());
+            jsonNode.put("porcentaje_iva", "15");
             jsonNode.put("tipo_producto", "SIM");
 
             String json = jsonNode.toString();

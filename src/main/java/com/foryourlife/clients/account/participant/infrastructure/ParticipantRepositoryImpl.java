@@ -1,5 +1,6 @@
 package com.foryourlife.clients.account.participant.infrastructure;
 
+import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.clients.account.participant.domain.LoginResponse;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
@@ -7,6 +8,8 @@ import com.foryourlife.shared.JWTUtils;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
+import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -16,9 +19,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -82,8 +92,8 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
     }
 
     @Override
-    public Page<Participant> getAll(Pageable pageable,Criteria criteria) {
-        return repository.findAll(criteriaConverter.getJpaSpecifications(criteria),pageable);
+    public Page<Participant> getAll(Pageable pageable, Criteria criteria) {
+        return repository.findAll(criteriaConverter.getJpaSpecifications(criteria), pageable);
     }
 
     @Override
@@ -105,5 +115,34 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
     @Override
     public List<Participant> findAllByUserIds(List<String> userIds) {
         return repository.findAllByUserIds(userIds);
+    }
+
+    @Override
+    public String getContract(String participantId, Payment paymentFocus) {
+
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+        Participant participant = repository
+                .findById(participantId)
+                .orElseThrow(() -> new BaseException(
+                        "Participant not found",
+                        List.of("Participant with id " + participantId + " not found")
+                ));
+        Context context = new Context(new Locale("es", "EC"));
+
+        var actualDate = LocalDate.now();
+
+        context.setVariable("participant", participant);
+        context.setVariable("date", actualDate);
+        context.setVariable("paymentFocus", paymentFocus);
+
+        return templateEngine.process(
+                "templates/contract-template",
+                context
+        );
     }
 }

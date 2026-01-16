@@ -48,6 +48,8 @@ public class SaveParticipantRequest {
     @NotNull
     @Valid
     public MedicalRecordSaveRequest medicalRecord;
+    @NotNull(message = "The termsAndConditions field is required")
+    public Boolean termsAndConditions;
 
     @NotNull
     @Valid
@@ -108,6 +110,9 @@ public class SaveParticipantRequest {
 
     public Participant toDomain() {
         var newId = id != null ? id : UUID.randomUUID().toString();
+        if (!termsAndConditions){
+            throw new IllegalArgumentException("Los terminos y condiciones deben ser aceptados.");
+        }
         return Participant.create(
                 newId,
                 new User(

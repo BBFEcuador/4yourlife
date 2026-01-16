@@ -40,27 +40,27 @@ public class OnCreatedProduct {
             jsonNode.put("pvp1", event.getProduct().getBasePrice());
             jsonNode.put("nombre", event.getProduct().getName());
             jsonNode.put("estado", "A");
-            jsonNode.put("codigo", event.getProduct().getId());
+            jsonNode.put("codigo", event.getProduct().getId().substring(0, 21));
             jsonNode.put("tipo", "SER");
             jsonNode.put("para_pos", true);
             jsonNode.put("porcentaje_iva", event.getProduct().getDescription());
             jsonNode.put("tipo_producto", "SIM");
 
-                String json = jsonNode.toString();
+            String json = jsonNode.toString();
 
             var config = configContificoRepository.findByCampusId(event.getProduct().getCampus().getId()).orElseThrow(
                     () -> new BaseException("Config not found", List.of(""))
             );
 
             ResponseEntity<String> response = httpClient.post()
-                    .uri("https://api.contifico.com/sistema/api/v1/producto")
+                    .uri("https://api.contifico.com/sistema/api/v1/producto/")
                     .body(json)
                     .header("Api-Token", config.getApiKey())
                     .header("Authorization", config.getApiSecret())
                     .retrieve()
                     .toEntity(String.class);
-
-            if (response.getStatusCodeValue() != 200) {
+            System.out.println(response.getBody());
+            if (response.getStatusCodeValue() > 299 || response.getStatusCodeValue() < 200) {
                 throw new RuntimeException("Failed to create product in Contifico API: " + response.getBody());
             }
             ObjectMapper objectMapper = new ObjectMapper();

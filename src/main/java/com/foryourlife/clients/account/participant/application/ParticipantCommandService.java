@@ -3,6 +3,9 @@ package com.foryourlife.clients.account.participant.application;
 import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.admin.programs.campus.domain.CampusRepository;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.clients.account.contact.domain.ContactRepository;
 import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
 import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
@@ -18,19 +21,25 @@ import com.foryourlife.clients.account.participantLevel.application.ParticipantL
 import com.foryourlife.clients.account.profileDetails.domain.ProfileDetailsRepository;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class ParticipantCommandService {
     private final ParticipantRepository _participantRepository;
-    private final com.foryourlife.shared.domain.user.UserRepository _userRepository;
+    private final UserRepository _userRepository;
     private final CommandGeneralUserService commandGeneralUserService;
     private final QueryInvitationServices queryInvitationServices;
     private final ParticipantLevelService _rolRepository;
@@ -45,8 +54,9 @@ public class ParticipantCommandService {
     private final InvoiceDataCommandService invoiceDataCommandService;
     private final CampusRepository campusRepository;
     private final TeamRepository teamRepository;
+    private final PaymentRepository paymentRepository;
 
-    public ParticipantCommandService(ParticipantRepository _participantRepository, com.foryourlife.shared.domain.user.UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, ContactRepository contactRepository, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService, CampusRepository campusRepository, TeamRepository teamRepository) {
+    public ParticipantCommandService(ParticipantRepository _participantRepository, UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, ContactRepository contactRepository, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService, CampusRepository campusRepository, TeamRepository teamRepository, PaymentRepository paymentRepository) {
         this._participantRepository = _participantRepository;
         this._userRepository = _userRepository;
         this.commandGeneralUserService = commandGeneralUserService;
@@ -62,6 +72,7 @@ public class ParticipantCommandService {
         this.invoiceDataCommandService = invoiceDataCommandService;
         this.campusRepository = campusRepository;
         this.teamRepository = teamRepository;
+        this.paymentRepository = paymentRepository;
     }
 
 //    @Transactional
@@ -206,5 +217,28 @@ public class ParticipantCommandService {
         participant.getTeams().add(newTeam);
         newTeam.getUsers().add(participant);
         this._participantRepository.save(participant);
+    }
+
+    public ByteArrayOutputStream getContract(String participantId) {
+        ByteArrayOutputStream pdf = new ByteArrayOutputStream();
+
+        Pageable page = PageRequest.of(0, 1);
+        var payment = paymentRepository
+                .findByParticipantId(participantId, page)
+                .getContent()
+                .stream()
+                .filter(p -> p.getStatus() == PaymentStatus.COMPLETED)
+                .min(Comparator.comparing(Payment::getCreatedDate))
+                .orElseThrow(() -> new RuntimeException("No completed payments found"));
+
+        try {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(_participantRepository.getContract(participantId, payment));
+            renderer.layout();
+            renderer.createPDF(pdf);
+            return pdf;
+        } catch (Exception e) {
+            throw new BaseException("Error generating invoice", List.of(e.getMessage()));
+        }
     }
 }

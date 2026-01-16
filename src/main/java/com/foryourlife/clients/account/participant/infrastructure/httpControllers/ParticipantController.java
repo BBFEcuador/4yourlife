@@ -8,10 +8,13 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -157,4 +160,14 @@ public class ParticipantController {
         participantCommandService.changeParticipantCampus(participantId, campusId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("/get-contract/{participantId}")
+    public ResponseEntity<?> getContract(@PathVariable String participantId) {
+        ByteArrayOutputStream pdfBytes = participantCommandService.getContract(participantId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("filename", "FULL POTENTIAL - CONTRATO PRESTACIÓN SERVICIOS ENTRENAMIENTO.pdf");
+
+        return ResponseEntity.ok().headers(headers).body(pdfBytes.toByteArray());    }
 }

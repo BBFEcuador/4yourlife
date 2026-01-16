@@ -38,6 +38,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.9'
+    implementation 'org.docx4j:docx4j-ImportXHTML:11.4.8'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
 

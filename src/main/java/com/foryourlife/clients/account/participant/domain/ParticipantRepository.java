@@ -1,10 +1,12 @@
 package com.foryourlife.clients.account.participant.domain;
 
+import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +28,5 @@ public interface ParticipantRepository {
 
     List<Participant> findAllByUserIds(List<String> userIds);
 
+    String getContract(String participantId, Payment paymentFocus);
 }

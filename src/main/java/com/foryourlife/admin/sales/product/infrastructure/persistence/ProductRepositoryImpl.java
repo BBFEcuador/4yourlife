@@ -61,4 +61,9 @@ public class ProductRepositoryImpl implements ProductRepository {
     public List<Product> findAllByCampusId(String campusId) {
         return impl.findAllByCampus_Id(campusId);
     }
+
+    @Override
+    public List<Product> findAll() {
+        return impl.findAll();
+    }
 }

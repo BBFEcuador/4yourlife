@@ -40,7 +40,7 @@ public class OnCreatedProduct {
             jsonNode.put("pvp1", event.getProduct().getBasePrice());
             jsonNode.put("nombre", event.getProduct().getName());
             jsonNode.put("estado", "A");
-            jsonNode.put("codigo", event.getProduct().getId().substring(0, 21));
+            jsonNode.put("codigo", event.getProduct().getId().substring(0, 19));
             jsonNode.put("tipo", "SER");
             jsonNode.put("para_pos", true);
             jsonNode.put("porcentaje_iva", "15");
@@ -51,6 +51,24 @@ public class OnCreatedProduct {
             var config = configContificoRepository.findByCampusId(event.getProduct().getCampus().getId()).orElseThrow(
                     () -> new BaseException("Config not found", List.of(""))
             );
+            ResponseEntity<String> categoryResponse = httpClient.get()
+                    .uri("https://api.contifico.com/sistema/api/v1/categoria/")
+                    .header("Api-Token", config.getApiKey())
+                    .header("Authorization", config.getApiSecret())
+                    .retrieve()
+                    .toEntity(String.class);
+
+            if (categoryResponse.getStatusCode().is2xxSuccessful()) {
+                JsonNode categoriesNode = objectMapper.readTree(categoryResponse.getBody());
+                if (categoriesNode.isArray() && !categoriesNode.isEmpty()) {
+                    String categoryId = categoriesNode.get(0).get("id").asText();
+                    ((ObjectNode) jsonNode).put("categoria_id", categoryId);
+                    json = jsonNode.toString();
+                }
+            }else {
+                throw new RuntimeException("Failed to fetch categories from Contifico API: " + categoryResponse.getBody());
+            }
+
 
             ResponseEntity<String> response = httpClient.post()
                     .uri("https://api.contifico.com/sistema/api/v1/producto/")
@@ -60,7 +78,7 @@ public class OnCreatedProduct {
                     .retrieve()
                     .toEntity(String.class);
             System.out.println(response.getBody());
-            if (response.getStatusCodeValue() > 299 || response.getStatusCodeValue() < 200) {
+            if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException("Failed to create product in Contifico API: " + response.getBody());
             }
             ObjectMapper objectMapper = new ObjectMapper();

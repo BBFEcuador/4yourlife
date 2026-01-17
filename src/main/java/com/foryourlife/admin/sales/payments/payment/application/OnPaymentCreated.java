@@ -76,6 +76,7 @@ public class OnPaymentCreated {
                 participantRepository.save(p);
             }
         });
+
         clientModuleCreatorService.createClientModule(participant.getModules());
     }
 }

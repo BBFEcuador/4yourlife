@@ -29,4 +29,6 @@ public interface ParticipantRepository {
     List<Participant> findAllByUserIds(List<String> userIds);
 
     String getContract(String participantId, Payment paymentFocus);
+
+    List<Participant> saveAll(List<Participant> participants);
 }

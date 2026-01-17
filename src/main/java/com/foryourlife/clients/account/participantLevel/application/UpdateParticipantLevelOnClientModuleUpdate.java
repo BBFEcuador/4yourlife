@@ -12,6 +12,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
 
@@ -29,9 +31,11 @@ public class UpdateParticipantLevelOnClientModuleUpdate {
 
     @Async
     @EventListener
-    @Transactional
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT
+    )
     public void on(ClientModulesUpdated event) {
-        var participant = participantRepository.findById(event.getClientModule().getUser().getId()).orElseThrow(() -> new BaseException("Not user found with id "+event.getClientModule().getUser().getId(), List.of()));
+        var participant = participantRepository.findById(event.getClientModule().getUser().getId()).orElseThrow(() -> new BaseException("Not user found with id " + event.getClientModule().getUser().getId(), List.of()));
         if (participant.getParticipantLevel().getCourseLevel() == CourseLevel.INIT && event.getClientModule().getHasFocus()) {
             Specification<ParticipantLevel> specification = (root, query, cb) -> cb.equal(root.get("courseLevel"), cb.literal(CourseLevel.FOCUS.name()));
             var participantLvl = participantLevelRepository.findOneByCriteria(specification).orElseThrow();

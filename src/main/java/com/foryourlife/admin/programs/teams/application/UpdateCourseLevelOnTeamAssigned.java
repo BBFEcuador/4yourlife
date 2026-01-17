@@ -11,6 +11,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
 @DomainEventSubscriber({TeamToTrainingAssigned.class})
@@ -28,7 +30,9 @@ public class UpdateCourseLevelOnTeamAssigned {
     }
 
     @EventListener
-    @Transactional
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT
+    )
     public void on(TeamToTrainingAssigned event) {
         var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow(() -> new RuntimeException(""));
         var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException(""));

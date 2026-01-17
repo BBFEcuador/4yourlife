@@ -145,4 +145,9 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
                 context
         );
     }
+
+    @Override
+    public List<Participant> saveAll(List<Participant> participants) {
+        return repository.saveAll(participants);
+    }
 }

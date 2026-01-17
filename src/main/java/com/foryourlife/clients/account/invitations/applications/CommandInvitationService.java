@@ -104,8 +104,14 @@ public class CommandInvitationService {
         if (team == null) {
             throw new BaseException("El participante no tiene equipo asignado", List.of());
         }
-        if (team.getTraining().getCourseLevel().equals(CourseLevel.FOCUS) ||  team.getTraining().getCourseLevel().equals(CourseLevel.YOUR)) {
-            throw new BaseException("El participante no puede crear invitaciones en este nivel", List.of());
+
+        if (team.getTraining().getCourseLevel().equals(CourseLevel.FOCUS)
+                || team.getTraining().getCourseLevel().equals(CourseLevel.YOUR)) {
+            var userEntity = user.getEntityMap();
+            var isMasterlife = userEntity != null && "MASTER_LIFE".equalsIgnoreCase(userEntity.toString());
+            if (!isMasterlife) {
+                throw new BaseException("El participante no puede crear invitaciones en este nivel", List.of());
+            }
         }
 
         var invitation = Invitation.create(
@@ -114,9 +120,10 @@ public class CommandInvitationService {
                 null,
                 false,
                 userId,
-                new Sender(user.getId(), user.getName(),participant.getTeam().getTraining().getName(), user.getPhone()),
-                Integer.parseInt(quantity),campus);
+                new Sender(user.getId(), user.getName(), participant.getTeam().getTraining().getName(), user.getPhone()),
+                Integer.parseInt(quantity), campus);
         this.repository.save(invitation);
         return token;
     }
+
 }

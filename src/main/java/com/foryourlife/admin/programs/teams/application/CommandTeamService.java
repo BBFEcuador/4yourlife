@@ -11,7 +11,13 @@ import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.AddUs
 import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.*;
 import com.foryourlife.admin.programs.trainer.application.TrainerQueryService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
+import com.foryourlife.admin.programs.training.domain.Training;
+import com.foryourlife.admin.programs.training.domain.TrainingRepository;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
+import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
+import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
+import com.foryourlife.clients.account.promises.application.PromiseCommandService;
 import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.masterLife.application.QueryMasterLifeService;
@@ -40,6 +46,7 @@ public class CommandTeamService {
 
     private final AttendanceRepositoryImpl attendanceRepository;
     private final CallRepository callRepository;
+    private final TrainingRepository trainingRepository;
     private String baseUrl;
     private final TeamRepository _teamRepository;
     private final EventBus bus;
@@ -52,9 +59,12 @@ public class CommandTeamService {
     private final QueryMasterLifeService queryMasterLifeService;
     private final QueryTeamService queryTeamService;
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
+    private final ParticipantLevelRepository participantLevelRepository;
+    private final PromiseCommandService promiseCommandService;
 
 
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, PromiseRepository promiseRepository) {
+
+    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, PromiseRepository promiseRepository, ParticipantLevelRepository participantLevelRepository, PromiseCommandService promiseCommandService, TrainingRepository trainingRepository) {
         this._teamRepository = _teamRepository;
         this.bus = bus;
         this._participantRepository = _participantRepository;
@@ -67,6 +77,9 @@ public class CommandTeamService {
         this.attendanceRepository = attendanceRepository;
         this.callRepository = callRepository;
         this.promiseRepository = promiseRepository;
+        this.participantLevelRepository = participantLevelRepository;
+        this.promiseCommandService = promiseCommandService;
+        this.trainingRepository = trainingRepository;
     }
 
     public void save(Team team) {
@@ -166,7 +179,31 @@ public class CommandTeamService {
                 new ArrayList<>()
         );
         this._teamRepository.save(team);
-        this.bus.publish(team.pullDomainEvents());
+        team.getUsers().forEach(user -> {
+            var participant = _participantRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException(""));
+            switch (training.getCourseLevel()) {
+                case LIFE_2, LIFE_3 -> {
+                    participant.setParticipantLevel(
+                            (participantLevelRepository.findOneByCriteria(
+                                    (root, query, cb) ->
+                                            cb.equal(root.get("courseLevel"), cb.literal(CourseLevel.LIFE.toString()))
+                            ).orElseThrow(() -> new RuntimeException(""))
+                            )
+                    );
+                }
+                default -> {
+                    participant.setParticipantLevel(
+                            (participantLevelRepository.findOneByCriteria(
+                                    (root, query, cb) ->
+                                            cb.equal(root.get("courseLevel"), training.getCourseLevel())
+                            ).orElseThrow(() -> new RuntimeException(""))
+                            )
+                    );
+                }
+            }
+            _participantRepository.save(participant);
+        });
+//        this.bus.publish(team.pullDomainEvents());
     }
 
 
@@ -293,6 +330,9 @@ public class CommandTeamService {
         var team = _teamRepository.findById(request.id).orElseThrow();
         var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
         var training = team.getTraining().getNextLevel();
+        Hibernate.initialize(team.getTraining().getNextLevel());
+
+        this.addOriginalTeam(team);
 
         var participants = request.users.stream()
                 .map(u -> _participantRepository.findById(u.getId()).orElseThrow())
@@ -349,7 +389,8 @@ public class CommandTeamService {
 
         team.getStaffs().clear();
         _teamRepository.save(team);
-        bus.publish(team.pullDomainEvents());
+        assignParticipantLevelToUsers(team.getUsers(),training);
+        this.assignAttendancesAndDeclarations(team, team.getTraining());
     }
 
     @Transactional
@@ -360,6 +401,8 @@ public class CommandTeamService {
         var trainer = trainerQueryService.findTrainerById(request.trainer)
                 .orElseThrow(() -> new BaseException("Trainer not found", List.of()));
         Hibernate.initialize(team.getTraining().getNextLevel());
+        this.addOriginalTeam(team);
+
         var training = team.getTraining().getNextLevel();
 
         var participants = request.users.stream()
@@ -420,7 +463,8 @@ public class CommandTeamService {
         team.getMasterLife().clear();
 
         _teamRepository.save(team);
-        bus.publish(team.pullDomainEvents());
+        assignParticipantLevelToUsers(team.getUsers(),team.getTraining());
+        this.assignAttendancesAndDeclarations(team, team.getTraining());
     }
 
     public void removeVisionaries(String teamId, String id) {
@@ -577,4 +621,111 @@ public class CommandTeamService {
         team.record(new TeamCreated(team.getId(), team));
         bus.publish(team.pullDomainEvents());
     }
-}
+
+    private void assignParticipantLevelToUsers(
+            List<Participant> participants,
+            Training training
+    ) {
+        CourseLevel levelToAssign =
+                switch (training.getCourseLevel()) {
+                    case LIFE_2, LIFE_3 -> CourseLevel.LIFE;
+                    default -> training.getCourseLevel();
+                };
+
+        ParticipantLevel participantLevel =
+                participantLevelRepository
+                        .findByCourseLevelId(levelToAssign)
+                        .orElseThrow(() ->
+                                new RuntimeException("ParticipantLevel not found for " + levelToAssign));
+
+        participants.forEach(p -> p.setParticipantLevel(participantLevel));
+
+        _participantRepository.saveAll(participants);
+    }
+
+
+    private void addOriginalTeam(Team team){
+        team.setName(team.getName());
+        team.getTraining().setOriginalTeam(team);
+        trainingRepository.save(team.getTraining());
+    }
+
+    public void  assignAttendancesAndDeclarations(Team team, Training training){
+        team.getUsers().forEach(user -> {
+            switch (training.getCourseLevel()) {
+                case CourseLevel.FOCUS:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.FOCUS, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
+                    break;
+                case CourseLevel.YOUR:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.YOUR, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
+                    break;
+                case CourseLevel.LIFE:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_1, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
+                    break;
+                case CourseLevel.LIFE_2:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_2, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
+                    break;
+                case CourseLevel.LIFE_3:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_3, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
+                    break;
+                case CourseLevel.LIFE_GRADUATE:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_GRADUATE, user.getUser(), training));
+                    callRepository.save(new Call(
+                                    UUID.randomUUID().toString(),
+                                    user.getUser(),
+                                    training
+                            )
+                    );
+                    break;
+            }
+        });
+
+        team.getMasterLife().forEach(masterLifes -> {
+            switch (training.getCourseLevel()) {
+                case CourseLevel.LIFE:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_1, masterLifes.getUser(), training));
+                    break;
+                case CourseLevel.LIFE_2:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_2, masterLifes.getUser(), training));
+                    break;
+                case CourseLevel.LIFE_3:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_3, masterLifes.getUser(), training));
+                    break;
+                case CourseLevel.LIFE_GRADUATE:
+                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_GRADUATE, masterLifes.getUser(), training));
+                    break;
+            }
+        });
+        promiseCommandService.createPromises(training.getId());
+    }
+ }

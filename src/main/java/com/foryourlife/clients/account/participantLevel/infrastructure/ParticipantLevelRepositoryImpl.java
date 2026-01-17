@@ -2,6 +2,7 @@ package com.foryourlife.clients.account.participantLevel.infrastructure;
 
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -40,5 +41,10 @@ public class ParticipantLevelRepositoryImpl implements ParticipantLevelRepositor
     @Override
     public Optional<ParticipantLevel> findOneByCriteria(Specification<ParticipantLevel> specification) {
         return this.repository.findOne(specification);
+    }
+
+    @Override
+    public Optional<ParticipantLevel> findByCourseLevelId(CourseLevel courseLevel) {
+        return repository.findByCourseLevel(courseLevel);
     }
 }

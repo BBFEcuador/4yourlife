@@ -110,8 +110,7 @@ public class ParticipantController {
             case "YOUR" -> {
                 var filters = List.of(
                         new Filter("courseLevel", CourseLevel.YOUR.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND),
-                        new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND),
-                        new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND)
+                        new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)
                 );
                 if (!campusId.isBlank()){
                     new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND);
@@ -123,11 +122,10 @@ public class ParticipantController {
                 );
                 return new ResponseEntity<>(participantQueryService.matchers(criteria), HttpStatus.OK);
             }
-            case "LIFE" -> {
+            case "LIFE", "LIFE_2", "LIFE_3" -> {
                 var filter = List.of(
                         new Filter("courseLevel", CourseLevel.LIFE.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND),
-                        new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND),
-                        new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND)
+                        new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)
                 );
                 if (!campusId.isBlank()){
                     new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND);

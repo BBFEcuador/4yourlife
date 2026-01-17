@@ -101,9 +101,9 @@ public class Attendance extends AggregateRoot {
 
     public boolean HasUnAttendance() {
         var unAttendance = this.fridayAttendance == AttendanceStatus.NO_ASISTIO || this.fridayAttendance == AttendanceStatus.DESERTO || this.saturdayAttendance == AttendanceStatus.NO_ASISTIO || this.saturdayAttendance == AttendanceStatus.DESERTO || this.sundayAttendance == AttendanceStatus.NO_ASISTIO || this.sundayAttendance == AttendanceStatus.DESERTO;
-        if (unAttendance) {
-            this.record(new OnNullDesistedAttend(this.user.getId(), this.user, this.training, this));
-        }
+//        if (unAttendance) {
+//            this.record(new OnNullDesistedAttend(this.user.getId(), this.user, this.training, this));
+//        }
         return unAttendance;
     }
 }

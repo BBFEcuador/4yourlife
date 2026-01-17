@@ -22,6 +22,7 @@ import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.masterLife.application.QueryMasterLifeService;
 import com.foryourlife.masterLife.domain.MasterLife;
+import com.foryourlife.masterLife.domain.MasterLifeRepository;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.TeamCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -52,6 +53,7 @@ public class CommandTeamService {
     private final EventBus bus;
     private final PromiseRepository promiseRepository;
     private final ParticipantRepository _participantRepository;
+    private final MasterLifeRepository masterLifeRepository;
     private final StaffRepository staffRepository;
     private final VisionaryRepository visionaryRepository;
     private final QueryTrainingService queryTrainingService;
@@ -64,7 +66,7 @@ public class CommandTeamService {
 
 
 
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, PromiseRepository promiseRepository, ParticipantLevelRepository participantLevelRepository, PromiseCommandService promiseCommandService, TrainingRepository trainingRepository) {
+    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, PromiseRepository promiseRepository, ParticipantLevelRepository participantLevelRepository, PromiseCommandService promiseCommandService, TrainingRepository trainingRepository, MasterLifeRepository masterLifeRepository) {
         this._teamRepository = _teamRepository;
         this.bus = bus;
         this._participantRepository = _participantRepository;
@@ -80,6 +82,7 @@ public class CommandTeamService {
         this.participantLevelRepository = participantLevelRepository;
         this.promiseCommandService = promiseCommandService;
         this.trainingRepository = trainingRepository;
+        this.masterLifeRepository = masterLifeRepository;
     }
 
     public void save(Team team) {
@@ -256,8 +259,8 @@ public class CommandTeamService {
     public void removeMastersLife(String teamId, String userId) {
         if (this._teamRepository.findById(teamId).isEmpty()) {
             throw new BaseException("Equipo no encontrado", List.of(""));
-        } else if (_participantRepository.findById(userId).isEmpty()) {
-            throw new BaseException("Usuario no encontrado", List.of(""));
+        } else if (masterLifeRepository.findById(userId).isEmpty()) {
+            throw new BaseException("Masterlife no encontrado no encontrado", List.of(""));
         }
         _teamRepository.removeMastersLife(teamId, userId);
     }

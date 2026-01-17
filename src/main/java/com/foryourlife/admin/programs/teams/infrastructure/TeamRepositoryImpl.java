@@ -77,18 +77,21 @@ public class TeamRepositoryImpl implements TeamRepository {
     }
 
     @Override
+    @Transactional
     public void removeMastersLife(String teamId, String userId) {
-        var team = _jpaTeamRepository.findById(teamId).orElseThrow(() -> new BaseException("Team not found", List.of("")));
-        var masterlife = team.getMasterLife();
-        for (var user : masterlife) {
-            if (user.getId().equals(userId)) {
-                masterlife.remove(user);
-                break;
-            }
-        }
-        team.setMasterLife(masterlife);
-        _jpaTeamRepository.save(team);
+
+        Team team = _jpaTeamRepository
+                .findByIdWithMasterLife(teamId)
+                .orElseThrow(() ->
+                        new BaseException("Team not found", List.of())
+                );
+
+        team.getMasterLife().removeIf(master ->
+                master.getId().equals(userId)
+        );
     }
+
+
     @Transactional
     @Override
     public void removeStaffs(String teamId, String userId) {
@@ -104,6 +107,7 @@ public class TeamRepositoryImpl implements TeamRepository {
         team.setStaffs(staffs);
         _jpaTeamRepository.save(team);
     }
+
     @Transactional
     @Override
     public void removeVisionaries(String teamId, String id) {
@@ -137,7 +141,7 @@ public class TeamRepositoryImpl implements TeamRepository {
 
     @Override
     public Page<Team> findAll(Pageable pageable, Criteria criteria) {
-        return _jpaTeamRepository.findAll(criteriaConverter.getJpaSpecifications(criteria),pageable);
+        return _jpaTeamRepository.findAll(criteriaConverter.getJpaSpecifications(criteria), pageable);
     }
 
     @Override

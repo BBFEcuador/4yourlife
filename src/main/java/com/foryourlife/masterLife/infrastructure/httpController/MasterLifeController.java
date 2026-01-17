@@ -38,7 +38,7 @@ public class MasterLifeController {
     }
 
     @PostMapping("add")
-    public ResponseEntity<?> createStaff(@RequestBody MasterLifeSaveRequest request) {
+    public ResponseEntity<?> createStaff(@RequestBody @Valid MasterLifeSaveRequest request) {
         commandMasterLifeService.save(request.toDomain());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

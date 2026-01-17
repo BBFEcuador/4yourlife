@@ -13,6 +13,8 @@ import com.foryourlife.shared.domain.level.CourseLevel;
 import jakarta.transaction.Transactional;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,7 +38,9 @@ public class OnPaymentCreated {
     }
 
     @EventListener
-    @Transactional
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT
+    )
     public void on(PaymentCreated event) {
         Participant participant = participantRepository.findById(event.getPayment().getParticipant().getId()).orElseThrow(NullPointerException::new);
         event.getPayment().getProducts().forEach(product -> {

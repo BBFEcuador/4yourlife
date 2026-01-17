@@ -27,3 +27,7 @@
 1764983295949:"app:import-entities"
 1767733750437:app:seed-permissions
 1768603570622:app:create-products-on-contifico
+1768665503154:app:init-seed
+1768665564372:app:seed-fake-data
+1768666319074:app:init-seed
+1768666360845:app:seed-fake-data

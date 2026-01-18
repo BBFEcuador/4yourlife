@@ -533,18 +533,18 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
 
     public TrainingInfo buildOperativeAssistantDashboardSection(Training training, Team team) {
         var attendances = attendanceRepository.findAttendanceByTraining(training.getId());
-
+        var teamT = training.getOriginalTeam() != null ? training.getOriginalTeam() : team;
         int participantDeclarations = 0, masterLifesDeclarations = 0, enrolmentsDeclarations;
         if (training.getCourseLevel() != CourseLevel.YOUR) {
             var declarations = promiseRepository.findByTrainingId(training.getId());
 
             if (!declarations.isEmpty()) {
                 for (var declaration : declarations) {
-                    var participant = team.getUsers().stream().filter(user -> user.getUser().getId().equals(declaration.getUser().getId())).findFirst();
+                    var participant = teamT.getUsers().stream().filter(user -> user.getUser().getId().equals(declaration.getUser().getId())).findFirst();
                     if (participant.isPresent()) {
                         participantDeclarations += declaration.getThirdPromise();
                     } else {
-                        var masterLife = team.getMasterLife().stream().filter(ml -> ml.getUser().getId().equals(declaration.getUser().getId())).findFirst();
+                        var masterLife = teamT.getMasterLife().stream().filter(ml -> ml.getUser().getId().equals(declaration.getUser().getId())).findFirst();
                         if (masterLife.isPresent()) {
                             masterLifesDeclarations += declaration.getThirdPromise();
                         }
@@ -655,31 +655,31 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
         }
 
         var participantAttendances = attendances.stream()
-                .filter(attendance -> team.getUsers().stream()
+                .filter(attendance -> teamT.getUsers().stream()
                         .anyMatch(participant -> participant.getUser().getId().equals(attendance.getUser().getId()))
                 ).count();
         var masterLifeAttendances = attendances.stream()
-                .filter(attendance -> team.getMasterLife().stream()
+                .filter(attendance -> teamT.getMasterLife().stream()
                         .anyMatch(ml -> ml.getUser().getId().equals(attendance.getUser().getId()))
                 ).count();
         List<WeeklyPaymentStats> weeklyTable;
-        weeklyTable = buildWeeklyTable(training,team);
+        weeklyTable = buildWeeklyTable(training,teamT);
         return new TrainingInfo(
                 training.getCourseLevel(),
-                team.getTrainer().getName(),
-                team.getName(),
-                team.getTrainingNumber().toString(),
-                team.getUsers().size(),
+                teamT.getTrainer().getName(),
+                teamT.getName(),
+                teamT.getTrainingNumber().toString(),
+                teamT.getUsers().size(),
                 (int) participantAttendances,
                 participantDeclarations,
-                team.getMasterLife().size(),
+                teamT.getMasterLife().size(),
                 (int) masterLifeAttendances,
                 masterLifesDeclarations,
-                team.getUsers().size() + team.getMasterLife().size(),
+                teamT.getUsers().size() + teamT.getMasterLife().size(),
                 (int) (participantAttendances + masterLifeAttendances),
                 enrolmentsDeclarations,
-                team.getVisionaries().size(),
-                team.getStaffs().size(),
+                teamT.getVisionaries().size(),
+                teamT.getStaffs().size(),
                 finalList,
                 weeklyTable
         );

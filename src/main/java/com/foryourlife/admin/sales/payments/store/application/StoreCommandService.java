@@ -75,7 +75,7 @@ public class StoreCommandService {
         var newStore = new Store(
                 store.id != null? store.getId() : UUID.randomUUID().toString(),
                 store.getAddress(),
-                store.getNumber(),
+                String.format("%03d", Integer.parseInt(store.getNumber())),
                 campus
         );
         repository.save(newStore);

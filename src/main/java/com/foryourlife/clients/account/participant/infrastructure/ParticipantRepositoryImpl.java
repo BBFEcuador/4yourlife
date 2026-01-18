@@ -57,7 +57,7 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
 
     private Participant loadUserByUsername(String username) throws BaseException {
         var user = repository.findByUser_email(username)
-                .orElseThrow(() -> new BaseException("Login Error", List.of("The user " + username + " does not exist.")));
+                .orElseThrow(() -> new BaseException("Usuario no encontrado", List.of("The user " + username + " does not exist.")));
         loadUser = user;
         return user;
     }

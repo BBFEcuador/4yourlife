@@ -73,13 +73,6 @@ public class TrainerController {
                             null,
                             Filter.Operation.LIKE,
                             Filter.LogicalOperator.OR
-                    ),
-                    new Filter(
-                            "name",
-                            search,
-                            "teams",
-                            Filter.Operation.LIKE,
-                            Filter.LogicalOperator.OR
                     )
             );
         }

@@ -20,8 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static org.bouncycastle.crypto.tls.ConnectionEnd.client;
 
 @Service
 public class CommandInvoiceService {
@@ -81,7 +84,30 @@ public class CommandInvoiceService {
         var configContifico = configContificoRepository
                 .findByCampusId(invoice.getPayment().getCampus().getId())
                 .orElseThrow(() -> new BaseException("Config for the campus not found", List.of("")));
+        String formattedInvoiceDate = invoice.getInvoiceDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
+        InvoiceContificoJson contificoJson = new InvoiceContificoJson(
+                configContifico.getApiKey(),
+                formattedInvoiceDate,
+                "FAC",
+                invoice.getInvoiceContifico().documento,
+                "",
+                invoice.getInvoiceContifico().cliente,
+                BigDecimal.ZERO,
+                invoice.getInvoiceContifico().subtotal_12,
+                BigDecimal.ZERO,
+                invoice.getInvoiceContifico().iva,
+                invoice.getInvoiceContifico().total,
+                invoice.getPayment().getNote(),
+                invoice.getInvoiceContifico().detalles,
+                BigDecimal.ZERO,
+                "Generado en 4YourLife",
+                "P",
+                true,
+                invoice.getInvoiceContifico().cobros
+        );
+
+        invoice.setInvoiceContifico(contificoJson);
         try {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -109,9 +135,9 @@ public class CommandInvoiceService {
                     String contificoId = rootNode.get("id").asText();
 
                     invoice.setSentContifico(true);
-                    var contificoJson = invoice.getInvoiceContifico();
-                    contificoJson.autorizacion = rootNode.get("autorizacion").asText();
-                    invoice.setInvoiceContifico(contificoJson);
+                    var newContificoJson = invoice.getInvoiceContifico();
+                    newContificoJson.autorizacion = rootNode.get("autorizacion").asText();
+                    invoice.setInvoiceContifico(newContificoJson);
                     invoice.setContificoId(contificoId);
 
                     System.out.println("Invoice sent to Contifico successfully. ID: " + contificoId);

@@ -93,7 +93,7 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
 
         return new TrainerLifeView(
                 training.getName(),
-                training.getOriginalTeam().getTrainer().getName(),
+                training.getName(),
                 attendanceDashboard,
                 promiseDashboard,
                 userDashboards

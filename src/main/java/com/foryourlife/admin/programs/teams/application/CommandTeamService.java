@@ -152,6 +152,7 @@ public class CommandTeamService {
         );
         this._teamRepository.save(team);
         this.bus.publish(team.pullDomainEvents());
+        this.addOriginalTeam(team);
     }
 
     public void saveYourTeam(SaveYourTeamRequest request) {

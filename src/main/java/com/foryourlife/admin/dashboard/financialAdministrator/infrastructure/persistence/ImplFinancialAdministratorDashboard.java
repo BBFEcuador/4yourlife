@@ -4,6 +4,7 @@ import com.foryourlife.admin.dashboard.financialAdministrator.domain.FinancialAd
 import com.foryourlife.admin.dashboard.financialAdministrator.domain.FinancialAdministratorDashboardRepository;
 import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.WeeklyPaymentStats;
 import com.foryourlife.admin.dashboard.operativeAssitantDashboard.infrastructure.persistence.ImplOperativeAssistantDashboardRepository;
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.PaymentMethodSummary;
@@ -25,11 +26,13 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
     private final PaymentRepository paymentRepository;
     private final TrainingRepository trainingRepository;
     private final ImplOperativeAssistantDashboardRepository operativeAssistantDashboardRepository;
+    private final TeamRepository teamRepository;
 
-    public ImplFinancialAdministratorDashboard(PaymentRepository paymentRepository, TrainingRepository trainingRepository, ImplOperativeAssistantDashboardRepository operativeAssistantDashboardRepository) {
+    public ImplFinancialAdministratorDashboard(PaymentRepository paymentRepository, TrainingRepository trainingRepository, ImplOperativeAssistantDashboardRepository operativeAssistantDashboardRepository, TeamRepository teamRepository) {
         this.paymentRepository = paymentRepository;
         this.trainingRepository = trainingRepository;
         this.operativeAssistantDashboardRepository = operativeAssistantDashboardRepository;
+        this.teamRepository = teamRepository;
     }
 
     @Override
@@ -40,7 +43,12 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
                         List.of("Training with id " + trainingId + " not found")
                 )
         );
-
+        var team = teamRepository.findByTrainingId(trainingId).orElseThrow(
+                () -> new BaseException(
+                        "Training not found",
+                        List.of("Training with id " + trainingId + " not found")
+                )
+        );
         if (training.getOriginalTeam() == null) {
             return new FinancialAdministratorDashboard(
                     BigDecimal.valueOf(0),
@@ -93,7 +101,7 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
                 .map(pm -> BigDecimal.valueOf(pm.getTotalAmount()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<WeeklyPaymentStats> weeklyTable = operativeAssistantDashboardRepository.buildWeeklyTable(training);
+        List<WeeklyPaymentStats> weeklyTable = operativeAssistantDashboardRepository.buildWeeklyTable(training,team);
 
         return new FinancialAdministratorDashboard(
                 totalIncome,

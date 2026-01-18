@@ -29,7 +29,7 @@ public class SaveGeneraUserRequest {
     @NotBlank(message = "El apellido es obligatorio")
     public String lastname1;
     public String lastname2;
-    @NotNull
+
     public String name;
     @NotNull
     public String phone;

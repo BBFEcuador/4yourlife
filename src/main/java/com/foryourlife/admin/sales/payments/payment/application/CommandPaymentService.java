@@ -262,6 +262,13 @@ public class CommandPaymentService {
                 c.setCuenta_bancaria_id(sh.getPaymentMethod().getBank().getContificoId());
                 c.setNumero_comprobante(sh.getTransactionId());
             }
+            if (sh.getPaymentMethod().getCode().equals("CHE")) {
+                c.setNumero_cheque(sh.getTransactionId());
+            }
+            if (sh.getPaymentMethod().getCode().equals("TC")) {
+                c.setTipo_ping(sh.getPingType());
+            }
+
 
             result.add(c);
         });

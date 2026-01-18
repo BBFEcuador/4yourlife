@@ -100,6 +100,16 @@ public class InvoiceContificoJson implements Serializable {
         public String cuenta_bancaria_id;
         public String numero_comprobante;
         public String fecha;
+        public String tipo_ping;
+        public String numero_cheque;
+
+        public String getNumero_cheque() {
+            return numero_cheque;
+        }
+
+        public void setNumero_cheque(String numero_cheque) {
+            this.numero_cheque = numero_cheque;
+        }
 
         public String getForma_cobro() {
             return forma_cobro;
@@ -139,6 +149,14 @@ public class InvoiceContificoJson implements Serializable {
 
         public void setFecha(String fecha) {
             this.fecha = fecha;
+        }
+
+        public String getTipo_ping() {
+            return tipo_ping;
+        }
+
+        public void setTipo_ping(String tipo_ping) {
+            this.tipo_ping = tipo_ping;
         }
     }
 }

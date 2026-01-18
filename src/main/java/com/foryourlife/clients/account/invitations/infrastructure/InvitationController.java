@@ -36,6 +36,11 @@ public class InvitationController {
         return new ResponseEntity<>(this.service.createInvitationByUserWithQuantity(id,quantity), HttpStatus.CREATED);
     }
 
+    @PostMapping("/generic")
+    public ResponseEntity<String> createGeneric(@Valid @RequestBody GenericInvitationRequest request) {
+        return new ResponseEntity<>(this.service.createGeneric(request), HttpStatus.CREATED);
+    }
+
     @GetMapping("/user/invitation/{id}")
     public ResponseEntity<?> getUserInvitation(@PathVariable String id) {
         return new ResponseEntity<>(this.queryInvitationServices.findActiveUserInvitation(id), HttpStatus.CREATED);

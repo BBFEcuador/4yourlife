@@ -2,15 +2,18 @@ package com.foryourlife.clients.account.invitations.applications;
 
 import com.foryourlife.admin.auth.application.AdminFinderService;
 import com.foryourlife.admin.programs.campus.application.QueryCampusService;
+import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.clients.account.invitations.domain.Invitation;
 import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
 import com.foryourlife.clients.account.invitations.domain.Sender;
+import com.foryourlife.clients.account.invitations.infrastructure.GenericInvitationRequest;
 import com.foryourlife.clients.account.invitations.infrastructure.InvitationRequest;
 import com.foryourlife.clients.account.participant.application.ParticipantCommandService;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.UserRepository;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,14 +28,17 @@ public class CommandInvitationService {
     private final UserRepository userRepository;
     private final QueryCampusService campusService;
     private final AdminFinderService adminFinderService;
-    private final Logger logger = LoggerFactory.getLogger(ParticipantCommandService.class);
 
-    public CommandInvitationService(InvitationRepository repository, ParticipantQueryService participantQueryService, UserRepository userRepository, QueryCampusService campusService, AdminFinderService adminFinderService) {
+    private final TrainingRepository trainingRepository;
+    private final Logger logger = LoggerFactory.getLogger(CommandInvitationService.class);
+
+    public CommandInvitationService(InvitationRepository repository, ParticipantQueryService participantQueryService, UserRepository userRepository, QueryCampusService campusService, AdminFinderService adminFinderService, TrainingRepository trainingRepository) {
         this.repository = repository;
         this.participantQueryService = participantQueryService;
         this.userRepository = userRepository;
         this.campusService = campusService;
         this.adminFinderService = adminFinderService;
+        this.trainingRepository = trainingRepository;
     }
 
     public String createInvitationByUser(String id, String campusId) {
@@ -126,4 +132,26 @@ public class CommandInvitationService {
         return token;
     }
 
+    public String createGeneric(@Valid GenericInvitationRequest request) {
+        var user = userRepository.findById(request.id).orElseThrow(() -> new BaseException("Usuario no encontrado", List.of()));
+        var token = UUID.randomUUID().toString();
+        var training = trainingRepository.findById(request.trainingId).orElseThrow(() -> new BaseException("Entrenamiento no encontrado", List.of()));
+        var invitation = Invitation.create(
+                UUID.randomUUID().toString(),
+                token,
+                null,
+                true,
+                request.id,
+                new Sender(
+                        user.getId(),
+                        user.getName(),
+                        training.getName(),
+                        user.getEmail()
+                ),
+                Integer.parseInt(request.quantity),
+                training.getCampus()
+        );
+        this.repository.save(invitation);
+        return token;
+    }
 }

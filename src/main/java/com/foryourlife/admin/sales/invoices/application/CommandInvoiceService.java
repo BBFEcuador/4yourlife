@@ -130,7 +130,6 @@ public class CommandInvoiceService {
 
             if (status.is2xxSuccessful()) {
                 if (status.is2xxSuccessful()) {
-
                     JsonNode rootNode = mapper.readTree(response.getBody());
                     String contificoId = rootNode.get("id").asText();
 
@@ -139,9 +138,9 @@ public class CommandInvoiceService {
                     newContificoJson.autorizacion = rootNode.get("autorizacion").asText();
                     invoice.setInvoiceContifico(newContificoJson);
                     invoice.setContificoId(contificoId);
-
                     System.out.println("Invoice sent to Contifico successfully. ID: " + contificoId);
 
+                    invoice.setContificoError(null);
                     try {
                         String sriUrl = "https://api.contifico.com/sistema/api/v1/documento/"
                                 + contificoId + "/sri/";
@@ -159,17 +158,14 @@ public class CommandInvoiceService {
 
                         if (sriResponse.getStatusCode().is2xxSuccessful()) {
                             System.out.println("Factura enviada al SRI correctamente.");
+                            invoice.setContificoError(null);
                         }
-
                     } catch (Exception e) {
                         System.err.println("Error enviando al SRI: " + e.getMessage());
                     }
                 }
-
             }
-
             invoiceRepository.save(invoice);
-
         } catch (HttpClientErrorException e) {
             try {
                 ObjectMapper mapper = new ObjectMapper();

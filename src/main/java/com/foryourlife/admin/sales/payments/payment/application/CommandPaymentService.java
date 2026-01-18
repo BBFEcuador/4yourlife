@@ -269,7 +269,6 @@ public class CommandPaymentService {
                 c.setTipo_ping(sh.getPingType());
             }
 
-
             result.add(c);
         });
 

@@ -16,9 +16,11 @@ import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -47,6 +49,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
     }
 
     @Override
+    @Transactional
     public OperativeAssistantDashboard getOpAssistDashboardByTeamId(String teamId) {
         var team = teamRepository.findById(teamId).orElseThrow(
                 () -> new BaseException("Team not found", List.of("Team with id " + teamId + " not found"))
@@ -54,7 +57,9 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
         var training = team.getTraining();
 
         Training focus = null, your = null, life1 = null, life2 = null, life3 = null;
-
+        Hibernate.initialize(team.getMasterLife());
+        Hibernate.initialize(team.getVisionaries());
+        Hibernate.initialize(team.getStaffs());
         if (training.getCourseLevel().equals(CourseLevel.FOCUS)) {
             focus = training;
         }

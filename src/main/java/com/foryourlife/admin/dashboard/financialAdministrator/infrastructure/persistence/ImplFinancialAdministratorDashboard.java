@@ -13,6 +13,8 @@ import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.shared.domain.exception.BaseException;
+import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -36,6 +38,7 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
     }
 
     @Override
+    @Transactional
     public FinancialAdministratorDashboard findByTrainingId(String trainingId) {
         Training training = trainingRepository.findById(trainingId).orElseThrow(
                 () -> new BaseException(
@@ -49,6 +52,9 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
                         List.of("Training with id " + trainingId + " not found")
                 )
         );
+        Hibernate.initialize(team.getMasterLife());
+        Hibernate.initialize(team.getVisionaries());
+        Hibernate.initialize(team.getStaffs());
         if (training.getOriginalTeam() == null) {
             return new FinancialAdministratorDashboard(
                     BigDecimal.valueOf(0),

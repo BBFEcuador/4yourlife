@@ -6,6 +6,7 @@ import com.foryourlife.admin.crm.callLogs.domain.CallStatus;
 import com.foryourlife.admin.crm.callLogs.domain.CallType;
 import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.*;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
+import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
@@ -78,11 +79,11 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
         }
 
         List<TrainingInfo> trainingInfos = new ArrayList<>();
-        if (focus != null) trainingInfos.add(buildOperativeAssistantDashboardSection(focus));
-        if (your != null) trainingInfos.add(buildOperativeAssistantDashboardSection(your));
-        if (life1 != null) trainingInfos.add(buildOperativeAssistantDashboardSection(life1));
-        if (life2 != null) trainingInfos.add(buildOperativeAssistantDashboardSection(life2));
-        if (life3 != null) trainingInfos.add(buildOperativeAssistantDashboardSection(life3));
+        if (focus != null) trainingInfos.add(buildOperativeAssistantDashboardSection(focus,team));
+        if (your != null) trainingInfos.add(buildOperativeAssistantDashboardSection(your,team));
+        if (life1 != null) trainingInfos.add(buildOperativeAssistantDashboardSection(life1,team));
+        if (life2 != null) trainingInfos.add(buildOperativeAssistantDashboardSection(life2,team));
+        if (life3 != null) trainingInfos.add(buildOperativeAssistantDashboardSection(life3,team));
         return new OperativeAssistantDashboard(
                 trainingInfos
         );
@@ -525,7 +526,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
     }
 
 
-    public TrainingInfo buildOperativeAssistantDashboardSection(Training training) {
+    public TrainingInfo buildOperativeAssistantDashboardSection(Training training, Team team) {
         var attendances = attendanceRepository.findAttendanceByTraining(training.getId());
 
         int participantDeclarations = 0, masterLifesDeclarations = 0, enrolmentsDeclarations;
@@ -534,11 +535,11 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
 
             if (!declarations.isEmpty()) {
                 for (var declaration : declarations) {
-                    var participant = training.getOriginalTeam().getUsers().stream().filter(user -> user.getUser().getId().equals(declaration.getUser().getId())).findFirst();
+                    var participant = team.getUsers().stream().filter(user -> user.getUser().getId().equals(declaration.getUser().getId())).findFirst();
                     if (participant.isPresent()) {
                         participantDeclarations += declaration.getThirdPromise();
                     } else {
-                        var masterLife = training.getOriginalTeam().getMasterLife().stream().filter(ml -> ml.getUser().getId().equals(declaration.getUser().getId())).findFirst();
+                        var masterLife = team.getMasterLife().stream().filter(ml -> ml.getUser().getId().equals(declaration.getUser().getId())).findFirst();
                         if (masterLife.isPresent()) {
                             masterLifesDeclarations += declaration.getThirdPromise();
                         }
@@ -649,31 +650,31 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
         }
 
         var participantAttendances = attendances.stream()
-                .filter(attendance -> training.getOriginalTeam().getUsers().stream()
+                .filter(attendance -> team.getUsers().stream()
                         .anyMatch(participant -> participant.getUser().getId().equals(attendance.getUser().getId()))
                 ).count();
         var masterLifeAttendances = attendances.stream()
-                .filter(attendance -> training.getOriginalTeam().getMasterLife().stream()
+                .filter(attendance -> team.getMasterLife().stream()
                         .anyMatch(ml -> ml.getUser().getId().equals(attendance.getUser().getId()))
                 ).count();
         List<WeeklyPaymentStats> weeklyTable;
-        weeklyTable = buildWeeklyTable(training);
+        weeklyTable = buildWeeklyTable(training,team);
         return new TrainingInfo(
                 training.getCourseLevel(),
-                training.getOriginalTeam().getTrainer().getName(),
-                training.getOriginalTeam().getName(),
-                training.getOriginalTeam().getTrainingNumber().toString(),
-                training.getOriginalTeam().getUsers().size(),
+                team.getTrainer().getName(),
+                team.getName(),
+                team.getTrainingNumber().toString(),
+                team.getUsers().size(),
                 (int) participantAttendances,
                 participantDeclarations,
-                training.getOriginalTeam().getMasterLife().size(),
+                team.getMasterLife().size(),
                 (int) masterLifeAttendances,
                 masterLifesDeclarations,
-                training.getOriginalTeam().getUsers().size() + training.getOriginalTeam().getMasterLife().size(),
+                team.getUsers().size() + team.getMasterLife().size(),
                 (int) (participantAttendances + masterLifeAttendances),
                 enrolmentsDeclarations,
-                training.getOriginalTeam().getVisionaries().size(),
-                training.getOriginalTeam().getStaffs().size(),
+                team.getVisionaries().size(),
+                team.getStaffs().size(),
                 finalList,
                 weeklyTable
         );
@@ -691,7 +692,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
         return fridays;
     }
 
-    public List<WeeklyPaymentStats> buildWeeklyTable(Training training) {
+    public List<WeeklyPaymentStats> buildWeeklyTable(Training training,Team team) {
 
         LocalDate startFriday = training.getStartDate();
         LocalDate nextFriday = training.getNextLevel().getStartDate();
@@ -699,7 +700,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
         List<LocalDate> fridayBoundaries = getFridayBoundaries(startFriday, nextFriday);
 
         List<Payment> payments = new java.util.ArrayList<>(List.of());
-        training.getOriginalTeam().getUsers().forEach(participant ->
+        team.getUsers().forEach(participant ->
                 paymentRepository.findAllBetweenDates(training.getStartDate().atStartOfDay(), training.getNextLevel().getStartDate().atStartOfDay()).forEach(
                         payment -> {
                             if (payment.getParticipant().getId().equals(participant.getId())) {

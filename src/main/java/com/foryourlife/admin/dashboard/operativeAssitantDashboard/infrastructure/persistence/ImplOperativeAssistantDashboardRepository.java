@@ -664,6 +664,8 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
                 ).count();
         List<WeeklyPaymentStats> weeklyTable;
         weeklyTable = buildWeeklyTable(training,teamT);
+        var visSize = teamT.getVisionaries() != null ? teamT.getVisionaries().size(): 0;
+        var staffSize = teamT.getStaffs() != null ? teamT.getStaffs().size(): 0;
         return new TrainingInfo(
                 training.getCourseLevel(),
                 teamT.getTrainer().getName(),
@@ -678,8 +680,8 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
                 teamT.getUsers().size() + teamT.getMasterLife().size(),
                 (int) (participantAttendances + masterLifeAttendances),
                 enrolmentsDeclarations,
-                teamT.getVisionaries().size(),
-                teamT.getStaffs().size(),
+                visSize,
+                staffSize,
                 finalList,
                 weeklyTable
         );

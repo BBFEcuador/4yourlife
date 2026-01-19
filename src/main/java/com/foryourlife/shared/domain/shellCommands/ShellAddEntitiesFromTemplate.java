@@ -72,7 +72,7 @@ public class ShellAddEntitiesFromTemplate {
         try {
 
             InputStream is = getClass().getClassLoader()
-                    .getResourceAsStream("plantillav3.xlsx");
+                    .getResourceAsStream("plantillav4.xlsx");
 
             if (is == null) {
                 throw new RuntimeException("Archivo no encontrado en resources");
@@ -106,7 +106,7 @@ public class ShellAddEntitiesFromTemplate {
             String apellido2 = getCellString(row.getCell(1));
             String telefono = getCellString(row.getCell(4));
             String direccion = getCellString(row.getCell(5));
-            String email = "participane.cue"+(i+1)+"@gmail.com";
+            String email = getCellString(row.getCell(6));
             var g = getCellString(row.getCell(7));
             String genero = g.equals("H") ? "H" : "M";
             String ci = getCellString(row.getCell(8));

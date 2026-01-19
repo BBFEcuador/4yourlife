@@ -176,7 +176,7 @@ public class ShellAddEntitiesFromTemplate {
             var participant = Participant.create(
                     UUID.randomUUID().toString(),
                     user,
-                    participantLevelRepository.getRolByLevel(CourseLevel.LIFE),
+                    participantLevelRepository.getRolByLevel(CourseLevel.FOCUS),
                     profile,
                     invitationToken,
                     false,

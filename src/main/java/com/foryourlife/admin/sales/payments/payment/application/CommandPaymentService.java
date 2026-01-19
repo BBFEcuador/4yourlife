@@ -125,6 +125,11 @@ public class CommandPaymentService {
             }
         }
 
+        BigDecimal remaining = paymentReq.total.subtract(total);
+        if (remaining.compareTo(BigDecimal.ZERO) <= 0) {
+            paymentReq.status = PaymentStatus.COMPLETED;
+        }
+
         var payment = Payment.create(
                 UUID.randomUUID().toString(),
                 products,

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.xhtmlrenderer.pdf.ITextRenderer;
@@ -55,8 +56,9 @@ public class ParticipantCommandService {
     private final CampusRepository campusRepository;
     private final TeamRepository teamRepository;
     private final PaymentRepository paymentRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public ParticipantCommandService(ParticipantRepository _participantRepository, UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, ContactRepository contactRepository, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService, CampusRepository campusRepository, TeamRepository teamRepository, PaymentRepository paymentRepository) {
+    public ParticipantCommandService(ParticipantRepository _participantRepository, UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, ContactRepository contactRepository, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService, CampusRepository campusRepository, TeamRepository teamRepository, PaymentRepository paymentRepository, PasswordEncoder passwordEncoder) {
         this._participantRepository = _participantRepository;
         this._userRepository = _userRepository;
         this.commandGeneralUserService = commandGeneralUserService;
@@ -73,6 +75,7 @@ public class ParticipantCommandService {
         this.campusRepository = campusRepository;
         this.teamRepository = teamRepository;
         this.paymentRepository = paymentRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 //    @Transactional
@@ -208,7 +211,7 @@ public class ParticipantCommandService {
                 () -> new BaseException("Equipo no encontrado", List.of("El equipo con id " + teamId + " no existe"))
         );
 
-        team.getUsers().stream().filter( u -> u.getId().equals(participantId) ).findFirst().ifPresent( u -> {
+        team.getUsers().stream().filter(u -> u.getId().equals(participantId)).findFirst().ifPresent(u -> {
             team.getUsers().remove(u);
         });
 
@@ -240,5 +243,17 @@ public class ParticipantCommandService {
         } catch (Exception e) {
             throw new BaseException("Error generating invoice", List.of(e.getMessage()));
         }
+    }
+
+    public void changeParticipantPassword(String participantId, String newPassword) {
+        var participant = this._participantRepository.findById(participantId)
+                .orElseThrow(
+                        () -> new BaseException("Participante no encontrado", List.of("El participante con id " + participantId + " no existe")
+                        )
+                );
+        var user = participant.getUser();
+        var hashedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(hashedPassword);
+        _userRepository.save(user);
     }
 }

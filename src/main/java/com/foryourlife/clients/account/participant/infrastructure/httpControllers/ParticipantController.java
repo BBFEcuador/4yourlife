@@ -167,5 +167,12 @@ public class ParticipantController {
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("filename", "FULL POTENTIAL - CONTRATO PRESTACIÓN SERVICIOS ENTRENAMIENTO.pdf");
 
-        return ResponseEntity.ok().headers(headers).body(pdfBytes.toByteArray());    }
+        return ResponseEntity.ok().headers(headers).body(pdfBytes.toByteArray());
+    }
+
+    @PutMapping("/reset-password/{participantId}")
+    public ResponseEntity<?> resetPassword(@PathVariable String participantId, @RequestBody ResetPasswordRequest request) {
+        participantCommandService.changeParticipantPassword(participantId, request.getNewPassword());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

@@ -1,6 +1,8 @@
 package com.foryourlife.clients.account.participant.infrastructure;
 
+import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.clients.account.participant.domain.LoginResponse;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
@@ -25,11 +27,11 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ParticipantRepositoryImpl implements ParticipantRepository {
@@ -118,7 +120,7 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
     }
 
     @Override
-    public String getContract(String participantId, Payment paymentFocus) {
+    public String getContract(String participantId, Product product, Training training) throws IOException {
 
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setSuffix(".html");
@@ -138,8 +140,11 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
 
         context.setVariable("participant", participant);
         context.setVariable("date", actualDate);
-        context.setVariable("paymentFocus", paymentFocus);
+        context.setVariable("product", product);
+        context.setVariable("training", training);
+        String base64Image = Base64.getEncoder().encodeToString(Files.readAllBytes(Path.of("src/main/resources/static/images/Picture1.png")));
 
+        context.setVariable("signatureImage", base64Image);
         return templateEngine.process(
                 "templates/contract-template",
                 context

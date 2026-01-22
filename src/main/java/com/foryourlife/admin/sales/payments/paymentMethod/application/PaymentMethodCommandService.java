@@ -30,7 +30,6 @@ public class PaymentMethodCommandService {
         }
         var campus = campusRepository.findById(command.campusId)
                 .orElseThrow(() -> new BaseException("Campus no encontrado", List.of("")));
-        var bank = bankQueryService.findById(command.bankId).orElse(null);
 
         String paymentMethodId = command.id != null ? command.id : UUID.randomUUID().toString();
 
@@ -43,5 +42,11 @@ public class PaymentMethodCommandService {
                 command.bankId != null ? bankQueryService.findById(command.bankId).orElse(null) : null
         );
         repository.save(paymentMethod);
+    }
+
+    public void changeStatus(String id) {
+        var pm = repository.findById(id).orElseThrow(() -> new BaseException("Campus no encontrado", List.of("No se encontro")));
+        pm.setActive(!pm.getActive());
+        repository.save(pm);
     }
 }

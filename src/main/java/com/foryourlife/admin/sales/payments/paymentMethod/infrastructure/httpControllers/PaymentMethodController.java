@@ -45,4 +45,10 @@ public class PaymentMethodController {
         paymentMethodCommandService.createPaymentMethod(paymentMethod);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("/change-status/{id}")
+    public ResponseEntity<?> changeStatus(@PathVariable String id) {
+        paymentMethodCommandService.changeStatus(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

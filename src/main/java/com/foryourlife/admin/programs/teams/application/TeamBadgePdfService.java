@@ -36,6 +36,7 @@ public class TeamBadgePdfService {
         // Tabla sin padding
         Table table = new Table(UnitValue.createPercentArray(2))
                 .useAllAvailableWidth()
+                .setPadding(0)
                 .setBorder(Border.NO_BORDER);  // SIN BORDE en la tabla principal
 
         for (int i = 0; i < users.size(); i++) {
@@ -52,19 +53,18 @@ public class TeamBadgePdfService {
 
         // La celda EXTERIOR es invisible y tiene MARGIN para crear el espacio
         Cell outer = new Cell()
-                .setHeight(200)
-                .setBorder(Border.NO_BORDER)  // SIN BORDE en la celda outer
-                .setMargin(6F);  // MARGIN crea el espacio entre gafetes
+                .setHeight(190)
+                .setBorder(Border.NO_BORDER);  // SIN BORDE en la celda outer
 
         // Tabla interna que contiene el contenido con borde
         Table card = new Table(1)
                 .useAllAvailableWidth()
                 .setBorder(new DashedBorder(0.5F))  // El borde va AQUÍ
-                .setPadding(12);  // Padding interno del gafete
+                .setPadding(0);  // Padding interno del gafete
 
         // ===== LOGO =====
         Cell logoCell = new Cell()
-                .setHeight(50)
+                .setMinHeight(50)
                 .setBorder(Border.NO_BORDER)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setHorizontalAlignment(HorizontalAlignment.CENTER)
@@ -74,31 +74,37 @@ public class TeamBadgePdfService {
             Image logo = new Image(
                     ImageDataFactory.create("classpath:static/images/focusYourLife.png"))
                     .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                    .setWidth(90);
+                    .setWidth(80);
             logoCell.add(logo);
         } catch (Exception ignored) {}
 
+        Cell lineCellTop = new Cell()
+                .setHeight(4)
+                .setPaddings(0F,8F,0F,8F)
+                .setBorder(Border.NO_BORDER);
+        lineCellTop.add(new LineSeparator(new SolidLine(0.6f)));
+
         // ===== NOMBRE =====
-        Cell nameCell = textCell(user.getName1(), 28, true, 38);
+        Cell nameCell = textCell(user.getName1(), 28, true, 28);
 
         // ===== APELLIDO =====
-        Cell lastNameCell = textCell(user.getLastname1()+" "+user.getLastname2(), 12, false, 22);
+        Cell lastNameCell = textCell(user.getLastname1()+" "+user.getLastname2(), 12, false, 12);
 
         // ===== NUMERO =====
-        Cell numberCell = textCell("-- " + number + " --", 9, false, 18);
+        Cell numberCell = textCell("-- " + number + " --", 9, false, 9);
 
         // ===== LINEA =====
         Cell lineCell = new Cell()
-                .setHeight(14)
-                .setPaddings(0F,0F,0F,8F)
+                .setHeight(4)
+                .setPaddings(0F,8F,0F,8F)
                 .setBorder(Border.NO_BORDER);
-        lineCell.add(new LineSeparator(new SolidLine(0.8f)));
+        lineCell.add(new LineSeparator(new SolidLine(0.6f)));
 
         // ===== ROL =====
-        Cell roleCell = textCell("PARTICIPANTE", 13, true, 30);
+        Cell roleCell = textCell("PARTICIPANTE", 20, true, 20);
 
         card.addCell(logoCell);
-        card.addCell(lineCell);
+        card.addCell(lineCellTop);
         card.addCell(nameCell);
         card.addCell(lastNameCell);
         card.addCell(numberCell);
@@ -118,7 +124,7 @@ public class TeamBadgePdfService {
         if (bold) p.setBold();
 
         return new Cell()
-                .setHeight(height)
+                .setMinHeight(height)
                 .setBorder(Border.NO_BORDER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .add(p);

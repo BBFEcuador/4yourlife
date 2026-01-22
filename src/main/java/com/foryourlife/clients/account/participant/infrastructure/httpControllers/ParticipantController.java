@@ -6,6 +6,7 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -96,7 +97,7 @@ public class ParticipantController {
                         new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)
 
                 );
-                if (!campusId.isBlank()){
+                if (!campusId.isBlank()) {
                     new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND);
                 }
                 var criteria = new Criteria(
@@ -112,7 +113,7 @@ public class ParticipantController {
                         new Filter("courseLevel", CourseLevel.YOUR.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND),
                         new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)
                 );
-                if (!campusId.isBlank()){
+                if (!campusId.isBlank()) {
                     new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND);
                 }
                 var criteria = new Criteria(
@@ -127,7 +128,7 @@ public class ParticipantController {
                         new Filter("courseLevel", CourseLevel.LIFE.toString(), "participantLevel", Filter.Operation.EQUAL, Filter.LogicalOperator.AND),
                         new Filter("teams", null, null, Filter.Operation.IS_EMPTY, Filter.LogicalOperator.AND)
                 );
-                if (!campusId.isBlank()){
+                if (!campusId.isBlank()) {
                     new Filter("id", campusId, "campus", Filter.Operation.EQUAL, Filter.LogicalOperator.AND);
                 }
                 var criteria = new Criteria(
@@ -160,8 +161,8 @@ public class ParticipantController {
     }
 
     @PostMapping("/get-contract/{participantId}")
-    public ResponseEntity<?> getContract(@PathVariable String participantId) {
-        ByteArrayOutputStream pdfBytes = participantCommandService.getContract(participantId);
+    public ResponseEntity<?> getContract(@PathVariable String participantId, @RequestBody @Valid ContractRequest request) {
+        ByteArrayOutputStream pdfBytes = participantCommandService.getContract(participantId, request.productId, request.trainingId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

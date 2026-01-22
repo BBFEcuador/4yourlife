@@ -3,9 +3,11 @@ package com.foryourlife.clients.account.participant.application;
 import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.admin.programs.campus.domain.CampusRepository;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
+import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.clients.account.contact.domain.ContactRepository;
 import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
 import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
@@ -57,8 +59,10 @@ public class ParticipantCommandService {
     private final TeamRepository teamRepository;
     private final PaymentRepository paymentRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProductRepository productRepository;
+    private final TrainingRepository trainingRepository;
 
-    public ParticipantCommandService(ParticipantRepository _participantRepository, UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, ContactRepository contactRepository, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService, CampusRepository campusRepository, TeamRepository teamRepository, PaymentRepository paymentRepository, PasswordEncoder passwordEncoder) {
+    public ParticipantCommandService(ParticipantRepository _participantRepository, UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, ContactRepository contactRepository, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService, CampusRepository campusRepository, TeamRepository teamRepository, PaymentRepository paymentRepository, PasswordEncoder passwordEncoder, ProductRepository productRepository, TrainingRepository trainingRepository) {
         this._participantRepository = _participantRepository;
         this._userRepository = _userRepository;
         this.commandGeneralUserService = commandGeneralUserService;
@@ -76,6 +80,8 @@ public class ParticipantCommandService {
         this.teamRepository = teamRepository;
         this.paymentRepository = paymentRepository;
         this.passwordEncoder = passwordEncoder;
+        this.productRepository = productRepository;
+        this.trainingRepository = trainingRepository;
     }
 
 //    @Transactional
@@ -222,19 +228,20 @@ public class ParticipantCommandService {
         this._participantRepository.save(participant);
     }
 
-    public ByteArrayOutputStream getContract(String participantId) {
+    public ByteArrayOutputStream getContract(String participantId, String productId, String trainingId) {
         ByteArrayOutputStream pdf = new ByteArrayOutputStream();
 
-        var payment = paymentRepository
-                .findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(
-                        participantId,
-                        PaymentStatus.COMPLETED
-                )
-                .orElseThrow(() -> new RuntimeException("No completed payments found"));
+        var product = productRepository.findById(productId).orElseThrow(
+                () -> new BaseException("Producto no encontrado", List.of("El producto con id " + productId + " no existe"))
+        );
+
+        var training = trainingRepository.findById(trainingId).orElseThrow(
+                () -> new BaseException("Entrenamiento no encontrado", List.of("El entrenamiento con id " + trainingId + " no existe"))
+        );
 
         try {
             ITextRenderer renderer = new ITextRenderer();
-            renderer.setDocumentFromString(_participantRepository.getContract(participantId, payment));
+            renderer.setDocumentFromString(_participantRepository.getContract(participantId, product, training));
             renderer.layout();
             renderer.createPDF(pdf);
             return pdf;

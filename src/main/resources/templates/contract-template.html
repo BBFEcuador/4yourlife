@@ -2,17 +2,22 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>FULL POTENTIAL - CONTRATO PRESTACIÓN SERVICIOS ENTRENAMIENTO</title>
+    <title th:text="${training.campus.city == 'Quito'
+        ? 'IMPETUS S.A.S - CONTRATO PRESTACIÓN SERVICIOS ENTRENAMIENTO'
+        : 'FULL POTENTIAL S.A.S - CONTRATO PRESTACIÓN SERVICIOS ENTRENAMIENTO'}">
+    </title>
     <style>
         @page {
-            size: A4;
-            margin: 2.5cm;
+            margin-top: 1cm;
+            margin-right: 1cm;
+            margin-bottom: 1cm;
+            margin-left: 1cm;
         }
 
         body {
             font-family: "Times New Roman", Times, serif;
             font-size: 12pt;
-            line-height: 1.5;
+            line-height: 1.0;
             text-align: justify;
         }
 
@@ -46,427 +51,707 @@
         .signature-cell {
             width: 50%;
         }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .header {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .header table {
+            width: 100%;
+        }
+
+        .header-title {
+            background: #000;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+            padding: 6px;
+            font-size: 14pt;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        .line {
+            border-bottom: 1px solid #000;
+            height: 18px;
+        }
+
+        table.form {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.form td {
+            padding: 4px;
+            vertical-align: bottom;
+        }
+
+        .label {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .black-box {
+            background: #000;
+            color: #fff;
+            font-weight: bold;
+            padding: 6px;
+            width: 120px;
+            text-align: center;
+        }
+
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 25px;
+            text-align: center;
+            padding-top: 4px;
+            font-size: 9pt;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 10pt;
+        }
+
+        .invoice-table,
+        .invoice-table th,
+        .invoice-table td {
+            border: 1px solid #000;
+        }
+
+        .invoice-table th,
+        .invoice-table td {
+            padding: 4px;
+            text-align: left;
+        }
+
+        .invoice-title {
+            text-align: center;
+            font-weight: bold;
+            padding: 6px;
+        }
+
     </style>
 </head>
 
 <body>
+<div class="header">
+    <table>
+        <tr>
+            <td>Sede: <span th:text="${training.getCampus().getCity()}"></span></td>
+            <td class="header-title">FICHA DE INSCRIPCIÓN</td>
+            <td style="text-align:right;">No.<span th:text="${training.getCourseLevelDisplay()}"></span>: <span
+                    th:text="${training.getNumber()}"></span></td>
+        </tr>
+    </table>
+</div>
+
+<!-- DATOS PERSONALES -->
+<div class="section-title">DATOS PERSONALES</div>
+
+<table class="form">
+    <tr>
+        <td class="label">Nombre Completo</td>
+        <td class="line" colspan="3"><span th:text="${participant.getUser().getName()}"></span></td>
+        <td class="label">Edad</td>
+        <td class="line"><span th:text="${participant.getProfile().getBirthday()}"></span></td>
+    </tr>
+
+    <tr>
+        <td class="label">Nombre por el que prefiero que me llamen</td>
+        <td class="line" colspan="3"></td>
+        <td class="label">Ciudad</td>
+        <td class="line"><span th:text="${participant.getCampus().getCity()}"></span></td>
+    </tr>
+
+    <tr>
+        <td class="label">Dirección Completa</td>
+        <td class="line" colspan="3"><span th:text="${participant.getProfile().getAddress()}"></span></td>
+        <td class="label">Teléfono</td>
+        <td class="line"><span th:text="${participant.getUser().getPhone()}"></span></td>
+    </tr>
+
+    <tr>
+        <td class="label">Número de cédula</td>
+        <td class="line"><span th:text="${participant.getProfile().getDni()}"></span></td>
+        <td class="label">E-mail</td>
+        <td class="line"><span th:text="${participant.getUser().getEmail()}"></span></td>
+        <td class="label">Estado Civil</td>
+        <td class="line"><span th:text="${participant.getProfile().getCivilStatus()}"></span></td>
+    </tr>
+
+    <tr>
+        <td class="label">Ocupación</td>
+        <td class="line" colspan="5"><span th:text="${participant.getProfile().getOccupation()}"></span></td>
+    </tr>
+
+    <tr>
+        <td class="label">En caso de emergencia llamar a</td>
+
+        <td class="line" colspan="3">
+        <span th:if="${participant.contacts != null and !#lists.isEmpty(participant.contacts)}"
+              th:text="${participant.contacts[0].name}">
+        </span>
+            <span th:unless="${participant.contacts != null and !#lists.isEmpty(participant.contacts)}">
+            -
+        </span>
+        </td>
+
+        <td class="label">Teléfono</td>
+
+        <td class="line">
+        <span th:if="${participant.contacts != null and !#lists.isEmpty(participant.contacts)}"
+              th:text="${participant.contacts[0].phone}">
+        </span>
+            <span th:unless="${participant.contacts != null and !#lists.isEmpty(participant.contacts)}">
+            -
+        </span>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td class="label">Quién te invitó a Focus Your Life?</td>
+
+        <td class="line" colspan="3">
+        <span th:if="${participant.invitation != null and participant.invitation.enrolled != null}"
+              th:text="${participant.invitation.enrolled.name}">
+        </span>
+            <span th:unless="${participant.invitation != null and participant.invitation.enrolled != null}">
+            -
+        </span>
+        </td>
+
+        <td class="label">Teléfono</td>
+
+        <td class="line">
+        <span th:if="${participant.invitation != null and participant.invitation.enrolled != null}"
+              th:text="${participant.invitation.enrolled.contact}">
+        </span>
+            <span th:unless="${participant.invitation != null and participant.invitation.enrolled != null}">
+            -
+        </span>
+        </td>
+    </tr>
+
+</table>
+
+<!-- PREGUNTAS -->
+<p>¿Tienes algún antecedente personal de enfermedades psiquiátricas o estás bajo tratamiento actualmente?
+    (SI) (NO) X ¿Cuál?</p>
+
+<p>¿Tienes algún antecedente médico del cuál debamos tener conocimiento?
+    (SI) (NO) X ¿Cuál?</p>
+
+<p>¿Tomas algún medicamento que altere tu conducta habitual?
+    (SI) (NO) X ¿Cuál?</p>
+
+<!-- FOCUS -->
+<table class="form" style="margin-top:20px;">
+    <tr>
+        <td class="black-box"><span>FOCUS</span></td>
+        <td>Método de pago:</td>
+        <td class="line"></td>
+        <td>Fecha de pago:</td>
+        <td class="line"></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Tarjeta:</td>
+        <td class="line"></td>
+        <td>Monto:</td>
+        <td class="line"></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Plazo:</td>
+        <td class="line"></td>
+        <td>No. Autorización:</td>
+        <td class="line"></td>
+    </tr>
+</table>
+<!-- YOUR -->
+<table class="form" style="margin-top:20px;">
+    <tr>
+        <td class="black-box"><span>YOUR</span></td>
+        <td>Método de pago:</td>
+        <td class="line"></td>
+        <td>Fecha de pago:</td>
+        <td class="line"></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Tarjeta:</td>
+        <td class="line"></td>
+        <td>Monto:</td>
+        <td class="line"></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Plazo:</td>
+        <td class="line"></td>
+        <td>No. Autorización:</td>
+        <td class="line"></td>
+    </tr>
+</table>
+<!-- LIFE -->
+<table class="form" style="margin-top:20px;">
+    <tr>
+        <td class="black-box"><span>LIFE</span></td>
+        <td>Método de pago:</td>
+        <td class="line"></td>
+        <td>Fecha de pago:</td>
+        <td class="line"></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Tarjeta:</td>
+        <td class="line"></td>
+        <td>Monto:</td>
+        <td class="line"></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>Plazo:</td>
+        <td class="line"></td>
+        <td>No. Autorización:</td>
+        <td class="line"></td>
+    </tr>
+</table>
+
+<!--<table class="form" style="margin-top:10px;">-->
+<!--    <tr>-->
+<!--        <td class="line">28 al 30 de noviembre/2025</td>-->
+<!--        <td class="line">$ 0.00</td>-->
+<!--        <td class="line">AYNI</td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td class="signature-line">Fecha del entrenamiento</td>-->
+<!--        <td class="signature-line">Precio</td>-->
+<!--        <td class="signature-line">Equipo</td>-->
+<!--    </tr>-->
+<!--</table>-->
+
+<!-- DATOS PARA FACTURA -->
+<table class="invoice-table">
+    <tr>
+        <th colspan="4" class="invoice-title">DATOS PARA LA FACTURA</th>
+    </tr>
+    <tr>
+        <th></th>
+        <th>FOCUS</th>
+        <th>YOUR</th>
+        <th>LIFE</th>
+    </tr>
+    <tr>
+        <td>Nombre:</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>CC/RUC:</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Dirección:</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Correo Electrónico:</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Teléfono:</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
+<div class="page-break"></div>
+
 <h1>CONTRATO DE PRESTACIÓN DE SERVICIOS</h1>
 
 <p class="paragraph">
     Comparecen a la celebración del presente Contrato de Prestación de Servicios,
-    por una parte, la empresa <strong>FULL POTENTIAL SAS</strong> legalmente representada
+    por una parte, la empresa <strong th:if="${training.campus.city == 'Quito'}">
+    Impetus S.A.S</strong><strong th:if="${training.campus.city == 'Cuenca'}">FULL POTENTIAL S.A.S</strong>
+    <strong th:if="${training.campus.city == 'Guayaquil'}">
+        Impetus S.A.S</strong>
+    legalmente representada
     por su Gerente General el señor <strong>Diego Coronel López</strong>, al que para
     efectos de este contrato se la denominará la
     <strong>“Contratista”</strong> o la <strong>“Compañía”</strong>;
     y, por otra parte, el <strong>Sr. <span th:text="${participant.getUser().getName()}"></span></strong>,
     por sus propios derechos, al que para efectos de este contrato se le denominará
-    el <strong>“Contratante”</strong>.
-</p>
-
-<p class="paragraph">
-    En lo posterior los comparecientes podrán denominarse simplemente las
-    <strong>“PARTES”</strong>.
-</p>
-
-<p class="clause-title">PRIMERA. - ANTECEDENTES:</p>
-
-<p class="paragraph">
-    <strong>1.1.-</strong> La Contratista, es una empresa cuyo objeto social se centra
+    el <strong>“Contratante”</strong>. En lo posterior los comparecientes podrán denominarse simplemente las<strong>“PARTES”</strong>.
+    <strong>PRIMERA. - ANTECEDENTES:</strong><strong>1.1.-</strong> La Contratista, es una empresa cuyo objeto social se
+    centra
     en la prestación de servicios profesionales en capacitación, formación y
     perfeccionamiento del potencial humano; a través de capacitaciones,
     consultorías, talleres, seminarios, conferencias, charlas y encuentros
     académicos interdisciplinarios, así como el desarrollo de talleres vivenciales
     y experienciales, de entrenamientos de vida y empresariales, de liderazgo
-    personal y corporativo;
-</p>
-<p class="paragraph">
-    <strong>1.2.-</strong> El Contratante es una persona legalmente capaz para contratar y obligarse por sus propios y
-    personales derechos que declara conocer los servicios que ofrece la Contratista.
-</p>
-<p class="paragraph">
-    <strong>1.3.-</strong> Por lo antes señalado el Contratante contrata los servicios de la Contratista y acuerdan en
-    suscribir el presente contrato.
-</p>
-<p class="clause-title">SEGUNDA. - OBJETO:</p>
-<p class="paragraph">
-    Las partes acuerdan que el objeto de presente contrato es el siguiente:
-</p>
-<p class="paragraph">
-    El Contratante suscribe el presente contrato para el entrenamiento
+    personal y corporativo;<strong>1.2.-</strong> El Contratante es una persona legalmente capaz para contratar y
+    obligarse por sus propios y
+    personales derechos que declara conocer los servicios que ofrece la Contratista.<strong>1.3.-</strong> Por lo antes
+    señalado el Contratante contrata los servicios de la Contratista y acuerdan en
+    suscribir el presente contrato.<strong>SEGUNDA. - OBJETO:</strong>Las partes acuerdan que el objeto de presente
+    contrato es el siguiente: El Contratante suscribe el presente contrato para el entrenamiento
     <strong>FOCUS YOUR LIFE</strong>, el mismo que se desarrolla en modalidad grupal con
     técnicas vivenciales para la aplicación de distinciones ontológicas, el mismo
-    que se encuentra dividido en tres etapas consecutivas:
-</p>
-
-<div class="paragraphlist">
-    <p><strong>1)</strong> 1era Etapa denominada <strong>FOCUS</strong> el cual es la introducción a varias distinciones
-        que permiten ampliar el estado de conciencia personal;</p>
-    <p><strong>2)</strong> 2da Etapa denominada <strong>YOUR</strong> que profundiza las distinciones introductorias;
-    </p>
-    <p><strong>3)</strong> 3ra Etapa <strong>LIFE</strong> 3) 3ra Etapa LIFE la misma que se subdivide en tres fines de
-        semana de acuerdo al calendario que se otorga al Contratante el cual desarrolla actividades complementarias y un
-        cuarto fin de semana al cual se accede luego de cumplir con todos los parámetros establecidos mediante
-        requerimiento informado promovido y aceptado por el Contratante..</p>
-
-</div>
-
-
-<p class="paragraph">
-    De lo expuesto el Contratante adquiere el entrenamiento <strong>FOCUS</strong>; y,
+    que se encuentra dividido en tres etapas consecutivas:<strong>1)</strong> 1era Etapa denominada
+    <strong>FOCUS</strong> el cual es la introducción a varias distinciones
+    que permiten ampliar el estado de conciencia personal;<strong>2)</strong> 2da Etapa denominada <strong>YOUR</strong>
+    que profundiza las distinciones introductorias;<strong>3)</strong> 3ra Etapa <strong>LIFE</strong> 3) 3ra Etapa LIFE
+    la misma que se subdivide en tres fines de
+    semana de acuerdo al calendario que se otorga al Contratante el cual desarrolla actividades complementarias y un
+    cuarto fin de semana al cual se accede luego de cumplir con todos los parámetros establecidos mediante
+    requerimiento informado promovido y aceptado por el Contratante..
+    De lo expuesto el Contratante adquiere el entrenamiento <strong><span
+        th:text="${training.getCourseLevelDisplay()}"></span></strong>; y,
     si luego de concluido dicho entrenamiento el Contratante decide acceder a la 2da etapa y/o 3ra etapa del
-    entrenamiento el presente contrato surtirá los mismos efectos para las dos precitadas etapas.
-</p>
-
-<p class="clause-title">
-    TERCERA. - ALCANCE
-</p>
-
-<p class="paragraph">
-    <strong>3.1 Obligaciones de la CONTRATISTA:</strong>
-</p>
-
-<p class="list">
-<p class="paragraph">
-    3.1.1. Realizar bajo su exclusiva responsabilidad todas las actividades descritas en la cláusula SEGUNDA.
-</p>
-
-<p class="paragraph">
+    entrenamiento el presente contrato surtirá los mismos efectos para las dos precitadas etapas.<strong>TERCERA. -
+    ALCANCE</strong>
+    <strong>3.1 Obligaciones de la CONTRATISTA:</strong> 3.1.1. Realizar bajo su exclusiva responsabilidad todas las
+    actividades descritas en la cláusula SEGUNDA.
     3.1.2. Proveer los recursos humanos y materiales que sean necesarios para el cumplimiento del objeto de este
     contrato.
-</p>
-
-<p class="paragraph">
-    3.1.3. Informar por escrito de manera física o electrónica a la Contratante cualquier novedad en el desarrollo de
-    sus obligaciones y hacerlo oportunamente a fin de evitar contratiempos.
-</p>
-
-</p>
-
-<p class="paragraph">
+    3.1.3. Informar por escrito de manera física o electrónica a la Contratante cualquier novedad en el desarrollo
+    de sus obligaciones y hacerlo oportunamente a fin de evitar contratiempos.
     <strong>3.2 Obligaciones del CONTRATANTE:</strong>
-</p>
-
-<p class="paragraph list">
-<p class="paragraph">
-    3.2.1. Pagar a la Contratista los valores pactados por la prestación de servicios, de conformidad con lo determinado
+    3.2.1. Pagar a la Contratista los valores pactados por la prestación de servicios, de conformidad con lo
+    determinado
     en la cláusula CUARTA del presente contrato.
-</p>
-
-<p class="paragraph">
-    3.2.2. Brindar a la Contratista todas las facilidades e información para que pueda cumplir eficazmente con el objeto
+    3.2.2. Brindar a la Contratista todas las facilidades e información para que pueda cumplir eficazmente con el
+    objeto
     materia de esta contratación.
-</p>
-
-<p class="paragraph">
-    3.2.3. La Contratante se responsabiliza, obliga y declara asistir en los días y horarios establecidos y a cumplir
-    con las indicaciones, normas, tareas, actividades y reglas que serán puestas a su conocimiento durante el desarrollo
-    del o los entrenamientos contratados, mismas que serán notificadas y puestas en su conocimiento de manera física o
+    3.2.3. La Contratante se responsabiliza, obliga y declara asistir en los días y horarios establecidos y a
+    cumplir
+    con las indicaciones, normas, tareas, actividades y reglas que serán puestas a su conocimiento durante el
+    desarrollo
+    del o los entrenamientos contratados, mismas que serán notificadas y puestas en su conocimiento de manera física
+    o
     electrónica y tendrá la misma validez que un contrato sin que se pueda alegar falta de aceptación del mismo.
-</p>
-</p>
-<p class="clause-title">
     CUARTA. - VALOR Y FORMA DE PAGO:
-</p>
-
-<p class="paragraph">
-    El precio establecido para el entrenamiento FOCUS tiene un valor de $<span th:text="${paymentFocus.getTotal()}"></span> Dólares Americanos que podrán ser
+    El precio establecido para el entrenamiento <span th:text="${training.getCourseLevelDisplay()}"></span> tiene un
+    valor de $<span
+        th:text="${product.getBasePrice()}"></span> Dólares Americanos que podrán ser
     cancelados por el Contratante de la siguiente manera:
-</p>
+    1) Mediante pago en efectivo, depósito o transferencia a la cuenta de ahorros No 2212187625 del Banco Pichincha
+    a
+    nombre de la Empresa <span th:if="${training.campus.city == 'Quito'}">
+    Impetus S.A.S</span>
 
-<p class="paragraph list">
-    1) Mediante pago en efectivo, depósito o transferencia a la cuenta de ahorros No 2212187625 del Banco Pichincha a
-    nombre de la Empresa FULL POTENTIAL SAS, o
-</p>
-
-<p class="paragraph list">
+    <span th:if="${training.campus.city == 'Cuenca'}">
+        FULL POTENTIAL S.A.S
+    </span>
+    <span th:if="${training.campus.city == 'Guayaquil'}">
+            Impetus S.A.S
+    </span>, o
     2) Mediante tarjeta de crédito a la suscripción del presente contrato.
-</p>
-
-<p class="paragraph">
     Una vez validado el pago realizado por la Contratante es obligación de la Contratista emitir la correspondiente
     factura en un plazo no mayor a cinco días posteriores al pago realizado.
-</p>
 
-<p class="clause-title">
-    QUINTA. - PLAZO:
-</p>
-
-<p class="paragraph">
-    El entrenamiento FOCUS se desarrollará del ---------------- en el horario de ingreso de 10h00 a 22h00
+    <strong>
+        QUINTA. - PLAZO:
+    </strong>
+    El entrenamiento <span th:text="${training.getCourseLevelDisplay()}"></span> se desarrollará del <span
+        th:text="${training.getStartDate()}"></span> - <span th:text="${training.getEndDate()}"></span> en el
+    horario de
+    ingreso de 10h00 a 22h00
     aproximadamente.
-</p>
-
-<p class="paragraph">
-    Si el Contratante luego de concluida esta etapa, por decisión propia y a su voluntad accede al entrenamiento YOUR
+    Si el Contratante luego de concluida esta etapa, por decisión propia y a su voluntad accede al entrenamiento
+    YOUR
     y/o LIFE los horarios y días de desarrollo del entrenamiento serán comunicados y notificados de manera física o
     electrónica al correo previamente registrado por el Contratante.
-</p>
 
-<p class="clause-title">
-    SEXTA. – SITIO DE LOS SERVICIOS:
-</p>
+    <strong>
+        SEXTA. – SITIO DE LOS SERVICIOS:
+    </strong>
 
-<p class="paragraph">
-    La Contratista prestara sus servicios, objeto de este contrato, en la ciudad de Cuenca.
-</p>
+    <strong>
+        La Contratista prestara sus servicios, objeto de este contrato, en la ciudad de Cuenca.
+    </strong>
 
-<p class="clause-title">
-    SÉPTIMA. – CESIÓN DE DERECHOS:
-</p>
+    <strong>
+        SÉPTIMA. – CESIÓN DE DERECHOS:
+    </strong>
 
-<p class="paragraph">
-    El Contratante en ningún caso podrá ceder total o parcialmente los derechos y obligaciones que se adquieran por el
+    El Contratante en ningún caso podrá ceder total o parcialmente los derechos y obligaciones que se adquieran por
+    el
     presente contrato sin la debida autorización, por escrito, de la Contratista.
-</p>
-<p class="clause-title">
-    OCTAVA. - ACUERDO DE CONFIDENCIALIDAD Y NO DIVULGACIÓN. -
-</p>
-
-<p class="paragraph">
-    8.1. El Contratante declara que guarda y guardará estricta confidencialidad sobre toda la información que llegare a
+    <strong>
+        OCTAVA. - ACUERDO DE CONFIDENCIALIDAD Y NO DIVULGACIÓN. -
+    </strong>
+    8.1. El Contratante declara que guarda y guardará estricta confidencialidad sobre toda la información que
+    llegare a
     su conocimiento relativa al objeto del presente contrato, las negociaciones, contratos de toda índole, listas de
     precios, la organización, métodos, procedimientos administrativos, técnicos y de la naturaleza que fuere, que
-    constituyen patrimonio intelectual de exclusiva propiedad de la Contratista y por tanto son secretos comerciales,
-    industriales, empresariales y por ende, información confidencial, por lo que el Contratante se compromete y obliga a
+    constituyen patrimonio intelectual de exclusiva propiedad de la Contratista y por tanto son secretos
+    comerciales,
+    industriales, empresariales y por ende, información confidencial, por lo que el Contratante se compromete y
+    obliga a
     no utilizarla a su favor, o a favor de terceros, y a no divulgarla.
-</p>
-
-<p class="paragraph">
-    8.2. Asimismo se considera información confidencial y reservada: cualquier información relacionada con los clientes
-    de la Contratista, sus directivos, representantes, entrenadores, sus socios o accionistas, situaciones de los socios
-    o funcionarios; políticas y procedimientos de la Compañía, información técnica, información relativa con los otros
+    8.2. Asimismo se considera información confidencial y reservada: cualquier información relacionada con los
+    clientes
+    de la Contratista, sus directivos, representantes, entrenadores, sus socios o accionistas, situaciones de los
+    socios
+    o funcionarios; políticas y procedimientos de la Compañía, información técnica, información relativa con los
+    otros
     temas de la Compañía, incluyendo pero no limitando a información accionaria, contratos con proveedores,
     contratistas, empleados o cualquier otro similar, información financiera, comercial, precios; así como proyectos
     actuales y otros proyectos, plazos, cronogramas, valores, métodos, fórmulas, equipos, cálculos, estrategias de
-    marketing, y de servicio al cliente u otros similares o en general información sobre clientes, contactos, usuarios,
-    proveedores, contratistas, alianzas, asociaciones, incluyendo listas o compilaciones o bases de datos que contengan
+    marketing, y de servicio al cliente u otros similares o en general información sobre clientes, contactos,
+    usuarios,
+    proveedores, contratistas, alianzas, asociaciones, incluyendo listas o compilaciones o bases de datos que
+    contengan
     cualquier tipo de información relacionada con aquellos; bases de datos de cualquier índole; información no
     divulgada, derechos de autor, o cualquier otra prestación protegida por la normativa de propiedad intelectual,
     procesos de todos los puntos mencionados en este acuerdo; y, cualquier otra información o material que haya o no
-    sido designado, clasificado o marcado con las expresiones "Confidencial", "Secreto", "Privilegiado", "Reservado", o
+    sido designado, clasificado o marcado con las expresiones "Confidencial", "Secreto", "Privilegiado",
+    "Reservado", o
     cualquier otra información equivalente que, a criterio de la Compañía y/o sus accionistas, directivos,
     representantes o sus clientes o información que la Compañía catalogue como confidencial a futuro, se considere
     confidencial. Todo lo cual constituye secreto empresarial, por lo que el Contratante deberá abstenerse, de forma
-    indefinida, a divulgar, usar o explotar, de cualquier forma, la información a la que haya tenido acceso debido al
-    ejercicio de sus funciones, aun cuando su relación haya cesado, de conformidad con lo establecido en el Art. 27 de
+    indefinida, a divulgar, usar o explotar, de cualquier forma, la información a la que haya tenido acceso debido
+    al
+    ejercicio de sus funciones, aun cuando su relación haya cesado, de conformidad con lo establecido en el Art. 27
+    de
     la Ley Orgánica de Regulación y Control del Poder de Mercado.
-</p>
-
-<p class="paragraph">
     8.3. Queda completamente prohibido revelar y/o utilizar la información confidencial de los negocios y secretos
     empresariales de la Compañía y/o de sus clientes.
-</p>
-
-<p class="paragraph">
     8.4. En caso de incumplimiento de esta cláusula se ejecutarán las medidas sancionatorias penal, civil y
     administrativa. Así mismo, en caso de que por el incumplimiento se generen responsabilidades civiles, penales o
-    administrativas hacia la Compañía, esta podrá repetir las acciones que sean pertinentes en contra del Contratante.
-</p>
-
-<p class="paragraph">
+    administrativas hacia la Compañía, esta podrá repetir las acciones que sean pertinentes en contra del
+    Contratante.
     8.5. Adicionalmente, el Contratante no podrá en ningún tiempo utilizar los conocimientos e información de la
     Compañía, ni divulgarla en su beneficio, ya sea en el ámbito cotidiano, profesional, administrativo, ordinario o
     extraordinario, judicial o extrajudicial.
-</p>
-<p class="clause-title">
-    NOVENA. - TERMINACIÓN DE CONTRATO:
-</p>
+    <strong>
+        NOVENA. - TERMINACIÓN DE CONTRATO:
+    </strong>
 
-<p class="paragraph">
     El contrato terminará normalmente por cumplimiento total de las obligaciones de las partes.
-</p>
-
-<p class="paragraph">
     El contrato terminará anticipadamente, sin necesidad de declaratoria judicial, por las siguientes causas:
-</p>
+    <strong>
+        9.1 Fuerza mayor o caso fortuito insuperables que impidan la conclusión del alcance.
+    </strong>
 
-<p class="paragraph list">
-    9.1 Fuerza mayor o caso fortuito insuperables que impidan la conclusión del alcance.
-</p>
-
-<p class="paragraph list">
     9.2 Por decisión de la Contratante previa determinación de impuestos, comisiones, promociones, gastos
-    administrativos y operacionales incurridos, para lo cual se comunicará a la Contratista con 15 días de anticipación.
-</p>
+    administrativos y operacionales incurridos, para lo cual se comunicará a la Contratista con 15 días de
+    anticipación.
+    <strong>
+        DÉCIMA. - NATURALEZA JURÍDICA DE LA VINCULACIÓN ENTRE EL CONTRATANTE Y LA CONTRATISTA:
+    </strong>
 
-<p class="clause-title">
-    DÉCIMA. - NATURALEZA JURÍDICA DE LA VINCULACIÓN ENTRE EL CONTRATANTE Y LA CONTRATISTA:
-</p>
-
-<p class="paragraph">
     Dada la naturaleza del presente contrato, la Compañía no tiene, ni tendrá vinculación laboral alguna con el
     Contratante, en consecuencia, no tiene ni tendrán derecho a emolumentos por concepto de prestaciones sociales o
     laborales.
-</p>
-
-<p class="paragraph">
-    La Contratista acepta y declara que la contratación del personal necesario para la ejecución del presente contrato,
+    La Contratista acepta y declara que la contratación del personal necesario para la ejecución del presente
+    contrato,
     dentro de lo pactado, es de su exclusiva responsabilidad; por tanto, los trabajadores que se utilicen para el
-    cumplimiento de este contrato serán contratados y laborarán en relación de dependencia de la Contratista y mantendrá
+    cumplimiento de este contrato serán contratados y laborarán en relación de dependencia de la Contratista y
+    mantendrá
     a la Contratante indemne frente a cualquier reclamo o acción laboral.
-</p>
-
-<p class="paragraph">
     La Contratista es y prestará los servicios estipulados en este contrato como Contratista INDEPENDIENTE,
-    manteniéndose y reconociendo que cada una de las partes es una persona independiente, sujetas única y exclusivamente
+    manteniéndose y reconociendo que cada una de las partes es una persona independiente, sujetas única y
+    exclusivamente
     a lo estipulado en el presente contrato.
-</p>
-<p class="clause-title">
-    DÉCIMA PRIMERA. – CASO FORTUITO O FUERZA MAYOR. -
-</p>
-
-<p class="paragraph">
-    En circunstancias de caso fortuito o fuerza mayor las partes acuerdan que se aplicarán las normas del Código Civil.
-</p>
-
-<p class="paragraph">
+    <strong>
+        DÉCIMA PRIMERA. – CASO FORTUITO O FUERZA MAYOR. -
+    </strong>
+    En circunstancias de caso fortuito o fuerza mayor las partes acuerdan que se aplicarán las normas del Código
+    Civil.
     Para el cumplimiento de las obligaciones del presente contrato, entiéndase por caso fortuito los eventos de la
     naturaleza, y por fuerza mayor los eventos causados por el hombre, que son inesperados, imprevisibles,
     irresistibles, o inevitables, en la medida que ambos conceptos se asimilan legalmente.
-</p>
-
-<p class="paragraph">
-    Se incluyen en caso fortuito, sin limitarse, a terremotos, huracanes, aluviones, inundaciones, incendios, erupción
-    volcánica, cualquier epidemia, pandemia, enfermedad generalizada, que cause aislamientos, o riesgos a la salud de la
+    Se incluyen en caso fortuito, sin limitarse, a terremotos, huracanes, aluviones, inundaciones, incendios,
+    erupción
+    volcánica, cualquier epidemia, pandemia, enfermedad generalizada, que cause aislamientos, o riesgos a la salud
+    de la
     población.
-</p>
-
-<p class="paragraph">
-    Se incluyen en fuerza mayor, sin limitarse, a actos ocasionados por el hombre que son inevitables e irresistibles,
-    tales como actos del Gobierno, de las autoridades competentes nacionales, seccionales, actos de autoridad ejecutados
-    por funcionarios públicos, policiales militares, municipales o de cualquier otra clase, disturbios o levantamientos,
+    Se incluyen en fuerza mayor, sin limitarse, a actos ocasionados por el hombre que son inevitables e
+    irresistibles,
+    tales como actos del Gobierno, de las autoridades competentes nacionales, seccionales, actos de autoridad
+    ejecutados
+    por funcionarios públicos, policiales militares, municipales o de cualquier otra clase, disturbios o
+    levantamientos,
     guerra declarada o no declarada, terrorismo, ataques armados y daños maliciosos a terceros.
-</p>
 
-<p class="clause-title">
-    DÉCIMA SEGUNDA. – POLITICAS DE REEMBOLSO . -
-</p>
-
-<p class="paragraph">
-    La Contratista una vez que suscribe el presente contrato de prestación de servicios con el Contratante, implementa
-    todos sus buenos oficios para el desarrollo del entrenamiento y la correcta ejecución del presente contrato, por tal
+    <strong>
+        DÉCIMA SEGUNDA. – POLITICAS DE REEMBOLSO . -
+    </strong>
+    La Contratista una vez que suscribe el presente contrato de prestación de servicios con el Contratante,
+    implementa
+    todos sus buenos oficios para el desarrollo del entrenamiento y la correcta ejecución del presente contrato, por
+    tal
     motivo no se contempla el rembolso del valor pagado por el Contratante.
-</p>
-
-<p class="paragraph">
     La Contratista podrá analizar un eventual reembolso bajo ciertas circunstancias:
-</p>
-
-<p class="paragraph list">
-    1) Que el impedimento por parte del Contratante para cumplir el objeto del presente contrato sea por causa de fuera
+    1) Que el impedimento por parte del Contratante para cumplir el objeto del presente contrato sea por causa de
+    fuera
     mayor o caso fortuito, para lo cual se deberá adjuntar los documentos que respalden dicha situación.
-</p>
-
-<p class="paragraph list">
-    2) Presentar por parte del Contratante una solicitud de reembolso por escrito con 15 días de anticipación en el cual
+    2) Presentar por parte del Contratante una solicitud de reembolso por escrito con 15 días de anticipación en el
+    cual
     se exponga la situación indicada en el numeral 1) de la presente clausula con los respectivos documentos de
     respaldo.
-</p>
-
-<p class="paragraph">
-    La Contratista analizará cada caso que se presente y podrá decidir si se acepta un reembolso total o parcial, o si
+    La Contratista analizará cada caso que se presente y podrá decidir si se acepta un reembolso total o parcial, o
+    si
     se cambia las fechas del entrenamiento o simplemente no aplica reembolso.
-</p>
-<p class="clause-title">
-    DÉCIMA TERCERA. - TRATAMIENTO DE DATOS PERSONALES. -
-</p>
+    <strong>
+        DÉCIMA TERCERA. - TRATAMIENTO DE DATOS PERSONALES. -
+    </strong>
 
-<p class="paragraph">
     En caso de que, en el marco de la ejecución del presente contrato, la Contratista acceda, obtenga o trate de
     cualquier modo datos personales de los que la Contratante, se compromete a tratar y conservar dichos datos de
     conformidad con la Política de Protección de Datos de la Contratante, la Ley Orgánica de Protección de Datos
     Personales, el Reglamento General a la Ley Orgánica de Protección de Datos Personales y demás normativa conexa.
-</p>
-
-<p class="paragraph">
-    En particular, se compromete a tratar dichos datos exclusivamente para las finalidades establecidas en este contrato
+    En particular, se compromete a tratar dichos datos exclusivamente para las finalidades establecidas en este
+    contrato
     y de conformidad con las instrucciones impartidas por la Contratante.
-</p>
 
-<p class="clause-title">
-    CLÁUSULA CUARTA.- AUTORIZACIÓN DE USO DE IMAGEN
-</p>
+    <strong>
+        CLÁUSULA CUARTA.- AUTORIZACIÓN DE USO DE IMAGEN
+    </strong>
 
-<p class="paragraph">
-    El Contratante autoriza de manera expresa, libre, voluntaria y gratuita a FULL POTENTIAL S.A.S. para captar,
-    reproducir, utilizar, fijar, editar y difundir su imagen, voz y testimonio, obtenidos durante el desarrollo de los
-    entrenamientos, actividades, dinámicas o eventos organizados por la Compañía, a través de fotografías, grabaciones
-    de video o audio.
-</p>
-
-<p class="paragraph">
-    Dicha autorización se otorga para fines institucionales, educativos, promocionales, publicitarios y de comunicación,
+    El Contratante autoriza de manera expresa, libre, voluntaria y gratuita a <span
+        th:if="${training.campus.city == 'Quito'}">
+    Impetus S.A.S</span>
+    <span th:if="${training.campus.city == 'Cuenca'}">
+        FULL POTENTIAL S.A.S
+    </span><span th:if="${training.campus.city == 'Guayaquil'}">
+            Impetus S.A.S
+    </span> para captar,
+    reproducir, utilizar, fijar, editar y difundir su imagen, voz y testimonio, obtenidos durante el desarrollo de
+    los
+    entrenamientos, actividades, dinámicas o eventos organizados por la Compañía, a través de fotografías,
+    grabaciones
+    de video o audio. Dicha autorización se otorga para fines institucionales, educativos, promocionales, publicitarios
+    y de
+    comunicación,
     y podrá ser utilizada en medios físicos o digitales, redes sociales, material audiovisual, plataformas web y
-    cualquier otro canal de difusión que la Compañía considere pertinente, sin limitación territorial ni temporal.
-</p>
-
-<p class="paragraph">
-    El Contratante declara que esta autorización no genera derecho a compensación económica alguna y libera a la
+    cualquier otro canal de difusión que la Compañía considere pertinente, sin limitación territorial ni temporal. El
+    Contratante declara que esta autorización no genera derecho a compensación económica alguna y libera a la
     Compañía de cualquier reclamo presente o futuro relacionado con el uso legítimo de su imagen, siempre que no se
     afecte su honra o dignidad.
-</p>
-<p class="clause-title">
-    DÉCIMA QUINTA. - SOLUCIÓN DE CONTROVERSIAS:
-</p>
-
-<p class="paragraph">
-    Las Partes renuncian a fuero y domicilio y lo fijan en la ciudad de Quito. En todo lo no previsto en este contrato
+    <strong class="clause-title">
+        DÉCIMA QUINTA. - SOLUCIÓN DE CONTROVERSIAS:
+    </strong>
+    Las Partes renuncian a fuero y domicilio y lo fijan en la ciudad de Quito. En todo lo no previsto en este
+    contrato
     se aplicarán las leyes de la República del Ecuador.
-</p>
-
-<p class="paragraph">
     Toda controversia, o diferencia derivada de este contrato y de su ejecución, interpretación o liquidación, se
-    someterá ante un mediador de la Cámara de Comercio Ecuatoriano Americana, ubicada en Quito. A falta de resolución
-    del conflicto las partes se someten al procedimiento Arbitral y al Tribunal de Arbitraje de la Cámara de Comercio
+    someterá ante un mediador de la Cámara de Comercio Ecuatoriano Americana, ubicada en Quito. A falta de
+    resolución
+    del conflicto las partes se someten al procedimiento Arbitral y al Tribunal de Arbitraje de la Cámara de
+    Comercio
     Ecuatoriano Americana, ubicada en Quito, el mismo que decidirá en derecho, cuyo procedimiento será de carácter
     confidencial, y para la ejecución de las medidas cautelares las partes podrán recurrir, en forma directa, a los
-    jueces ordinarios o a los árbitros quienes podrán solicitar auxilio a funcionarios públicos, judiciales, policiales
+    jueces ordinarios o a los árbitros quienes podrán solicitar auxilio a funcionarios públicos, judiciales,
+    policiales
     y administrativos, sin tener que recurrir al Juez ordinario, según lo establecido en la Ley de Arbitraje y
     Mediación, vigente en el Ecuador.
-</p>
 
-<p class="clause-title">
-    DÉCIMA SEXTA. - DECLARACIÓN DE CONFORMIDAD:
-</p>
-
-<p class="paragraph">
-    Las partes declaran su total conocimiento a lo aquí estipulado luego de haber leído todas y cada una de las
+    <strong class="clause-title">
+        DÉCIMA SEXTA. - DECLARACIÓN DE CONFORMIDAD:
+    </strong>
+Las partes declaran su total conocimiento a lo aquí estipulado luego de haber leído todas y cada una de las
     cláusulas y manifiestan su absoluta conformidad con todas las disposiciones contempladas en este contrato.
-</p>
-
-<p class="paragraph">
-    En forma libre y voluntaria, conocedores del total contenido del presente instrumento, las partes, en forma mutua y
-    en constancia de su plena aceptación y conocimiento a lo aquí establecido, suscriben el presente contrato, en dos
-    ejemplares de igual tenor y valor, en esta ciudad de <span th:text="${participant.getCampus().getCity()}"></span>, a
+    En forma libre y voluntaria, conocedores del total contenido del presente instrumento, las partes, en forma
+    mutua y
+    en constancia de su plena aceptación y conocimiento a lo aquí establecido, suscriben el presente contrato, en
+    dos
+    ejemplares de igual tenor y valor, en esta ciudad de <span
+        th:text="${participant.getCampus().getCity()}"></span>, a
     los <span th:text="${participant.getCreatedDate().getDayOfMonth()}"></span> días del mes de <span
         th:text="${#temporals.format(date, 'MMMM')}"></span>
     de <span
-        th:text="${participant.getCreatedDate().getYear()}"></span> .
+        th:text="${participant.getCreatedDate().getYear()}"></span>.
 </p>
+<table style="width:100%; margin-top:40px; table-layout:fixed;">
+    <tr>
+        <td style="width:50%; text-align:center;"></td>
+        <td style="width:50%; text-align:center;">
+            <img th:src="'data:image/png;base64,' + ${signatureImage}"
+                 alt="Firma Contratante"
+                 style="width:200px;height:100px;"/>
+        </td>
+    </tr>
 
-<p class="paragraph">
-    <strong>EL CONTRATANTE</strong>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <strong>LA CONTRATISTA</strong>
-</p>
+    <tr>
+        <td style="text-align:center;"><strong>EL CONTRATANTE</strong></td>
+        <td style="text-align:center;"><strong>LA CONTRATISTA</strong></td>
+    </tr>
 
-<p class="paragraph">
-    Sr/a. <span th:text="${participant.getUser().getName()}"></span>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    Ing. Diego Coronel López
-</p>
+    <tr>
+        <!-- CONTRATANTE -->
+        <td style="width:50%; text-align:center; vertical-align:top;">
+            <div style="
+                display:block;
+                max-width:100%;
+                word-wrap:break-word;
+                overflow-wrap:break-word;
+                white-space:normal;
+                line-height:1.2;
+            ">
+                Sr/a. <span th:text="${participant.user.name}"></span>
+            </div>
+        </td>
 
-<p class="paragraph">
-    C.C. <span th:text="${participant.getProfile().getDni()}"></span>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    Gerente General
-</p>
+        <!-- CONTRATISTA -->
+        <td style="width:50%; text-align:center;">
+            Ing. Diego Coronel López
+        </td>
+    </tr>
 
-<p class="paragraph">
-    &nbsp;
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    FULL POTENTIAL SAS
-</p>
+    <tr>
+        <td style="text-align:center;">
+            C.C. <span th:text="${participant.profile.dni}"></span>
+        </td>
+        <td style="text-align:center;">
+            Gerente General
+        </td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td style="text-align:center;">
+            <span th:if="${training.campus.city == 'Quito'}">
+                Impetus S.A.S
+            </span>
+            <span th:if="${training.campus.city == 'Cuenca'}">
+                FULL POTENTIAL S.A.S
+            </span>
+            <span th:if="${training.campus.city == 'Guayaquil'}">
+                Impetus S.A.S
+            </span>
+        </td>
+    </tr>
+</table>
 
 </body>
 </html>

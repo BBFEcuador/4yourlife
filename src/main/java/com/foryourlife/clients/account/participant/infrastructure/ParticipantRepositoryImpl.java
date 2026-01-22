@@ -147,11 +147,11 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
         ClassPathResource resource =
                 new ClassPathResource("static/images/Picture1.png");
 
-        byte[] imageBytes = StreamUtils.copyToByteArray(resource.getInputStream());
-
-        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-
-        context.setVariable("signatureImage", base64Image);
+//        byte[] imageBytes = StreamUtils.copyToByteArray(resource.getInputStream());
+//
+//        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+//
+//        context.setVariable("signatureImage", base64Image);
         return templateEngine.process(
                 "templates/contract-template",
                 context

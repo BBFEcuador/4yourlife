@@ -22,6 +22,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PaymentRepositoryImpl implements PaymentRepository {
@@ -104,5 +105,10 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public List<Payment> findAllBetweenDates(LocalDateTime startDate, LocalDateTime endDate) {
         return _jpaPaymentRepository.findAllByCreatedDateBetween(startDate, endDate);
+    }
+
+    @Override
+    public Optional<Payment> findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(String participantId, PaymentStatus status) {
+        return _jpaPaymentRepository.findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(participantId, status);
     }
 }

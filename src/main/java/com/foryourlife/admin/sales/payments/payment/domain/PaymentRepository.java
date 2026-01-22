@@ -8,10 +8,15 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface PaymentRepository {
     Payment save(Payment payment);
     Payment findById(String id);
+    Optional<Payment> findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(
+            String participantId,
+            PaymentStatus status
+    );
     Page<Payment> findByParticipantId(String id, Pageable pageable);
     Page<Payment> findAll(Pageable pageable);
     Page<Payment> findAll(Pageable pageable, Criteria criteria);

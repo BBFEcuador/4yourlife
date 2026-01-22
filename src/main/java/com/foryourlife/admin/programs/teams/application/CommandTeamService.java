@@ -740,7 +740,10 @@ public class CommandTeamService {
         var team = _teamRepository.findById(id).orElseThrow(() -> new BaseException("Error",List.of("Equipo no encontrado")));
 
         Hibernate.initialize(team.getUsers());
-        var bytes = teamBadgePdfService.generatePdf(team.getUsers().stream().map(Participant::getUser).toList(),"PARTICIPANTE");
+        Hibernate.initialize(team.getVisionaries());
+        Hibernate.initialize(team.getStaffs());
+        Hibernate.initialize(team.getMasterLife());
+        var bytes = teamBadgePdfService.generatePdf(team);
         return bytes;
     }
 }

@@ -1,6 +1,11 @@
 package com.foryourlife.admin.programs.teams.application;
 
+import com.foryourlife.admin.programs.teams.domain.Team;
+import com.foryourlife.clients.account.participant.domain.Participant;
+import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.user.User;
+import com.foryourlife.staff.domain.Staff;
+import com.foryourlife.visionary.domain.Visionary;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -22,7 +27,43 @@ import java.util.List;
 
 @Service
 public class TeamBadgePdfService {
+    public byte[] generatePdf(Team team) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
+        PdfWriter writer = new PdfWriter(out);
+        PdfDocument pdf = new PdfDocument(writer);
+        Document document = new Document(pdf, PageSize.A4);
+
+        document.setMargins(20, 20, 20, 20);
+
+        // Tabla sin padding
+        Table table = new Table(UnitValue.createPercentArray(2))
+                .useAllAvailableWidth()
+                .setPadding(0)
+                .setBorder(Border.NO_BORDER);  // SIN BORDE en la tabla principal
+        var users = team.getUsers().stream().map(Participant::getUser).toList();
+        var ml = team.getMasterLife().stream().map(MasterLife::getUser).toList();
+        var visionary = team.getVisionaries().stream().map(Visionary::getUser).toList();
+        var staff = team.getStaffs().stream().map(Staff::getUser).toList();
+
+        for (int i = 0; i < users.size(); i++) {
+            table.addCell(createBadge(users.get(i), i + 1, "PARTICIPANTES"));
+        }
+        for (int i = 0; i < visionary.size(); i++) {
+            table.addCell(createBadge(visionary.get(i), i + 1, "VISIONARIOS"));
+        }
+        for (int i = 0; i < staff.size(); i++) {
+            table.addCell(createBadge(staff.get(i), i + 1, "STAFF"));
+        }
+        for (int i = 0; i < ml.size(); i++) {
+            table.addCell(createBadge(ml.get(i), i + 1, "MASTER LIFE"));
+        }
+
+        document.add(table);
+        document.close();
+
+        return out.toByteArray();
+    }
     public byte[] generatePdf(List<User> users, String role) throws IOException {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -74,7 +115,7 @@ public class TeamBadgePdfService {
             Image logo = new Image(
                     ImageDataFactory.create("classpath:static/images/focusYourLife.png"))
                     .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                    .setWidth(80);
+                    .setWidth(60);
             logoCell.add(logo);
         } catch (Exception ignored) {}
 
@@ -85,7 +126,7 @@ public class TeamBadgePdfService {
         lineCellTop.add(new LineSeparator(new SolidLine(0.6f)));
 
         // ===== NOMBRE =====
-        Cell nameCell = textCell(user.getName1(), 28, true, 28);
+        Cell nameCell = textCell(user.getName1().toUpperCase(), 38, true, 38);
 
         // ===== APELLIDO =====
         Cell lastNameCell = textCell(user.getLastname1()+" "+user.getLastname2(), 12, false, 12);
@@ -101,7 +142,7 @@ public class TeamBadgePdfService {
         lineCell.add(new LineSeparator(new SolidLine(0.6f)));
 
         // ===== ROL =====
-        Cell roleCell = textCell("PARTICIPANTE", 20, true, 20);
+        Cell roleCell = textCell("PARTICIPANTE", 14, true, 14);
 
         card.addCell(logoCell);
         card.addCell(lineCellTop);

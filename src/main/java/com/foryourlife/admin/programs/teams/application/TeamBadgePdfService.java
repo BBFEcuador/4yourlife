@@ -7,10 +7,14 @@ import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.visionary.domain.Visionary;
 import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.Color;
+import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
+import com.itextpdf.kernel.pdf.colorspace.PdfColorSpace;
+import com.itextpdf.kernel.pdf.colorspace.PdfDeviceCs;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.DashedBorder;
@@ -47,16 +51,16 @@ public class TeamBadgePdfService {
         var staff = team.getStaffs().stream().map(Staff::getUser).toList();
 
         for (int i = 0; i < users.size(); i++) {
-            table.addCell(createBadge(users.get(i), i + 1, "PARTICIPANTES"));
+            table.addCell(createBadge(users.get(i), i + 1, "PARTICIPANTES",new DeviceRgb(0,0,0)));
         }
         for (int i = 0; i < visionary.size(); i++) {
-            table.addCell(createBadge(visionary.get(i), i + 1, "VISIONARIOS"));
+            table.addCell(createBadge(visionary.get(i), i + 1, "VISIONARIOS",new DeviceRgb(140,0,250)));
         }
         for (int i = 0; i < staff.size(); i++) {
-            table.addCell(createBadge(staff.get(i), i + 1, "STAFF"));
+            table.addCell(createBadge(staff.get(i), i + 1, "STAFF",new DeviceRgb(16,153,14)));
         }
         for (int i = 0; i < ml.size(); i++) {
-            table.addCell(createBadge(ml.get(i), i + 1, "MASTER LIFE"));
+            table.addCell(createBadge(ml.get(i), i + 1, "MASTER LIFE",new DeviceRgb(173,95,0)));
         }
 
         document.add(table);
@@ -64,33 +68,7 @@ public class TeamBadgePdfService {
 
         return out.toByteArray();
     }
-    public byte[] generatePdf(List<User> users, String role) throws IOException {
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        PdfWriter writer = new PdfWriter(out);
-        PdfDocument pdf = new PdfDocument(writer);
-        Document document = new Document(pdf, PageSize.A4);
-
-        document.setMargins(20, 20, 20, 20);
-
-        // Tabla sin padding
-        Table table = new Table(UnitValue.createPercentArray(2))
-                .useAllAvailableWidth()
-                .setPadding(0)
-                .setBorder(Border.NO_BORDER);  // SIN BORDE en la tabla principal
-
-        for (int i = 0; i < users.size(); i++) {
-            table.addCell(createBadge(users.get(i), i + 1, role));
-        }
-
-        document.add(table);
-        document.close();
-
-        return out.toByteArray();
-    }
-
-    private Cell createBadge(User user, Integer number, String role) {
+    private Cell createBadge(User user, Integer number, String role,DeviceRgb roleColor) {
 
         // La celda EXTERIOR es invisible y tiene MARGIN para crear el espacio
         Cell outer = new Cell()
@@ -126,13 +104,13 @@ public class TeamBadgePdfService {
         lineCellTop.add(new LineSeparator(new SolidLine(0.6f)));
 
         // ===== NOMBRE =====
-        Cell nameCell = textCell(user.getName1().toUpperCase(), 38, true, 38);
+        Cell nameCell = textCell(user.getName1().toUpperCase(), 38, true, 38,new DeviceRgb(0,0,0));
 
         // ===== APELLIDO =====
-        Cell lastNameCell = textCell(user.getLastname1()+" "+user.getLastname2(), 12, false, 12);
+        Cell lastNameCell = textCell(user.getLastname1()+" "+user.getLastname2(), 12, false, 12,new DeviceRgb(0,0,0));
 
         // ===== NUMERO =====
-        Cell numberCell = textCell("-- " + number + " --", 9, false, 9);
+        Cell numberCell = textCell("-- " + number + " --", 9, false, 9,new DeviceRgb(0,0,0));
 
         // ===== LINEA =====
         Cell lineCell = new Cell()
@@ -142,7 +120,7 @@ public class TeamBadgePdfService {
         lineCell.add(new LineSeparator(new SolidLine(0.6f)));
 
         // ===== ROL =====
-        Cell roleCell = textCell("PARTICIPANTE", 14, true, 14);
+        Cell roleCell = textCell(role, 14, true, 14,roleColor);
 
         card.addCell(logoCell);
         card.addCell(lineCellTop);
@@ -156,10 +134,11 @@ public class TeamBadgePdfService {
         return outer;
     }
 
-    private Cell textCell(String text, int fontSize, boolean bold, int height) {
+    private Cell textCell(String text, int fontSize, boolean bold, int height,DeviceRgb color) {
 
         Paragraph p = new Paragraph(text)
                 .setFontSize(fontSize)
+                .setFontColor(color)
                 .setTextAlignment(TextAlignment.CENTER);
 
         if (bold) p.setBold();

@@ -12,6 +12,7 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,6 +22,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -142,9 +144,14 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
         context.setVariable("date", actualDate);
         context.setVariable("product", product);
         context.setVariable("training", training);
-        String base64Image = Base64.getEncoder().encodeToString(Files.readAllBytes(Path.of("src/main/resources/static/images/Picture1.png")));
+        ClassPathResource resource =
+                new ClassPathResource("static/images/Picture1.png");
 
-        context.setVariable("signatureImage", base64Image);
+//        byte[] imageBytes = StreamUtils.copyToByteArray(resource.getInputStream());
+//
+//        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+//
+//        context.setVariable("signatureImage", base64Image);
         return templateEngine.process(
                 "templates/contract-template",
                 context

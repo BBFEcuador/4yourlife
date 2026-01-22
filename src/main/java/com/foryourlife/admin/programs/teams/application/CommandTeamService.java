@@ -63,10 +63,11 @@ public class CommandTeamService {
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
     private final ParticipantLevelRepository participantLevelRepository;
     private final PromiseCommandService promiseCommandService;
+    private final TeamBadgePdfService teamBadgePdfService;
 
 
 
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, PromiseRepository promiseRepository, ParticipantLevelRepository participantLevelRepository, PromiseCommandService promiseCommandService, TrainingRepository trainingRepository, MasterLifeRepository masterLifeRepository) {
+    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, PromiseRepository promiseRepository, ParticipantLevelRepository participantLevelRepository, PromiseCommandService promiseCommandService, TrainingRepository trainingRepository, MasterLifeRepository masterLifeRepository, TeamBadgePdfService teamBadgePdfService) {
         this._teamRepository = _teamRepository;
         this.bus = bus;
         this._participantRepository = _participantRepository;
@@ -83,6 +84,7 @@ public class CommandTeamService {
         this.promiseCommandService = promiseCommandService;
         this.trainingRepository = trainingRepository;
         this.masterLifeRepository = masterLifeRepository;
+        this.teamBadgePdfService = teamBadgePdfService;
     }
 
     public void save(Team team) {
@@ -732,4 +734,13 @@ public class CommandTeamService {
         });
         promiseCommandService.createPromises(training.getId());
     }
- }
+
+    @Transactional
+    public byte[] gafetes(String id) throws IOException {
+        var team = _teamRepository.findById(id).orElseThrow(() -> new BaseException("Error",List.of("Equipo no encontrado")));
+
+        Hibernate.initialize(team.getUsers());
+        var bytes = teamBadgePdfService.generatePdf(team.getUsers().stream().map(Participant::getUser).toList(),"PARTICIPANTE");
+        return bytes;
+    }
+}

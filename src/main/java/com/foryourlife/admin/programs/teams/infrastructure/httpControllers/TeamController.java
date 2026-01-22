@@ -9,12 +9,16 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +54,26 @@ public class TeamController {
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable String id) {
         return new ResponseEntity<>(this.queryTeamService.getTeamById(id), HttpStatus.OK);
+    }
+
+    @PostMapping("/gafetes/{id}")
+    public ResponseEntity<byte[]> gafete(@PathVariable String id) throws IOException {
+        String timestamp = LocalDateTime.now().format(
+                DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+        );
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ));
+        headers.set(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=gefetes" + timestamp + ".pdf"
+        );
+        byte[] excelBytes = this.commandTeamService.gafetes(id);
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(excelBytes);
     }
 
     @GetMapping("/photo/{id}")

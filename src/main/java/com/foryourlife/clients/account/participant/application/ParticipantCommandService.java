@@ -225,13 +225,11 @@ public class ParticipantCommandService {
     public ByteArrayOutputStream getContract(String participantId) {
         ByteArrayOutputStream pdf = new ByteArrayOutputStream();
 
-        Pageable page = PageRequest.of(0, 1);
         var payment = paymentRepository
-                .findByParticipantId(participantId, page)
-                .getContent()
-                .stream()
-                .filter(p -> p.getStatus() == PaymentStatus.COMPLETED)
-                .min(Comparator.comparing(Payment::getCreatedDate))
+                .findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(
+                        participantId,
+                        PaymentStatus.COMPLETED
+                )
                 .orElseThrow(() -> new RuntimeException("No completed payments found"));
 
         try {

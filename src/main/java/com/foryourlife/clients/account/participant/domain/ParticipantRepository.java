@@ -1,5 +1,6 @@
 package com.foryourlife.clients.account.participant.domain;
 
+import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.product.domain.Product;
@@ -31,7 +32,9 @@ public interface ParticipantRepository {
 
     List<Participant> findAllByUserIds(List<String> userIds);
 
-    String getContract(String participantId, Product product, Training training) throws IOException;
+    String getContract(Training training,Product product, Participant participant) throws IOException;
+
+    String getContractByTeam(Training training,Product product, List<Participant> participants) throws IOException;
 
     List<Participant> saveAll(List<Participant> participants);
 }

@@ -3,6 +3,7 @@ package com.foryourlife.admin.sales.product.infrastructure.persistence;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,5 +66,10 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public List<Product> findAll() {
         return impl.findAll();
+    }
+
+    @Override
+    public Optional<Product> findByCampusIdAndProductProgramAndHighPrice(String campusId, CourseLevel courseLevel) {
+        return impl.findTopPricedProductByCampusAndCourseLevel(campusId, courseLevel);
     }
 }

@@ -1,6 +1,7 @@
 package com.foryourlife.admin.sales.product.domain;
 
 import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,6 +18,6 @@ public interface ProductRepository {
     Page<Product> findAllAvailable(Pageable pageable);
     List<Product> findAllByCampusId(String campusId);
     List<Product> findAll();
-
+    Optional<Product> findByCampusIdAndProductProgramAndHighPrice(String campusId, CourseLevel courseLevel);
     void saveAll(List<Product> products);
 }

@@ -153,6 +153,7 @@
             font-size: 9pt;
             font-weight: bold;
         }
+
         .question {
             margin-bottom: 12px;
             font-size: 10.5pt;
@@ -205,7 +206,7 @@
         }
 
         .line {
-            flex: 1;                      /* ⬅ la línea ocupa SOLO lo que falta */
+            flex: 1; /* ⬅ la línea ocupa SOLO lo que falta */
             border-bottom: 1px solid #000;
             margin-left: 6px;
             height: 1px;
@@ -268,7 +269,6 @@
     </table>
 </div>
 
-<!-- DATOS PERSONALES -->
 <div class="section-title">DATOS PERSONALES</div>
 <div class="form-row">
     <span class="label">Nombre Completo</span>
@@ -276,7 +276,7 @@
 </div>
 <div class="form-line two">
     <div class="label">Nombre por el que prefiero que me llamen</div>
-    <div class="value-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    <div class="value-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
     <div class="label">Edad</div>
     <div class="value-line" th:text="${participant.profile.age}"></div>
@@ -288,7 +288,7 @@
 
     <span class="label" style="margin-left:12px;">Ciudad</span>
     <span class="value-line" style="width:100px;"
-          th:text="${participant.campus.city}"></span>
+          th:text="${participant.profile.city}"></span>
 </div>
 <div class="form-row">
     <span class="label">Número de cédula</span>
@@ -336,7 +336,6 @@
                    ? participant.invitation.enrolled.contact : '-'}"></span>
 </div>
 
-<!-- PREGUNTAS -->
 <div class="question">
     <div class="question-text">
         ¿Tienes algún antecedente personal de enfermedades psiquiátricas o estás bajo tratamiento actualmente?
@@ -373,7 +372,6 @@
     </div>
 </div>
 
-<!-- FOCUS -->
 <table class="form" style="margin-top:20px;">
     <tr>
         <td class="black-box"><span>FOCUS</span></td>
@@ -401,11 +399,13 @@
 </table>
 <div class="signature-section">
     <table class="signature-table">
-        <!-- INFO DEL ENTRENAMIENTO -->
         <tr>
             <td colspan="4" style="text-align:left;">
                 <strong>
-                    <span th:text="${training.getStartDate().getDayOfMonth()}"></span> al <span th:text="${training.getEndDate().getDayOfMonth()}"> </span> de <span th:text="${#temporals.format(training.getEndDate(), 'MMMM')}"></span> / <span th:text="${training.getEndDate().getYear()}"></span>
+                    <span th:text="${training.getStartDate().getDayOfMonth()}"></span> al <span
+                        th:text="${training.getEndDate().getDayOfMonth()}"> </span> de <span
+                        th:text="${#temporals.format(training.getEndDate(), 'MMMM')}"></span> / <span
+                        th:text="${training.getEndDate().getYear()}"></span>
                 </strong>
 
             </td>
@@ -413,7 +413,6 @@
                 <strong><span th:text="${training.getName()}"></span></strong>
             </td>
         </tr>
-        <!-- LINEAS DE FIRMA -->
         <tr>
             <td>
                 <div class="signature-line"></div>
@@ -422,7 +421,7 @@
 
             <td>
                 <div class="signature-line"></div>
-                <div class="signature-label"> Precio </div>
+                <div class="signature-label"> Precio</div>
             </td>
 
             <td>
@@ -437,12 +436,11 @@
 
             <td>
                 <div class="signature-line"></div>
-                <div class="signature-label"> Equipo </div>
+                <div class="signature-label"> Equipo</div>
             </td>
         </tr>
     </table>
 </div>
-<!-- YOUR -->
 <table class="form" style="margin-top:20px;">
     <tr>
         <td class="black-box"><span>YOUR</span></td>
@@ -470,12 +468,10 @@
 </table>
 <div class="signature-section">
     <table class="signature-table">
-        <!-- INFO DEL ENTRENAMIENTO -->
         <tr>
             <td colspan="5" style="text-align:left;">
             </td>
         </tr>
-        <!-- LINEAS DE FIRMA -->
         <tr>
             <td>
                 <div class="signature-line"></div>
@@ -492,7 +488,6 @@
         </tr>
     </table>
 </div>
-<!-- LIFE -->
 <table class="form" style="margin-top:20px;">
     <tr>
         <td class="black-box"><span>LIFE</span></td>
@@ -521,7 +516,6 @@
 </table>
 <div class="signature-section">
     <table class="signature-table">
-        <!-- INFO DEL ENTRENAMIENTO -->
         <tr>
             <td colspan="5" style="text-align:left;">
             </td>
@@ -544,67 +538,13 @@
         </tr>
     </table>
 </div>
-<!--<table class="form" style="margin-top:10px;">-->
-<!--    <tr>-->
-<!--        <td class="line">28 al 30 de noviembre/2025</td>-->
-<!--        <td class="line">$ 0.00</td>-->
-<!--        <td class="line">AYNI</td>-->
-<!--    </tr>-->
-<!--    <tr>-->
-<!--        <td class="signature-line">Fecha del entrenamiento</td>-->
-<!--        <td class="signature-line">Precio</td>-->
-<!--        <td class="signature-line">Equipo</td>-->
-<!--    </tr>-->
-<!--</table>-->
 
-<!-- DATOS PARA FACTURA -->
-<!--<table class="invoice-table">-->
-<!--    <tr>-->
-<!--        <th colspan="4" class="invoice-title">DATOS PARA LA FACTURA</th>-->
-<!--    </tr>-->
-<!--    <tr>-->
-<!--        <th></th>-->
-<!--        <th>FOCUS</th>-->
-<!--        <th>YOUR</th>-->
-<!--        <th>LIFE</th>-->
-<!--    </tr>-->
-<!--    <tr>-->
-<!--        <td>Nombre:</td>-->
-<!--        <td></td>-->
-<!--        <td></td>-->
-<!--        <td></td>-->
-<!--    </tr>-->
-<!--    <tr>-->
-<!--        <td>CC/RUC:</td>-->
-<!--        <td></td>-->
-<!--        <td></td>-->
-<!--        <td></td>-->
-<!--    </tr>-->
-<!--    <tr>-->
-<!--        <td>Dirección:</td>-->
-<!--        <td></td>-->
-<!--        <td></td>-->
-<!--        <td></td>-->
-<!--    </tr>-->
-<!--    <tr>-->
-<!--        <td>Correo Electrónico:</td>-->
-<!--        <td></td>-->
-<!--        <td></td>-->
-<!--        <td></td>-->
-<!--    </tr>-->
-<!--    <tr>-->
-<!--        <td>Teléfono:</td>-->
-<!--        <td></td>-->
-<!--        <td></td>-->
-<!--        <td></td>-->
-<!--    </tr>-->
-<!--</table>-->
 
 <div class="page-break"></div>
 
 <h1>CONTRATO DE PRESTACIÓN DE SERVICIOS</h1>
 
-<p class="paragraph">
+<div class="paragraph">
     Comparecen a la celebración del presente Contrato de Prestación de Servicios,
     por una parte, la empresa <strong th:if="${training.campus.city == 'Quito'}">
     Impetus S.A.S</strong><strong th:if="${training.campus.city == 'Cuenca'}">FULL POTENTIAL S.A.S</strong>
@@ -617,297 +557,302 @@
     y, por otra parte, el <strong>Sr. <span th:text="${participant.getUser().getName()}"></span></strong>,
     por sus propios derechos, al que para efectos de este contrato se le denominará
     el <strong>“Contratante”</strong>. En lo posterior los comparecientes podrán denominarse simplemente las<strong>“PARTES”</strong>.
-<div class="clause-title">PRIMERA. - ANTECEDENTES:</div>
-<strong>1.1.-</strong> La Contratista, es una empresa cuyo objeto social se
-centra
-en la prestación de servicios profesionales en capacitación, formación y
-perfeccionamiento del potencial humano; a través de capacitaciones,
-consultorías, talleres, seminarios, conferencias, charlas y encuentros
-académicos interdisciplinarios, así como el desarrollo de talleres vivenciales
-y experienciales, de entrenamientos de vida y empresariales, de liderazgo
-personal y corporativo;<strong>1.2.-</strong> El Contratante es una persona legalmente capaz para contratar y
-obligarse por sus propios y
-personales derechos que declara conocer los servicios que ofrece la Contratista.<strong>1.3.-</strong> Por lo antes
-señalado el Contratante contrata los servicios de la Contratista y acuerdan en
-suscribir el presente contrato.
-<div class="clause-title">SEGUNDA. - OBJETO:</div>
-Las partes acuerdan que el objeto de presente
-contrato es el siguiente: El Contratante suscribe el presente contrato para el entrenamiento
-<strong>FOCUS YOUR LIFE</strong>, el mismo que se desarrolla en modalidad grupal con
-técnicas vivenciales para la aplicación de distinciones ontológicas, el mismo
-que se encuentra dividido en tres etapas consecutivas:<strong>1)</strong> 1era Etapa denominada
-<strong>FOCUS</strong> el cual es la introducción a varias distinciones
-que permiten ampliar el estado de conciencia personal;<strong>2)</strong> 2da Etapa denominada <strong>YOUR</strong>
-que profundiza las distinciones introductorias;<strong>3)</strong> 3ra Etapa <strong>LIFE</strong> 3) 3ra Etapa LIFE
-la misma que se subdivide en tres fines de
-semana de acuerdo al calendario que se otorga al Contratante el cual desarrolla actividades complementarias y un
-cuarto fin de semana al cual se accede luego de cumplir con todos los parámetros establecidos mediante
-requerimiento informado promovido y aceptado por el Contratante..
-De lo expuesto el Contratante adquiere el entrenamiento <strong><span
+    <div class="clause-title">PRIMERA. - ANTECEDENTES:</div>
+    <strong>1.1.-</strong> La Contratista, es una empresa cuyo objeto social se
+    centra
+    en la prestación de servicios profesionales en capacitación, formación y
+    perfeccionamiento del potencial humano; a través de capacitaciones,
+    consultorías, talleres, seminarios, conferencias, charlas y encuentros
+    académicos interdisciplinarios, así como el desarrollo de talleres vivenciales
+    y experienciales, de entrenamientos de vida y empresariales, de liderazgo
+    personal y corporativo;<strong>1.2.-</strong> El Contratante es una persona legalmente capaz para contratar y
+    obligarse por sus propios y
+    personales derechos que declara conocer los servicios que ofrece la Contratista.<strong>1.3.-</strong> Por lo antes
+    señalado el Contratante contrata los servicios de la Contratista y acuerdan en
+    suscribir el presente contrato.
+    <div class="clause-title">SEGUNDA. - OBJETO:</div>
+    Las partes acuerdan que el objeto de presente
+    contrato es el siguiente: El Contratante suscribe el presente contrato para el entrenamiento
+    <strong>FOCUS YOUR LIFE</strong>, el mismo que se desarrolla en modalidad grupal con
+    técnicas vivenciales para la aplicación de distinciones ontológicas, el mismo
+    que se encuentra dividido en tres etapas consecutivas:<strong>1)</strong> 1era Etapa denominada
+    <strong>FOCUS</strong> el cual es la introducción a varias distinciones
+    que permiten ampliar el estado de conciencia personal;<strong>2)</strong> 2da Etapa denominada <strong>YOUR</strong>
+    que profundiza las distinciones introductorias;<strong>3)</strong> 3ra Etapa <strong>LIFE</strong> 3) 3ra Etapa LIFE
+    la misma que se subdivide en tres fines de
+    semana de acuerdo al calendario que se otorga al Contratante el cual desarrolla actividades complementarias y un
+    cuarto fin de semana al cual se accede luego de cumplir con todos los parámetros establecidos mediante
+    requerimiento informado promovido y aceptado por el Contratante..
+    De lo expuesto el Contratante adquiere el entrenamiento <strong><span
         th:text="${training.getCourseLevelDisplay()}"></span></strong>; y,
-si luego de concluido dicho entrenamiento el Contratante decide acceder a la 2da etapa y/o 3ra etapa del
-entrenamiento el presente contrato surtirá los mismos efectos para las dos precitadas etapas.
-<div class="clause-title">TERCERA. -
-    ALCANCE
-</div>
-<strong>3.1 Obligaciones de la CONTRATISTA:</strong> 3.1.1. Realizar bajo su exclusiva responsabilidad todas las
-actividades descritas en la cláusula SEGUNDA.
-3.1.2. Proveer los recursos humanos y materiales que sean necesarios para el cumplimiento del objeto de este
-contrato.
-3.1.3. Informar por escrito de manera física o electrónica a la Contratante cualquier novedad en el desarrollo
-de sus obligaciones y hacerlo oportunamente a fin de evitar contratiempos.
-<strong>3.2 Obligaciones del CONTRATANTE:</strong>
-3.2.1. Pagar a la Contratista los valores pactados por la prestación de servicios, de conformidad con lo
-determinado
-en la cláusula CUARTA del presente contrato.
-3.2.2. Brindar a la Contratista todas las facilidades e información para que pueda cumplir eficazmente con el
-objeto
-materia de esta contratación.
-3.2.3. La Contratante se responsabiliza, obliga y declara asistir en los días y horarios establecidos y a
-cumplir
-con las indicaciones, normas, tareas, actividades y reglas que serán puestas a su conocimiento durante el
-desarrollo
-del o los entrenamientos contratados, mismas que serán notificadas y puestas en su conocimiento de manera física
-o
-electrónica y tendrá la misma validez que un contrato sin que se pueda alegar falta de aceptación del mismo.
-<div class="clause-title">
-    CUARTA. - VALOR Y FORMA DE PAGO:
-</div>
+    si luego de concluido dicho entrenamiento el Contratante decide acceder a la 2da etapa y/o 3ra etapa del
+    entrenamiento el presente contrato surtirá los mismos efectos para las dos precitadas etapas.
+    <div class="clause-title">TERCERA. -
+        ALCANCE
+    </div>
+    <strong>3.1 Obligaciones de la CONTRATISTA:</strong> 3.1.1. Realizar bajo su exclusiva responsabilidad todas las
+    actividades descritas en la cláusula SEGUNDA.
+    3.1.2. Proveer los recursos humanos y materiales que sean necesarios para el cumplimiento del objeto de este
+    contrato.
+    3.1.3. Informar por escrito de manera física o electrónica a la Contratante cualquier novedad en el desarrollo
+    de sus obligaciones y hacerlo oportunamente a fin de evitar contratiempos.
+    <strong>3.2 Obligaciones del CONTRATANTE:</strong>
+    3.2.1. Pagar a la Contratista los valores pactados por la prestación de servicios, de conformidad con lo
+    determinado
+    en la cláusula CUARTA del presente contrato.
+    3.2.2. Brindar a la Contratista todas las facilidades e información para que pueda cumplir eficazmente con el
+    objeto
+    materia de esta contratación.
+    3.2.3. La Contratante se responsabiliza, obliga y declara asistir en los días y horarios establecidos y a
+    cumplir
+    con las indicaciones, normas, tareas, actividades y reglas que serán puestas a su conocimiento durante el
+    desarrollo
+    del o los entrenamientos contratados, mismas que serán notificadas y puestas en su conocimiento de manera física
+    o
+    electrónica y tendrá la misma validez que un contrato sin que se pueda alegar falta de aceptación del mismo.
+    <div class="clause-title">
+        CUARTA. - VALOR Y FORMA DE PAGO:
+    </div>
 
-El precio establecido para el entrenamiento <span th:text="${training.getCourseLevelDisplay()}"></span> tiene un
-valor de $<span
+    El precio establecido para el entrenamiento <span th:text="${training.getCourseLevelDisplay()}"></span> tiene un
+    valor de $<span
         th:text="${product.getBasePrice()}"></span> Dólares Americanos que podrán ser
-cancelados por el Contratante de la siguiente manera:
-1) Mediante pago en efectivo, depósito o transferencia a la cuenta de ahorros No 2212187625 del Banco Pichincha
-a
-nombre de la Empresa <span th:if="${training.campus.city == 'Quito'}">
+    cancelados por el Contratante de la siguiente manera:
+    1) Mediante pago en efectivo, depósito o transferencia a la cuenta de ahorros No 2212187625 del Banco Pichincha
+    a
+    nombre de la Empresa <span th:if="${training.campus.city == 'Quito'}">
     Impetus S.A.S</span>
 
-<span th:if="${training.campus.city == 'Cuenca'}">
+    <span th:if="${training.campus.city == 'Cuenca'}">
         FULL POTENTIAL S.A.S
     </span>
-<span th:if="${training.campus.city == 'Guayaquil'}">
+    <span th:if="${training.campus.city == 'Guayaquil'}">
             Impetus S.A.S
     </span>, o
-2) Mediante tarjeta de crédito a la suscripción del presente contrato.
-Una vez validado el pago realizado por la Contratante es obligación de la Contratista emitir la correspondiente
-factura en un plazo no mayor a cinco días posteriores al pago realizado.
+    2) Mediante tarjeta de crédito a la suscripción del presente contrato.
+    Una vez validado el pago realizado por la Contratante es obligación de la Contratista emitir la correspondiente
+    factura en un plazo no mayor a cinco días posteriores al pago realizado.
 
-<div class="clause-title">
-    QUINTA. - PLAZO:
-</div>
-El entrenamiento <span th:text="${training.getCourseLevelDisplay()}"></span> se desarrollará del <span
+    <div class="clause-title">
+        QUINTA. - PLAZO:
+    </div>
+    El entrenamiento <span th:text="${training.getCourseLevelDisplay()}"></span> se desarrollará del <span
         th:text="${training.getStartDate()}"></span> - <span th:text="${training.getEndDate()}"></span> en el
-horario de
-ingreso de 10h00 a 22h00
-aproximadamente.
-Si el Contratante luego de concluida esta etapa, por decisión propia y a su voluntad accede al entrenamiento
-YOUR
-y/o LIFE los horarios y días de desarrollo del entrenamiento serán comunicados y notificados de manera física o
-electrónica al correo previamente registrado por el Contratante.
+    horario de
+    ingreso de 10h00 a 22h00
+    aproximadamente.
+    Si el Contratante luego de concluida esta etapa, por decisión propia y a su voluntad accede al entrenamiento
+    YOUR
+    y/o LIFE los horarios y días de desarrollo del entrenamiento serán comunicados y notificados de manera física o
+    electrónica al correo previamente registrado por el Contratante.
 
-<div class="clause-title">
-    SEXTA. – SITIO DE LOS SERVICIOS:
-</div>
+    <div class="clause-title">
+        SEXTA. – SITIO DE LOS SERVICIOS:
+    </div>
 
-<strong>
-    La Contratista prestara sus servicios, objeto de este contrato, en la ciudad de Cuenca.
-</strong>
+    <strong>
+        La Contratista prestara sus servicios, objeto de este contrato, en la ciudad de <span
+            th:text="${training.campus.city}"></span>.
+    </strong>
 
-<div class="clause-title">
-    SÉPTIMA. – CESIÓN DE DERECHOS:
-</div>
+    <div class="clause-title">
+        SÉPTIMA. – CESIÓN DE DERECHOS:
+    </div>
 
-El Contratante en ningún caso podrá ceder total o parcialmente los derechos y obligaciones que se adquieran por
-el
-presente contrato sin la debida autorización, por escrito, de la Contratista.
-<div class="clause-title">
-    OCTAVA. - ACUERDO DE CONFIDENCIALIDAD Y NO DIVULGACIÓN. -
-</div>
-8.1. El Contratante declara que guarda y guardará estricta confidencialidad sobre toda la información que
-llegare a
-su conocimiento relativa al objeto del presente contrato, las negociaciones, contratos de toda índole, listas de
-precios, la organización, métodos, procedimientos administrativos, técnicos y de la naturaleza que fuere, que
-constituyen patrimonio intelectual de exclusiva propiedad de la Contratista y por tanto son secretos
-comerciales,
-industriales, empresariales y por ende, información confidencial, por lo que el Contratante se compromete y
-obliga a
-no utilizarla a su favor, o a favor de terceros, y a no divulgarla.
-8.2. Asimismo se considera información confidencial y reservada: cualquier información relacionada con los
-clientes
-de la Contratista, sus directivos, representantes, entrenadores, sus socios o accionistas, situaciones de los
-socios
-o funcionarios; políticas y procedimientos de la Compañía, información técnica, información relativa con los
-otros
-temas de la Compañía, incluyendo pero no limitando a información accionaria, contratos con proveedores,
-contratistas, empleados o cualquier otro similar, información financiera, comercial, precios; así como proyectos
-actuales y otros proyectos, plazos, cronogramas, valores, métodos, fórmulas, equipos, cálculos, estrategias de
-marketing, y de servicio al cliente u otros similares o en general información sobre clientes, contactos,
-usuarios,
-proveedores, contratistas, alianzas, asociaciones, incluyendo listas o compilaciones o bases de datos que
-contengan
-cualquier tipo de información relacionada con aquellos; bases de datos de cualquier índole; información no
-divulgada, derechos de autor, o cualquier otra prestación protegida por la normativa de propiedad intelectual,
-procesos de todos los puntos mencionados en este acuerdo; y, cualquier otra información o material que haya o no
-sido designado, clasificado o marcado con las expresiones "Confidencial", "Secreto", "Privilegiado",
-"Reservado", o
-cualquier otra información equivalente que, a criterio de la Compañía y/o sus accionistas, directivos,
-representantes o sus clientes o información que la Compañía catalogue como confidencial a futuro, se considere
-confidencial. Todo lo cual constituye secreto empresarial, por lo que el Contratante deberá abstenerse, de forma
-indefinida, a divulgar, usar o explotar, de cualquier forma, la información a la que haya tenido acceso debido
-al
-ejercicio de sus funciones, aun cuando su relación haya cesado, de conformidad con lo establecido en el Art. 27
-de
-la Ley Orgánica de Regulación y Control del Poder de Mercado.
-8.3. Queda completamente prohibido revelar y/o utilizar la información confidencial de los negocios y secretos
-empresariales de la Compañía y/o de sus clientes.
-8.4. En caso de incumplimiento de esta cláusula se ejecutarán las medidas sancionatorias penal, civil y
-administrativa. Así mismo, en caso de que por el incumplimiento se generen responsabilidades civiles, penales o
-administrativas hacia la Compañía, esta podrá repetir las acciones que sean pertinentes en contra del
-Contratante.
-8.5. Adicionalmente, el Contratante no podrá en ningún tiempo utilizar los conocimientos e información de la
-Compañía, ni divulgarla en su beneficio, ya sea en el ámbito cotidiano, profesional, administrativo, ordinario o
-extraordinario, judicial o extrajudicial.
-<div class="clause-title">
-    NOVENA. - TERMINACIÓN DE CONTRATO:
-</div>
+    El Contratante en ningún caso podrá ceder total o parcialmente los derechos y obligaciones que se adquieran por
+    el
+    presente contrato sin la debida autorización, por escrito, de la Contratista.
+    <div class="clause-title">
+        OCTAVA. - ACUERDO DE CONFIDENCIALIDAD Y NO DIVULGACIÓN. -
+    </div>
+    8.1. El Contratante declara que guarda y guardará estricta confidencialidad sobre toda la información que
+    llegare a
+    su conocimiento relativa al objeto del presente contrato, las negociaciones, contratos de toda índole, listas de
+    precios, la organización, métodos, procedimientos administrativos, técnicos y de la naturaleza que fuere, que
+    constituyen patrimonio intelectual de exclusiva propiedad de la Contratista y por tanto son secretos
+    comerciales,
+    industriales, empresariales y por ende, información confidencial, por lo que el Contratante se compromete y
+    obliga a
+    no utilizarla a su favor, o a favor de terceros, y a no divulgarla.
+    8.2. Asimismo se considera información confidencial y reservada: cualquier información relacionada con los
+    clientes
+    de la Contratista, sus directivos, representantes, entrenadores, sus socios o accionistas, situaciones de los
+    socios
+    o funcionarios; políticas y procedimientos de la Compañía, información técnica, información relativa con los
+    otros
+    temas de la Compañía, incluyendo pero no limitando a información accionaria, contratos con proveedores,
+    contratistas, empleados o cualquier otro similar, información financiera, comercial, precios; así como proyectos
+    actuales y otros proyectos, plazos, cronogramas, valores, métodos, fórmulas, equipos, cálculos, estrategias de
+    marketing, y de servicio al cliente u otros similares o en general información sobre clientes, contactos,
+    usuarios,
+    proveedores, contratistas, alianzas, asociaciones, incluyendo listas o compilaciones o bases de datos que
+    contengan
+    cualquier tipo de información relacionada con aquellos; bases de datos de cualquier índole; información no
+    divulgada, derechos de autor, o cualquier otra prestación protegida por la normativa de propiedad intelectual,
+    procesos de todos los puntos mencionados en este acuerdo; y, cualquier otra información o material que haya o no
+    sido designado, clasificado o marcado con las expresiones "Confidencial", "Secreto", "Privilegiado",
+    "Reservado", o
+    cualquier otra información equivalente que, a criterio de la Compañía y/o sus accionistas, directivos,
+    representantes o sus clientes o información que la Compañía catalogue como confidencial a futuro, se considere
+    confidencial. Todo lo cual constituye secreto empresarial, por lo que el Contratante deberá abstenerse, de forma
+    indefinida, a divulgar, usar o explotar, de cualquier forma, la información a la que haya tenido acceso debido
+    al
+    ejercicio de sus funciones, aun cuando su relación haya cesado, de conformidad con lo establecido en el Art. 27
+    de
+    la Ley Orgánica de Regulación y Control del Poder de Mercado.
+    8.3. Queda completamente prohibido revelar y/o utilizar la información confidencial de los negocios y secretos
+    empresariales de la Compañía y/o de sus clientes.
+    8.4. En caso de incumplimiento de esta cláusula se ejecutarán las medidas sancionatorias penal, civil y
+    administrativa. Así mismo, en caso de que por el incumplimiento se generen responsabilidades civiles, penales o
+    administrativas hacia la Compañía, esta podrá repetir las acciones que sean pertinentes en contra del
+    Contratante.
+    8.5. Adicionalmente, el Contratante no podrá en ningún tiempo utilizar los conocimientos e información de la
+    Compañía, ni divulgarla en su beneficio, ya sea en el ámbito cotidiano, profesional, administrativo, ordinario o
+    extraordinario, judicial o extrajudicial.
+    <div class="clause-title">
+        NOVENA. - TERMINACIÓN DE CONTRATO:
+    </div>
 
-El contrato terminará normalmente por cumplimiento total de las obligaciones de las partes.
-El contrato terminará anticipadamente, sin necesidad de declaratoria judicial, por las siguientes causas:
-<strong>
-    9.1 Fuerza mayor o caso fortuito insuperables que impidan la conclusión del alcance.
-</strong>
+    El contrato terminará normalmente por cumplimiento total de las obligaciones de las partes.
+    El contrato terminará anticipadamente, sin necesidad de declaratoria judicial, por las siguientes causas:
+    <strong>
+        9.1 Fuerza mayor o caso fortuito insuperables que impidan la conclusión del alcance.
+    </strong>
 
-9.2 Por decisión de la Contratante previa determinación de impuestos, comisiones, promociones, gastos
-administrativos y operacionales incurridos, para lo cual se comunicará a la Contratista con 15 días de
-anticipación.
-<div class="clause-title">
-    DÉCIMA. - NATURALEZA JURÍDICA DE LA VINCULACIÓN ENTRE EL CONTRATANTE Y LA CONTRATISTA:
-</div>
+    9.2 Por decisión de la Contratante previa determinación de impuestos, comisiones, promociones, gastos
+    administrativos y operacionales incurridos, para lo cual se comunicará a la Contratista con 15 días de
+    anticipación.
+    <div class="clause-title">
+        DÉCIMA. - NATURALEZA JURÍDICA DE LA VINCULACIÓN ENTRE EL CONTRATANTE Y LA CONTRATISTA:
+    </div>
 
-Dada la naturaleza del presente contrato, la Compañía no tiene, ni tendrá vinculación laboral alguna con el
-Contratante, en consecuencia, no tiene ni tendrán derecho a emolumentos por concepto de prestaciones sociales o
-laborales.
-La Contratista acepta y declara que la contratación del personal necesario para la ejecución del presente
-contrato,
-dentro de lo pactado, es de su exclusiva responsabilidad; por tanto, los trabajadores que se utilicen para el
-cumplimiento de este contrato serán contratados y laborarán en relación de dependencia de la Contratista y
-mantendrá
-a la Contratante indemne frente a cualquier reclamo o acción laboral.
-La Contratista es y prestará los servicios estipulados en este contrato como Contratista INDEPENDIENTE,
-manteniéndose y reconociendo que cada una de las partes es una persona independiente, sujetas única y
-exclusivamente
-a lo estipulado en el presente contrato.
-<div class="clause-title">
-    DÉCIMA PRIMERA. – CASO FORTUITO O FUERZA MAYOR. -
-</div>
-En circunstancias de caso fortuito o fuerza mayor las partes acuerdan que se aplicarán las normas del Código
-Civil.
-Para el cumplimiento de las obligaciones del presente contrato, entiéndase por caso fortuito los eventos de la
-naturaleza, y por fuerza mayor los eventos causados por el hombre, que son inesperados, imprevisibles,
-irresistibles, o inevitables, en la medida que ambos conceptos se asimilan legalmente.
-Se incluyen en caso fortuito, sin limitarse, a terremotos, huracanes, aluviones, inundaciones, incendios,
-erupción
-volcánica, cualquier epidemia, pandemia, enfermedad generalizada, que cause aislamientos, o riesgos a la salud
-de la
-población.
-Se incluyen en fuerza mayor, sin limitarse, a actos ocasionados por el hombre que son inevitables e
-irresistibles,
-tales como actos del Gobierno, de las autoridades competentes nacionales, seccionales, actos de autoridad
-ejecutados
-por funcionarios públicos, policiales militares, municipales o de cualquier otra clase, disturbios o
-levantamientos,
-guerra declarada o no declarada, terrorismo, ataques armados y daños maliciosos a terceros.
+    Dada la naturaleza del presente contrato, la Compañía no tiene, ni tendrá vinculación laboral alguna con el
+    Contratante, en consecuencia, no tiene ni tendrán derecho a emolumentos por concepto de prestaciones sociales o
+    laborales.
+    La Contratista acepta y declara que la contratación del personal necesario para la ejecución del presente
+    contrato,
+    dentro de lo pactado, es de su exclusiva responsabilidad; por tanto, los trabajadores que se utilicen para el
+    cumplimiento de este contrato serán contratados y laborarán en relación de dependencia de la Contratista y
+    mantendrá
+    a la Contratante indemne frente a cualquier reclamo o acción laboral.
+    La Contratista es y prestará los servicios estipulados en este contrato como Contratista INDEPENDIENTE,
+    manteniéndose y reconociendo que cada una de las partes es una persona independiente, sujetas única y
+    exclusivamente
+    a lo estipulado en el presente contrato.
+    <div class="clause-title">
+        DÉCIMA PRIMERA. – CASO FORTUITO O FUERZA MAYOR. -
+    </div>
+    En circunstancias de caso fortuito o fuerza mayor las partes acuerdan que se aplicarán las normas del Código
+    Civil.
+    Para el cumplimiento de las obligaciones del presente contrato, entiéndase por caso fortuito los eventos de la
+    naturaleza, y por fuerza mayor los eventos causados por el hombre, que son inesperados, imprevisibles,
+    irresistibles, o inevitables, en la medida que ambos conceptos se asimilan legalmente.
+    Se incluyen en caso fortuito, sin limitarse, a terremotos, huracanes, aluviones, inundaciones, incendios,
+    erupción
+    volcánica, cualquier epidemia, pandemia, enfermedad generalizada, que cause aislamientos, o riesgos a la salud
+    de la
+    población.
+    Se incluyen en fuerza mayor, sin limitarse, a actos ocasionados por el hombre que son inevitables e
+    irresistibles,
+    tales como actos del Gobierno, de las autoridades competentes nacionales, seccionales, actos de autoridad
+    ejecutados
+    por funcionarios públicos, policiales militares, municipales o de cualquier otra clase, disturbios o
+    levantamientos,
+    guerra declarada o no declarada, terrorismo, ataques armados y daños maliciosos a terceros.
 
-<div class="clause-title">
-    DÉCIMA SEGUNDA. – POLITICAS DE REEMBOLSO . -
-</div>
-La Contratista una vez que suscribe el presente contrato de prestación de servicios con el Contratante,
-implementa
-todos sus buenos oficios para el desarrollo del entrenamiento y la correcta ejecución del presente contrato, por
-tal
-motivo no se contempla el rembolso del valor pagado por el Contratante.
-La Contratista podrá analizar un eventual reembolso bajo ciertas circunstancias:
-1) Que el impedimento por parte del Contratante para cumplir el objeto del presente contrato sea por causa de
-fuera
-mayor o caso fortuito, para lo cual se deberá adjuntar los documentos que respalden dicha situación.
-2) Presentar por parte del Contratante una solicitud de reembolso por escrito con 15 días de anticipación en el
-cual
-se exponga la situación indicada en el numeral 1) de la presente clausula con los respectivos documentos de
-respaldo.
-La Contratista analizará cada caso que se presente y podrá decidir si se acepta un reembolso total o parcial, o
-si
-se cambia las fechas del entrenamiento o simplemente no aplica reembolso.
-<div class="clause-title">
-    DÉCIMA TERCERA. - TRATAMIENTO DE DATOS PERSONALES. -
-</div>
+    <div class="clause-title">
+        DÉCIMA SEGUNDA. – POLITICAS DE REEMBOLSO . -
+    </div>
+    La Contratista una vez que suscribe el presente contrato de prestación de servicios con el Contratante,
+    implementa
+    todos sus buenos oficios para el desarrollo del entrenamiento y la correcta ejecución del presente contrato, por
+    tal
+    motivo no se contempla el rembolso del valor pagado por el Contratante.
+    La Contratista podrá analizar un eventual reembolso bajo ciertas circunstancias:
+    1) Que el impedimento por parte del Contratante para cumplir el objeto del presente contrato sea por causa de
+    fuera
+    mayor o caso fortuito, para lo cual se deberá adjuntar los documentos que respalden dicha situación.
+    2) Presentar por parte del Contratante una solicitud de reembolso por escrito con 15 días de anticipación en el
+    cual
+    se exponga la situación indicada en el numeral 1) de la presente clausula con los respectivos documentos de
+    respaldo.
+    La Contratista analizará cada caso que se presente y podrá decidir si se acepta un reembolso total o parcial, o
+    si
+    se cambia las fechas del entrenamiento o simplemente no aplica reembolso.
+    <div class="clause-title">
+        DÉCIMA TERCERA. - TRATAMIENTO DE DATOS PERSONALES. -
+    </div>
 
-En caso de que, en el marco de la ejecución del presente contrato, la Contratista acceda, obtenga o trate de
-cualquier modo datos personales de los que la Contratante, se compromete a tratar y conservar dichos datos de
-conformidad con la Política de Protección de Datos de la Contratante, la Ley Orgánica de Protección de Datos
-Personales, el Reglamento General a la Ley Orgánica de Protección de Datos Personales y demás normativa conexa.
-En particular, se compromete a tratar dichos datos exclusivamente para las finalidades establecidas en este
-contrato
-y de conformidad con las instrucciones impartidas por la Contratante.
+    En caso de que, en el marco de la ejecución del presente contrato, la Contratista acceda, obtenga o trate de
+    cualquier modo datos personales de los que la Contratante, se compromete a tratar y conservar dichos datos de
+    conformidad con la Política de Protección de Datos de la Contratante, la Ley Orgánica de Protección de Datos
+    Personales, el Reglamento General a la Ley Orgánica de Protección de Datos Personales y demás normativa conexa.
+    En particular, se compromete a tratar dichos datos exclusivamente para las finalidades establecidas en este
+    contrato
+    y de conformidad con las instrucciones impartidas por la Contratante.
 
-<div class="clause-title">
-    DÉCIMA CUARTA.- AUTORIZACIÓN DE USO DE IMAGEN
-</div>
+    <div class="clause-title">
+        DÉCIMA CUARTA.- AUTORIZACIÓN DE USO DE IMAGEN
+    </div>
 
-El Contratante autoriza de manera expresa, libre, voluntaria y gratuita a <span
+    El Contratante autoriza de manera expresa, libre, voluntaria y gratuita a <span
         th:if="${training.campus.city == 'Quito'}">
     Impetus S.A.S</span>
-<span th:if="${training.campus.city == 'Cuenca'}">
+    <span th:if="${training.campus.city == 'Cuenca'}">
         FULL POTENTIAL S.A.S
     </span><span th:if="${training.campus.city == 'Guayaquil'}">
             Impetus S.A.S
     </span> para captar,
-reproducir, utilizar, fijar, editar y difundir su imagen, voz y testimonio, obtenidos durante el desarrollo de
-los
-entrenamientos, actividades, dinámicas o eventos organizados por la Compañía, a través de fotografías,
-grabaciones
-de video o audio. Dicha autorización se otorga para fines institucionales, educativos, promocionales, publicitarios
-y de
-comunicación,
-y podrá ser utilizada en medios físicos o digitales, redes sociales, material audiovisual, plataformas web y
-cualquier otro canal de difusión que la Compañía considere pertinente, sin limitación territorial ni temporal. El
-Contratante declara que esta autorización no genera derecho a compensación económica alguna y libera a la
-Compañía de cualquier reclamo presente o futuro relacionado con el uso legítimo de su imagen, siempre que no se
-afecte su honra o dignidad.
-<div class="clause-title">
-    DÉCIMA QUINTA. - SOLUCIÓN DE CONTROVERSIAS:
-</div>
-Las Partes renuncian a fuero y domicilio y lo fijan en la ciudad de Quito. En todo lo no previsto en este
-contrato
-se aplicarán las leyes de la República del Ecuador.
-Toda controversia, o diferencia derivada de este contrato y de su ejecución, interpretación o liquidación, se
-someterá ante un mediador de la Cámara de Comercio Ecuatoriano Americana, ubicada en Quito. A falta de
-resolución
-del conflicto las partes se someten al procedimiento Arbitral y al Tribunal de Arbitraje de la Cámara de
-Comercio
-Ecuatoriano Americana, ubicada en Quito, el mismo que decidirá en derecho, cuyo procedimiento será de carácter
-confidencial, y para la ejecución de las medidas cautelares las partes podrán recurrir, en forma directa, a los
-jueces ordinarios o a los árbitros quienes podrán solicitar auxilio a funcionarios públicos, judiciales,
-policiales
-y administrativos, sin tener que recurrir al Juez ordinario, según lo establecido en la Ley de Arbitraje y
-Mediación, vigente en el Ecuador.
+    reproducir, utilizar, fijar, editar y difundir su imagen, voz y testimonio, obtenidos durante el desarrollo de
+    los
+    entrenamientos, actividades, dinámicas o eventos organizados por la Compañía, a través de fotografías,
+    grabaciones
+    de video o audio. Dicha autorización se otorga para fines institucionales, educativos, promocionales, publicitarios
+    y de
+    comunicación,
+    y podrá ser utilizada en medios físicos o digitales, redes sociales, material audiovisual, plataformas web y
+    cualquier otro canal de difusión que la Compañía considere pertinente, sin limitación territorial ni temporal. El
+    Contratante declara que esta autorización no genera derecho a compensación económica alguna y libera a la
+    Compañía de cualquier reclamo presente o futuro relacionado con el uso legítimo de su imagen, siempre que no se
+    afecte su honra o dignidad.
+    <div class="clause-title">
+        DÉCIMA QUINTA. - SOLUCIÓN DE CONTROVERSIAS:
+    </div>
+    Las Partes renuncian a fuero y domicilio y lo fijan en la ciudad de <span th:text="${training.campus.city}"></span>.
+    En
+    todo lo no previsto en este
+    contrato
+    se aplicarán las leyes de la República del Ecuador.
+    Toda controversia, o diferencia derivada de este contrato y de su ejecución, interpretación o liquidación, se
+    someterá ante un mediador de la Cámara de Comercio Ecuatoriano Americana, ubicada en <span
+        th:text="${training.campus.city}"></span>. A falta de
+    resolución
+    del conflicto las partes se someten al procedimiento Arbitral y al Tribunal de Arbitraje de la Cámara de
+    Comercio
+    Ecuatoriano Americana, ubicada en <span th:text="${training.campus.city}"></span>, el mismo que decidirá en derecho,
+    cuyo procedimiento será de carácter
+    confidencial, y para la ejecución de las medidas cautelares las partes podrán recurrir, en forma directa, a los
+    jueces ordinarios o a los árbitros quienes podrán solicitar auxilio a funcionarios públicos, judiciales,
+    policiales
+    y administrativos, sin tener que recurrir al Juez ordinario, según lo establecido en la Ley de Arbitraje y
+    Mediación, vigente en el Ecuador.
 
-<div class="clause-title">
-    DÉCIMA SEXTA. - DECLARACIÓN DE CONFORMIDAD:
-</div>
-Las partes declaran su total conocimiento a lo aquí estipulado luego de haber leído todas y cada una de las
-cláusulas y manifiestan su absoluta conformidad con todas las disposiciones contempladas en este contrato.
-En forma libre y voluntaria, conocedores del total contenido del presente instrumento, las partes, en forma
-mutua y
-en constancia de su plena aceptación y conocimiento a lo aquí establecido, suscriben el presente contrato, en
-dos
-ejemplares de igual tenor y valor, en esta ciudad de <span
+    <div class="clause-title">
+        DÉCIMA SEXTA. - DECLARACIÓN DE CONFORMIDAD:
+    </div>
+    Las partes declaran su total conocimiento a lo aquí estipulado luego de haber leído todas y cada una de las
+    cláusulas y manifiestan su absoluta conformidad con todas las disposiciones contempladas en este contrato.
+    En forma libre y voluntaria, conocedores del total contenido del presente instrumento, las partes, en forma
+    mutua y
+    en constancia de su plena aceptación y conocimiento a lo aquí establecido, suscriben el presente contrato, en
+    dos
+    ejemplares de igual tenor y valor, en esta ciudad de <span
         th:text="${participant.getCampus().getCity()}"></span>, a
-los <span th:text="${participant.getCreatedDate().getDayOfMonth()}"></span> días del mes de <span
+    los <span th:text="${participant.getCreatedDate().getDayOfMonth()}"></span> días del mes de <span
         th:text="${#temporals.format(date, 'MMMM')}"></span>
-de <span
+    de <span
         th:text="${participant.getCreatedDate().getYear()}"></span>.
-</p>
+</div>
 <table style="width:100%; margin-top:100px; table-layout:fixed;">
     <tr>
         <td style="width:50%; text-align:center;"></td>
@@ -922,8 +867,7 @@ de <span
     </tr>
 
     <tr>
-        <!-- CONTRATANTE -->
-        <td style="width:50%; text-align:center; vertical-align:top;">
+        <td style="width:50%; text-align:center; vertical-align:top">
             <div style="
                 display:block;
                 max-width:100%;
@@ -936,7 +880,6 @@ de <span
             </div>
         </td>
 
-        <!-- CONTRATISTA -->
         <td style="width:50%; text-align:center;">
             Ing. Diego Coronel López
         </td>

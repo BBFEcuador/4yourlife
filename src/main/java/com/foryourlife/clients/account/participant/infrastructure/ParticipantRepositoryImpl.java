@@ -1,5 +1,6 @@
 package com.foryourlife.clients.account.participant.infrastructure;
 
+import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.product.domain.Product;
@@ -122,7 +123,8 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
     }
 
     @Override
-    public String getContract(String participantId, Product product, Training training) throws IOException {
+    public String getContract(Training training, Product product, Participant participant)
+            throws IOException {
 
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setSuffix(".html");
@@ -130,30 +132,37 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
 
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
-        Participant participant = repository
-                .findById(participantId)
-                .orElseThrow(() -> new BaseException(
-                        "Participant not found",
-                        List.of("Participant with id " + participantId + " not found")
-                ));
+
         Context context = new Context(new Locale("es", "EC"));
-
-        var actualDate = LocalDate.now();
-
         context.setVariable("participant", participant);
-        context.setVariable("date", actualDate);
+        context.setVariable("date", LocalDate.now());
         context.setVariable("product", product);
         context.setVariable("training", training);
-        ClassPathResource resource =
-                new ClassPathResource("static/images/Picture1.png");
 
-//        byte[] imageBytes = StreamUtils.copyToByteArray(resource.getInputStream());
-//
-//        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-//
-//        context.setVariable("signatureImage", base64Image);
         return templateEngine.process(
                 "templates/contract-template",
+                context
+        );
+    }
+
+    @Override
+    public String getContractByTeam(Training training, Product product, List<Participant> participants) throws IOException {
+
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+
+        Context context = new Context(new Locale("es", "EC"));
+        context.setVariable("participants", participants);
+        context.setVariable("date", LocalDate.now());
+        context.setVariable("product", product);
+        context.setVariable("training", training);
+
+        return templateEngine.process(
+                "templates/contracts-template",
                 context
         );
     }

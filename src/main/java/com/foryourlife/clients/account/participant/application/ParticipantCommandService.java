@@ -23,6 +23,7 @@ import com.foryourlife.clients.account.participantLevel.application.ParticipantL
 import com.foryourlife.clients.account.profileDetails.domain.ProfileDetailsRepository;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
 import org.slf4j.Logger;
@@ -239,14 +240,61 @@ public class ParticipantCommandService {
                 () -> new BaseException("Entrenamiento no encontrado", List.of("El entrenamiento con id " + trainingId + " no existe"))
         );
 
+        var participant = _participantRepository.findById(participantId)
+                .orElseThrow(() -> new BaseException("Participante no encontrado", List.of("El participante con id " + participantId + " no existe")));
+
         try {
             ITextRenderer renderer = new ITextRenderer();
-            renderer.setDocumentFromString(_participantRepository.getContract(participantId, product, training));
+            renderer.setDocumentFromString(_participantRepository.getContract(training, product, participant));
             renderer.layout();
             renderer.createPDF(pdf);
             return pdf;
         } catch (Exception e) {
             throw new BaseException("Error generating invoice", List.of(e.getMessage()));
+        }
+    }
+
+    public ByteArrayOutputStream getContractByTeam(String teamId) {
+
+        var team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BaseException(
+                        "Entrenamiento no encontrado",
+                        List.of("El entrenamiento con id " + teamId + " no existe")
+                ));
+
+        var product = productRepository
+                .findByCampusIdAndProductProgramAndHighPrice(
+                        team.getTraining().getCampus().getId(),
+                        CourseLevel.FOCUS
+                )
+                .orElseThrow(() -> new BaseException(
+                        "Producto no encontrado",
+                        List.of("No se encontró un producto asociado al entrenamiento")
+                ));
+
+        try {
+
+            String fullHtml = _participantRepository.getContractByTeam(
+                    team.getTraining(),
+                    product,
+                    team.getUsers()
+            );
+
+
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(fullHtml);
+            renderer.layout();
+
+            ByteArrayOutputStream pdf = new ByteArrayOutputStream();
+            renderer.createPDF(pdf);
+
+            return pdf;
+
+        } catch (Exception e) {
+            throw new BaseException(
+                    "Error generating contract PDF",
+                    List.of(e.getMessage())
+            );
         }
     }
 

@@ -276,68 +276,68 @@
 <div class="section-title">DATOS PERSONALES</div>
 <div class="form-row">
     <span class="label">Nombre Completo</span>
-    <span class="value-line" style="padding-left: 10px; padding-right: 10px" th:text="${participant.user.name}"></span>
+    <span class="value-line" style="padding-left: 10px; padding-right: 10px" th:text="${data.participant.user.name}"></span>
 </div>
 <div class="form-line two">
     <div class="label">Nombre por el que prefiero que me llamen</div>
     <div class="value-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
     <div class="label">Edad</div>
-    <div class="value-line" th:text="${participant.profile.age}"></div>
+    <div class="value-line" th:text="${data.participant.profile.age}"></div>
 </div>
 <div class="form-row">
     <span class="label">Dirección Completa</span>
     <span class="value-line" style="width:360px;"
-          th:text="${participant.profile.address}"></span>
+          th:text="${data.participant.profile.address}"></span>
 
     <span class="label" style="margin-left:12px;">Ciudad</span>
     <span class="value-line" style="width:100px;"
-          th:text="${participant.profile.city}"></span>
+          th:text="${data.participant.profile.city}"></span>
 </div>
 <div class="form-row">
     <span class="label">Número de cédula</span>
     <span class="value-line" style="width:160px;"
-          th:text="${participant.profile.dni}"></span>
+          th:text="${data.participant.profile.dni}"></span>
 
     <span class="label" style="margin-left:12px;">Teléfono</span>
     <span class="value-line" style="width:160px;"
-          th:text="${participant.user.phone}"></span>
+          th:text="${data.participant.user.phone}"></span>
 </div>
 <div class="form-row">
     <span class="label">E-mail</span>
     <span class="value-line" style="width:260px;"
-          th:text="${participant.user.email}"></span>
+          th:text="${data.participant.user.email}"></span>
 
     <span class="label" style="margin-left:12px;">Estado Civil</span>
     <span class="value-line" style="width:120px;"
-          th:text="${participant.profile.civilStatus}"></span>
+          th:text="${data.participant.profile.civilStatus}"></span>
 </div>
 <div class="form-row">
     <span class="label">Ocupación</span>
     <span class="value-line" style="width:420px;"
-          th:text="${participant.profile.occupation}"></span>
+          th:text="${data.participant.profile.occupation}"></span>
 </div>
 <div class="form-row">
     <span class="label">En caso de emergencia llamar a</span>
     <span class="value-line" style="width:260px;"
-          th:text="${contact != null
-                   ? contact.name : '-'}"></span>
+          th:text="${data.contact != null
+                   ? data.contact.name : '-'}"></span>
 
     <span class="label" style="margin-left:12px;">Teléfono</span>
     <span class="value-line" style="width:160px;"
-          th:text="${contact != null
-                   ? contact.phone : '-'}"></span>
+          th:text="${data.contact != null
+                   ? data.contact.phone : '-'}"></span>
 </div>
 <div class="form-row">
     <span class="label">Quién te invitó a Focus Your Life?</span>
     <span class="value-line" style="width:240px;"
-          th:text="${sender != null
-                   ? sender.name : '-'}"></span>
+          th:text="${data.sender != null
+                   ? data.sender.name : '-'}"></span>
 
     <span class="label" style="margin-left:12px;">Teléfono</span>
     <span class="value-line" style="width:160px;"
-          th:text="${sender != null
-                   ? sender.phone : '-'}"></span>
+          th:text="${data.sender != null
+                   ? data.sender.phone : '-'}"></span>
 </div>
 
 <div class="question">
@@ -346,8 +346,8 @@
     </div>
 
     <div class="question-options">
-        (SI)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.psychiatric_history_detail != 'N/A' ? '  X':''}"></span>
-        (NO)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.psychiatric_history_detail == 'N/A' ? '  X':''}"></span>
+        (SI)<span class="check-line" th:text="${data.medicalRecord != null && data.medicalRecord.psychiatric_history_detail != 'N/A' ? '  X':''}"></span>
+        (NO)<span class="check-line" th:text="${data.medicalRecord != null && data.medicalRecord.psychiatric_history_detail == 'N/A' ? '  X':''}"></span>
         ¿Cuál?<span class="answer-line"></span>
     </div>
 </div>
@@ -358,8 +358,8 @@
     </div>
 
     <div class="question-options">
-        (SI)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.medical_history_detail != 'N/A' ? '  X':''}"></span>
-        (NO)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.medical_history_detail == 'N/A' ? '  X':''}"></span>
+        (SI)<span class="check-line" th:text="${data.medicalRecord != null && data.medicalRecord.medical_history_detail != 'N/A' ? '  X':''}"></span>
+        (NO)<span class="check-line" th:text="${data.medicalRecord != null && data.medicalRecord.medical_history_detail == 'N/A' ? '  X':''}"></span>
         ¿Cuál?<span class="answer-line"></span>
     </div>
 </div>
@@ -370,9 +370,9 @@
     </div>
 
     <div class="question-options">
-        (SI)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.medication_history_detail != 'N/A' ? '  X':''}"></span>
-        (NO)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.medication_history_detail == 'N/A' ? '  X':''}"></span>
-        ¿Cuál?<span class="answer-line" th:text="${medicalRecord != null ? medicalRecord.medication_history_detail :'N/A'}"></span>
+        (SI)<span class="check-line" th:text="${data.medicalRecord != null && data.medicalRecord.medication_history_detail != 'N/A' ? '  X':''}"></span>
+        (NO)<span class="check-line" th:text="${data.medicalRecord != null && data.medicalRecord.medication_history_detail == 'N/A' ? '  X':''}"></span>
+        ¿Cuál?<span class="answer-line" th:text="${data.medicalRecord != null ? data.medicalRecord.medication_history_detail :'N/A'}"></span>
     </div>
 </div>
 
@@ -380,25 +380,25 @@
     <tr>
         <td class="black-box"><span>FOCUS</span></td>
         <td>Método de pago:</td>
-        <td class="line" style="width: 150px"><span th:text="${paymentHistory != null && payment.getPaymentshistory().size() > 2 ? 'Multipago': paymentHistory.getPaymentMethod().type}"></span></td>
+        <td class="line" style="width: 150px"><span th:text="${data.paymentHistory != null && data.payment.getPaymentshistory().size() > 2 ? 'Multipago': data.paymentHistory.getPaymentMethod().type}"></span></td>
         <td>Fecha de pago:</td>
-        <td class="line" style="width: 150px"><span th:text="${payment != null ?  #temporals.format(payment.getCreatedDate(), 'dd/MM/yyyy'): 'N/A'}"></span></td>
+        <td class="line" style="width: 150px"><span th:text="${data.payment != null ?  #temporals.format(data.payment.getCreatedDate(), 'dd/MM/yyyy'): 'N/A'}"></span></td>
     </tr>
 
     <tr>
         <td></td>
         <td>Tarjeta:</td>
-        <td class="line" style="width: 150px"><span th:text="${payment != null ? '': ''}"></span></td>
+        <td class="line" style="width: 150px"><span th:text="${data.payment != null ? '': ''}"></span></td>
         <td>Monto:</td>
-        <td class="line" style="width: 150px"><span th:text="${payment != null ? payment.getTotal(): ''}"></span></td>
+        <td class="line" style="width: 150px"><span th:text="${data.payment != null ? data.payment.getTotal(): ''}"></span></td>
     </tr>
 
     <tr>
         <td></td>
         <td>Plazo:</td>
-        <td class="line" style="width: 150px"><span th:text="${payment != null ? '': ''}"></span></td>
+        <td class="line" style="width: 150px"><span th:text="${data.payment != null ? '': ''}"></span></td>
         <td>No. Autorización:</td>
-        <td class="line" style="width: 150px"><span th:text="${payment != null && payment.getInvoice() != null && payment.getInvoice().size() > 0 ? payment.getInvoice().getFirst().invoiceContifico.documento: 'N/A'}"></span></td>
+        <td class="line" style="width: 150px"><span th:text="${data.payment != null && data.payment.getInvoice() != null && data.payment.getInvoice().size() > 0 ? data.payment.getInvoice().getFirst().invoiceContifico.documento: 'N/A'}"></span></td>
     </tr>
 </table>
 <div class="signature-section">
@@ -424,8 +424,8 @@
             </td>
 
             <td>
-                <span th:text="${payment != null
-                   ? payment.getTotal() : product.getBasePrice()}">$160</span>
+                <span th:text="${data.payment != null
+                   ? data.payment.getTotal() : product.getBasePrice()}">$160</span>
                 <div class="signature-line margin-top-0">
                 </div>
                 <div class="signature-label"> Precio</div>
@@ -442,8 +442,8 @@
             </td>
 
             <td>
-                  <span th:text="${trainingSender != null
-                   ? trainingSender.trainingName : ''}"></span>
+                  <span th:text="${data.trainingSender != null
+                   ? data.trainingSender.trainingName : ''}"></span>
                 <div class="signature-line margin-top-0">
 
                 </div>
@@ -565,7 +565,7 @@
     por su Gerente General el señor <strong>Diego Coronel López</strong>, al que para
     efectos de este contrato se la denominará la
     <strong>“Contratista”</strong> o la <strong>“Compañía”</strong>;
-    y, por otra parte, el <strong>Sr. <span th:text="${participant.getUser().getName()}"></span></strong>,
+    y, por otra parte, el <strong>Sr. <span th:text="${data.participant.getUser().getName()}"></span></strong>,
     por sus propios derechos, al que para efectos de este contrato se le denominará
     el <strong>“Contratante”</strong>. En lo posterior los comparecientes podrán denominarse simplemente las<strong>“PARTES”</strong>.
     <div class="clause-title">PRIMERA. - ANTECEDENTES:</div>
@@ -858,11 +858,11 @@
     en constancia de su plena aceptación y conocimiento a lo aquí establecido, suscriben el presente contrato, en
     dos
     ejemplares de igual tenor y valor, en esta ciudad de <span
-        th:text="${participant.getCampus().getCity()}"></span>, a
+        th:text="${training.getCampus().getCity()}"></span>, a
     los <span th:text="${training.startDate.getDayOfMonth()}"></span> días del mes de <span
         th:text="${#temporals.format(training.startDate, 'MMMM')}"></span>
     de <span
-        th:text="${participant.getCreatedDate().getYear()}"></span>.
+        th:text="${training.getStartDate().getYear()}"></span>.
 </div>
 <table style="width:100%; margin-top:100px; table-layout:fixed;">
     <tr>
@@ -887,7 +887,7 @@
                 white-space:normal;
                 line-height:1.2;
             ">
-                Sr/a. <span th:text="${participant.user.name}"></span>
+                Sr/a. <span th:text="${data.participant.user.name}"></span>
             </div>
         </td>
 
@@ -898,7 +898,7 @@
 
     <tr>
         <td style="text-align:center;">
-            C.C. <span th:text="${participant.profile.dni}"></span>
+            C.C. <span th:text="${data.participant.profile.dni}"></span>
         </td>
         <td style="text-align:center;">
             Gerente General

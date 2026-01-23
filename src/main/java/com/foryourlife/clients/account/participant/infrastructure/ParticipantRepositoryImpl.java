@@ -8,6 +8,7 @@ import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
 import com.foryourlife.clients.account.participant.domain.LoginResponse;
+import com.foryourlife.clients.account.participant.domain.ParticipantContractData;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.JWTUtils;
@@ -135,7 +136,6 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
     @Override
     public String getContract(Training training, Product product, Participant participant)
             throws IOException {
-
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode(TemplateMode.HTML);
@@ -143,38 +143,20 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
 
-        var payment = paymentRepository.findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(participant.getId(), PaymentStatus.COMPLETED).orElse(null);
+        var data = buildParticipantContractData(participant);
 
-        var contact = participant.getContacts() != null && !participant.getContacts().isEmpty()
-                ? participant.getContacts().getFirst()
-                : null;
-        var medicalRecord = participant.getMedicalRecord() != null
-                ? participant.getMedicalRecord()
-                : null;
-        var invitation = invitationRepository.findByToken(participant.getInvitationToken()).orElse(null);
-        var sender = invitation != null ? invitation.getEnrolled() : null;
-        var user = sender != null ?
-                userRepository.findById(sender.getId()).orElse(null) : null;
-        var paymentHistory = payment != null && payment.getPaymentshistory()!= null && !payment.getPaymentshistory().isEmpty()
-                ? payment.getPaymentshistory().getFirst()
-                : null;
         Context context = new Context(new Locale("es", "EC"));
-        context.setVariable("contact", contact);
-        context.setVariable("trainingSender", sender);
-        context.setVariable("sender", user);
-        context.setVariable("payment", payment);
-        context.setVariable("paymentHistory", paymentHistory);
-        context.setVariable("participant", participant);
+        context.setVariable("data", data);
         context.setVariable("date", LocalDate.now());
         context.setVariable("product", product);
         context.setVariable("training", training);
-        context.setVariable("medicalRecord", medicalRecord);
 
         return templateEngine.process(
                 "templates/contract-template",
                 context
         );
     }
+
 
     @Override
     public String getContractByTeam(Training training, Product product, List<Participant> participants) throws IOException {
@@ -186,8 +168,12 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
 
+        List<ParticipantContractData> contracts = participants.stream()
+                .map(this::buildParticipantContractData)
+                .toList();
+
         Context context = new Context(new Locale("es", "EC"));
-        context.setVariable("participants", participants);
+        context.setVariable("contracts", contracts);
         context.setVariable("date", LocalDate.now());
         context.setVariable("product", product);
         context.setVariable("training", training);
@@ -196,6 +182,49 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
                 "templates/contracts-template",
                 context
         );
+    }
+
+    private ParticipantContractData buildParticipantContractData(Participant participant) {
+
+        var payment = paymentRepository
+                .findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(
+                        participant.getId(),
+                        PaymentStatus.COMPLETED
+                )
+                .orElse(null);
+
+        var contact = participant.getContacts() != null && !participant.getContacts().isEmpty()
+                ? participant.getContacts().getFirst()
+                : null;
+
+        var medicalRecord = participant.getMedicalRecord();
+
+        var invitation = invitationRepository
+                .findByToken(participant.getInvitationToken())
+                .orElse(null);
+
+        var trainingSender = invitation != null ? invitation.getEnrolled() : null;
+
+        var sender = trainingSender != null
+                ? userRepository.findById(trainingSender.getId()).orElse(null)
+                : null;
+
+        var paymentHistory = payment != null
+                && payment.getPaymentshistory() != null
+                && !payment.getPaymentshistory().isEmpty()
+                ? payment.getPaymentshistory().getFirst()
+                : null;
+
+        ParticipantContractData data = new ParticipantContractData();
+        data.setParticipant(participant);
+        data.setContact(contact);
+        data.setMedicalRecord(medicalRecord);
+        data.setPayment(payment);
+        data.setPaymentHistory(paymentHistory);
+        data.setSender(sender);
+        data.setTrainingSender(trainingSender);
+
+        return data;
     }
 
     @Override

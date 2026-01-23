@@ -258,7 +258,7 @@
 </head>
 
 <body>
-<div th:each="participant : ${participants}">
+<div th:each="data : ${contracts}">
     <div class="header">
         <table>
             <tr>
@@ -273,68 +273,69 @@
     <div class="section-title">DATOS PERSONALES</div>
     <div class="form-row">
         <span class="label">Nombre Completo</span>
-        <span class="value-line" style="padding-left: 10px; padding-right: 10px" th:text="${participant.user.name}"></span>
+        <span class="value-line" style="padding-left: 10px; padding-right: 10px"
+              th:text="${data.participant.user.name}"></span>
     </div>
     <div class="form-line two">
         <div class="label">Nombre por el que prefiero que me llamen</div>
         <div class="value-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
         <div class="label">Edad</div>
-        <div class="value-line" th:text="${participant.profile.age}"></div>
+        <div class="value-line" th:text="${data.participant.profile.age}"></div>
     </div>
     <div class="form-row">
         <span class="label">Dirección Completa</span>
         <span class="value-line" style="width:360px;"
-              th:text="${participant.profile.address}"></span>
+              th:text="${data.participant.profile.address}"></span>
 
         <span class="label" style="margin-left:12px;">Ciudad</span>
         <span class="value-line" style="width:100px;"
-              th:text="${participant.profile.city}"></span>
+              th:text="${data.participant.profile.city}"></span>
     </div>
     <div class="form-row">
         <span class="label">Número de cédula</span>
         <span class="value-line" style="width:160px;"
-              th:text="${participant.profile.dni}"></span>
+              th:text="${data.participant.profile.dni}"></span>
 
         <span class="label" style="margin-left:12px;">Teléfono</span>
         <span class="value-line" style="width:160px;"
-              th:text="${participant.user.phone}"></span>
+              th:text="${data.participant.user.phone}"></span>
     </div>
     <div class="form-row">
         <span class="label">E-mail</span>
         <span class="value-line" style="width:260px;"
-              th:text="${participant.user.email}"></span>
+              th:text="${data.participant.user.email}"></span>
 
         <span class="label" style="margin-left:12px;">Estado Civil</span>
         <span class="value-line" style="width:120px;"
-              th:text="${participant.profile.civilStatus}"></span>
+              th:text="${data.participant.profile.civilStatus}"></span>
     </div>
     <div class="form-row">
         <span class="label">Ocupación</span>
         <span class="value-line" style="width:420px;"
-              th:text="${participant.profile.occupation}"></span>
+              th:text="${data.participant.profile.occupation}"></span>
     </div>
     <div class="form-row">
         <span class="label">En caso de emergencia llamar a</span>
         <span class="value-line" style="width:260px;"
-              th:text="${participant.contacts != null and !#lists.isEmpty(participant.contacts)
-                   ? participant.contacts[0].name : '-'}"></span>
+              th:text="${data.contact != null
+                   ? data.contact.name : '-'}"></span>
 
         <span class="label" style="margin-left:12px;">Teléfono</span>
         <span class="value-line" style="width:160px;"
-              th:text="${participant.contacts != null and !#lists.isEmpty(participant.contacts)
-                   ? participant.contacts[0].phone : '-'}"></span>
+              th:text="${data.contact != null
+                   ? data.contact.phone : '-'}"></span>
     </div>
     <div class="form-row">
         <span class="label">Quién te invitó a Focus Your Life?</span>
         <span class="value-line" style="width:240px;"
-              th:text="${participant.invitation != null and participant.invitation.enrolled != null
-                   ? participant.invitation.enrolled.name : '-'}"></span>
+              th:text="${data.sender != null
+                   ? data.sender.name : '-'}"></span>
 
         <span class="label" style="margin-left:12px;">Teléfono</span>
         <span class="value-line" style="width:160px;"
-              th:text="${participant.invitation != null and participant.invitation.enrolled != null
-                   ? participant.invitation.enrolled.contact : '-'}"></span>
+              th:text="${data.sender != null
+                   ? data.sender.phone : '-'}"></span>
     </div>
 
     <div class="question">
@@ -343,8 +344,10 @@
         </div>
 
         <div class="question-options">
-            (SI)<span class="check-line"></span>
-            (NO)<span class="check-line"></span>
+            (SI)<span class="check-line"
+                      th:text="${data.medicalRecord != null && data.medicalRecord.psychiatric_history_detail != 'N/A' ? '  X':''}"></span>
+            (NO)<span class="check-line"
+                      th:text="${data.medicalRecord != null && data.medicalRecord.psychiatric_history_detail == 'N/A' ? '  X':''}"></span>
             ¿Cuál?<span class="answer-line"></span>
         </div>
     </div>
@@ -355,8 +358,10 @@
         </div>
 
         <div class="question-options">
-            (SI)<span class="check-line"></span>
-            (NO)<span class="check-line"></span>
+            (SI)<span class="check-line"
+                      th:text="${data.medicalRecord != null && data.medicalRecord.medical_history_detail != 'N/A' ? '  X':''}"></span>
+            (NO)<span class="check-line"
+                      th:text="${data.medicalRecord != null && data.medicalRecord.medical_history_detail == 'N/A' ? '  X':''}"></span>
             ¿Cuál?<span class="answer-line"></span>
         </div>
     </div>
@@ -367,9 +372,12 @@
         </div>
 
         <div class="question-options">
-            (SI)<span class="check-line"></span>
-            (NO)<span class="check-line"></span>
-            ¿Cuál?<span class="answer-line"></span>
+            (SI)<span class="check-line"
+                      th:text="${data.medicalRecord != null && data.medicalRecord.medication_history_detail != 'N/A' ? '  X':''}"></span>
+            (NO)<span class="check-line"
+                      th:text="${data.medicalRecord != null && data.medicalRecord.medication_history_detail == 'N/A' ? '  X':''}"></span>
+            ¿Cuál?<span class="answer-line"
+                        th:text="${data.medicalRecord != null ? data.medicalRecord.medication_history_detail :'N/A'}"></span>
         </div>
     </div>
 
@@ -377,25 +385,39 @@
         <tr>
             <td class="black-box"><span>FOCUS</span></td>
             <td>Método de pago:</td>
-            <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td class="line" style="width: 150px"><span th:text="
+                    ${data.payment != null
+                      and data.payment.paymentshistory != null
+                      and data.payment.paymentshistory.size() > 2}
+                      ? 'Multipago'
+                      : (${data.paymentHistory != null
+                          and data.paymentHistory.paymentMethod != null}
+                          ? data.paymentHistory.paymentMethod.type
+          : '')"></span>
+            </td>
             <td>Fecha de pago:</td>
-            <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td class="line" style="width: 150px"><span
+                    th:text="${data.payment != null ?  #temporals.format(data.payment.getCreatedDate(), 'dd/MM/yyyy'): ''}"></span>
+            </td>
         </tr>
 
         <tr>
             <td></td>
             <td>Tarjeta:</td>
-            <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td class="line" style="width: 150px"><span th:text="${data.payment != null ? '': ''}"></span></td>
             <td>Monto:</td>
-            <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td class="line" style="width: 150px"><span
+                    th:text="${data.payment != null ? data.payment.getTotal(): ''}"></span></td>
         </tr>
 
         <tr>
             <td></td>
             <td>Plazo:</td>
-            <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td class="line" style="width: 150px"><span th:text="${data.payment != null ? '': ''}"></span></td>
             <td>No. Autorización:</td>
-            <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td class="line" style="width: 150px"><span
+                    th:text="${data.payment != null && data.payment.getInvoice() != null && data.payment.getInvoice().size() > 0 ? data.payment.getInvoice().getFirst().invoiceContifico.documento: ''}"></span>
+            </td>
         </tr>
     </table>
     <div class="signature-section">
@@ -421,7 +443,10 @@
                 </td>
 
                 <td>
-                    <div class="signature-line"></div>
+                <span th:text="${data.payment != null
+                   ? data.payment.getTotal() : product.getBasePrice()}">$160</span>
+                    <div class="signature-line margin-top-0">
+                    </div>
                     <div class="signature-label"> Precio</div>
                 </td>
 
@@ -436,7 +461,11 @@
                 </td>
 
                 <td>
-                    <div class="signature-line"></div>
+                  <span th:text="${data.trainingSender != null
+                   ? data.trainingSender.trainingName : ''}"></span>
+                    <div class="signature-line margin-top-0">
+
+                    </div>
                     <div class="signature-label"> Equipo</div>
                 </td>
             </tr>
@@ -555,7 +584,7 @@
         por su Gerente General el señor <strong>Diego Coronel López</strong>, al que para
         efectos de este contrato se la denominará la
         <strong>“Contratista”</strong> o la <strong>“Compañía”</strong>;
-        y, por otra parte, el <strong>Sr. <span th:text="${participant.getUser().getName()}"></span></strong>,
+        y, por otra parte, el <strong>Sr. <span th:text="${data.participant.getUser().getName()}"></span></strong>,
         por sus propios derechos, al que para efectos de este contrato se le denominará
         el <strong>“Contratante”</strong>. En lo posterior los comparecientes podrán denominarse simplemente las<strong>“PARTES”</strong>.
         <div class="clause-title">PRIMERA. - ANTECEDENTES:</div>
@@ -568,7 +597,8 @@
         y experienciales, de entrenamientos de vida y empresariales, de liderazgo
         personal y corporativo;<strong>1.2.-</strong> El Contratante es una persona legalmente capaz para contratar y
         obligarse por sus propios y
-        personales derechos que declara conocer los servicios que ofrece la Contratista.<strong>1.3.-</strong> Por lo antes
+        personales derechos que declara conocer los servicios que ofrece la Contratista.<strong>1.3.-</strong> Por lo
+        antes
         señalado el Contratante contrata los servicios de la Contratista y acuerdan en
         suscribir el presente contrato.
         <div class="clause-title">SEGUNDA. - OBJETO:</div>
@@ -578,8 +608,10 @@
         técnicas vivenciales para la aplicación de distinciones ontológicas, el mismo
         que se encuentra dividido en tres etapas consecutivas:<strong>1)</strong> 1era Etapa denominada
         <strong>FOCUS</strong> el cual es la introducción a varias distinciones
-        que permiten ampliar el estado de conciencia personal;<strong>2)</strong> 2da Etapa denominada <strong>YOUR</strong>
-        que profundiza las distinciones introductorias;<strong>3)</strong> 3ra Etapa <strong>LIFE</strong> 3) 3ra Etapa LIFE
+        que permiten ampliar el estado de conciencia personal;<strong>2)</strong> 2da Etapa denominada
+        <strong>YOUR</strong>
+        que profundiza las distinciones introductorias;<strong>3)</strong> 3ra Etapa <strong>LIFE</strong> 3) 3ra Etapa
+        LIFE
         la misma que se subdivide en tres fines de
         semana de acuerdo al calendario que se otorga al Contratante el cual desarrolla actividades complementarias y un
         cuarto fin de semana al cual se accede luego de cumplir con todos los parámetros establecidos mediante
@@ -619,7 +651,15 @@
         valor de $<span
             th:text="${product.getBasePrice()}"></span> Dólares Americanos que podrán ser
         cancelados por el Contratante de la siguiente manera:
-        1) Mediante pago en efectivo, depósito o transferencia a la cuenta de ahorros No 2212187625 del Banco Pichincha
+        1) Mediante pago en efectivo, depósito o transferencia a la cuenta de ahorros No <span th:if="${training.campus.city == 'Quito'}">
+    2212187651</span>
+
+        <span th:if="${training.campus.city == 'Cuenca'}">
+        2212187625
+    </span>
+        <span th:if="${training.campus.city == 'Guayaquil'}">
+            2212187651
+    </span> del Banco Pichincha
         a
         nombre de la Empresa <span th:if="${training.campus.city == 'Quito'}">
     Impetus S.A.S</span>
@@ -808,18 +848,21 @@
         los
         entrenamientos, actividades, dinámicas o eventos organizados por la Compañía, a través de fotografías,
         grabaciones
-        de video o audio. Dicha autorización se otorga para fines institucionales, educativos, promocionales, publicitarios
+        de video o audio. Dicha autorización se otorga para fines institucionales, educativos, promocionales,
+        publicitarios
         y de
         comunicación,
         y podrá ser utilizada en medios físicos o digitales, redes sociales, material audiovisual, plataformas web y
-        cualquier otro canal de difusión que la Compañía considere pertinente, sin limitación territorial ni temporal. El
+        cualquier otro canal de difusión que la Compañía considere pertinente, sin limitación territorial ni temporal.
+        El
         Contratante declara que esta autorización no genera derecho a compensación económica alguna y libera a la
         Compañía de cualquier reclamo presente o futuro relacionado con el uso legítimo de su imagen, siempre que no se
         afecte su honra o dignidad.
         <div class="clause-title">
             DÉCIMA QUINTA. - SOLUCIÓN DE CONTROVERSIAS:
         </div>
-        Las Partes renuncian a fuero y domicilio y lo fijan en la ciudad de <span th:text="${training.campus.city}"></span>.
+        Las Partes renuncian a fuero y domicilio y lo fijan en la ciudad de <span
+            th:text="${training.campus.city}"></span>.
         En
         todo lo no previsto en este
         contrato
@@ -830,7 +873,8 @@
         resolución
         del conflicto las partes se someten al procedimiento Arbitral y al Tribunal de Arbitraje de la Cámara de
         Comercio
-        Ecuatoriano Americana, ubicada en <span th:text="${training.campus.city}"></span>, el mismo que decidirá en derecho,
+        Ecuatoriano Americana, ubicada en <span th:text="${training.campus.city}"></span>, el mismo que decidirá en
+        derecho,
         cuyo procedimiento será de carácter
         confidencial, y para la ejecución de las medidas cautelares las partes podrán recurrir, en forma directa, a los
         jueces ordinarios o a los árbitros quienes podrán solicitar auxilio a funcionarios públicos, judiciales,
@@ -848,11 +892,11 @@
         en constancia de su plena aceptación y conocimiento a lo aquí establecido, suscriben el presente contrato, en
         dos
         ejemplares de igual tenor y valor, en esta ciudad de <span
-            th:text="${participant.getCampus().getCity()}"></span>, a
-        los <span th:text="${participant.getCreatedDate().getDayOfMonth()}"></span> días del mes de <span
-            th:text="${#temporals.format(date, 'MMMM')}"></span>
+            th:text="${training.getCampus().getCity()}"></span>, a
+        los <span th:text="${training.startDate.getDayOfMonth()}"></span> días del mes de <span
+            th:text="${#temporals.format(training.startDate, 'MMMM')}"></span>
         de <span
-            th:text="${participant.getCreatedDate().getYear()}"></span>.
+            th:text="${training.getStartDate().getYear()}"></span>.
     </div>
     <table style="width:100%; margin-top:100px; table-layout:fixed;">
         <tr>
@@ -877,7 +921,7 @@
                 white-space:normal;
                 line-height:1.2;
             ">
-                    Sr/a. <span th:text="${participant.user.name}"></span>
+                    Sr/a. <span th:text="${data.participant.user.name}"></span>
                 </div>
             </td>
 
@@ -888,7 +932,7 @@
 
         <tr>
             <td style="text-align:center;">
-                C.C. <span th:text="${participant.profile.dni}"></span>
+                C.C. <span th:text="${data.participant.profile.dni}"></span>
             </td>
             <td style="text-align:center;">
                 Gerente General
@@ -910,7 +954,6 @@
             </td>
         </tr>
     </table>
-    <div class="page-break"></div>
 </div>
 </body>
 </html>

@@ -288,7 +288,7 @@
 
     <span class="label" style="margin-left:12px;">Ciudad</span>
     <span class="value-line" style="width:100px;"
-          th:text="${participant.campus.city}"></span>
+          th:text="${participant.profile.city}"></span>
 </div>
 <div class="form-row">
     <span class="label">Número de cédula</span>
@@ -711,7 +711,7 @@ electrónica al correo previamente registrado por el Contratante.
 </div>
 
 <strong>
-    La Contratista prestara sus servicios, objeto de este contrato, en la ciudad de Cuenca.
+    La Contratista prestara sus servicios, objeto de este contrato, en la ciudad de <span th:text="${training.campus.city}"></span>.
 </strong>
 
 <div class="clause-title">
@@ -877,15 +877,15 @@ afecte su honra o dignidad.
 <div class="clause-title">
     DÉCIMA QUINTA. - SOLUCIÓN DE CONTROVERSIAS:
 </div>
-Las Partes renuncian a fuero y domicilio y lo fijan en la ciudad de Quito. En todo lo no previsto en este
+Las Partes renuncian a fuero y domicilio y lo fijan en la ciudad de <span th:text="${training.campus.city}"></span>. En todo lo no previsto en este
 contrato
 se aplicarán las leyes de la República del Ecuador.
 Toda controversia, o diferencia derivada de este contrato y de su ejecución, interpretación o liquidación, se
-someterá ante un mediador de la Cámara de Comercio Ecuatoriano Americana, ubicada en Quito. A falta de
+someterá ante un mediador de la Cámara de Comercio Ecuatoriano Americana, ubicada en <span th:text="${training.campus.city}"></span>. A falta de
 resolución
 del conflicto las partes se someten al procedimiento Arbitral y al Tribunal de Arbitraje de la Cámara de
 Comercio
-Ecuatoriano Americana, ubicada en Quito, el mismo que decidirá en derecho, cuyo procedimiento será de carácter
+Ecuatoriano Americana, ubicada en <span th:text="${training.campus.city}"></span>, el mismo que decidirá en derecho, cuyo procedimiento será de carácter
 confidencial, y para la ejecución de las medidas cautelares las partes podrán recurrir, en forma directa, a los
 jueces ordinarios o a los árbitros quienes podrán solicitar auxilio a funcionarios públicos, judiciales,
 policiales

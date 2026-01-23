@@ -72,7 +72,7 @@ public class CommandInvitationService {
         var user = adminFinderService.findById(id);
         var token = UUID.randomUUID().toString();
         var campus = campusService.findById(campusId);
-        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getId(), user.getName(), "Administrativo", user.getEmail()), 1, campus);
+        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getUser().getId(), user.getName(), "Administrativo", user.getEmail()), 1, campus);
         this.repository.save(invitation);
         return token;
     }
@@ -87,7 +87,7 @@ public class CommandInvitationService {
                 null,
                 true,
                 request.id,
-                new Sender(user.getId(), user.getName(), "Administrativo", user.getEmail()), Integer.parseInt(request.quantity)
+                new Sender(user.getUser().getId(), user.getName(), "Administrativo", user.getEmail()), Integer.parseInt(request.quantity)
                 , campus);
         this.repository.save(invitation);
         return token;

@@ -101,6 +101,10 @@
             font-size: 11pt;
         }
 
+        .margin-top-0 {
+            margin-top: 0px !important;
+        }
+
         .invoice-table {
             width: 100%;
             border-collapse: collapse;
@@ -316,24 +320,24 @@
 <div class="form-row">
     <span class="label">En caso de emergencia llamar a</span>
     <span class="value-line" style="width:260px;"
-          th:text="${participant.contacts != null and !#lists.isEmpty(participant.contacts)
-                   ? participant.contacts[0].name : '-'}"></span>
+          th:text="${contact != null
+                   ? contact.name : '-'}"></span>
 
     <span class="label" style="margin-left:12px;">Teléfono</span>
     <span class="value-line" style="width:160px;"
-          th:text="${participant.contacts != null and !#lists.isEmpty(participant.contacts)
-                   ? participant.contacts[0].phone : '-'}"></span>
+          th:text="${contact != null
+                   ? contact.phone : '-'}"></span>
 </div>
 <div class="form-row">
     <span class="label">Quién te invitó a Focus Your Life?</span>
     <span class="value-line" style="width:240px;"
-          th:text="${participant.invitation != null and participant.invitation.enrolled != null
-                   ? participant.invitation.enrolled.name : '-'}"></span>
+          th:text="${sender != null
+                   ? sender.name : '-'}"></span>
 
     <span class="label" style="margin-left:12px;">Teléfono</span>
     <span class="value-line" style="width:160px;"
-          th:text="${participant.invitation != null and participant.invitation.enrolled != null
-                   ? participant.invitation.enrolled.contact : '-'}"></span>
+          th:text="${sender != null
+                   ? sender.phone : '-'}"></span>
 </div>
 
 <div class="question">
@@ -342,8 +346,8 @@
     </div>
 
     <div class="question-options">
-        (SI)<span class="check-line"></span>
-        (NO)<span class="check-line"></span>
+        (SI)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.psychiatric_history_detail != 'N/A' ? '  X':''}"></span>
+        (NO)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.psychiatric_history_detail == 'N/A' ? '  X':''}"></span>
         ¿Cuál?<span class="answer-line"></span>
     </div>
 </div>
@@ -354,8 +358,8 @@
     </div>
 
     <div class="question-options">
-        (SI)<span class="check-line"></span>
-        (NO)<span class="check-line"></span>
+        (SI)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.medical_history_detail != 'N/A' ? '  X':''}"></span>
+        (NO)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.medical_history_detail == 'N/A' ? '  X':''}"></span>
         ¿Cuál?<span class="answer-line"></span>
     </div>
 </div>
@@ -366,9 +370,9 @@
     </div>
 
     <div class="question-options">
-        (SI)<span class="check-line"></span>
-        (NO)<span class="check-line"></span>
-        ¿Cuál?<span class="answer-line"></span>
+        (SI)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.medication_history_detail != 'N/A' ? '  X':''}"></span>
+        (NO)<span class="check-line" th:text="${medicalRecord != null && medicalRecord.medication_history_detail == 'N/A' ? '  X':''}"></span>
+        ¿Cuál?<span class="answer-line" th:text="${medicalRecord != null ? medicalRecord.medication_history_detail :'N/A'}"></span>
     </div>
 </div>
 
@@ -376,25 +380,25 @@
     <tr>
         <td class="black-box"><span>FOCUS</span></td>
         <td>Método de pago:</td>
-        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td class="line" style="width: 150px"><span th:text="${paymentHistory != null && payment.getPaymentshistory().size() > 2 ? 'Multipago': paymentHistory.getPaymentMethod().type}"></span></td>
         <td>Fecha de pago:</td>
-        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td class="line" style="width: 150px"><span th:text="${payment != null ?  #temporals.format(payment.getCreatedDate(), 'dd/MM/yyyy'): 'N/A'}"></span></td>
     </tr>
 
     <tr>
         <td></td>
         <td>Tarjeta:</td>
-        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td class="line" style="width: 150px"><span th:text="${payment != null ? '': ''}"></span></td>
         <td>Monto:</td>
-        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td class="line" style="width: 150px"><span th:text="${payment != null ? payment.getTotal(): ''}"></span></td>
     </tr>
 
     <tr>
         <td></td>
         <td>Plazo:</td>
-        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td class="line" style="width: 150px"><span th:text="${payment != null ? '': ''}"></span></td>
         <td>No. Autorización:</td>
-        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td class="line" style="width: 150px"><span th:text="${payment != null && payment.getInvoice() != null && payment.getInvoice().size() > 0 ? payment.getInvoice().getFirst().invoiceContifico.documento: 'N/A'}"></span></td>
     </tr>
 </table>
 <div class="signature-section">
@@ -420,7 +424,10 @@
             </td>
 
             <td>
-                <div class="signature-line"></div>
+                <span th:text="${payment != null
+                   ? payment.getTotal() : product.getBasePrice()}">$160</span>
+                <div class="signature-line margin-top-0">
+                </div>
                 <div class="signature-label"> Precio</div>
             </td>
 
@@ -435,7 +442,11 @@
             </td>
 
             <td>
-                <div class="signature-line"></div>
+                  <span th:text="${trainingSender != null
+                   ? trainingSender.trainingName : ''}"></span>
+                <div class="signature-line margin-top-0">
+
+                </div>
                 <div class="signature-label"> Equipo</div>
             </td>
         </tr>
@@ -848,8 +859,8 @@
     dos
     ejemplares de igual tenor y valor, en esta ciudad de <span
         th:text="${participant.getCampus().getCity()}"></span>, a
-    los <span th:text="${participant.getCreatedDate().getDayOfMonth()}"></span> días del mes de <span
-        th:text="${#temporals.format(date, 'MMMM')}"></span>
+    los <span th:text="${training.startDate.getDayOfMonth()}"></span> días del mes de <span
+        th:text="${#temporals.format(training.startDate, 'MMMM')}"></span>
     de <span
         th:text="${participant.getCreatedDate().getYear()}"></span>.
 </div>

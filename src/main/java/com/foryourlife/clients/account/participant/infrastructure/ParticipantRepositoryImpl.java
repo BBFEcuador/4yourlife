@@ -3,13 +3,17 @@ package com.foryourlife.clients.account.participant.infrastructure;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.admin.sales.product.domain.Product;
+import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
 import com.foryourlife.clients.account.participant.domain.LoginResponse;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.JWTUtils;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
@@ -42,14 +46,20 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
     private final JPAParticipantRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JWTUtils jwtUtils;
+    private final PaymentRepository paymentRepository;
+    private final UserRepository userRepository;
     private Participant loadUser;
+    private final InvitationRepository invitationRepository;
     private final JPACriteriaConverter<Participant> criteriaConverter;
 
-    public ParticipantRepositoryImpl(JPAParticipantRepository repository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils, JPACriteriaConverter<Participant> criteriaConverter) {
+    public ParticipantRepositoryImpl(JPAParticipantRepository repository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils, JPACriteriaConverter<Participant> criteriaConverter, PaymentRepository paymentRepository, InvitationRepository invitationRepository, UserRepository userRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.criteriaConverter = criteriaConverter;
+        this.paymentRepository = paymentRepository;
+        this.invitationRepository = invitationRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -133,11 +143,32 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
 
+        var payment = paymentRepository.findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(participant.getId(), PaymentStatus.COMPLETED).orElse(null);
+
+        var contact = participant.getContacts() != null && !participant.getContacts().isEmpty()
+                ? participant.getContacts().getFirst()
+                : null;
+        var medicalRecord = participant.getMedicalRecord() != null
+                ? participant.getMedicalRecord()
+                : null;
+        var invitation = invitationRepository.findByToken(participant.getInvitationToken()).orElse(null);
+        var sender = invitation != null ? invitation.getEnrolled() : null;
+        var user = sender != null ?
+                userRepository.findById(sender.getId()).orElse(null) : null;
+        var paymentHistory = payment != null && payment.getPaymentshistory()!= null && !payment.getPaymentshistory().isEmpty()
+                ? payment.getPaymentshistory().getFirst()
+                : null;
         Context context = new Context(new Locale("es", "EC"));
+        context.setVariable("contact", contact);
+        context.setVariable("trainingSender", sender);
+        context.setVariable("sender", user);
+        context.setVariable("payment", payment);
+        context.setVariable("paymentHistory", paymentHistory);
         context.setVariable("participant", participant);
         context.setVariable("date", LocalDate.now());
         context.setVariable("product", product);
         context.setVariable("training", training);
+        context.setVariable("medicalRecord", medicalRecord);
 
         return templateEngine.process(
                 "templates/contract-template",

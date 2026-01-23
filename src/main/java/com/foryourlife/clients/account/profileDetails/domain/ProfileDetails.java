@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.shared.domain.AggregateRoot;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Entity
@@ -72,4 +75,19 @@ public class ProfileDetails extends AggregateRoot {
     public String getCity() {
         return city;
     }
+
+    @JsonProperty(value = "age", access = JsonProperty.Access.READ_ONLY)
+    public Integer getAge() {
+        if (birthday == null || birthday.getValue() == null) {
+            return null;
+        }
+
+        LocalDate birthDate = birthday.getValue()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        return Period.between(birthDate, LocalDate.now()).getYears();
+    }
+
 }

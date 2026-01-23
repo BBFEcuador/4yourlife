@@ -42,12 +42,6 @@
             margin-left: 30px;
         }
 
-        .signature-table {
-            width: 100%;
-            margin-top: 50px;
-            text-align: center;
-        }
-
         .signature-cell {
             width: 50%;
         }
@@ -80,11 +74,6 @@
             margin-bottom: 5px;
         }
 
-        .line {
-            border-bottom: 1px solid #000;
-            height: 18px;
-        }
-
         table.form {
             width: 100%;
             border-collapse: collapse;
@@ -93,11 +82,6 @@
         table.form td {
             padding: 4px;
             vertical-align: bottom;
-        }
-
-        .label {
-            font-weight: bold;
-            white-space: nowrap;
         }
 
         .black-box {
@@ -111,10 +95,10 @@
 
         .signature-line {
             border-top: 1px solid #000;
-            margin-top: 25px;
+            margin-top: 19px;
             text-align: center;
             padding-top: 4px;
-            font-size: 9pt;
+            font-size: 11pt;
         }
 
         .invoice-table {
@@ -142,6 +126,133 @@
             padding: 6px;
         }
 
+        .signature-section {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+        }
+
+        .signature-table td {
+            padding: 6px;
+            text-align: center;
+            vertical-align: bottom;
+        }
+
+        /*.signature-line {*/
+        /*    border-top: 1px solid #000;*/
+        /*    height: 30px;*/
+        /*    margin-bottom: 4px;*/
+        /*}*/
+
+        .signature-label {
+            font-size: 9pt;
+            font-weight: bold;
+        }
+        .question {
+            margin-bottom: 12px;
+            font-size: 10.5pt;
+        }
+
+        .question-text {
+            margin-bottom: 4px;
+        }
+
+        .question-options {
+            white-space: nowrap;
+        }
+
+        .check-line {
+            display: inline-block;
+            width: 18px;
+            border-bottom: 1px solid #000;
+            margin: 0 6px;
+        }
+
+        .answer-line {
+            display: inline-block;
+            width: 260px;
+            border-bottom: 1px solid #000;
+            margin-left: 6px;
+        }
+
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: auto 1fr auto 120px;
+            column-gap: 8px;
+            row-gap: 6px;
+            font-size: 10.5pt;
+        }
+
+        .form-row {
+            display: contents;
+        }
+
+        .field {
+            display: inline-flex;
+            align-items: baseline;
+            width: 100%;
+        }
+
+        .value {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .line {
+            flex: 1;                      /* ⬅ la línea ocupa SOLO lo que falta */
+            border-bottom: 1px solid #000;
+            margin-left: 6px;
+            height: 1px;
+        }
+
+
+        .form-line {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            column-gap: 8px;
+            margin-bottom: 6px;
+            font-size: 10.5pt;
+        }
+
+        .form-line.two {
+            grid-template-columns: auto 1fr auto 120px;
+        }
+
+        .form-row {
+            width: 100%;
+            margin-bottom: 6px;
+            font-size: 10.5pt;
+            flex-grow: 1;
+        }
+
+        .label {
+            display: inline-block;
+            font-weight: bold;
+            white-space: nowrap;
+            margin-right: 6px;
+        }
+
+        .value-line {
+            display: inline-block;
+            width: calc(100% - 160px); /* ajustable */
+            border-bottom: 1px solid #000;
+            font-weight: bold;
+            min-height: 14px;
+        }
+
+        .form-line.two {
+            grid-template-columns: auto 1fr auto 120px;
+        }
+
+        .form-line.three {
+            grid-template-columns: auto 1fr auto 120px auto 120px;
+        }
     </style>
 </head>
 
@@ -159,183 +270,280 @@
 
 <!-- DATOS PERSONALES -->
 <div class="section-title">DATOS PERSONALES</div>
+<div class="form-row">
+    <span class="label">Nombre Completo</span>
+    <span class="value-line" style="padding-left: 10px; padding-right: 10px" th:text="${participant.user.name}"></span>
+</div>
+<div class="form-line two">
+    <div class="label">Nombre por el que prefiero que me llamen</div>
+    <div class="value-line">ALEXANDRA</div>
 
-<table class="form">
-    <tr>
-        <td class="label">Nombre Completo</td>
-        <td class="line" colspan="3"><span th:text="${participant.getUser().getName()}"></span></td>
-        <td class="label">Edad</td>
-        <td class="line"><span th:text="${participant.getProfile().getBirthday()}"></span></td>
-    </tr>
+    <div class="label">Edad</div>
+    <div class="value-line" th:text="${participant.profile.age}"></div>
+</div>
+<div class="form-row">
+    <span class="label">Dirección Completa</span>
+    <span class="value-line" style="width:360px;"
+          th:text="${participant.profile.address}"></span>
 
-    <tr>
-        <td class="label">Nombre por el que prefiero que me llamen</td>
-        <td class="line" colspan="3"></td>
-        <td class="label">Ciudad</td>
-        <td class="line"><span th:text="${participant.getCampus().getCity()}"></span></td>
-    </tr>
+    <span class="label" style="margin-left:12px;">Ciudad</span>
+    <span class="value-line" style="width:100px;"
+          th:text="${participant.campus.city}"></span>
+</div>
+<div class="form-row">
+    <span class="label">Número de cédula</span>
+    <span class="value-line" style="width:160px;"
+          th:text="${participant.profile.dni}"></span>
 
-    <tr>
-        <td class="label">Dirección Completa</td>
-        <td class="line" colspan="3"><span th:text="${participant.getProfile().getAddress()}"></span></td>
-        <td class="label">Teléfono</td>
-        <td class="line"><span th:text="${participant.getUser().getPhone()}"></span></td>
-    </tr>
+    <span class="label" style="margin-left:12px;">Teléfono</span>
+    <span class="value-line" style="width:160px;"
+          th:text="${participant.user.phone}"></span>
+</div>
+<div class="form-row">
+    <span class="label">E-mail</span>
+    <span class="value-line" style="width:260px;"
+          th:text="${participant.user.email}"></span>
 
-    <tr>
-        <td class="label">Número de cédula</td>
-        <td class="line"><span th:text="${participant.getProfile().getDni()}"></span></td>
-        <td class="label">E-mail</td>
-        <td class="line"><span th:text="${participant.getUser().getEmail()}"></span></td>
-        <td class="label">Estado Civil</td>
-        <td class="line"><span th:text="${participant.getProfile().getCivilStatus()}"></span></td>
-    </tr>
+    <span class="label" style="margin-left:12px;">Estado Civil</span>
+    <span class="value-line" style="width:120px;"
+          th:text="${participant.profile.civilStatus}"></span>
+</div>
+<div class="form-row">
+    <span class="label">Ocupación</span>
+    <span class="value-line" style="width:420px;"
+          th:text="${participant.profile.occupation}"></span>
+</div>
+<div class="form-row">
+    <span class="label">En caso de emergencia llamar a</span>
+    <span class="value-line" style="width:260px;"
+          th:text="${participant.contacts != null and !#lists.isEmpty(participant.contacts)
+                   ? participant.contacts[0].name : '-'}"></span>
 
-    <tr>
-        <td class="label">Ocupación</td>
-        <td class="line" colspan="5"><span th:text="${participant.getProfile().getOccupation()}"></span></td>
-    </tr>
+    <span class="label" style="margin-left:12px;">Teléfono</span>
+    <span class="value-line" style="width:160px;"
+          th:text="${participant.contacts != null and !#lists.isEmpty(participant.contacts)
+                   ? participant.contacts[0].phone : '-'}"></span>
+</div>
+<div class="form-row">
+    <span class="label">Quién te invitó a Focus Your Life?</span>
+    <span class="value-line" style="width:240px;"
+          th:text="${participant.invitation != null and participant.invitation.enrolled != null
+                   ? participant.invitation.enrolled.name : '-'}"></span>
 
-    <tr>
-        <td class="label">En caso de emergencia llamar a</td>
-
-        <td class="line" colspan="3">
-        <span th:if="${participant.contacts != null and !#lists.isEmpty(participant.contacts)}"
-              th:text="${participant.contacts[0].name}">
-        </span>
-            <span th:unless="${participant.contacts != null and !#lists.isEmpty(participant.contacts)}">
-            -
-        </span>
-        </td>
-
-        <td class="label">Teléfono</td>
-
-        <td class="line">
-        <span th:if="${participant.contacts != null and !#lists.isEmpty(participant.contacts)}"
-              th:text="${participant.contacts[0].phone}">
-        </span>
-            <span th:unless="${participant.contacts != null and !#lists.isEmpty(participant.contacts)}">
-            -
-        </span>
-        </td>
-    </tr>
-
-
-    <tr>
-        <td class="label">Quién te invitó a Focus Your Life?</td>
-
-        <td class="line" colspan="3">
-        <span th:if="${participant.invitation != null and participant.invitation.enrolled != null}"
-              th:text="${participant.invitation.enrolled.name}">
-        </span>
-            <span th:unless="${participant.invitation != null and participant.invitation.enrolled != null}">
-            -
-        </span>
-        </td>
-
-        <td class="label">Teléfono</td>
-
-        <td class="line">
-        <span th:if="${participant.invitation != null and participant.invitation.enrolled != null}"
-              th:text="${participant.invitation.enrolled.contact}">
-        </span>
-            <span th:unless="${participant.invitation != null and participant.invitation.enrolled != null}">
-            -
-        </span>
-        </td>
-    </tr>
-
-</table>
+    <span class="label" style="margin-left:12px;">Teléfono</span>
+    <span class="value-line" style="width:160px;"
+          th:text="${participant.invitation != null and participant.invitation.enrolled != null
+                   ? participant.invitation.enrolled.contact : '-'}"></span>
+</div>
 
 <!-- PREGUNTAS -->
-<p>¿Tienes algún antecedente personal de enfermedades psiquiátricas o estás bajo tratamiento actualmente?
-    (SI) (NO) X ¿Cuál?</p>
+<div class="question">
+    <div class="question-text">
+        ¿Tienes algún antecedente personal de enfermedades psiquiátricas o estás bajo tratamiento actualmente?
+    </div>
 
-<p>¿Tienes algún antecedente médico del cuál debamos tener conocimiento?
-    (SI) (NO) X ¿Cuál?</p>
+    <div class="question-options">
+        (SI)<span class="check-line"></span>
+        (NO)<span class="check-line"></span>
+        ¿Cuál?<span class="answer-line"></span>
+    </div>
+</div>
 
-<p>¿Tomas algún medicamento que altere tu conducta habitual?
-    (SI) (NO) X ¿Cuál?</p>
+<div class="question">
+    <div class="question-text">
+        ¿Tienes algún antecedente médico del cuál debamos tener conocimiento?
+    </div>
+
+    <div class="question-options">
+        (SI)<span class="check-line"></span>
+        (NO)<span class="check-line"></span>
+        ¿Cuál?<span class="answer-line"></span>
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-text">
+        ¿Tomas algún medicamento que altere tu conducta habitual?
+    </div>
+
+    <div class="question-options">
+        (SI)<span class="check-line"></span>
+        (NO)<span class="check-line"></span>
+        ¿Cuál?<span class="answer-line"></span>
+    </div>
+</div>
 
 <!-- FOCUS -->
 <table class="form" style="margin-top:20px;">
     <tr>
         <td class="black-box"><span>FOCUS</span></td>
         <td>Método de pago:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
         <td>Fecha de pago:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
     </tr>
 
     <tr>
         <td></td>
         <td>Tarjeta:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
         <td>Monto:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
     </tr>
 
     <tr>
         <td></td>
         <td>Plazo:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
         <td>No. Autorización:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
     </tr>
 </table>
+<div class="signature-section">
+    <table class="signature-table">
+        <!-- INFO DEL ENTRENAMIENTO -->
+        <tr>
+            <td colspan="4" style="text-align:left;">
+                <strong>
+                    <span th:text="${training.getStartDate().getDayOfMonth()}"></span> al <span th:text="${training.getEndDate().getDayOfMonth()}"> </span> de <span th:text="${#temporals.format(training.getEndDate(), 'MMMM')}"></span> / <span th:text="${training.getEndDate().getYear()}"></span>
+                </strong>
+
+            </td>
+            <td colspan="5" style="text-align:center;">
+                <strong><span th:text="${training.getName()}"></span></strong>
+            </td>
+        </tr>
+        <!-- LINEAS DE FIRMA -->
+        <tr>
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label">Fecha del entrenamiento</div>
+            </td>
+
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label"> Precio </div>
+            </td>
+
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label">Firma del participante</div>
+            </td>
+
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label">Firma de quien invita</div>
+            </td>
+
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label"> Equipo </div>
+            </td>
+        </tr>
+    </table>
+</div>
 <!-- YOUR -->
 <table class="form" style="margin-top:20px;">
     <tr>
         <td class="black-box"><span>YOUR</span></td>
         <td>Método de pago:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
         <td>Fecha de pago:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
     </tr>
 
     <tr>
         <td></td>
         <td>Tarjeta:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
         <td>Monto:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
     </tr>
 
     <tr>
         <td></td>
         <td>Plazo:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
         <td>No. Autorización:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
     </tr>
 </table>
+<div class="signature-section">
+    <table class="signature-table">
+        <!-- INFO DEL ENTRENAMIENTO -->
+        <tr>
+            <td colspan="5" style="text-align:left;">
+            </td>
+        </tr>
+        <!-- LINEAS DE FIRMA -->
+        <tr>
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label">Fecha del entrenamiento</div>
+            </td>
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label">Precio</div>
+            </td>
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label">Firma del participante</div>
+            </td>
+        </tr>
+    </table>
+</div>
 <!-- LIFE -->
 <table class="form" style="margin-top:20px;">
     <tr>
         <td class="black-box"><span>LIFE</span></td>
         <td>Método de pago:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
         <td>Fecha de pago:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
     </tr>
 
     <tr>
         <td></td>
         <td>Tarjeta:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
         <td>Monto:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
     </tr>
 
     <tr>
         <td></td>
         <td>Plazo:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
         <td>No. Autorización:</td>
-        <td class="line"></td>
+        <td class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
     </tr>
-</table>
 
+</table>
+<div class="signature-section">
+    <table class="signature-table">
+        <!-- INFO DEL ENTRENAMIENTO -->
+        <tr>
+            <td colspan="5" style="text-align:left;">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label">Fecha del entrenamiento</div>
+            </td>
+
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label">Precio</div>
+            </td>
+
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label">Firma del participante</div>
+            </td>
+        </tr>
+    </table>
+</div>
 <!--<table class="form" style="margin-top:10px;">-->
 <!--    <tr>-->
 <!--        <td class="line">28 al 30 de noviembre/2025</td>-->
@@ -350,47 +558,47 @@
 <!--</table>-->
 
 <!-- DATOS PARA FACTURA -->
-<table class="invoice-table">
-    <tr>
-        <th colspan="4" class="invoice-title">DATOS PARA LA FACTURA</th>
-    </tr>
-    <tr>
-        <th></th>
-        <th>FOCUS</th>
-        <th>YOUR</th>
-        <th>LIFE</th>
-    </tr>
-    <tr>
-        <td>Nombre:</td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>CC/RUC:</td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Dirección:</td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Correo Electrónico:</td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Teléfono:</td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-</table>
+<!--<table class="invoice-table">-->
+<!--    <tr>-->
+<!--        <th colspan="4" class="invoice-title">DATOS PARA LA FACTURA</th>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <th></th>-->
+<!--        <th>FOCUS</th>-->
+<!--        <th>YOUR</th>-->
+<!--        <th>LIFE</th>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td>Nombre:</td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td>CC/RUC:</td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td>Dirección:</td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td>Correo Electrónico:</td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td>Teléfono:</td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--        <td></td>-->
+<!--    </tr>-->
+<!--</table>-->
 
 <div class="page-break"></div>
 
@@ -643,7 +851,7 @@ contrato
 y de conformidad con las instrucciones impartidas por la Contratante.
 
 <div class="clause-title">
-    DÉCIMA  CUARTA.- AUTORIZACIÓN DE USO DE IMAGEN
+    DÉCIMA CUARTA.- AUTORIZACIÓN DE USO DE IMAGEN
 </div>
 
 El Contratante autoriza de manera expresa, libre, voluntaria y gratuita a <span

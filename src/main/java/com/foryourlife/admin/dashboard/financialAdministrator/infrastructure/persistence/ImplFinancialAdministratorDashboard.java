@@ -48,8 +48,8 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
         );
         var team = teamRepository.findByTrainingId(trainingId).orElseThrow(
                 () -> new BaseException(
-                        "Training not found",
-                        List.of("Training with id " + trainingId + " not found")
+                        "Equipo no encontrado",
+                        List.of("Team with training id " + trainingId + " not found")
                 )
         );
         Hibernate.initialize(team.getMasterLife());
@@ -70,8 +70,8 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
         List<Payment> payments = new ArrayList<>();
         training.getOriginalTeam().getUsers().forEach(participant ->
                 paymentRepository.findAllBetweenDates(
-                                training.getStartDate().atStartOfDay(),
-                                training.getNextLevel().getStartDate().atStartOfDay()
+                                training.getStartDate().atStartOfDay().minusWeeks(1),
+                                training.getStartDate().atStartOfDay()
                         ).stream()
                         .filter(payment -> payment.getParticipant() != null && payment.getParticipant().getId().equals(participant.getId()))
                         .forEach(payments::add)

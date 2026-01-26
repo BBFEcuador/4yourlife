@@ -212,7 +212,6 @@
             height: 1px;
         }
 
-
         .form-line {
             display: grid;
             grid-template-columns: auto 1fr;
@@ -258,7 +257,7 @@
 </head>
 
 <body>
-<div th:each="data : ${contracts}">
+<div th:each="data,iterStat : ${contracts}">
     <div class="header">
         <table>
             <tr>
@@ -269,8 +268,18 @@
             </tr>
         </table>
     </div>
-
-    <div class="section-title">DATOS PERSONALES</div>
+    <table>
+        <tr>
+            <td>
+                <div class="section-title">DATOS PERSONALES</div>
+            </td>
+            <td style="text-align:center; width: 75%;">
+                <div th:text="'-'+${iterStat.index+1}+'-'">
+                    -1-
+                </div>
+            </td>
+        </tr>
+    </table>
     <div class="form-row">
         <span class="label">Nombre Completo</span>
         <span class="value-line" style="padding-left: 10px; padding-right: 10px"

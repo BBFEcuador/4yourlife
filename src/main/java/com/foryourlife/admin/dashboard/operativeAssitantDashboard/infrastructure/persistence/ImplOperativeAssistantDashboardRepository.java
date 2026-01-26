@@ -530,7 +530,6 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
         }
     }
 
-
     public TrainingInfo buildOperativeAssistantDashboardSection(Training training, Team team) {
         var attendances = attendanceRepository.findAttendanceByTraining(training.getId());
         var teamT = training.getOriginalTeam() != null ? training.getOriginalTeam() : team;

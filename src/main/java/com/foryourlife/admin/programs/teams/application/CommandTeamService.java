@@ -40,7 +40,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class CommandTeamService {
@@ -64,7 +66,6 @@ public class CommandTeamService {
     private final ParticipantLevelRepository participantLevelRepository;
     private final PromiseCommandService promiseCommandService;
     private final TeamBadgePdfService teamBadgePdfService;
-
 
 
     public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, PromiseRepository promiseRepository, ParticipantLevelRepository participantLevelRepository, PromiseCommandService promiseCommandService, TrainingRepository trainingRepository, MasterLifeRepository masterLifeRepository, TeamBadgePdfService teamBadgePdfService) {
@@ -395,7 +396,7 @@ public class CommandTeamService {
 
         team.getStaffs().clear();
         _teamRepository.save(team);
-        assignParticipantLevelToUsers(team.getUsers(),training);
+        assignParticipantLevelToUsers(team.getUsers(), training);
         this.assignAttendancesAndDeclarations(team, team.getTraining());
     }
 
@@ -469,7 +470,7 @@ public class CommandTeamService {
         team.getMasterLife().clear();
 
         _teamRepository.save(team);
-        assignParticipantLevelToUsers(team.getUsers(),team.getTraining());
+        assignParticipantLevelToUsers(team.getUsers(), team.getTraining());
         this.assignAttendancesAndDeclarations(team, team.getTraining());
     }
 
@@ -532,7 +533,7 @@ public class CommandTeamService {
             team.getUsers().addAll(listParticipants);
         }
 
-        if (request.getStaffIds()  != null) {
+        if (request.getStaffIds() != null) {
             var listStaffs = request.getStaffIds().stream().map(staffId -> {
                 var staff = staffRepository.findById(staffId).orElseThrow(
                         () -> new BaseException("Staff not found", List.of(""))
@@ -650,13 +651,13 @@ public class CommandTeamService {
     }
 
 
-    private void addOriginalTeam(Team team){
+    private void addOriginalTeam(Team team) {
         team.setName(team.getName());
         team.getTraining().setOriginalTeam(team);
         trainingRepository.save(team.getTraining());
     }
 
-    public void  assignAttendancesAndDeclarations(Team team, Training training){
+    public void assignAttendancesAndDeclarations(Team team, Training training) {
         team.getUsers().forEach(user -> {
             switch (training.getCourseLevel()) {
                 case CourseLevel.FOCUS:
@@ -737,13 +738,14 @@ public class CommandTeamService {
 
     @Transactional
     public byte[] gafetes(String id) throws IOException {
-        var team = _teamRepository.findById(id).orElseThrow(() -> new BaseException("Error",List.of("Equipo no encontrado")));
+        var team = _teamRepository.findById(id)
+                .orElseThrow(() -> new BaseException("Error", List.of("Equipo no encontrado")));
 
         Hibernate.initialize(team.getUsers());
         Hibernate.initialize(team.getVisionaries());
         Hibernate.initialize(team.getStaffs());
         Hibernate.initialize(team.getMasterLife());
-        var bytes = teamBadgePdfService.generatePdf(team);
-        return bytes;
+
+        return teamBadgePdfService.generatePdf(team);
     }
 }

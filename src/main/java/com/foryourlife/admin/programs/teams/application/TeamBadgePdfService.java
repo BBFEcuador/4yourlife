@@ -1,5 +1,9 @@
 package com.foryourlife.admin.programs.teams.application;
 
+import com.foryourlife.admin.crm.call.domain.Call;
+import com.foryourlife.admin.crm.call.domain.CallRepository;
+import com.foryourlife.admin.crm.callLogs.domain.CallStatus;
+import com.foryourlife.admin.crm.callLogs.domain.CallType;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.masterLife.domain.MasterLife;
@@ -28,9 +32,18 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class TeamBadgePdfService {
+
+    private final CallRepository callsRepository;
+
+    public TeamBadgePdfService(CallRepository callsRepository) {
+        this.callsRepository = callsRepository;
+    }
+
     public byte[] generatePdf(Team team) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -50,17 +63,40 @@ public class TeamBadgePdfService {
         var visionary = team.getVisionaries().stream().map(Visionary::getUser).toList();
         var staff = team.getStaffs().stream().map(Staff::getUser).toList();
 
+        var calls = callsRepository.findAllByTrainingId(team.getTraining().getId());
+        Map<String, Call> callMap = calls.stream()
+                .collect(Collectors.toMap(
+                        call -> call.getCalledUser().getId(),
+                        call -> call,
+                        (c1, c2) -> c1
+                ));
+
         for (int i = 0; i < users.size(); i++) {
-            table.addCell(createBadge(users.get(i), i + 1, "PARTICIPANTES",new DeviceRgb(0,0,0)));
+
+            var user = users.get(i);
+            var userCall = callMap.get(user.getId());
+
+            if (userCall != null) {
+                boolean hasUnconfirmedLogs = userCall.getCallLogs().stream()
+                        .anyMatch(callLog -> callLog.getStatus() == CallStatus.CONFIRMED || callLog.getType() == CallType.LOGISTIC);
+                if (!hasUnconfirmedLogs) {
+                    continue;
+                }
+            }else{
+                continue;
+            }
+
+            table.addCell(createBadge(user, i + 1, "PARTICIPANTES", new DeviceRgb(0, 0, 0)));
         }
+
         for (int i = 0; i < visionary.size(); i++) {
-            table.addCell(createBadge(visionary.get(i), i + 1, "VISIONARIOS",new DeviceRgb(140,0,250)));
+            table.addCell(createBadge(visionary.get(i), i + 1, "VISIONARIOS", new DeviceRgb(140, 0, 250)));
         }
         for (int i = 0; i < staff.size(); i++) {
-            table.addCell(createBadge(staff.get(i), i + 1, "STAFF",new DeviceRgb(16,153,14)));
+            table.addCell(createBadge(staff.get(i), i + 1, "STAFF", new DeviceRgb(16, 153, 14)));
         }
         for (int i = 0; i < ml.size(); i++) {
-            table.addCell(createBadge(ml.get(i), i + 1, "MASTER LIFE",new DeviceRgb(173,95,0)));
+            table.addCell(createBadge(ml.get(i), i + 1, "MASTER LIFE", new DeviceRgb(173, 95, 0)));
         }
 
         document.add(table);
@@ -68,7 +104,8 @@ public class TeamBadgePdfService {
 
         return out.toByteArray();
     }
-    private Cell createBadge(User user, Integer number, String role,DeviceRgb roleColor) {
+
+    private Cell createBadge(User user, Integer number, String role, DeviceRgb roleColor) {
 
         // La celda EXTERIOR es invisible y tiene MARGIN para crear el espacio
         Cell outer = new Cell()
@@ -95,32 +132,33 @@ public class TeamBadgePdfService {
                     .setHorizontalAlignment(HorizontalAlignment.CENTER)
                     .setWidth(60);
             logoCell.add(logo);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         Cell lineCellTop = new Cell()
                 .setHeight(4)
-                .setPaddings(0F,8F,0F,8F)
+                .setPaddings(0F, 8F, 0F, 8F)
                 .setBorder(Border.NO_BORDER);
         lineCellTop.add(new LineSeparator(new SolidLine(0.6f)));
 
         // ===== NOMBRE =====
-        Cell nameCell = textCell(user.getName1().toUpperCase(), 38, true, 38,new DeviceRgb(0,0,0));
+        Cell nameCell = textCell(user.getName1().toUpperCase(), 38, true, 38, new DeviceRgb(0, 0, 0));
 
         // ===== APELLIDO =====
-        Cell lastNameCell = textCell(user.getLastname1()+" "+user.getLastname2(), 12, false, 12,new DeviceRgb(0,0,0));
+        Cell lastNameCell = textCell(user.getLastname1() + " " + user.getLastname2(), 12, false, 12, new DeviceRgb(0, 0, 0));
 
         // ===== NUMERO =====
-        Cell numberCell = textCell("-- " + number + " --", 9, false, 9,new DeviceRgb(0,0,0));
+        Cell numberCell = textCell("-- " + number + " --", 9, false, 9, new DeviceRgb(0, 0, 0));
 
         // ===== LINEA =====
         Cell lineCell = new Cell()
                 .setHeight(4)
-                .setPaddings(0F,8F,0F,8F)
+                .setPaddings(0F, 8F, 0F, 8F)
                 .setBorder(Border.NO_BORDER);
         lineCell.add(new LineSeparator(new SolidLine(0.6f)));
 
         // ===== ROL =====
-        Cell roleCell = textCell(role, 14, true, 14,roleColor);
+        Cell roleCell = textCell(role, 14, true, 14, roleColor);
 
         card.addCell(logoCell);
         card.addCell(lineCellTop);
@@ -134,7 +172,7 @@ public class TeamBadgePdfService {
         return outer;
     }
 
-    private Cell textCell(String text, int fontSize, boolean bold, int height,DeviceRgb color) {
+    private Cell textCell(String text, int fontSize, boolean bold, int height, DeviceRgb color) {
 
         Paragraph p = new Paragraph(text)
                 .setFontSize(fontSize)

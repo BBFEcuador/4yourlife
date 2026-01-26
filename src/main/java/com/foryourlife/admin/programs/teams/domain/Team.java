@@ -8,6 +8,7 @@ import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.TeamCreated;
 import com.foryourlife.shared.domain.events.TeamToTrainingAssigned;
+import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.visionary.domain.Visionary;
 import jakarta.persistence.*;
@@ -15,10 +16,7 @@ import org.springframework.cglib.core.Local;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @Table(name = "teams")
@@ -115,7 +113,7 @@ public class Team extends AggregateRoot implements Serializable {
     }
 
     public List<Participant> getUsers() {
-        return users;
+        return users.stream().sorted(Comparator.comparing(AuditableEntity::getCreatedDate)).toList();
     }
 
     public List<MasterLife> getMasterLife() {

@@ -1,7 +1,6 @@
 package com.foryourlife.admin.sales.payments.payment.infrastructure.persistence;
 
 import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
-import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
@@ -104,11 +103,11 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     @Override
     public List<Payment> findAllBetweenDates(LocalDateTime startDate, LocalDateTime endDate) {
-        return _jpaPaymentRepository.findAllByCreatedDateBetween(startDate, endDate);
+        return _jpaPaymentRepository.findByCreatedDateBetween(startDate, endDate);
     }
 
     @Override
     public Optional<Payment> findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(String participantId, PaymentStatus status) {
-        return _jpaPaymentRepository.findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(participantId, status);
+        return _jpaPaymentRepository.findFirstByParticipant_IdAndStatusOrderByCreatedDateAsc(participantId, status);
     }
 }

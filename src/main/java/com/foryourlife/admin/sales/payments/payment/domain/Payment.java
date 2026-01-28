@@ -45,7 +45,7 @@ public class Payment extends AuditableEntity {
 
     @ManyToOne
     @JoinColumn(name = "participant_id", referencedColumnName = "id")
-    @JsonIgnoreProperties({"campus", "profile", "participantLevel", "invitationToken", "isLingerer", "isDesertor", "modules", "contacts", "team", "teams", "medicalRecord", "user.entityMap"})
+    @JsonIgnoreProperties({"campus", "profile", "participantLevel", "invitationToken", "isLingerer", "isDesertor", "modules", "contacts", "team", "teams", "medicalRecord", "user.entityMap", "modules", "contacts"})
     private Participant participant;
 
     @ManyToOne

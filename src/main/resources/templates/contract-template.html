@@ -380,7 +380,7 @@
     <tr>
         <td class="black-box"><span>FOCUS</span></td>
         <td>Método de pago:</td>
-        <td class="line" style="width: 150px"><span th:text="${data.paymentHistory != null && data.payment.getPaymentshistory().size() > 2 ? 'Multipago': data.paymentHistory.getPaymentMethod().type}"></span></td>
+        <td class="line" style="width: 150px"><span th:text="${data.paymentHistory != null && data.payment.getPaymentshistory().size() > 2 ? 'Multipago': data.paymentHistory.getPaymentMethod().getType()}"></span></td>
         <td>Fecha de pago:</td>
         <td class="line" style="width: 150px"><span th:text="${data.payment != null ?  #temporals.format(data.payment.getCreatedDate(), 'dd/MM/yyyy'): 'N/A'}"></span></td>
     </tr>
@@ -404,25 +404,18 @@
 <div class="signature-section">
     <table class="signature-table">
         <tr>
-            <td colspan="4" style="text-align:left;">
+        </tr>
+        <tr>
+            <td>
                 <strong>
                     <span th:text="${training.getStartDate().getDayOfMonth()}"></span> al <span
                         th:text="${training.getEndDate().getDayOfMonth()}"> </span> de <span
                         th:text="${#temporals.format(training.getEndDate(), 'MMMM')}"></span> / <span
                         th:text="${training.getEndDate().getYear()}"></span>
                 </strong>
-
-            </td>
-            <td colspan="5" style="text-align:center;">
-                <strong><span th:text="${training.getName()}"></span></strong>
-            </td>
-        </tr>
-        <tr>
-            <td>
                 <div class="signature-line"></div>
                 <div class="signature-label">Fecha del entrenamiento</div>
             </td>
-
             <td>
                 <span th:text="${data.payment != null
                    ? data.payment.getTotal() : product.getBasePrice()}">$160</span>
@@ -430,17 +423,10 @@
                 </div>
                 <div class="signature-label"> Precio</div>
             </td>
-
             <td>
                 <div class="signature-line"></div>
                 <div class="signature-label">Firma del participante</div>
             </td>
-
-            <td>
-                <div class="signature-line"></div>
-                <div class="signature-label">Firma de quien invita</div>
-            </td>
-
             <td>
                   <span th:text="${data.trainingSender != null
                    ? data.trainingSender.trainingName : ''}"></span>
@@ -627,7 +613,7 @@
 
     El precio establecido para el entrenamiento <span th:text="${training.getCourseLevelDisplay()}"></span> tiene un
     valor de $<span
-        th:text="${product.getBasePrice()}"></span> Dólares Americanos que podrán ser
+        th:text="${data.payment != null ? data.payment.getTotal() :product.getBasePrice()}"></span> Dólares Americanos que podrán ser
     cancelados por el Contratante de la siguiente manera:
     1) Mediante pago en efectivo, depósito o transferencia a la cuenta de ahorros No 2212187625 del Banco Pichincha
     a

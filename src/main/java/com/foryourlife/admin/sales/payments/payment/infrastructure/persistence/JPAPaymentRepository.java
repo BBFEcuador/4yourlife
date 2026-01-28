@@ -22,7 +22,7 @@ public interface JPAPaymentRepository extends JpaRepository<Payment, String>, Jp
 
     List<Payment> findAllByParticipantIn(Collection<Participant> participants);
 
-    List<Payment> findAllByCreatedDateBetween(LocalDateTime createdDateAfter, LocalDateTime createdDateBefore);
+    List<Payment> findByCreatedDateBetween(LocalDateTime createdDateAfter, LocalDateTime createdDateBefore);
 
-    Optional<Payment> findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(String participantId, PaymentStatus status);
+    Optional<Payment> findFirstByParticipant_IdAndStatusOrderByCreatedDateAsc(String participantId, PaymentStatus status);
 }

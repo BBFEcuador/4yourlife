@@ -5,6 +5,7 @@ import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -22,7 +23,8 @@ public interface JPAPaymentRepository extends JpaRepository<Payment, String>, Jp
 
     List<Payment> findAllByParticipantIn(Collection<Participant> participants);
 
-    List<Payment> findAllByCreatedDateBetween(LocalDateTime createdDateAfter, LocalDateTime createdDateBefore);
+    @EntityGraph(attributePaths = {"invoices"})
+    Optional<Payment> findFirstByParticipant_IdAndStatusOrderByCreatedDateAsc(String participantId, PaymentStatus status);
 
-    Optional<Payment> findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(String participantId, PaymentStatus status);
+    List<Payment> findAllByCreatedDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

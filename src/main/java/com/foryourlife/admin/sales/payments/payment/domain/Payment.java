@@ -23,6 +23,8 @@ import org.springframework.data.annotation.CreatedDate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,7 +45,7 @@ public class Payment extends AuditableEntity {
     @JsonIgnoreProperties({"payments"})
     private ProductDiscount discount;
 
-    @ManyToOne
+    @ManyToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name = "participant_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"campus", "profile", "participantLevel", "invitationToken", "isLingerer", "isDesertor", "modules", "contacts", "team", "teams", "medicalRecord", "user.entityMap"})
     private Participant participant;
@@ -67,9 +69,9 @@ public class Payment extends AuditableEntity {
     @JsonIgnore
     private List<CashDrawerDetail> cashDrawerDetail;
 
-    @OneToMany(mappedBy = "payment", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"payment", "invoiceContifico", "products"})
-    private List<Invoice> invoices;
+    private List<Invoice> invoices = Collections.emptyList();
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)

@@ -4,6 +4,8 @@ import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
 import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecordRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class MedicalRecordFinderService {
     private final MedicalRecordRepository repository;
@@ -12,7 +14,7 @@ public class MedicalRecordFinderService {
         this.repository = repository;
     }
 
-    public MedicalRecord findByParticipant(String userId) {
+    public Optional<MedicalRecord> findByParticipant(String userId) {
         return repository.findByParticipantId(userId);
     }
 }

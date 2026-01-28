@@ -1,6 +1,8 @@
 package com.foryourlife.clients.account.medicalRecord.domain;
 
+import java.util.Optional;
+
 public interface MedicalRecordRepository {
     void save(MedicalRecord medicalRecord);
-    MedicalRecord findByParticipantId(String userId);
+    Optional<MedicalRecord> findByParticipantId(String userId);
 }

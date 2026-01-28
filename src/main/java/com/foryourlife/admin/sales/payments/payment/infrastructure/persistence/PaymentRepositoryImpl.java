@@ -109,6 +109,6 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     @Override
     public Optional<Payment> findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(String participantId, PaymentStatus status) {
-        return _jpaPaymentRepository.findFirstByParticipantIdAndStatusOrderByCreatedDateAsc(participantId, status);
+        return _jpaPaymentRepository.findFirstByParticipant_IdAndStatusOrderByCreatedDateAsc(participantId, status);
     }
 }

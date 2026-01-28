@@ -4,6 +4,8 @@ import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecord;
 import com.foryourlife.clients.account.medicalRecord.domain.MedicalRecordRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
 
@@ -22,7 +24,7 @@ public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
     }
 
     @Override
-    public MedicalRecord findByParticipantId(String userId) {
+    public Optional<MedicalRecord> findByParticipantId(String userId) {
         return this.repository.findByParticipant_Id(userId);
     }
 }

@@ -14,15 +14,7 @@ public class MedicalRecordRequest {
     @NotNull
     public String  medication_history_detail;
     @NotNull
-    public Participant participant;
-
-    public MedicalRecordRequest(String id, String psychiatric_history_detail, String medical_history_detail, String medication_history_detail, Participant participant) {
-        this.id = id;
-        this.psychiatric_history_detail = psychiatric_history_detail;
-        this.medical_history_detail = medical_history_detail;
-        this.medication_history_detail = medication_history_detail;
-        this.participant = participant;
-    }
+    public String participantId;
 
     public void setId(String id) {
         this.id = id;
@@ -38,14 +30,6 @@ public class MedicalRecordRequest {
 
     public void setMedication_history_detail(String medication_history_detail) {
         this.medication_history_detail = medication_history_detail;
-    }
-
-    public void setParticipant(Participant participant) {
-        this.participant = participant;
-    }
-
-    public MedicalRecord toDomain(){
-        return MedicalRecord.create(id != null ? id: java.util.UUID.randomUUID().toString(), this.psychiatric_history_detail, this.medical_history_detail, this.medication_history_detail, this.participant);
     }
 
 }

@@ -38,9 +38,7 @@ public class OnPaymentCreated {
     }
 
     @EventListener
-    @TransactionalEventListener(
-            phase = TransactionPhase.AFTER_COMMIT
-    )
+    @Transactional
     public void on(PaymentCreated event) {
         Participant participant = participantRepository.findById(event.getPayment().getParticipant().getId()).orElseThrow(NullPointerException::new);
         event.getPayment().getProducts().forEach(product -> {
@@ -74,7 +72,7 @@ public class OnPaymentCreated {
                 }
             });
             if (event.getPayment().getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.INIT) {
-                var p = event.getPayment().getParticipant();
+                var p = participant;
                 var pl = participantLevelRepository.getRolByLevel(CourseLevel.FOCUS);
                 p.setParticipantLevel(pl);
                 participantRepository.save(p);

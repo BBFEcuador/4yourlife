@@ -28,7 +28,7 @@ public class ConsumedInvitationOnUserCreated {
         var token = repository.findByToken(event.getParticipant().getInvitationToken()).orElseThrow();
         token.consumeToken();
         var enrolledUserList = token.getUsers();
-        enrolledUserList.add(new EnrolledUsers(event.getParticipant().getId(), LocalDate.now(), event.getParticipant().getName()));
+        enrolledUserList.add(new EnrolledUsers(event.getParticipant().getId(), LocalDate.now(), event.getParticipant().getUser().getName()));
         token.setUsers(enrolledUserList);
         if (!token.getAdmin()){
             var promise = promiseRepository.findLastByUserId(event.getParticipant().getUser().getId());

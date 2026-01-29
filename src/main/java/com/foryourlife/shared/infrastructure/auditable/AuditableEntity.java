@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AuditableEntity extends AggregateRoot implements Serializable {
+public abstract class AuditableEntity extends AggregateRoot {
 
     @CreatedDate
     @Column(name = "created_date", nullable = false, updatable = false)

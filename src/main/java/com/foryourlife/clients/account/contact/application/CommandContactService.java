@@ -8,6 +8,7 @@ import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CommandContactService {
@@ -21,7 +22,13 @@ public class CommandContactService {
 
     public void save(SaveContactRequest contactReq) {
         Contact contact = contactReq.toDomain();
-        contact.setUser(_participantRepository.findById(contactReq.getUserId()).orElseThrow(() -> new BaseException("Usuario no encontrado", new ArrayList<>())));
+        contact.setUser(
+                _participantRepository.findById(contactReq.getUserId()).orElseThrow(
+                        () -> new BaseException("Usuario no encontrado", List.of(
+                                "No se encontro el usuario con id " + contactReq.getUserId()
+                        ))
+                )
+        );
         _contactRepository.save(contact);
     }
 

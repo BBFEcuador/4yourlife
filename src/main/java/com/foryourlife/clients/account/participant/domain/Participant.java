@@ -24,13 +24,13 @@ import java.util.*;
 public class Participant extends AuditableEntity implements Serializable {
     @Id
     private String id;
-    @OneToOne()
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "id", name = "user_id")
     private User user;
     @ManyToOne
     @JoinColumn(name = "participant_level_id", referencedColumnName = "id")
     private ParticipantLevel participantLevel;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     @JoinColumn(referencedColumnName = "id", name = "profile_id")
     private ProfileDetails profile;
     @ManyToOne()
@@ -39,17 +39,16 @@ public class Participant extends AuditableEntity implements Serializable {
     private String invitationToken;
     private Boolean isLingerer = false;
     private Boolean isDesertor = false;
-    @OneToOne(mappedBy = "user", targetEntity = ClientModule.class)
+    @OneToOne(mappedBy = "user")
     private ClientModule modules;
-    @OneToMany(mappedBy = "user", targetEntity = Contact.class, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("user")
     private List<Contact> contacts = new ArrayList<>();
-    @ManyToMany(mappedBy = "users", targetEntity = Team.class, fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
     private Set<Team> teams = new HashSet<>();
-    @OneToOne(mappedBy = "participant", targetEntity = MedicalRecord.class, fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "participant", fetch = FetchType.EAGER)
     @JsonIgnoreProperties("participant")
     private MedicalRecord medicalRecord;
-    @Transient
-    private Invitation invitation;
 
     public Team getTeam() {
         if (teams != null && !teams.isEmpty()) {
@@ -104,7 +103,6 @@ public class Participant extends AuditableEntity implements Serializable {
     }
 
     public static Participant create(String id, User user, ParticipantLevel role, ProfileDetails profile, String invitationToken, Boolean isLingerer, Boolean isDesertor, Campus campus) {
-
         var participant = new Participant(id, user, role, profile, invitationToken, isLingerer, isDesertor, campus);
         participant.record(new UserCreated(id, participant));
         return participant;
@@ -114,20 +112,16 @@ public class Participant extends AuditableEntity implements Serializable {
         return id;
     }
 
-    public String getEmail() {
-        return user.getEmail();
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getPassword() {
-        return user.getPassword();
+    public User getUser() {
+        return user;
     }
 
-    public String getName() {
-        return user.getName();
-    }
-
-    public String getPhone() {
-        return user.getPhone();
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public ParticipantLevel getParticipantLevel() {
@@ -146,56 +140,78 @@ public class Participant extends AuditableEntity implements Serializable {
         return profile;
     }
 
+    public void setProfile(ProfileDetails profile) {
+        this.profile = profile;
+    }
+
     public String getInvitationToken() {
         return invitationToken;
+    }
+
+    public void setInvitationToken(String invitationToken) {
+        this.invitationToken = invitationToken;
     }
 
     public Boolean getIsLingerer() {
         return isLingerer;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setLingerer(Boolean lingerer) {
+        isLingerer = lingerer;
     }
 
-    public void setProfile(ProfileDetails profile) {
-        this.profile = profile;
+    public Boolean getDesertor() {
+        return isDesertor;
     }
 
-    public User getUser() {
-        return user;
+    public void setDesertor(Boolean desertor) {
+        isDesertor = desertor;
+    }
+
+    public void setModules(ClientModule modules) {
+        this.modules = modules;
+    }
+
+    public void setContacts(List<Contact> contacts) {
+        this.contacts = contacts;
     }
 
     public void updateLvl(ParticipantLevel newLvl) {
         this.participantLevel = newLvl;
     }
 
-    public MedicalRecord getMedicalRecord() {
-        return medicalRecord;
-    }
-
     public Set<Team> getTeams() {
         return teams;
     }
 
+    public void setTeams(Set<Team> teams) {
+        this.teams = teams;
+    }
+
+    public MedicalRecord getMedicalRecord() {
+        return medicalRecord;
+    }
+
+    public void setMedicalRecord(MedicalRecord medicalRecord) {
+        this.medicalRecord = medicalRecord;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Participant that = (Participant) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(id, that.id) && Objects.equals(user, that.user) && Objects.equals(participantLevel, that.participantLevel) && Objects.equals(profile, that.profile) && Objects.equals(campus, that.campus) && Objects.equals(invitationToken, that.invitationToken) && Objects.equals(isLingerer, that.isLingerer) && Objects.equals(isDesertor, that.isDesertor) && Objects.equals(modules, that.modules) && Objects.equals(contacts, that.contacts) && Objects.equals(teams, that.teams) && Objects.equals(medicalRecord, that.medicalRecord);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, user, participantLevel, profile, campus, invitationToken, isLingerer, isDesertor, modules, contacts, teams, medicalRecord);
     }
 
-    public void setInvitation(Invitation invitation) {
-        this.invitation = invitation;
-    }
-
-    public Invitation getInvitation() {
-        return invitation;
+    @Override
+    public String toString() {
+        return "Participant{" +
+                "id='" + id + '\'' +
+                '}';
     }
 }

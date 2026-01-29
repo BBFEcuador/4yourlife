@@ -17,14 +17,16 @@ public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
 
     @Override
     public void save(MedicalRecord medicalRecord) {
-        if (this.findByParticipantId(medicalRecord.participant.getId()) != null) {
-            throw new IllegalArgumentException("Participant has medical record");
-        }
         this.repository.save(medicalRecord);
     }
 
     @Override
     public Optional<MedicalRecord> findByParticipantId(String userId) {
         return this.repository.findByParticipant_Id(userId);
+    }
+
+    @Override
+    public Optional<MedicalRecord> findByMedicalRecordId(String medicalRecordId) {
+        return this.repository.findById(medicalRecordId);
     }
 }

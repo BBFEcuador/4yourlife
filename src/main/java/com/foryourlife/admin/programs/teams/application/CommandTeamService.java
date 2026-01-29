@@ -99,7 +99,7 @@ public class CommandTeamService {
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
-                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getName() + " ya tiene un equipo"));
+                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getUser().getName() + " ya tiene un equipo"));
             }
             if (p.getModules().getHasLife()) return p;
             return null;
@@ -129,7 +129,7 @@ public class CommandTeamService {
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
-                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getName() + " ya tiene un equipo"));
+                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getUser().getName() + " ya tiene un equipo"));
             }
             return p;
         }).toList();
@@ -164,7 +164,7 @@ public class CommandTeamService {
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();
             if (p.getTeam() != null) {
-                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getName() + " ya tiene un equipo"));
+                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getUser().getName() + " ya tiene un equipo"));
             }
             if (p.getModules().getHasYour()) return p;
             return null;

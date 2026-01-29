@@ -31,9 +31,6 @@ public class ParticipantQueryService {
         return this._participantRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The participant Id: " + id + " doesn't exist."));
     }
 
-    public List<Participant> getAll() {
-        return this._participantRepository.getAll();
-    }
     public Page<Participant> getAll(Pageable pageable,Criteria criteria) {
         return this._participantRepository.getAll(pageable,criteria);
     }

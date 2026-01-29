@@ -71,9 +71,13 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         participants.values().forEach(participant -> {
             String token = participant.getInvitationToken();
             if (token != null) {
-                participant.setInvitation(invitationsByToken.get(token));
+                Invitation invitation = invitationsByToken.get(token);
+                if (invitation != null) {
+                    participant.getUser().setInvitations(List.of(invitation));
+                }
             }
         });
+
 
         List<String> trainingNames = new ArrayList<>();
 
@@ -109,8 +113,8 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                     UserType userType = UserType.fromValue(entity);
 
                     String invitationInfo = null;
-                    if (participant != null && participant.getInvitation() != null) {
-                        invitationInfo = participant.getInvitation().getEnrolled().getTrainingName();
+                    if (participant != null && participant.getUser().getInvitations().getFirst() != null) {
+                        invitationInfo = participant.getUser().getInvitations().getFirst().getEnrolled().getTrainingName();
 
                     }
 

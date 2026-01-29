@@ -2,15 +2,13 @@ package com.foryourlife.clients.account.medicalRecord.infrastructure.httpcontrol
 
 import jakarta.validation.constraints.NotNull;
 
-public class MedicalRecordRequest {
+public class MedicalRecordUpdateRequest {
     @NotNull
     public String  psychiatric_history_detail;
     @NotNull
     public String  medical_history_detail;
     @NotNull
     public String  medication_history_detail;
-    @NotNull
-    public String participantId;
 
     public String getPsychiatric_history_detail() {
         return psychiatric_history_detail;
@@ -34,13 +32,5 @@ public class MedicalRecordRequest {
 
     public void setMedication_history_detail(String medication_history_detail) {
         this.medication_history_detail = medication_history_detail;
-    }
-
-    public String getParticipantId() {
-        return participantId;
-    }
-
-    public void setParticipantId(String participantId) {
-        this.participantId = participantId;
     }
 }

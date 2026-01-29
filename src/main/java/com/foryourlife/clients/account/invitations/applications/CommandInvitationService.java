@@ -54,9 +54,9 @@ public class CommandInvitationService {
                     id,
                     new Sender(
                             user.getId(),
-                            user.getName(),
+                            user.getUser().getName(),
                             user.getTeam().getTraining().getName(),
-                            user.getPhone()
+                            user.getUser().getPhone()
                     ),
                     1,
                     campus);

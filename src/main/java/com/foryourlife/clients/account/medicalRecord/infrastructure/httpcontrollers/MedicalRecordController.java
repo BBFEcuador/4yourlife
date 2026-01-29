@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/medical-record")
 public class MedicalRecordController {
     @Autowired
@@ -17,9 +17,9 @@ public class MedicalRecordController {
     @Autowired
     private MedicalRecordFinderService medicalRecordFinderService;
 
-    @GetMapping("{userId}")
-    public ResponseEntity<?> getMedicalRecord(@RequestParam String userId) {
-        var medicalRecord = medicalRecordFinderService.findByParticipant(userId);
+    @GetMapping("{participantId}")
+    public ResponseEntity<?> getMedicalRecord(@PathVariable String participantId) {
+        var medicalRecord = medicalRecordFinderService.findByParticipant(participantId);
         if (medicalRecord.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -30,5 +30,11 @@ public class MedicalRecordController {
     public ResponseEntity<?> addMedicalRecord(@RequestBody MedicalRecordRequest request) {
         medicalRecordService.createMedicalRecordByRequest(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("update/{id}")
+    public ResponseEntity<?> updateMedicalRecord(@PathVariable String id,@RequestBody MedicalRecordUpdateRequest request) {
+        medicalRecordService.updateMedicalRecordByRequest(id,request);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

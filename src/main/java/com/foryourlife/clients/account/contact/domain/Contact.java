@@ -14,7 +14,6 @@ public class Contact extends AuditableEntity {
     private String name;
     private String relationship;
     private String phone;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Participant user;

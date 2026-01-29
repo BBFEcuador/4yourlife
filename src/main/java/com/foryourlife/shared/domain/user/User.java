@@ -1,12 +1,11 @@
 package com.foryourlife.shared.domain.user;
 
+import com.foryourlife.clients.account.invitations.domain.Invitation;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +27,9 @@ public class User {
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private List<UserEntities> entityMap;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "senderId", referencedColumnName = "id")
+    private List<Invitation> invitations = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -111,5 +113,13 @@ public class User {
 
     public List<UserEntities> getEntityMap() {
         return entityMap;
+    }
+
+    public List<Invitation> getInvitations() {
+        return invitations;
+    }
+
+    public void setInvitations(List<Invitation> invitations) {
+        this.invitations = invitations;
     }
 }

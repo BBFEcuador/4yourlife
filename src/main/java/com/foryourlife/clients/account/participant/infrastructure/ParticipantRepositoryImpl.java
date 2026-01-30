@@ -118,6 +118,11 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
     }
 
     @Override
+    public void saveAllAndFlush(List<Participant> users) {
+        this.repository.saveAll(users);
+    }
+
+    @Override
     public Optional<Participant> findByUserId(String userId) {
         return repository.findByUser_Id(userId);
     }

@@ -45,15 +45,14 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
                         List.of("Training with id " + trainingId + " not found")
                 )
         );
-        var team = teamRepository.findByTrainingId(trainingId).orElseThrow(
-                () -> new BaseException(
-                        "Equipo no encontrado",
-                        List.of("Team with training id " + trainingId + " not found")
-                )
-        );
-        Hibernate.initialize(team.getMasterLife());
-        Hibernate.initialize(team.getVisionaries());
-        Hibernate.initialize(team.getStaffs());
+
+        var team = training.getOriginalTeam();
+        if (team == null) {
+            throw new BaseException(
+                    "Equipo no encontrado",
+                    List.of("Team for training with id " + trainingId + " not found")
+            );
+        }
         if (training.getOriginalTeam() == null) {
             return new FinancialAdministratorDashboard(
                     BigDecimal.valueOf(0),
@@ -67,11 +66,12 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
         }
 
         List<Payment> payments = new ArrayList<>();
+        var listPayments = paymentRepository.findAllBetweenDates(
+                training.getStartDate().atStartOfDay().minusWeeks(1),
+                training.getStartDate().atStartOfDay()
+        );
         training.getOriginalTeam().getUsers().forEach(participant ->
-                paymentRepository.findAllBetweenDates(
-                                training.getStartDate().atStartOfDay().minusWeeks(1),
-                                training.getStartDate().atStartOfDay()
-                        ).stream()
+                listPayments.stream()
                         .filter(payment -> payment.getParticipant() != null && payment.getParticipant().getId().equals(participant.getId()))
                         .forEach(payments::add)
         );

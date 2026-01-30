@@ -27,6 +27,7 @@ public interface ParticipantRepository {
     List<Participant> match(Criteria criteria);
 
     void save(Participant user);
+    void saveAllAndFlush(List<Participant> users);
 
     Optional<Participant> findByUserId(String userId);
 

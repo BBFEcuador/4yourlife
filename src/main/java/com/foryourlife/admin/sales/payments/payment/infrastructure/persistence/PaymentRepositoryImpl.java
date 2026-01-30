@@ -1,7 +1,6 @@
 package com.foryourlife.admin.sales.payments.payment.infrastructure.persistence;
 
 import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
-import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;

@@ -432,15 +432,15 @@ public class CommandTeamService {
         if (filteredUsers.isEmpty()) {
             throw new BaseException("No hay usuarios suficientes", List.of());
         }
-
+        var newParticipant = new ArrayList<Participant>();
         team.getUsers().stream()
                 .filter(p -> !participants.contains(p))
                 .forEach(p -> {
                     p.setIsLingerer(true);
                     p.setIsDesertor(true);
-                    _participantRepository.save(p);
+                    newParticipant.add(p);
                 });
-
+        _participantRepository.saveAllAndFlush(newParticipant);
         var staff = request.staffs.stream().map(participant -> {
             var p = staffRepository.findById(participant.getId()).orElseThrow();
             if (!staffRepository.isStaffAvailable(

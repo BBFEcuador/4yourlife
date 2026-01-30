@@ -381,6 +381,7 @@
         </div>
 
         <div class="question-options">
+            <span th:text="${data.payment}"></span>
             (SI)<span class="check-line"
                       th:text="${data.medicalRecord != null && data.medicalRecord.medication_history_detail != 'N/A' ? '  X':''}"></span>
             (NO)<span class="check-line"
@@ -401,7 +402,7 @@
                       ? 'Multipago'
                       : (${data.paymentHistory != null
                           and data.paymentHistory.paymentMethod != null}
-                          ? data.paymentHistory.paymentMethod.type
+                          ? ${data.paymentHistory.paymentMethod.type}
           : '')"></span>
             </td>
             <td>Fecha de pago:</td>
@@ -432,22 +433,18 @@
     <div class="signature-section">
         <table class="signature-table">
             <tr>
-                <td colspan="4" style="text-align:left;">
+
+            </tr>
+            <tr>
+                <td>
                     <strong>
                         <span th:text="${training.getStartDate().getDayOfMonth()}"></span> al <span
                             th:text="${training.getEndDate().getDayOfMonth()}"> </span> de <span
                             th:text="${#temporals.format(training.getEndDate(), 'MMMM')}"></span> / <span
                             th:text="${training.getEndDate().getYear()}"></span>
                     </strong>
-
-                </td>
-                <td colspan="5" style="text-align:center;">
-                    <strong><span th:text="${training.getName()}"></span></strong>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="signature-line"></div>
+                    <div class="signature-line">
+                    </div>
                     <div class="signature-label">Fecha del entrenamiento</div>
                 </td>
 
@@ -463,12 +460,6 @@
                     <div class="signature-line"></div>
                     <div class="signature-label">Firma del participante</div>
                 </td>
-
-                <td>
-                    <div class="signature-line"></div>
-                    <div class="signature-label">Firma de quien invita</div>
-                </td>
-
                 <td>
                   <span th:text="${data.trainingSender != null
                    ? data.trainingSender.trainingName : ''}"></span>
@@ -657,7 +648,7 @@
 
         El precio establecido para el entrenamiento <span th:text="${training.getCourseLevelDisplay()}"></span> tiene un
         valor de $<span
-            th:text="${product.getBasePrice()}"></span> Dólares Americanos que podrán ser
+            th:text="${data.payment != null ? data.payment.getTotal() :product.getBasePrice()}"></span> Dólares Americanos que podrán ser
         cancelados por el Contratante de la siguiente manera:
         1) Mediante pago en efectivo, depósito o transferencia a la cuenta de ahorros No <span th:if="${training.campus.city == 'Quito'}">
     2212187651</span>

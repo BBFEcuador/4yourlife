@@ -33,7 +33,7 @@ public class Team extends AggregateRoot implements Serializable {
     private Integer trainingNumber;
 
 
-    @ManyToMany( fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "team_users",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
@@ -113,7 +113,7 @@ public class Team extends AggregateRoot implements Serializable {
     }
 
     public List<Participant> getUsers() {
-        return users.stream().sorted(Comparator.comparing(AuditableEntity::getCreatedDate)).toList();
+        return users;
     }
 
     public List<MasterLife> getMasterLife() {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.shared.domain.AggregateRoot;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -12,7 +13,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "profile_details")
-public class ProfileDetails extends AggregateRoot {
+public class ProfileDetails extends AggregateRoot implements Serializable {
     @Id
     private String id;
 

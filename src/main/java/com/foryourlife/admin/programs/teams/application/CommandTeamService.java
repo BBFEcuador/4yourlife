@@ -29,6 +29,7 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.staff.domain.StaffRepository;
 import com.foryourlife.visionary.domain.VisionaryRepository;
+import org.apache.commons.lang3.SerializationUtils;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -338,8 +339,13 @@ public class CommandTeamService {
         var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
         var training = team.getTraining().getNextLevel();
         Hibernate.initialize(team.getTraining().getNextLevel());
+        Hibernate.initialize(team.getStaffs());
+        Hibernate.initialize(team.getMasterLife());
+        Hibernate.initialize(team.getVisionaries());
+        Hibernate.initialize(team.getUsers());
 
-        this.addOriginalTeam(team);
+        var newTeam = SerializationUtils.clone(team);
+        this.addOriginalTeam(newTeam);
 
         var participants = request.users.stream()
                 .map(u -> _participantRepository.findById(u.getId()).orElseThrow())
@@ -408,7 +414,13 @@ public class CommandTeamService {
         var trainer = trainerQueryService.findTrainerById(request.trainer)
                 .orElseThrow(() -> new BaseException("Trainer not found", List.of()));
         Hibernate.initialize(team.getTraining().getNextLevel());
-        this.addOriginalTeam(team);
+        Hibernate.initialize(team.getStaffs());
+        Hibernate.initialize(team.getMasterLife());
+        Hibernate.initialize(team.getVisionaries());
+        Hibernate.initialize(team.getUsers());
+
+        var newTeam = SerializationUtils.clone(team);
+        this.addOriginalTeam(newTeam);
 
         var training = team.getTraining().getNextLevel();
 

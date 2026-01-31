@@ -4,9 +4,11 @@ import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "medical_records")
-public class MedicalRecord extends AuditableEntity {
+public class MedicalRecord extends AuditableEntity implements Serializable {
     @Id
     public String id;
 

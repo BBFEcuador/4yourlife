@@ -4,9 +4,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "trainers")
-public class Trainer {
+public class Trainer implements Serializable {
     @Id
     private String id;
 

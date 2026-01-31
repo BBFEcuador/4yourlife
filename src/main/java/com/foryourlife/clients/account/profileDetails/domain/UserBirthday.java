@@ -6,6 +6,7 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.persistence.Embeddable;
 import org.apache.catalina.User;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -13,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @Embeddable
-public class UserBirthday {
+public class UserBirthday implements Serializable {
 
     private Date value;
 

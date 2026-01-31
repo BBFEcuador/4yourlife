@@ -5,13 +5,14 @@ import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "master_life")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MasterLife {
+public class MasterLife implements Serializable {
     @Id
     private String id;
 

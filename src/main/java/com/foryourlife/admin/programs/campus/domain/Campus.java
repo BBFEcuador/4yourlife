@@ -5,11 +5,12 @@ import com.foryourlife.admin.auth.domain.Admin;
 import com.foryourlife.admin.contifico.config.domain.ConfigContifico;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Entity
 @Table(name = "campus")
-public class Campus {
+public class Campus implements Serializable {
 
     @Id
     private String id;

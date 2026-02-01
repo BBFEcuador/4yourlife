@@ -108,8 +108,12 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
         Predicate<Attendance> isParticipant = a ->
                 a.getUser() != null &&
                         a.getUser().getEntityMap() != null &&
-                        a.getUser().getEntityMap().stream()
-                                .anyMatch(e -> e.getEntity().equals(UserType.PARTICIPANT.name()));
+                        a.getUser().getEntityMap().stream().anyMatch(e ->
+                                e.getEntity().equals(UserType.PARTICIPANT.name())
+                        ) &&
+                        a.getUser().getEntityMap().stream().noneMatch(e ->
+                                e.getEntity().equals(UserType.MASTER_LIFE.name())
+                        );
 
         Predicate<Attendance> isMasterLife = a ->
                 a.getUser() != null &&

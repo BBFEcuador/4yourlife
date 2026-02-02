@@ -1,6 +1,8 @@
 package com.foryourlife.shared.domain.user;
 
-public class UserEntities {
+import java.io.Serializable;
+
+public class UserEntities implements Serializable {
     private String id;
     private String entity;
 

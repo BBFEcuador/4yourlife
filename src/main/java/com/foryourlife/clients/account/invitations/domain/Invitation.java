@@ -8,12 +8,13 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "invitation")
-public class Invitation extends AggregateRoot {
+public class Invitation extends AggregateRoot implements Serializable {
     @Id
     private String id;
     @Column(unique = true)

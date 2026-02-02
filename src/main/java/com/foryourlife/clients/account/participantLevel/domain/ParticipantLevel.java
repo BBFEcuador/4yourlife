@@ -5,9 +5,11 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "participant_level")
-public class ParticipantLevel {
+public class ParticipantLevel implements Serializable {
 
     @Id
     private String id;

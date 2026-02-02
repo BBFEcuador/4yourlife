@@ -1,8 +1,5 @@
 package com.foryourlife.admin.programs.teams.application;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.foryourlife.admin.crm.call.domain.Call;
 import com.foryourlife.admin.crm.call.domain.CallRepository;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
@@ -32,6 +29,7 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.staff.domain.StaffRepository;
 import com.foryourlife.visionary.domain.VisionaryRepository;
+import org.apache.commons.lang3.SerializationUtils;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +39,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -154,6 +155,7 @@ public class CommandTeamService {
                 new ArrayList<>()
         );
         this._teamRepository.save(team);
+        this.bus.publish(team.pullDomainEvents());
         this.addOriginalTeam(team);
     }
 
@@ -334,11 +336,16 @@ public class CommandTeamService {
     @Transactional
     public void promotionLifeTeam(PromotionLifeRequest request) {
         var team = _teamRepository.findById(request.id).orElseThrow();
-        var team2 = _teamRepository.findById(request.id).orElseThrow();
         var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
         var training = team.getTraining().getNextLevel();
         Hibernate.initialize(team.getTraining().getNextLevel());
-        this.addOriginalTeam(team2);
+        Hibernate.initialize(team.getStaffs());
+        Hibernate.initialize(team.getMasterLife());
+        Hibernate.initialize(team.getVisionaries());
+        Hibernate.initialize(team.getUsers());
+
+        var newTeam = SerializationUtils.clone(team);
+        this.addOriginalTeam(newTeam);
 
         var participants = request.users.stream()
                 .map(u -> _participantRepository.findById(u.getId()).orElseThrow())
@@ -353,11 +360,6 @@ public class CommandTeamService {
             throw new BaseException("Participantes inválidos", invalidParticipants);
         }
 
-        team.setName(training.getCourseLevel().name() + "-" + training.getNumber());
-        team.setTraining(training);
-        team.setTrainingNumber(training.getNumber());
-        team.setTrainer(trainer);
-
         var filteredUsers = participants.stream()
                 .filter(p -> p.getModules().getHasLife())
                 .toList();
@@ -365,18 +367,15 @@ public class CommandTeamService {
         if (filteredUsers.isEmpty()) {
             throw new BaseException("No hay usuarios suficientes", List.of());
         }
-        var newParticipant = new ArrayList<Participant>();
+
         team.getUsers().stream()
                 .filter(p -> !participants.contains(p))
                 .forEach(p -> {
                     p.setIsLingerer(true);
                     p.setIsDesertor(true);
-                    newParticipant.add(p);
+                    _participantRepository.save(p);
                 });
-        _participantRepository.saveAllAndFlush(newParticipant);
-//        filteredUsers.forEach(participant -> {
-//           participant.setTeams(Set.of(team));
-//        });
+
         var masterLife = request.masterLife.stream().map(participant -> {
             var p = queryMasterLifeService.findById(participant.getId());
             if (!queryMasterLifeService.isMasterLifeAvailable(
@@ -390,6 +389,11 @@ public class CommandTeamService {
             return p;
         }).toList();
 
+        team.setName(training.getCourseLevel().name() + "-" + training.getNumber());
+        team.setTraining(training);
+        team.setTrainingNumber(training.getNumber());
+        team.setTrainer(trainer);
+
         team.getUsers().clear();
         team.getUsers().addAll(filteredUsers);
 
@@ -397,22 +401,27 @@ public class CommandTeamService {
         team.getMasterLife().addAll(masterLife);
 
         team.getStaffs().clear();
-        var savedTeam = _teamRepository.save(team);
-        assignParticipantLevelToUsers(savedTeam.getUsers(), savedTeam.getTraining());
-        this.assignAttendancesAndDeclarations(savedTeam, savedTeam.getTraining());
+        _teamRepository.save(team);
+        assignParticipantLevelToUsers(team.getUsers(), training);
+        this.assignAttendancesAndDeclarations(team, team.getTraining());
     }
 
     @Transactional
     public void promotionYourTeam(PromotionYourRequest request) {
         var team = _teamRepository.findById(request.id)
                 .orElseThrow(() -> new BaseException("Team not found", List.of()));
-        var team2 = _teamRepository.findById(request.id)
-                .orElseThrow(() -> new BaseException("Team not found", List.of()));
 
         var trainer = trainerQueryService.findTrainerById(request.trainer)
                 .orElseThrow(() -> new BaseException("Trainer not found", List.of()));
-        this.addOriginalTeam(team2);
         Hibernate.initialize(team.getTraining().getNextLevel());
+        Hibernate.initialize(team.getStaffs());
+        Hibernate.initialize(team.getMasterLife());
+        Hibernate.initialize(team.getVisionaries());
+        Hibernate.initialize(team.getUsers());
+
+        var newTeam = SerializationUtils.clone(team);
+        this.addOriginalTeam(newTeam);
+
         var training = team.getTraining().getNextLevel();
 
         var participants = request.users.stream()
@@ -472,9 +481,9 @@ public class CommandTeamService {
         team.getVisionaries().clear();
         team.getMasterLife().clear();
 
-        var savedTeam = _teamRepository.save(team);
-        assignParticipantLevelToUsers(savedTeam.getUsers(), savedTeam.getTraining());
-        this.assignAttendancesAndDeclarations(savedTeam, savedTeam.getTraining());
+        _teamRepository.save(team);
+        assignParticipantLevelToUsers(team.getUsers(), team.getTraining());
+        this.assignAttendancesAndDeclarations(team, team.getTraining());
     }
 
     public void removeVisionaries(String teamId, String id) {

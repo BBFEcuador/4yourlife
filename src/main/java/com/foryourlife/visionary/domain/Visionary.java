@@ -4,12 +4,13 @@ import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "visionaries")
-public class Visionary {
+public class Visionary implements Serializable {
     @Id
     private String id;
     private Boolean isActive = true;

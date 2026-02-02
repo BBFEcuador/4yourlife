@@ -5,9 +5,11 @@ import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "contacts")
-public class Contact extends AuditableEntity {
+public class Contact extends AuditableEntity implements Serializable {
 
     @Id
     private String id;

@@ -7,9 +7,11 @@ import com.foryourlife.shared.domain.AggregateRoot;
 import com.foryourlife.shared.domain.events.ClientModulesUpdated;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "client_modules")
-public class ClientModule extends AggregateRoot {
+public class ClientModule extends AggregateRoot implements Serializable {
     @Id
     private String id;
     private Boolean hasFocus;

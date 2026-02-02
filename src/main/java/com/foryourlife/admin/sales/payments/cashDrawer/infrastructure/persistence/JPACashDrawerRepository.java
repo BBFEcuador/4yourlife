@@ -15,6 +15,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 public class JPACashDrawerRepository implements CashDrawerRepository {
@@ -92,23 +93,18 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
                 .mapToDouble(PaymentMethodSummary::getTotalAmount)
                 .sum();
 
-        System.out.println("Number of payment methods found: " + paymentMethods.length);
-        for (PaymentMethodSummary summary : paymentMethods) {
-            System.out.println("Payment Method: " + summary.getPaymentMethod().getType() +
-                    ", Total Amount: " + summary.getTotalAmount() +
-                    ", Transaction Count: " + summary.getTransactionCount());
-        }
         List<Map<String, Object>> simplifiedDetails = details.stream()
-                .map(detail -> {
+                .flatMap(detail -> {
                     Map<String, Object> map = new HashMap<>();
                     PaymentHistory paymentHistory = findPaymentHistory(detail);
-                    map.put("date", paymentHistory != null ? paymentHistory.getDate() : detail.getPayment().getCreated_at());
-                    map.put("productName", detail.getPaymentHistoryId() != null && !detail.getPayment().getProducts().isEmpty()
-                            ? detail.getPayment().getProducts().getFirst().getName() + " - ABONO" : detail.getPayment().getProducts().getFirst().getName() + " - COMPROMISO DE PAGO");
-                    map.put("paymentMethod", paymentHistory != null && paymentHistory.getPaymentMethod() != null
-                            ? paymentHistory.getPaymentMethod().getType() : "");
-                    map.put("amount", paymentHistory != null ? paymentHistory.getAmount() : 0.0);
-                    return map;
+                    if (paymentHistory == null) {
+                        return Stream.empty();
+                    }
+                    map.put("date", paymentHistory.getDate());
+                    map.put("productName", detail.getPayment().getProducts().getFirst().getName() + "-"+detail.getPayment().getParticipant().getUser().getName()  + " - ABONO");
+                    map.put("paymentMethod", paymentHistory.getPaymentMethod().getType());
+                    map.put("amount", paymentHistory.getAmount());
+                    return Stream.of(map);
                 })
                 .toList();
 

@@ -33,14 +33,13 @@ public class Team extends AggregateRoot implements Serializable {
     private Integer trainingNumber;
 
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "team_users",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"))
-    @JsonIgnoreProperties(value = {"teams", "team"})
+    @JsonIgnoreProperties(value = {"teams", "team", "profile", "campus", "contacts", "medicalRecord"})
     private List<Participant> users = new ArrayList<>();
-
 
     @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(
@@ -49,6 +48,7 @@ public class Team extends AggregateRoot implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "masterlife_id", referencedColumnName = "id"))
     @JsonIgnoreProperties(value = {"teams", "masterLife","team"})
     private List<MasterLife> masterLife = new ArrayList<>();
+
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
     private Trainer trainer;

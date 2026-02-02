@@ -32,8 +32,13 @@ public class TeamRepositoryImpl implements TeamRepository {
     }
 
     @Override
-    public void save(Team team) {
-        _jpaTeamRepository.save(team);
+    public Team save(Team team) {
+        return _jpaTeamRepository.save(team);
+    }
+
+    @Override
+    public Team saveAndFlush(Team team) {
+        return _jpaTeamRepository.saveAndFlush(team);
     }
 
     @Override
@@ -64,7 +69,7 @@ public class TeamRepositoryImpl implements TeamRepository {
 
     @Override
     public void removeParticipants(String teamId, String userId) {
-        var team = _jpaTeamRepository.findById(teamId).orElseThrow(() -> new BaseException("Team not found", List.of("")));
+        var team = _jpaTeamRepository.findByIdWithUsers(teamId).orElseThrow(() -> new BaseException("Team not found", List.of("")));
         var users = team.getUsers();
         for (var user : users) {
             if (user.getId().equals(userId)) {
@@ -126,7 +131,7 @@ public class TeamRepositoryImpl implements TeamRepository {
 
     @Override
     public Optional<Team> findById(String id) {
-        return _jpaTeamRepository.findById(id);
+        return _jpaTeamRepository.findByIdWithUsers(id);
     }
 
     @Override

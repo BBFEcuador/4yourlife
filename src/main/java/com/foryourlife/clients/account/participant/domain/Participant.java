@@ -26,6 +26,7 @@ public class Participant extends AuditableEntity implements Serializable {
     private String id;
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "id", name = "user_id")
+    @JsonIgnoreProperties("invitations")
     private User user;
     @ManyToOne
     @JoinColumn(name = "participant_level_id", referencedColumnName = "id")

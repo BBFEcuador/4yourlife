@@ -45,7 +45,7 @@ public class PromiseCommandService {
         team.getUsers().forEach(it -> {
             Promise promise = new Promise(
                     UUID.randomUUID().toString(),
-                    it.getTeam().getTraining(),
+                    team.getTraining(),
                     it.getUser()
             );
             promise.setStartDate(team.getTraining().getEndDate().plusDays(1));

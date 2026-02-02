@@ -45,7 +45,7 @@ public class Payment extends AuditableEntity {
     @JsonIgnoreProperties({"payments"})
     private ProductDiscount discount;
 
-    @ManyToOne(fetch =  FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "participant_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"campus", "profile", "participantLevel", "invitationToken", "isLingerer", "isDesertor", "modules", "contacts", "team", "teams", "medicalRecord", "user.entityMap", "modules", "contacts"})
     private Participant participant;
@@ -69,7 +69,7 @@ public class Payment extends AuditableEntity {
     @JsonIgnore
     private List<CashDrawerDetail> cashDrawerDetail;
 
-    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "payment", fetch = FetchType.EAGER)
     @JsonIgnoreProperties({"payment", "invoiceContifico", "products"})
     private List<Invoice> invoices = Collections.emptyList();
 

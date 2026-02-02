@@ -15,7 +15,9 @@ import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.UserType;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -113,7 +115,8 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                     UserType userType = UserType.fromValue(entity);
 
                     String invitationInfo = null;
-                    if (participant != null && participant.getUser().getInvitations().getFirst() != null) {
+
+                    if (participant != null && !participant.getUser().getInvitations().isEmpty()) {
                         invitationInfo = participant.getUser().getInvitations().getFirst().getEnrolled().getTrainingName();
 
                     }

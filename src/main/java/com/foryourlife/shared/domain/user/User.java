@@ -27,7 +27,7 @@ public class User {
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private List<UserEntities> entityMap;
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "senderId", referencedColumnName = "id")
     private List<Invitation> invitations = new ArrayList<>();
 

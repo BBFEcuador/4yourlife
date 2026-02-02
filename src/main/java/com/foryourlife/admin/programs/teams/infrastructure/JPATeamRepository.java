@@ -12,7 +12,12 @@ import java.util.Optional;
 
 @Repository
 public interface JPATeamRepository extends JpaRepository<Team, String>, JpaSpecificationExecutor<Team> {
-    Optional<Team> findByTraining_id(String s);
+    @Query("""
+                SELECT t FROM Team t
+                LEFT JOIN FETCH t.users
+                WHERE t.training.id = :id
+            """)
+    Optional<Team> findByTraining_id(@Param("id") String id);
 
     List<Team> findAllByTrainer_Id(String trainerId);
 
@@ -23,4 +28,10 @@ public interface JPATeamRepository extends JpaRepository<Team, String>, JpaSpeci
             """)
     Optional<Team> findByIdWithMasterLife(@Param("id") String teamId);
 
+    @Query("""
+                SELECT t FROM Team t
+                LEFT JOIN FETCH t.users
+                WHERE t.id = :id
+            """)
+    Optional<Team> findByIdWithUsers(@Param("id") String id);
 }

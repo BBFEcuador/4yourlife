@@ -134,7 +134,7 @@
             <td th:text="${detail.date}"></td>
             <td th:text="${detail.productName}"></td>
             <td th:text="${detail.paymentMethod}"></td>
-            <td th:text="${#numbers.formatDecimal(detail.amount, 1, 2)}"></td>
+            <td th:text="${#numbers.formatDecimal(detail.amount, 1, 2) + ' $'}"></td>
         </tr>
         </tbody>
         <tfoot>

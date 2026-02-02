@@ -86,7 +86,7 @@ public class CashDrawerCommandService {
         if (userOpenDrawer.isPresent()) {
             var drawer = userOpenDrawer.get();
             throw new BaseException(
-                    "Caja abierta!",
+                    "Ya tiene una caja abierta!",
                     List.of("El usuario " + user.getName() +
                             " ya tiene abierta la caja Nº " + drawer.getCashBox().getNumber())
             );
@@ -97,7 +97,7 @@ public class CashDrawerCommandService {
         if (openDrawerForBox.isPresent()) {
             var drawer = openDrawerForBox.get();
             throw new BaseException(
-                    "Caja ya abierta",
+                    "Caja ya abierta!",
                     List.of("La caja Nº " + cashBox.getNumber() +
                             " está abierta por " + drawer.getOpenedByUser().getName())
             );

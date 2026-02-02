@@ -10,7 +10,8 @@ import java.util.Optional;
 
 public interface TeamRepository {
 
-    void save(Team team);
+    Team save(Team team);
+    Team saveAndFlush(Team team);
     void updatePhoto(String id, String photo);
     Optional<Team> findById(String id);
     Optional<Team> findByTrainingId(String id);

@@ -18,9 +18,14 @@ import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethodRe
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.admin.sales.programs.domain.Program;
+import com.foryourlife.clients.account.invitations.applications.QueryInvitationServices;
 import com.foryourlife.clients.account.module.application.ClientModuleCreatorService;
 import com.foryourlife.clients.account.module.domain.ClientModule;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
+import com.foryourlife.clients.account.participant.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
+import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
+import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -32,6 +37,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -52,8 +58,12 @@ public class CommandPaymentService {
     private final ConfigContificoQueryService configContificoQueryService;
     private final CommandInvoiceService commandInvoiceService;
     private final ClientModuleCreatorService clientModuleCreatorService;
+    private final QueryInvitationServices queryInvitationServices;
+    private final PromiseRepository promiseRepository;
+    private final ParticipantRepository participantRepository;
+    private final ParticipantLevelService participantLevelRepository;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository) {
         this._paymentRepository = _paymentRepository;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
@@ -66,6 +76,10 @@ public class CommandPaymentService {
         this.configContificoQueryService = configContificoQueryService;
         this.commandInvoiceService = commandInvoiceService;
         this.clientModuleCreatorService = clientModuleCreatorService;
+        this.queryInvitationServices = queryInvitationServices;
+        this.promiseRepository = promiseRepository;
+        this.participantRepository = participantRepository;
+        this.participantLevelRepository = participantLevelRepository;
     }
 
     @Transactional
@@ -172,7 +186,7 @@ public class CommandPaymentService {
             var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
             _paymentRepository.save(payment);
             var newInvoice = createInvoice(invoice, cashDrawer, payment, payment.getPaymentshistory());
-            eventBus.publish(List.of(new PaymentCreated(payment, newInvoice, cashDrawer)));
+            this.paymentCreated(new PaymentCreated(payment, newInvoice, cashDrawer));
         }
 
         cashDrawerDetailCommandService.save(null, paymentReq.cashDrawerId, payment);
@@ -432,5 +446,47 @@ public class CommandPaymentService {
         } catch (Exception e) {
             throw new BaseException("Error generating invoice", List.of(e.getMessage()));
         }
+    }
+
+    public void paymentCreated(PaymentCreated event) {
+        Participant participant = event.getPayment().getParticipant();
+        event.getPayment().getProducts().forEach(product -> {
+
+            var invitation = queryInvitationServices.findInvitationByToken(participant.getInvitationToken());
+
+            var promiseOpt = promiseRepository.findLastByUserId(invitation.getSenderId());
+
+            if (promiseOpt.isPresent()) {
+                var promise = promiseOpt.get();
+
+                LocalDate createdDate = participant.getCreatedDate().toLocalDate();
+                LocalDate startDate = promise.getStartDate();
+                LocalDate endDate = promise.getEndDate();
+
+                if ((createdDate.isEqual(startDate) || createdDate.isAfter(startDate)) &&
+                        (createdDate.isEqual(endDate) || createdDate.isBefore(endDate))) {
+
+                    promise.setPaidCount(promise.getPaidCount() + 1);
+                    promiseRepository.save(promise);
+                }
+            }
+            var prod = event.getPayment().getProducts().getFirst();
+
+            prod.getPrograms().forEach(program -> {
+                switch (program.getCourseLevel()) {
+                    case FOCUS -> participant.getModules().setHasFocus(true);
+                    case YOUR -> participant.getModules().setHasYour(true);
+                    case LIFE -> participant.getModules().setHasLife(true);
+                    default -> throw new BaseException("Invalid course level", List.of(""));
+                }
+            });
+            if (event.getPayment().getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.INIT) {
+                var pl = participantLevelRepository.getRolByLevel(CourseLevel.FOCUS);
+                participant.setParticipantLevel(pl);
+                participantRepository.save(participant);
+            }
+        });
+
+        clientModuleCreatorService.createClientModule(participant.getModules());
     }
 }

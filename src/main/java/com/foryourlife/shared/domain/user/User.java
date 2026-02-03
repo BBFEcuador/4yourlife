@@ -28,7 +28,7 @@ public class User implements Serializable {
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private List<UserEntities> entityMap;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "senderId", referencedColumnName = "id")
     private List<Invitation> invitations = new ArrayList<>();
 

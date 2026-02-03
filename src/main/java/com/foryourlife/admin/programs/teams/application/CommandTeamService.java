@@ -2,6 +2,7 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.crm.call.domain.Call;
 import com.foryourlife.admin.crm.call.domain.CallRepository;
+import com.foryourlife.admin.programs.attendance.application.CommandAttendanceService;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.FylStage;
 import com.foryourlife.admin.programs.attendance.infraestructure.AttendanceRepositoryImpl;
@@ -17,7 +18,6 @@ import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevel;
 import com.foryourlife.clients.account.participantLevel.domain.ParticipantLevelRepository;
-import com.foryourlife.clients.account.promises.application.PromiseCommandService;
 import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.masterLife.application.QueryMasterLifeService;
@@ -41,13 +41,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class CommandTeamService {
-
     private final AttendanceRepositoryImpl attendanceRepository;
     private final CallRepository callRepository;
     private final TrainingRepository trainingRepository;
@@ -65,28 +62,27 @@ public class CommandTeamService {
     private final QueryTeamService queryTeamService;
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
     private final ParticipantLevelRepository participantLevelRepository;
-    private final PromiseCommandService promiseCommandService;
     private final TeamBadgePdfService teamBadgePdfService;
+    private final CommandAttendanceService commandAttendanceService;
 
-
-    public CommandTeamService(TeamRepository _teamRepository, EventBus bus, ParticipantRepository _participantRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, PromiseRepository promiseRepository, ParticipantLevelRepository participantLevelRepository, PromiseCommandService promiseCommandService, TrainingRepository trainingRepository, MasterLifeRepository masterLifeRepository, TeamBadgePdfService teamBadgePdfService) {
+    public CommandTeamService(AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, TrainingRepository trainingRepository, TeamRepository _teamRepository, EventBus bus, PromiseRepository promiseRepository, ParticipantRepository _participantRepository, MasterLifeRepository masterLifeRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, ParticipantLevelRepository participantLevelRepository, TeamBadgePdfService teamBadgePdfService, CommandAttendanceService commandAttendanceService) {
+        this.attendanceRepository = attendanceRepository;
+        this.callRepository = callRepository;
+        this.trainingRepository = trainingRepository;
         this._teamRepository = _teamRepository;
         this.bus = bus;
+        this.promiseRepository = promiseRepository;
         this._participantRepository = _participantRepository;
+        this.masterLifeRepository = masterLifeRepository;
         this.staffRepository = staffRepository;
         this.visionaryRepository = visionaryRepository;
         this.queryTrainingService = queryTrainingService;
         this.trainerQueryService = trainerQueryService;
         this.queryMasterLifeService = queryMasterLifeService;
         this.queryTeamService = queryTeamService;
-        this.attendanceRepository = attendanceRepository;
-        this.callRepository = callRepository;
-        this.promiseRepository = promiseRepository;
         this.participantLevelRepository = participantLevelRepository;
-        this.promiseCommandService = promiseCommandService;
-        this.trainingRepository = trainingRepository;
-        this.masterLifeRepository = masterLifeRepository;
         this.teamBadgePdfService = teamBadgePdfService;
+        this.commandAttendanceService = commandAttendanceService;
     }
 
     public void save(Team team) {
@@ -135,12 +131,10 @@ public class CommandTeamService {
             return p;
         }).toList();
         var staff = request.staffs.stream().map(participant -> {
-            var p = staffRepository.findById(participant.getId()).orElseThrow();
-            return p;
+            return staffRepository.findById(participant.getId()).orElseThrow();
         }).toList();
         var visionaries = request.visionaries.stream().map(participant -> {
-            var p = visionaryRepository.findById(participant.getId()).orElseThrow();
-            return p;
+            return visionaryRepository.findById(participant.getId()).orElseThrow();
         }).toList();
         var team = Team.create(
                 request.id != null ? request.id : UUID.randomUUID().toString(),
@@ -171,8 +165,9 @@ public class CommandTeamService {
             return null;
         }).toList();
         var staff = request.staffs.stream().map(participant -> {
-            var p = staffRepository.findById(participant.getId()).orElseThrow();
-            return p;
+            return staffRepository.findById(participant.getId()).orElseThrow(
+                    () -> new BaseException("Staff no disponible", List.of("El staff no existe"))
+            );
         }).toList();
         var team = Team.create(
                 request.id != null ? request.id : UUID.randomUUID().toString(),
@@ -211,7 +206,6 @@ public class CommandTeamService {
             }
             _participantRepository.save(participant);
         });
-//        this.bus.publish(team.pullDomainEvents());
     }
 
 
@@ -279,16 +273,6 @@ public class CommandTeamService {
         _teamRepository.removeStaffs(teamId, userId);
     }
 
-    public void assignTeams(String teamId, String trainingId) {
-        var team = this._teamRepository.findById(teamId).orElseThrow(() ->
-                new BaseException("Team not found", List.of("The team with id " + teamId + " does not exist"))
-        );
-        var training = this.queryTrainingService.getTrainingById(trainingId);
-        team.setTraining(training);
-        this._teamRepository.save(team);
-        this.bus.publish(team.pullDomainEvents());
-    }
-
     public String updatePhoto(String id, MultipartFile photo) throws IOException {
         String imagePath = null;
         try {
@@ -338,14 +322,7 @@ public class CommandTeamService {
         var team = _teamRepository.findById(request.id).orElseThrow();
         var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
         var training = team.getTraining().getNextLevel();
-        Hibernate.initialize(team.getTraining().getNextLevel());
-        Hibernate.initialize(team.getStaffs());
-        Hibernate.initialize(team.getMasterLife());
-        Hibernate.initialize(team.getVisionaries());
-        Hibernate.initialize(team.getUsers());
-
-        var newTeam = SerializationUtils.clone(team);
-        this.addOriginalTeam(newTeam);
+        initializeTeamProperties(team);
 
         var participants = request.users.stream()
                 .map(u -> _participantRepository.findById(u.getId()).orElseThrow())
@@ -403,7 +380,7 @@ public class CommandTeamService {
         team.getStaffs().clear();
         _teamRepository.save(team);
         assignParticipantLevelToUsers(team.getUsers(), training);
-        this.assignAttendancesAndDeclarations(team, team.getTraining());
+        commandAttendanceService.assignAttendancesAndDeclarations(team, team.getTraining());
     }
 
     @Transactional
@@ -413,14 +390,7 @@ public class CommandTeamService {
 
         var trainer = trainerQueryService.findTrainerById(request.trainer)
                 .orElseThrow(() -> new BaseException("Trainer not found", List.of()));
-        Hibernate.initialize(team.getTraining().getNextLevel());
-        Hibernate.initialize(team.getStaffs());
-        Hibernate.initialize(team.getMasterLife());
-        Hibernate.initialize(team.getVisionaries());
-        Hibernate.initialize(team.getUsers());
-
-        var newTeam = SerializationUtils.clone(team);
-        this.addOriginalTeam(newTeam);
+        initializeTeamProperties(team);
 
         var training = team.getTraining().getNextLevel();
 
@@ -483,7 +453,18 @@ public class CommandTeamService {
 
         _teamRepository.save(team);
         assignParticipantLevelToUsers(team.getUsers(), team.getTraining());
-        this.assignAttendancesAndDeclarations(team, team.getTraining());
+        commandAttendanceService.assignAttendancesAndDeclarations(team, team.getTraining());
+    }
+
+    private void initializeTeamProperties(Team team) {
+        Hibernate.initialize(team.getTraining().getNextLevel());
+        Hibernate.initialize(team.getStaffs());
+        Hibernate.initialize(team.getMasterLife());
+        Hibernate.initialize(team.getVisionaries());
+        Hibernate.initialize(team.getUsers());
+
+        var newTeam = SerializationUtils.clone(team);
+        this.addOriginalTeam(newTeam);
     }
 
     public void removeVisionaries(String teamId, String id) {
@@ -521,7 +502,6 @@ public class CommandTeamService {
                     promise.setEndDate(team.getTraining().getEndDate().plusDays(5));
                     promiseRepository.save(promise);
                 }
-
                 attendanceRepository.save(
                         Attendance.create(
                                 UUID.randomUUID().toString(),
@@ -597,7 +577,6 @@ public class CommandTeamService {
                     );
                 }
                 if (team.getTraining().getCourseLevel().equals(CourseLevel.LIFE_2)) {
-
                     attendanceRepository.save(
                             Attendance.create(
                                     UUID.randomUUID().toString(),
@@ -667,85 +646,6 @@ public class CommandTeamService {
         team.setName(team.getName());
         team.getTraining().setOriginalTeam(team);
         trainingRepository.save(team.getTraining());
-    }
-
-    public void assignAttendancesAndDeclarations(Team team, Training training) {
-        team.getUsers().forEach(user -> {
-            switch (training.getCourseLevel()) {
-                case CourseLevel.FOCUS:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.FOCUS, user.getUser(), training));
-                    callRepository.save(new Call(
-                                    UUID.randomUUID().toString(),
-                                    user.getUser(),
-                                    training
-                            )
-                    );
-                    break;
-                case CourseLevel.YOUR:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.YOUR, user.getUser(), training));
-                    callRepository.save(new Call(
-                                    UUID.randomUUID().toString(),
-                                    user.getUser(),
-                                    training
-                            )
-                    );
-                    break;
-                case CourseLevel.LIFE:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_1, user.getUser(), training));
-                    callRepository.save(new Call(
-                                    UUID.randomUUID().toString(),
-                                    user.getUser(),
-                                    training
-                            )
-                    );
-                    break;
-                case CourseLevel.LIFE_2:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_2, user.getUser(), training));
-                    callRepository.save(new Call(
-                                    UUID.randomUUID().toString(),
-                                    user.getUser(),
-                                    training
-                            )
-                    );
-                    break;
-                case CourseLevel.LIFE_3:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_3, user.getUser(), training));
-                    callRepository.save(new Call(
-                                    UUID.randomUUID().toString(),
-                                    user.getUser(),
-                                    training
-                            )
-                    );
-                    break;
-                case CourseLevel.LIFE_GRADUATE:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_GRADUATE, user.getUser(), training));
-                    callRepository.save(new Call(
-                                    UUID.randomUUID().toString(),
-                                    user.getUser(),
-                                    training
-                            )
-                    );
-                    break;
-            }
-        });
-
-        team.getMasterLife().forEach(masterLifes -> {
-            switch (training.getCourseLevel()) {
-                case CourseLevel.LIFE:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_1, masterLifes.getUser(), training));
-                    break;
-                case CourseLevel.LIFE_2:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_2, masterLifes.getUser(), training));
-                    break;
-                case CourseLevel.LIFE_3:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_3, masterLifes.getUser(), training));
-                    break;
-                case CourseLevel.LIFE_GRADUATE:
-                    attendanceRepository.save(Attendance.create(UUID.randomUUID().toString(), null, null, null, FylStage.LIFE_GRADUATE, masterLifes.getUser(), training));
-                    break;
-            }
-        });
-        promiseCommandService.createPromises(training.getId());
     }
 
     @Transactional

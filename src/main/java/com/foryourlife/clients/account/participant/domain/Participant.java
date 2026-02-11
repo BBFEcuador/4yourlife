@@ -31,7 +31,7 @@ public class Participant extends AuditableEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "participant_level_id", referencedColumnName = "id")
     private ParticipantLevel participantLevel;
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(referencedColumnName = "id", name = "profile_id")
     private ProfileDetails profile;
     @ManyToOne()

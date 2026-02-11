@@ -1,6 +1,8 @@
 package com.foryourlife.clients.account.invitations.domain;
 
-public class Sender {
+import java.io.Serializable;
+
+public class Sender implements Serializable {
     private String id;
     private String name;
     private String trainingName = null;

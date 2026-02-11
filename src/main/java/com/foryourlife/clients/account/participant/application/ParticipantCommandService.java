@@ -194,9 +194,9 @@ public class ParticipantCommandService {
     public void changeParticipantCampus(String participantId, String campusId) {
         var participant = this._participantRepository.findById(participantId)
                 .orElseThrow(() -> new BaseException("Participante no encontrado", List.of("El participante con id " + participantId + " no existe")));
-        if (participant.getTeam() != null) {
-            throw new BaseException("No se puede cambiar el campus", List.of("El participante ya pertenece a un equipo"));
-        }
+//        if (participant.getTeam() != null) {
+//            throw new BaseException("No se puede cambiar el campus", List.of("El participante ya pertenece a un equipo"));
+//        }
         var campus = campusRepository.findById(campusId).orElseThrow(
                 () -> new BaseException("Campus no encontrado", List.of("El campus con id " + campusId + " no existe"))
         );

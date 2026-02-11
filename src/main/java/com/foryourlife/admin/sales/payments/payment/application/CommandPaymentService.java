@@ -285,7 +285,7 @@ public class CommandPaymentService {
                 c.setNumero_cheque(sh.getTransactionId());
             }
             if (sh.getPaymentMethod().getCode().equals("TC")) {
-                c.setTipo_ping(sh.getPingType());
+                c.setTipo_ping("D");
             }
 
             result.add(c);

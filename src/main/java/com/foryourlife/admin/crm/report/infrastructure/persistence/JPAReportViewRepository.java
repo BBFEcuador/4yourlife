@@ -7,6 +7,7 @@ import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 import com.foryourlife.admin.programs.trainer.trainerDashboard.infrastructure.persistence.TrainerFocusViewRepositoryImpl;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -179,12 +180,12 @@ public class JPAReportViewRepository implements ReportViewRepository {
                     .map(a -> a.getUser().getId())
                     .distinct()
                     .toList();
-            var participants = training.getOriginalTeam().getUsers()
+            var participants = training.getOriginalTeam() != null ? training.getOriginalTeam().getUsers()
             .stream()
                     .collect(Collectors.toMap(
                             p -> p.getUser().getId(),
                             p -> p
-                    ));
+                    )) : new HashMap<String, Participant>();
 
             var payments = trainerFocusViewRepository.buildPaymentDashboard(attendances, participants);
 
@@ -211,8 +212,8 @@ public class JPAReportViewRepository implements ReportViewRepository {
             });
 
             ref.rowIdx++;
-
-            if (!training.getOriginalTeam().getMasterLife().isEmpty()){
+            var master = training.getOriginalTeam() != null ? training.getOriginalTeam().getMasterLife() : new ArrayList<>();
+            if (!master.isEmpty()){
                 Row promiseHeader = operativeSheet.createRow(ref.rowIdx);
                 promiseHeader.createCell(0).setCellValue("Declaraciones de Pago Life Master");
                 Row promiseColumns = operativeSheet.createRow(ref.rowIdx);

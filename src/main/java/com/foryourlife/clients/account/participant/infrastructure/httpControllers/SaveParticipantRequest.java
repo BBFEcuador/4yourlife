@@ -33,6 +33,10 @@ public class SaveParticipantRequest {
     @NotBlank(message = "The name1 field is required")
     public String name1;
 
+    @NotNull
+    @NotBlank(message = "The nickname field is required")
+    public String nickname;
+
     public String name2;
     @NotNull
     @NotBlank(message = "The lastname1 field is required")
@@ -120,6 +124,7 @@ public class SaveParticipantRequest {
                         email.toLowerCase().trim(),
                         password.trim(),
                         name1,
+                        nickname,
                         name2,
                         lastname1,
                         lastname2,
@@ -127,7 +132,8 @@ public class SaveParticipantRequest {
                                 .filter(s -> s != null && !s.trim().isEmpty())
                                 .collect(Collectors.joining(" ")),
                         phone,
-                        List.of(new UserEntities(newId, UserType.PARTICIPANT.toString()))),
+                        List.of(new UserEntities(newId, UserType.PARTICIPANT.toString()))
+                ),
                 null,
                 profile.toDomain(),
                 token,

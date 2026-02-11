@@ -19,6 +19,8 @@ public class User implements Serializable {
     private String password;
 
     private String name1;
+
+    private String nickname;
     private String name2;
     private String lastname1;
     private String lastname2;
@@ -67,6 +69,28 @@ public class User implements Serializable {
         this.name = name;
         this.phone = phone;
         this.entityMap = entityMap;
+    }
+
+    public User(String id, String email, String password, String name1, String nickname, String name2, String lastname1, String lastname2, String name, String phone, List<UserEntities> entityMap) {
+        this.id = id;
+        this.email = email.toLowerCase();
+        this.password = password;
+        this.name1 = name1;
+        this.nickname = nickname;
+        this.name2 = name2;
+        this.lastname1 = lastname1;
+        this.lastname2 = lastname2;
+        this.name = name;
+        this.phone = phone;
+        this.entityMap = entityMap;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public String getName1() {

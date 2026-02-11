@@ -58,7 +58,7 @@ public class OnPaymentHistoryCreated {
                     jsonNode.put("forma_cobro", "TC");
                     jsonNode.put("monto", event.getPaymentHistory().getAmount());
                     jsonNode.put("fecha", formattedDate);
-                    jsonNode.put("tipo_ping", event.getPaymentHistory().getPingType() != null ? event.getPaymentHistory().getPingType() : "D");
+                    jsonNode.put("tipo_ping", "D");
                     break;
                 case "TRA":
                     jsonNode.put("forma_cobro", "TRA");

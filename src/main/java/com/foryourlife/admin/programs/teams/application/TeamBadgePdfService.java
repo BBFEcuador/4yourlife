@@ -90,7 +90,7 @@ public class TeamBadgePdfService {
         }
 
         for (int i = 0; i < visionary.size(); i++) {
-            table.addCell(createBadge(visionary.get(i), i + 1, "VISIONARIOS", new DeviceRgb(140, 0, 250)));
+            table.addCell(createBadge(visionary.get(i), i + 1, "VISIONARIO", new DeviceRgb(140, 0, 250)));
         }
         for (int i = 0; i < staff.size(); i++) {
             table.addCell(createBadge(staff.get(i), i + 1, "STAFF", new DeviceRgb(16, 153, 14)));
@@ -142,7 +142,7 @@ public class TeamBadgePdfService {
         lineCellTop.add(new LineSeparator(new SolidLine(0.6f)));
 
         // ===== NOMBRE =====
-        Cell nameCell = textCell(user.getName1().toUpperCase(), 38, true, 38, new DeviceRgb(0, 0, 0));
+        Cell nameCell = textCell(user.getNickname().toUpperCase(), 38, true, 38, new DeviceRgb(0, 0, 0));
 
         // ===== APELLIDO =====
         Cell lastNameCell = textCell(user.getLastname1() + " " + user.getLastname2(), 12, false, 12, new DeviceRgb(0, 0, 0));

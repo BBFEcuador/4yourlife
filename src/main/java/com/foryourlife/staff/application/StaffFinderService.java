@@ -29,7 +29,9 @@ public class StaffFinderService {
     }
 
     public Staff findByUserId(String userId) {
-        return _repository.findByUserId(userId);
+        return _repository.findByUserId(userId).orElseThrow(() ->
+                new BaseException("Error", List.of("Staff no encontrado por usuairo"))
+        );
     }
 
     public List<Staff> getAll() {

@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -58,7 +59,7 @@ public class TeamBadgePdfService {
                 .useAllAvailableWidth()
                 .setPadding(0)
                 .setBorder(Border.NO_BORDER);  // SIN BORDE en la tabla principal
-        var users = team.getUsers().stream().map(Participant::getUser).toList();
+        var users = team.getUsers().stream().map(Participant::getUser).sorted(Comparator.comparing(User::getLastname1)).toList();
         var ml = team.getMasterLife().stream().map(MasterLife::getUser).toList();
         var visionary = team.getVisionaries().stream().map(Visionary::getUser).toList();
         var staff = team.getStaffs().stream().map(Staff::getUser).toList();
@@ -82,7 +83,7 @@ public class TeamBadgePdfService {
                 if (!hasUnconfirmedLogs) {
                     continue;
                 }
-            }else{
+            } else {
                 continue;
             }
 
@@ -141,11 +142,13 @@ public class TeamBadgePdfService {
                 .setBorder(Border.NO_BORDER);
         lineCellTop.add(new LineSeparator(new SolidLine(0.6f)));
 
+        var name = user.getNickname() != null ? user.getNickname().toUpperCase() : user.getName1().toUpperCase();
+
         // ===== NOMBRE =====
-        Cell nameCell = textCell(user.getNickname().toUpperCase(), 38, true, 38, new DeviceRgb(0, 0, 0));
+        Cell nameCell = textCell(name, 46, true, 46, new DeviceRgb(0, 0, 0));
 
         // ===== APELLIDO =====
-        Cell lastNameCell = textCell(user.getLastname1() + " " + user.getLastname2(), 12, false, 12, new DeviceRgb(0, 0, 0));
+        Cell lastNameCell = textCell(user.getLastname1() + " " + user.getLastname2(), 10, false, 10, new DeviceRgb(0, 0, 0));
 
         // ===== NUMERO =====
         Cell numberCell = textCell("-- " + number + " --", 9, false, 9, new DeviceRgb(0, 0, 0));
@@ -158,7 +161,7 @@ public class TeamBadgePdfService {
         lineCell.add(new LineSeparator(new SolidLine(0.6f)));
 
         // ===== ROL =====
-        Cell roleCell = textCell(role, 14, true, 14, roleColor);
+        Cell roleCell = textCell(role, 8, true, 8, roleColor);
 
         card.addCell(logoCell);
         card.addCell(lineCellTop);

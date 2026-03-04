@@ -46,6 +46,11 @@ public class PaymentController {
         return new ResponseEntity<>(queryPaymentService.findByParticipantId(id, p), HttpStatus.OK);
     }
 
+    @GetMapping("/participant-all/{id}")
+    public ResponseEntity<?> getAllPaymentsByParticipantId(@PathVariable String id) {
+        return new ResponseEntity<>(queryPaymentService.findAllByParticipantIn(id), HttpStatus.OK);
+    }
+
     @GetMapping("")
     public ResponseEntity<?> getAllPayments(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search, @RequestParam(value = "campusId", defaultValue = "") String campusId) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());

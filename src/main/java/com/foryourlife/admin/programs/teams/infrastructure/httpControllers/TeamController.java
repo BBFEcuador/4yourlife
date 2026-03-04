@@ -194,4 +194,10 @@ public class TeamController {
         commandTeamService.addParticipants(teamId, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("/{id}/trainer/{trainerId}")
+    public ResponseEntity<?> updateTrainer(@PathVariable String trainerId,@PathVariable String id) {
+        commandTeamService.updateTrainer(id, trainerId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

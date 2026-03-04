@@ -19,6 +19,6 @@ public interface StaffRepository {
     List<Staff> match(Criteria criteria);
 
     void deleteById(String id);
-    Staff findByUserId(String participantId);
+    Optional<Staff> findByUserId(String participantId);
     boolean isStaffAvailable(String staffId, LocalDate startDate, LocalDate endDate, String newTrainingId);
 }

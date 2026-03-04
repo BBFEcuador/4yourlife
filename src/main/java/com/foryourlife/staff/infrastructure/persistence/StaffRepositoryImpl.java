@@ -64,7 +64,7 @@ public class StaffRepositoryImpl implements StaffRepository {
     }
 
     @Override
-    public Staff findByUserId(String userId) {
+    public Optional<Staff> findByUserId(String userId) {
         return repository.findByUser_Id(userId);
     }
 

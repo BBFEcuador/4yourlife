@@ -24,6 +24,7 @@ import com.foryourlife.clients.account.profileDetails.domain.ProfileDetailsRepos
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
 import org.slf4j.Logger;
@@ -58,12 +59,30 @@ public class ParticipantCommandService {
     private final InvoiceDataCommandService invoiceDataCommandService;
     private final CampusRepository campusRepository;
     private final TeamRepository teamRepository;
-    private final PaymentRepository paymentRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProductRepository productRepository;
     private final TrainingRepository trainingRepository;
 
-    public ParticipantCommandService(ParticipantRepository _participantRepository, UserRepository _userRepository, CommandGeneralUserService commandGeneralUserService, QueryInvitationServices queryInvitationServices, ParticipantLevelService _rolRepository, ClientModuleCreatorService _clientModuleRepository, ProfileDetailsRepository profileDetailsRepository, ParticipantLevelService participantLevelService, ContactRepository contactRepository, EventBus bus, AdminRepository _adminRepository, MedicalRecordCreatorService medicalRecordCreatorService, InvoiceDataCommandService invoiceDataCommandService, CampusRepository campusRepository, TeamRepository teamRepository, PaymentRepository paymentRepository, PasswordEncoder passwordEncoder, ProductRepository productRepository, TrainingRepository trainingRepository) {
+    public ParticipantCommandService(
+            ParticipantRepository _participantRepository,
+            UserRepository _userRepository,
+            CommandGeneralUserService commandGeneralUserService,
+            QueryInvitationServices queryInvitationServices,
+            ParticipantLevelService _rolRepository,
+            ClientModuleCreatorService _clientModuleRepository,
+            ProfileDetailsRepository profileDetailsRepository,
+            ParticipantLevelService participantLevelService,
+            ContactRepository contactRepository,
+            EventBus bus,
+            AdminRepository _adminRepository,
+            MedicalRecordCreatorService medicalRecordCreatorService,
+            InvoiceDataCommandService invoiceDataCommandService,
+            CampusRepository campusRepository,
+            TeamRepository teamRepository,
+            PasswordEncoder passwordEncoder,
+            ProductRepository productRepository,
+            TrainingRepository trainingRepository
+    ) {
         this._participantRepository = _participantRepository;
         this._userRepository = _userRepository;
         this.commandGeneralUserService = commandGeneralUserService;
@@ -79,7 +98,6 @@ public class ParticipantCommandService {
         this.invoiceDataCommandService = invoiceDataCommandService;
         this.campusRepository = campusRepository;
         this.teamRepository = teamRepository;
-        this.paymentRepository = paymentRepository;
         this.passwordEncoder = passwordEncoder;
         this.productRepository = productRepository;
         this.trainingRepository = trainingRepository;
@@ -95,7 +113,9 @@ public class ParticipantCommandService {
         var token = queryInvitationServices.findInvitationByToken(user.getInvitationToken());
         if (token.getUsed())
             throw new BaseException("Token expirado", List.of("El token ya fue utilizado"));
-
+        _profileDetailsRepository.findByDni(user.getProfile().getDni()).ifPresent(profileDetails -> {
+            throw new BaseException("Error al crear", List.of("Ya existe un participante con el documento "+user.getProfile().getDni()));
+        });
         commandGeneralUserService.save(user.getUser());
 
         var role = this._rolRepository.getInitRole();
@@ -144,10 +164,18 @@ public class ParticipantCommandService {
 
     public void update(Participant participant) {
         try {
-            _userRepository.findById(participant.getUser().getId()).orElseThrow(() -> new BaseException("No se encontró el usuario asociado al participante.", List.of()));
+            var u = _userRepository.findById(participant.getUser().getId()).orElseThrow(() -> new BaseException("No se encontró el usuario asociado al participante.", List.of()));
             var auxUser = participant.getUser();
-            auxUser.setName(participant.getUser().getName1() + " " + participant.getUser().getName2() + " " + participant.getUser().getLastname1() + " " + participant.getUser().getLastname2());
-            _userRepository.save(auxUser);
+            u.setName(auxUser.getName1() + " " + auxUser.getName2() + " " + auxUser.getLastname1() + " " + auxUser.getLastname2());
+            u.setName1(auxUser.getName1());
+            u.setName2(auxUser.getName2());
+            u.setLastname1(auxUser.getLastname1());
+            u.setLastname2(auxUser.getLastname2());
+            u.setNickname(auxUser.getNickname());
+            u.setEmail(auxUser.getEmail());
+            u.setPhone(auxUser.getPhone());
+            _userRepository.save(u);
+            participant.setUser(u);
             participant.setCampus(participant.getCampus() != null ? participant.getCampus() : queryInvitationServices.findInvitationByToken(participant.getInvitationToken()).getCampus());
             _profileDetailsRepository.findById(participant.getProfile().getId()).orElseThrow(() -> new BaseException("No se encontró el perfil asociado al participante.", List.of()));
             _profileDetailsRepository.save(participant.getProfile());
@@ -262,6 +290,7 @@ public class ParticipantCommandService {
                         List.of("El entrenamiento con id " + teamId + " no existe")
                 ));
 
+
         var product = productRepository
                 .findByCampusIdAndProductProgramAndHighPrice(
                         team.getTraining().getCampus().getId(),
@@ -278,6 +307,9 @@ public class ParticipantCommandService {
                     team.getTraining(),
                     product,
                     team.getUsers()
+                            .stream()
+                            .sorted(Comparator.comparing(participant -> participant.getUser().getLastname1()))
+                            .toList()
             );
 
 

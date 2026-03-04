@@ -10,10 +10,11 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface JpaStaffRepository extends JpaRepository<Staff, String>, JpaSpecificationExecutor<Staff> {
-    Staff findByUser_Id(String userId);
+    Optional<Staff> findByUser_Id(String userId);
 
     @Query("""
                 SELECT s FROM Staff s

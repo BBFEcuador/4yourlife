@@ -33,6 +33,7 @@ public class SaveGeneraUserRequest {
     public String name;
     @NotNull
     public String phone;
+    public String nickname;
 
     public User toDomain(List<UserEntities> entity) {
         return new User(
@@ -40,6 +41,7 @@ public class SaveGeneraUserRequest {
                 email,
                 password,
                 name1,
+                nickname,
                 name2,
                 lastname1,
                 lastname2,

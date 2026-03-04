@@ -147,4 +147,12 @@ public class User implements Serializable {
     public void setInvitations(List<Invitation> invitations) {
         this.invitations = invitations;
     }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 }

@@ -52,6 +52,11 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
+    public List<Payment> findByParticipantId(String id) {
+        return _jpaPaymentRepository.findByParticipantId(id);
+    }
+
+    @Override
     public Page<Payment> findAll(Pageable pageable) {
         return _jpaPaymentRepository.findAll(pageable);
     }

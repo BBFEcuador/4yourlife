@@ -73,7 +73,6 @@ public class OrganizationChartCommandService {
         List<ChartNode> allNodes = new ArrayList<>();
 
 
-
         var chartNodes = chartNodeQueryService.findAllByOrganizationId(organizationChart.getId());
         chartNodes.forEach(chartNode -> {
             chartNodeCommandService.deleteNode(chartNode.getId());
@@ -186,8 +185,10 @@ public class OrganizationChartCommandService {
         node.setLevel(level);
         node.setOrganizationChart(chart);
         if (level == UserType.STAFF) {
-            var staff = staffRepository.findByUserId(userId).getRol();
-            if (Objects.equals(staff, "CAPITAN")) {
+            var staff = staffRepository.findByUserId(userId).orElseThrow(() ->
+                    new BaseException("Error", List.of("Staff no encontrado por usuairo"))
+            );
+            if (Objects.equals(staff.getRol(), "CAPITAN")) {
                 node.setCaptain(true);
             }
         }
@@ -206,7 +207,7 @@ public class OrganizationChartCommandService {
     private void validateUserLevel(User user, UserType level) {
 
         String requiredEntity = switch (level) {
-            case UserType.MASTER_LIFE ->  "MASTER_LIFE";
+            case UserType.MASTER_LIFE -> "MASTER_LIFE";
             case UserType.VISIONARY -> "VISIONARY";
             case UserType.STAFF -> "STAFF";
             case UserType.PARTICIPANT -> "PARTICIPANT";

@@ -411,6 +411,7 @@ public class CommandPaymentService {
         cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
 
         createInvoice(newInvoice, cashDrawer, payment, List.of(paymentHistory));
+        this.paymentCreated(new PaymentCreated(payment, newInvoice, cashDrawer));
     }
 
     public void changeStatus(String id, String status) {
@@ -449,44 +450,45 @@ public class CommandPaymentService {
     }
 
     public void paymentCreated(PaymentCreated event) {
-        Participant participant = event.getPayment().getParticipant();
-        event.getPayment().getProducts().forEach(product -> {
+        if (event.getPayment().getStatus() == PaymentStatus.COMPLETED) {
+            Participant participant = event.getPayment().getParticipant();
+            event.getPayment().getProducts().forEach(product -> {
 
-            var invitation = queryInvitationServices.findInvitationByToken(participant.getInvitationToken());
+                var invitation = queryInvitationServices.findInvitationByToken(participant.getInvitationToken());
 
-            var promiseOpt = promiseRepository.findLastByUserId(invitation.getSenderId());
+                var promiseOpt = promiseRepository.findLastByUserId(invitation.getSenderId());
 
-            if (promiseOpt.isPresent()) {
-                var promise = promiseOpt.get();
+                if (promiseOpt.isPresent()) {
+                    var promise = promiseOpt.get();
 
-                LocalDate createdDate = participant.getCreatedDate().toLocalDate();
-                LocalDate startDate = promise.getStartDate();
-                LocalDate endDate = promise.getEndDate();
+                    LocalDate createdDate = participant.getCreatedDate().toLocalDate();
+                    LocalDate startDate = promise.getStartDate();
+                    LocalDate endDate = promise.getEndDate();
 
-                if ((createdDate.isEqual(startDate) || createdDate.isAfter(startDate)) &&
-                        (createdDate.isEqual(endDate) || createdDate.isBefore(endDate))) {
+                    if ((createdDate.isEqual(startDate) || createdDate.isAfter(startDate)) &&
+                            (createdDate.isEqual(endDate) || createdDate.isBefore(endDate))) {
 
-                    promise.setPaidCount(promise.getPaidCount() + 1);
-                    promiseRepository.save(promise);
+                        promise.setPaidCount(promise.getPaidCount() + 1);
+                        promiseRepository.save(promise);
+                    }
                 }
-            }
-            var prod = event.getPayment().getProducts().getFirst();
+                var prod = event.getPayment().getProducts().getFirst();
 
-            prod.getPrograms().forEach(program -> {
-                switch (program.getCourseLevel()) {
-                    case FOCUS -> participant.getModules().setHasFocus(true);
-                    case YOUR -> participant.getModules().setHasYour(true);
-                    case LIFE -> participant.getModules().setHasLife(true);
-                    default -> throw new BaseException("Invalid course level", List.of(""));
+                prod.getPrograms().forEach(program -> {
+                    switch (program.getCourseLevel()) {
+                        case FOCUS -> participant.getModules().setHasFocus(true);
+                        case YOUR -> participant.getModules().setHasYour(true);
+                        case LIFE -> participant.getModules().setHasLife(true);
+                        default -> throw new BaseException("Invalid course level", List.of(""));
+                    }
+                });
+                if (event.getPayment().getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.INIT) {
+                    var pl = participantLevelRepository.getRolByLevel(CourseLevel.FOCUS);
+                    participant.setParticipantLevel(pl);
+                    participantRepository.save(participant);
                 }
             });
-            if (event.getPayment().getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.INIT) {
-                var pl = participantLevelRepository.getRolByLevel(CourseLevel.FOCUS);
-                participant.setParticipantLevel(pl);
-                participantRepository.save(participant);
-            }
-        });
-
-        clientModuleCreatorService.createClientModule(participant.getModules());
+            clientModuleCreatorService.createClientModule(participant.getModules());
+        }
     }
 }

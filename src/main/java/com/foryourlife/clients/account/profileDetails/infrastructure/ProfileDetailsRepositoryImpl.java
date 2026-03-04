@@ -23,4 +23,9 @@ public class ProfileDetailsRepositoryImpl implements ProfileDetailsRepository {
     public Optional<ProfileDetails> findById(String id) {
         return this.repository.findById(id);
     }
+
+    @Override
+    public Optional<ProfileDetails> findByDni(String id) {
+        return this.repository.findByDni(id);
+    }
 }

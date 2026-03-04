@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -89,6 +90,9 @@ public class CommandTrainingService {
         repository.findByStartDateAndCampus_id(new StartDate(date).getValue(), training.getCampus().getId()).forEach(t -> {
             if (t.getCourseLevel() == FOCUS || t.getCourseLevel() == YOUR) {
                 throw new BaseException("Error al actualizar la fecha", List.of("Entrenamientos Focus o Your no pueden coincidir"));
+            }
+            if (t.getNumber() == training.getNumber()){
+                throw new BaseException("Error al actualizar la fecha", List.of("El entrenamiento coincide con un entrenamiento de su mismo numero"));
             }
         });
         training.setStartDate(new StartDate(date).getValue());

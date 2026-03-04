@@ -7,4 +7,6 @@ public interface ProfileDetailsRepository {
     void save(ProfileDetails profileDetails);
 
     Optional<ProfileDetails> findById(String id);
+
+    Optional<ProfileDetails> findByDni(String id);
 }

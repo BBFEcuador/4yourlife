@@ -8,4 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface JPAProfileDetailsRepository extends JpaRepository<ProfileDetails,String> {
+     Optional<ProfileDetails> findByDni(String dni);
 }

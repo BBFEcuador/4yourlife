@@ -19,6 +19,8 @@ import java.util.Optional;
 public interface JPAPaymentRepository extends JpaRepository<Payment, String>, JpaSpecificationExecutor<Payment> {
     Page<Payment> findByParticipantId(String id, Pageable page);
 
+    List<Payment> findByParticipantId(String id);
+
     boolean existsByParticipant_IdAndStatus(String participantId, PaymentStatus status);
 
     List<Payment> findAllByParticipantIn(Collection<Participant> participants);

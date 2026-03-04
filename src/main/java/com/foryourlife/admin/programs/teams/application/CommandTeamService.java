@@ -660,4 +660,15 @@ public class CommandTeamService {
 
         return teamBadgePdfService.generatePdf(team);
     }
+
+    public void updateTrainer(String id, String trainerId) {
+        var trainer = trainerQueryService.findTrainerById(trainerId).orElseThrow(() ->
+                new BaseException("Error",List.of("Entrenador no encontrado"))
+        );
+        var team = _teamRepository.findById(id).orElseThrow(() ->
+            new BaseException("Error",List.of("Equipo no encontrado"))
+        );
+        team.setTrainer(trainer);
+        _teamRepository.save(team);
+    }
 }

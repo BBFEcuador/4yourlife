@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class QueryPaymentService {
     private final PaymentRepository _paymentRepository;
@@ -30,5 +32,9 @@ public class QueryPaymentService {
 
     public Page<Payment> findByParticipantId(String id, Pageable pageable){
         return  _paymentRepository.findByParticipantId(id, pageable);
+    }
+
+    public List<Payment> findAllByParticipantIn(String id) {
+        return  _paymentRepository.findByParticipantId(id);
     }
 }

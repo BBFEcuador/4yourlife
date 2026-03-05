@@ -3,6 +3,7 @@ package com.foryourlife.admin.crm.call.infrastructure.http;
 import com.foryourlife.admin.crm.call.application.CallCommandService;
 import com.foryourlife.admin.crm.call.application.CallQueryService;
 import com.foryourlife.admin.crm.call.domain.Call;
+import com.foryourlife.admin.crm.call.domain.CallResponse;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +59,8 @@ public class CallController {
     }
 
     @GetMapping("training/{id}")
-    public ResponseEntity<List<Call>> findAllByTrainingId(@PathVariable String id) {
-        List<Call> calls = callQueryService.findAllByTrainingId(id);
+    public ResponseEntity<?> findAllByTrainingId(@PathVariable String id) {
+        var calls = callQueryService.findAllByTrainingId(id);
         return new ResponseEntity<>(calls, HttpStatus.OK);
     }
 }

@@ -46,6 +46,7 @@ public class Participant extends AuditableEntity implements Serializable {
     @JsonIgnoreProperties("user")
     private List<Contact> contacts = new ArrayList<>();
     @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({"users","staffs","masterLife","visionaries"})
     private Set<Team> teams = new HashSet<>();
     @OneToOne(mappedBy = "participant", fetch = FetchType.EAGER)
     @JsonIgnoreProperties("participant")

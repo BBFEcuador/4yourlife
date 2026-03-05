@@ -3,6 +3,7 @@ package com.foryourlife.shared.domain.user;
 import com.foryourlife.clients.account.invitations.domain.Invitation;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
+@BatchSize(size = 50)
 @Table(name = "users")
 public class User implements Serializable {
     @Id
@@ -30,8 +32,7 @@ public class User implements Serializable {
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private List<UserEntities> entityMap;
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "senderId", referencedColumnName = "id")
+    @Transient
     private List<Invitation> invitations = new ArrayList<>();
 
     public String getId() {

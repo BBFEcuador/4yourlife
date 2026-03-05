@@ -671,4 +671,8 @@ public class CommandTeamService {
         team.setTrainer(trainer);
         _teamRepository.save(team);
     }
+
+    public byte[] getParticipantList(String id) throws IOException {
+        return teamBadgePdfService.getParticipantList(id).toByteArray();
+    }
 }

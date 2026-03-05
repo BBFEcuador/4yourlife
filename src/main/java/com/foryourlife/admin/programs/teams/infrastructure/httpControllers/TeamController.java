@@ -200,4 +200,23 @@ public class TeamController {
         commandTeamService.updateTrainer(id, trainerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    @PostMapping("participant-list/{id}")
+    public ResponseEntity<?> participantList(@PathVariable String id) throws IOException {
+        String timestamp = LocalDateTime.now().format(
+                DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+        );
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ));
+        headers.set(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=gefetes" + timestamp + ".pdf"
+        );
+        var excelBytes = commandTeamService.getParticipantList(id);
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(excelBytes);
+    }
 }

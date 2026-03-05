@@ -5,20 +5,21 @@ import com.foryourlife.admin.crm.call.domain.CallRepository;
 import com.foryourlife.admin.crm.callLogs.domain.CallStatus;
 import com.foryourlife.admin.crm.callLogs.domain.CallType;
 import com.foryourlife.admin.programs.teams.domain.Team;
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.masterLife.domain.MasterLife;
+import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.User;
+import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.visionary.domain.Visionary;
 import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
-import com.itextpdf.kernel.pdf.colorspace.PdfColorSpace;
-import com.itextpdf.kernel.pdf.colorspace.PdfDeviceCs;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.DashedBorder;
@@ -27,6 +28,12 @@ import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
+import jakarta.transaction.Transactional;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -40,9 +47,16 @@ import java.util.stream.Collectors;
 public class TeamBadgePdfService {
 
     private final CallRepository callsRepository;
+    private final TeamRepository _teamRepository;
+    private final InvitationRepository invitationRepository;
 
-    public TeamBadgePdfService(CallRepository callsRepository) {
+    private final UserRepository userRepository;
+
+    public TeamBadgePdfService(CallRepository callsRepository, TeamRepository teamRepository, InvitationRepository invitationRepository, UserRepository userRepository) {
         this.callsRepository = callsRepository;
+        _teamRepository = teamRepository;
+        this.invitationRepository = invitationRepository;
+        this.userRepository = userRepository;
     }
 
     public byte[] generatePdf(Team team) throws IOException {
@@ -189,5 +203,58 @@ public class TeamBadgePdfService {
                 .setBorder(Border.NO_BORDER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .add(p);
+    }
+
+    @Transactional
+    public ByteArrayOutputStream getParticipantList(String id) throws IOException {
+        var team = _teamRepository.findById(id)
+                .orElseThrow(() -> new BaseException("Error", List.of("Equipo no encontrado")));
+
+        Hibernate.initialize(team.getUsers());
+        var calls = callsRepository.findAllByTrainingId(team.getTraining().getId());
+        Map<String, Call> callMap = calls.stream()
+                .collect(Collectors.toMap(
+                        call -> call.getCalledUser().getId(),
+                        call -> call,
+                        (c1, c2) -> c1
+                ));
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet trainingSheet = workbook.createSheet("Asistencia");
+        var users = team.getUsers().stream().sorted(Comparator.comparing(participant -> participant.getUser().getLastname1())).toList();
+        Row headerRow = trainingSheet.createRow(0);
+        headerRow.createCell(0).setCellValue("Nombre");
+        headerRow.createCell(1).setCellValue("Nickname");
+        headerRow.createCell(2).setCellValue("Telefono");
+        headerRow.createCell(3).setCellValue("Enrolador");
+        headerRow.createCell(4).setCellValue("Telefono Enrolador");
+        headerRow.createCell(5).setCellValue("Firma");
+        var index = 1;
+        for (int i = 0; i < users.size(); i++) {
+            var user = users.get(i);
+            var userCall = callMap.get(user.getUser().getId());
+
+            if (userCall != null) {
+                boolean hasUnconfirmedLogs = userCall.getCallLogs().stream()
+                        .anyMatch(callLog -> callLog.getStatus() == CallStatus.CONFIRMED || callLog.getType() == CallType.LOGISTIC);
+                if (!hasUnconfirmedLogs) {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+            Row row = trainingSheet.createRow(index);
+            var inv = invitationRepository.findByToken(user.getInvitationToken()).orElse(null) ;
+            var sender = inv != null ? userRepository.findById(inv.getSenderId()).orElse(null) : null;
+            row.createCell(0).setCellValue(user.getUser().getName());
+            row.createCell(1).setCellValue(user.getUser().getNickname() != null ? user.getUser().getNickname() : "");
+            row.createCell(2).setCellValue(user.getUser().getPhone());
+            row.createCell(3).setCellValue(sender != null ? sender.getName() : inv != null ? inv.getEnrolled().getName() : "");
+            row.createCell(4).setCellValue(sender != null ? sender.getPhone() : "");
+            index++;
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        workbook.write(out);
+        return out;
     }
 }

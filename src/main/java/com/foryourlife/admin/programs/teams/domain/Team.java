@@ -12,6 +12,9 @@ import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.visionary.domain.Visionary;
 import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.cglib.core.Local;
 
 import java.io.Serializable;
@@ -34,14 +37,19 @@ public class Team extends AggregateRoot implements Serializable {
 
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.MERGE})
+    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 50)
     @JoinTable(
             name = "team_users",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"))
+            inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id")
+    )
     @JsonIgnoreProperties(value = {"teams", "team", "profile", "campus", "contacts", "medicalRecord"})
     private List<Participant> users = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.MERGE})
+    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 50)
     @JoinTable(
             name = "team_master_life",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
@@ -54,6 +62,8 @@ public class Team extends AggregateRoot implements Serializable {
     private Trainer trainer;
 
     @ManyToMany(cascade = {CascadeType.MERGE})
+    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 50)
     @JoinTable(
             name = "team_staff",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
@@ -62,6 +72,8 @@ public class Team extends AggregateRoot implements Serializable {
     private List<Staff> staffs = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.MERGE})
+    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 50)
     @JoinTable(
             name = "team_visionary",
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),

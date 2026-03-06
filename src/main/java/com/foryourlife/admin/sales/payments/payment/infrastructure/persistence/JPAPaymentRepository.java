@@ -29,4 +29,6 @@ public interface JPAPaymentRepository extends JpaRepository<Payment, String>, Jp
     Optional<Payment> findFirstByParticipant_IdAndStatusOrderByCreatedDateAsc(String participantId, PaymentStatus status);
 
     List<Payment> findAllByCreatedDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Payment> findAllByTraining_Id(String trainingId);
 }

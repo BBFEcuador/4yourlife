@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.payments.payment.application;
 
 import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
 import com.foryourlife.admin.programs.campus.application.QueryCampusService;
+import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
@@ -26,7 +27,6 @@ import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
-import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -52,7 +52,6 @@ public class CommandPaymentService {
     private final ParticipantQueryService participantQueryService;
     private final QueryCampusService queryCampusService;
     private final QueryInvoiceService queryInvoiceService;
-    private final EventBus eventBus;
     private final CashDrawerDetailCommandService cashDrawerDetailCommandService;
     private final CashDrawerQueryService cashDrawerQueryService;
     private final ConfigContificoQueryService configContificoQueryService;
@@ -62,15 +61,15 @@ public class CommandPaymentService {
     private final PromiseRepository promiseRepository;
     private final ParticipantRepository participantRepository;
     private final ParticipantLevelService participantLevelRepository;
+    private final TrainingRepository trainingRepository;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, EventBus eventBus, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, TrainingRepository trainingRepository) {
         this._paymentRepository = _paymentRepository;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
         this.participantQueryService = participantQueryService;
         this.queryCampusService = queryCampusService;
         this.queryInvoiceService = queryInvoiceService;
-        this.eventBus = eventBus;
         this.cashDrawerDetailCommandService = cashDrawerDetailCommandService;
         this.cashDrawerQueryService = cashDrawerQueryService;
         this.configContificoQueryService = configContificoQueryService;
@@ -80,6 +79,7 @@ public class CommandPaymentService {
         this.promiseRepository = promiseRepository;
         this.participantRepository = participantRepository;
         this.participantLevelRepository = participantLevelRepository;
+        this.trainingRepository = trainingRepository;
     }
 
     @Transactional
@@ -144,6 +144,10 @@ public class CommandPaymentService {
             paymentReq.status = PaymentStatus.COMPLETED;
         }
 
+        var training = trainingRepository.findById(paymentReq.trainingId).orElseThrow(
+                () -> new BaseException("Entrenamiento no encontrado", List.of("El entrenamiento con id " + paymentReq.trainingId + " no existe"))
+        );
+
         var payment = Payment.create(
                 UUID.randomUUID().toString(),
                 products,
@@ -153,7 +157,8 @@ public class CommandPaymentService {
                 paymentReq.paymentsHistory,
                 paymentReq.total,
                 paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING,
-                paymentReq.note
+                paymentReq.note,
+                training
         );
         _paymentRepository.save(payment);
 
@@ -322,21 +327,6 @@ public class CommandPaymentService {
             invoiceContifico.cliente.ruc = invoiceContifico.cliente.cedula;
             invoiceContifico.cliente.cedula = invoiceContifico.cliente.cedula.substring(0, 10);
         }
-    }
-
-    public void update(PaymentRequest paymentReq) {
-        if (paymentReq.id == null || paymentReq.id.isEmpty()) {
-            throw new IllegalArgumentException("No se puede actualizar, el id de pago es requerido");
-        }
-        var participant = participantQueryService.getParticipantById(paymentReq.participant);
-        List<Product> products = new ArrayList<>(List.of());
-        paymentReq.products.forEach(productId -> {
-            var product = _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
-            products.add(product);
-        });
-        _paymentRepository.findById(paymentReq.id);
-        var payment = Payment.create(paymentReq.id, products, paymentReq.discount, participant, queryCampusService.findById(paymentReq.campus), paymentReq.paymentsHistory, paymentReq.total, paymentReq.status, paymentReq.note);
-        _paymentRepository.save(payment);
     }
 
     @Transactional

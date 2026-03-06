@@ -25,4 +25,5 @@ public interface PaymentRepository {
     boolean existsByParticipantIdAndStatus(String participantId, PaymentStatus status);
     List<Payment> findAllByParticipantIn(Collection<Participant> participantIds);
     List<Payment> findAllBetweenDates(LocalDateTime startDate, LocalDateTime endDate);
+    List<Payment> findAllByTrainingId(String trainingId);
 }

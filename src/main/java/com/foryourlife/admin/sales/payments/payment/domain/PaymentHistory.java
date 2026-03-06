@@ -15,6 +15,8 @@ public class PaymentHistory {
     private String pingType;
     private Boolean sent = false;
     private String notSendError;
+    private String creditCardType;
+    private String paymentType;
 
     public PaymentHistory(PaymentMethod paymentMethod, double amount, String date) {
         this.paymentMethod = paymentMethod;
@@ -84,5 +86,21 @@ public class PaymentHistory {
 
     public void setNotSendError(String notSendError) {
         this.notSendError = notSendError;
+    }
+
+    public String getCreditCardType() {
+        return creditCardType;
+    }
+
+    public void setCreditCardType(String creditCardType) {
+        this.creditCardType = creditCardType;
+    }
+
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType;
     }
 }

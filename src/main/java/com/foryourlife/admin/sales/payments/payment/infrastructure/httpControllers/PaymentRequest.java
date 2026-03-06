@@ -33,4 +33,6 @@ public class PaymentRequest {
     public String note;
     public String cashDrawerId;
     public String userId;
+    @NotNull(message = "El entrenamiento es requerido")
+    public String trainingId;
 }

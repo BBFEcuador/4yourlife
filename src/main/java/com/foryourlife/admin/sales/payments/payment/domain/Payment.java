@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.contifico.config.domain.ConfigContifico;
 import com.foryourlife.admin.programs.campus.domain.Campus;
+import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.sales.discounts.domain.ProductDiscount;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
@@ -77,10 +78,17 @@ public class Payment extends AuditableEntity {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime created_at = LocalDateTime.now();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "training_id",
+            referencedColumnName = "id"
+    )
+    private Training training;
+
     protected Payment() {
     }
 
-    public Payment(String id, List<Product> products, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, BigDecimal total, PaymentStatus status, String note) {
+    public Payment(String id, List<Product> products, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, BigDecimal total, PaymentStatus status, String note, Training training) {
         this.id = id;
         this.products = products;
         this.discount = discount;
@@ -90,10 +98,11 @@ public class Payment extends AuditableEntity {
         this.total = total;
         this.status = status;
         this.note = note;
+        this.training = training;
     }
 
-    public static Payment create(String id, List<Product> product, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, BigDecimal total, PaymentStatus status, String note) {
-        return new Payment(id, product, discount, participant, campus, paymentshistory, total, status, note);
+    public static Payment create(String id, List<Product> product, ProductDiscount discount, Participant participant, Campus campus, List<PaymentHistory> paymentshistory, BigDecimal total, PaymentStatus status, String note, Training training) {
+        return new Payment(id, product, discount, participant, campus, paymentshistory, total, status, note, training);
     }
 
     public String getId() {

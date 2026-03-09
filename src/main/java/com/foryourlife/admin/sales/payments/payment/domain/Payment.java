@@ -168,4 +168,12 @@ public class Payment extends AuditableEntity {
                 .sum());
         return this.total.subtract(totalPayments);
     }
+
+    public Training getTraining() {
+        return training;
+    }
+
+    public void setTraining(Training training) {
+        this.training = training;
+    }
 }

@@ -14,4 +14,5 @@ public interface PromiseRepository {
     Page<Promise> findAll(Pageable pageable, Criteria criteria);
     List<Promise> findByTrainingId(String trainingId);
     Optional<Promise> findLastByUserId(String userId);
+    Optional<Promise> findLastByUserIdAndTrainingId(String userId, String trainingId);
 }

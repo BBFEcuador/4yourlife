@@ -705,9 +705,9 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
 
         List<LocalDate> fridayBoundaries = getFridayBoundaries(startFriday, nextFriday);
 
-        List<Payment> payments = new java.util.ArrayList<>(List.of());
+        List<Payment> payments = new ArrayList<>(List.of());
         team.getUsers().forEach(participant ->
-                paymentRepository.findAllBetweenDates(training.getStartDate().atStartOfDay(), training.getNextLevel().getStartDate().atStartOfDay()).forEach(
+                paymentRepository.findAllByTrainingId(training.getId()).forEach(
                         payment -> {
                             if (payment.getParticipant().getId().equals(participant.getId())) {
                                 payments.add(payment);

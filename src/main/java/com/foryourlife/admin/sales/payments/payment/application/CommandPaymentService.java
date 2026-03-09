@@ -473,6 +473,7 @@ public class CommandPaymentService {
                     }
                 });
                 if (event.getPayment().getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.INIT) {
+                    participant.setOriginalTraining(event.getPayment().getTraining().getName());
                     var pl = participantLevelRepository.getRolByLevel(CourseLevel.FOCUS);
                     participant.setParticipantLevel(pl);
                     participantRepository.save(participant);

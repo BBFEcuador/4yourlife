@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface JPAImplPromiseRepository extends JpaRepository<Promise, String>, JpaSpecificationExecutor<Promise> {
     List<Promise> findAllByTraining_Id(String trainingId);
     Optional<Promise> findFirstByUser_IdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByStartDateDesc(String userId, LocalDate startDateIsLessThan, LocalDate endDateIsGreaterThan);
+    Optional<Promise> findByUser_IdAndTraining_Id(String userId, String trainingId);
 }

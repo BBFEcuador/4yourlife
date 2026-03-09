@@ -46,11 +46,16 @@ public class Participant extends AuditableEntity implements Serializable {
     @JsonIgnoreProperties("user")
     private List<Contact> contacts = new ArrayList<>();
     @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
-    @JsonIgnoreProperties({"users","staffs","masterLife","visionaries"})
+    @JsonIgnoreProperties({"users", "staffs", "masterLife", "visionaries"})
     private Set<Team> teams = new HashSet<>();
     @OneToOne(mappedBy = "participant", fetch = FetchType.EAGER)
     @JsonIgnoreProperties("participant")
     private MedicalRecord medicalRecord;
+    @Column(
+            columnDefinition = "text",
+            name = "original_training"
+    )
+    private String originalTraining;
 
     public Team getTeam() {
         if (teams != null && !teams.isEmpty()) {
@@ -215,5 +220,13 @@ public class Participant extends AuditableEntity implements Serializable {
         return "Participant{" +
                 "id='" + id + '\'' +
                 '}';
+    }
+
+    public String getOriginalTraining() {
+        return originalTraining;
+    }
+
+    public void setOriginalTraining(String originalTraining) {
+        this.originalTraining = originalTraining;
     }
 }

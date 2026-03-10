@@ -177,7 +177,7 @@ public class OrganizationChartCommandService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException("Usuario no encontrado: " + userId, List.of()));
 
-        validateUserLevel(user, level);
+//        validateUserLevel(user, level);
 
         ChartNode node = new ChartNode();
         node.setId(UUID.randomUUID().toString());

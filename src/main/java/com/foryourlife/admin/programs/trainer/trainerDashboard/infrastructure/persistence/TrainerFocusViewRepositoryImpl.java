@@ -22,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -80,7 +77,6 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
             }
         });
 
-
         List<String> trainingNames = new ArrayList<>();
 
         invitationsByToken.values().forEach(invitation -> {
@@ -92,12 +88,49 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
             }
         });
 
+        Map<String, LifeWeekendAssistant> lifeWeekendAssistants = new HashMap<>();
+
+        for (String trainingName : trainingNames) {
+
+            int enrolled = 0;
+            int assistant = 0;
+
+            for (Participant participant : participants.values()) {
+
+                String token = participant.getInvitationToken();
+                if (token == null) continue;
+
+                Invitation invitation = invitationsByToken.get(token);
+                if (invitation == null || invitation.getEnrolled() == null) continue;
+
+                if (trainingName.equals(invitation.getEnrolled().getTrainingName())) {
+
+                    enrolled++;
+
+                    boolean attended = attendances.stream()
+                            .anyMatch(a -> a.getUser().getId().equals(participant.getUser().getId()));
+
+                    if (attended) {
+                        assistant++;
+                    }
+                }
+            }
+
+            int percentage = enrolled == 0 ? 0 : (assistant * 100) / enrolled;
+
+            lifeWeekendAssistants.put(
+                    trainingName,
+                    new LifeWeekendAssistant(assistant, enrolled, percentage)
+            );
+        }
+
         return new TrainerFocusView(
                 this.buildGeneralAttendance(attendances, participants),
                 this.buildGenderDashboard(attendances, participants),
                 this.buildAgeDashboard(attendances, participants),
                 this.buildPaymentDashboard(attendances, participants),
-                trainingNames
+                trainingNames,
+                lifeWeekendAssistants
         );
     }
 
@@ -149,7 +182,6 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         return new GeneralAttendance(totalFocus, totalLingerers, userAttendances);
     }
 
-
     public List<GenderDashboard> buildGenderDashboard(
             List<Attendance> attendances,
             Map<String, Participant> participants
@@ -183,7 +215,6 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         );
     }
 
-
     public List<AgeDashboard> buildAgeDashboard(
             List<Attendance> attendances,
             Map<String, Participant> participants
@@ -216,27 +247,27 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
 
         AgeDashboard friday = new AgeDashboard();
         friday.day = "Viernes";
-        friday.age_less_18   = countByAgeRange.apply(Attendance::getFridayAttendance, "less_18").intValue();
-        friday.age_18_27     = countByAgeRange.apply(Attendance::getFridayAttendance, "18_27").intValue();
-        friday.age_28_40     = countByAgeRange.apply(Attendance::getFridayAttendance, "28_40").intValue();
-        friday.age_41_65     = countByAgeRange.apply(Attendance::getFridayAttendance, "41_65").intValue();
-        friday.age_above_65  = countByAgeRange.apply(Attendance::getFridayAttendance, "above_65").intValue();
+        friday.age_less_18 = countByAgeRange.apply(Attendance::getFridayAttendance, "less_18").intValue();
+        friday.age_18_27 = countByAgeRange.apply(Attendance::getFridayAttendance, "18_27").intValue();
+        friday.age_28_40 = countByAgeRange.apply(Attendance::getFridayAttendance, "28_40").intValue();
+        friday.age_41_65 = countByAgeRange.apply(Attendance::getFridayAttendance, "41_65").intValue();
+        friday.age_above_65 = countByAgeRange.apply(Attendance::getFridayAttendance, "above_65").intValue();
 
         AgeDashboard saturday = new AgeDashboard();
         saturday.day = "Sábado";
-        saturday.age_less_18   = countByAgeRange.apply(Attendance::getSaturdayAttendance, "less_18").intValue();
-        saturday.age_18_27     = countByAgeRange.apply(Attendance::getSaturdayAttendance, "18_27").intValue();
-        saturday.age_28_40     = countByAgeRange.apply(Attendance::getSaturdayAttendance, "28_40").intValue();
-        saturday.age_41_65     = countByAgeRange.apply(Attendance::getSaturdayAttendance, "41_65").intValue();
-        saturday.age_above_65  = countByAgeRange.apply(Attendance::getSaturdayAttendance, "above_65").intValue();
+        saturday.age_less_18 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "less_18").intValue();
+        saturday.age_18_27 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "18_27").intValue();
+        saturday.age_28_40 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "28_40").intValue();
+        saturday.age_41_65 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "41_65").intValue();
+        saturday.age_above_65 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "above_65").intValue();
 
         AgeDashboard sunday = new AgeDashboard();
         sunday.day = "Domingo";
-        sunday.age_less_18   = countByAgeRange.apply(Attendance::getSundayAttendance, "less_18").intValue();
-        sunday.age_18_27     = countByAgeRange.apply(Attendance::getSundayAttendance, "18_27").intValue();
-        sunday.age_28_40     = countByAgeRange.apply(Attendance::getSundayAttendance, "28_40").intValue();
-        sunday.age_41_65     = countByAgeRange.apply(Attendance::getSundayAttendance, "41_65").intValue();
-        sunday.age_above_65  = countByAgeRange.apply(Attendance::getSundayAttendance, "above_65").intValue();
+        sunday.age_less_18 = countByAgeRange.apply(Attendance::getSundayAttendance, "less_18").intValue();
+        sunday.age_18_27 = countByAgeRange.apply(Attendance::getSundayAttendance, "18_27").intValue();
+        sunday.age_28_40 = countByAgeRange.apply(Attendance::getSundayAttendance, "28_40").intValue();
+        sunday.age_41_65 = countByAgeRange.apply(Attendance::getSundayAttendance, "41_65").intValue();
+        sunday.age_above_65 = countByAgeRange.apply(Attendance::getSundayAttendance, "above_65").intValue();
 
         return List.of(friday, saturday, sunday);
     }
@@ -261,14 +292,18 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         return Period.between(birthday, LocalDate.now()).getYears();
     }
 
-
     public List<PaymentDashboard> buildPaymentDashboard(
             List<Attendance> attendances,
             Map<String, Participant> participants
     ) {
 
+        if (attendances.isEmpty()) return List.of();
+
+        var training = attendances.getFirst().getTraining();
+        LocalDate sunday = training.getEndDate();
+
         var organizationChart = organizationChartRepository
-                .getOrganizationChartTrainingId(attendances.getFirst().getTraining().getId());
+                .getOrganizationChartTrainingId(training.getId());
 
         if (organizationChart.isEmpty()) return List.of();
 
@@ -283,72 +318,114 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                 .toList();
 
 
+        // staff -> participants
         Map<String, List<String>> staffToParticipants = participantNodes.stream()
                 .collect(Collectors.groupingBy(
                         ChartNode::getParentNodeId,
                         Collectors.mapping(n -> n.getMembers().getId(), Collectors.toList())
                 ));
 
+
+        // obtener todos los pagos
         List<Payment> payments = paymentRepository.findAllByParticipantIn(participants.values());
 
+        // pagos por participante
         Map<String, List<Payment>> paymentsByParticipantId = payments.stream()
-                .collect(Collectors.groupingBy(p -> p.getParticipant().getUser().getId()));
+                .collect(Collectors.groupingBy(
+                        p -> p.getParticipant().getUser().getId()
+                ));
+
 
         List<PaymentDashboard> dashboards = new ArrayList<>();
+
 
         for (ChartNode staffNode : staffNodes) {
 
             List<String> staffParticipantIds =
                     staffToParticipants.getOrDefault(staffNode.getId(), List.of());
 
+            // todos los pagos de los participantes de ese staff
             List<Payment> allPayments = staffParticipantIds.stream()
-                    .flatMap(pId -> paymentsByParticipantId.getOrDefault(pId, List.of()).stream())
+                    .flatMap(pId -> paymentsByParticipantId
+                            .getOrDefault(pId, List.of())
+                            .stream())
                     .toList();
 
-            long completed = allPayments.stream()
-                    .filter(p -> p.getStatus() == PaymentStatus.COMPLETED)
+
+            // pagos hasta domingo
+            List<Payment> sundayPayments = allPayments.stream()
+                    .filter(p -> !p.getCreatedDate().toLocalDate().isAfter(sunday))
+                    .toList();
+
+
+            // ---------- DOMINGO ----------
+
+            int yourSunday = (int) sundayPayments.stream()
+                    .filter(p -> p.getTraining() != null
+                            && CourseLevel.YOUR.equals(p.getTraining().getCourseLevel())
+                            && p.getStatus() == PaymentStatus.COMPLETED)
                     .count();
 
-            long partial = allPayments.stream()
-                    .filter(p -> p.getStatus() == PaymentStatus.PENDING)
+            int lifeSunday = (int) sundayPayments.stream()
+                    .filter(p -> p.getTraining() != null
+                            && CourseLevel.YOUR.equals(p.getTraining().getCourseLevel())
+                            && p.getStatus() == PaymentStatus.COMPLETED)
                     .count();
 
-            long total = allPayments.size();
+            int yourPlusLifeSunday = yourSunday + lifeSunday;
 
-            long yourCompleted = countByCourseLevel(allPayments, CourseLevel.YOUR, true);
-            long yourPartial   = countByCourseLevel(allPayments, CourseLevel.YOUR, false);
-
-            long lifeCompleted = countByCourseLevel(allPayments, CourseLevel.LIFE, true);
-            long lifePartial   = countByCourseLevel(allPayments, CourseLevel.LIFE, false);
+            int totalSunday = sundayPayments.size();
 
 
-            dashboards.add(new PaymentDashboard(
-                    staffNode.getMembers().getName(),
-                    (int) completed,
-                    (int) partial,
-                    (int) total,
-                    (int) yourPartial,
-                    (int) yourCompleted,
-                    (int) lifePartial,
-                    (int) lifeCompleted
-            ));
+
+
+            int yourFinal = (int) allPayments.stream()
+                    .filter(p -> p.getTraining() != null
+                            && CourseLevel.YOUR.equals(p.getTraining().getCourseLevel())
+                            && p.getStatus() == PaymentStatus.COMPLETED)
+                    .count();
+
+            int lifeFinal = (int) allPayments.stream()
+                    .filter(p -> p.getTraining() != null
+                            && CourseLevel.YOUR.equals(p.getTraining().getCourseLevel())
+                            && p.getStatus() == PaymentStatus.COMPLETED)
+                    .count();
+
+            int yourPlusLifeFinal = yourFinal + lifeFinal;
+
+            int totalFinal = allPayments.size();
+
+            int totalFocus = (int) attendances.stream()
+                    .filter(a -> {
+                        Participant p = participants.get(a.getUser().getId());
+                        return p != null && !Boolean.TRUE.equals(p.getIsLingerer());
+                    })
+                    .count();
+
+            double passPercentageSunday = totalSunday == 0
+                    ? 0
+                    : ((double) yourPlusLifeSunday / totalFocus) * 100;
+
+
+            double passPercentageTotal = totalFinal == 0
+                    ? 0
+                    : ((double) yourPlusLifeFinal / totalFocus) * 100;
+            dashboards.add(
+                   new PaymentDashboard(
+                            staffNode.getMembers().getName(),
+                            yourSunday,
+                            yourPlusLifeSunday,
+                            totalSunday,
+                            passPercentageSunday,
+                            yourFinal,
+                            yourPlusLifeFinal,
+                            totalFinal,
+                           passPercentageTotal
+                    )
+            );
         }
 
         return dashboards;
-    }
-
-    private long countByCourseLevel(List<Payment> payments, CourseLevel level, boolean completed) {
-        return payments.stream()
-                .filter(p -> (completed && p.getStatus() == PaymentStatus.COMPLETED)
-                        || (!completed && p.getStatus() == PaymentStatus.PENDING))
-                .filter(p -> p.getProducts() != null && p.getProducts().stream()
-                        .anyMatch(prod -> prod.getPrograms() != null &&
-                                prod.getPrograms().stream().anyMatch(prg ->
-                                        prg.getCourseLevel() == level
-                                )
-                        )
-                )
-                .count();
     }
 
     private List<ChartNode> flattenTree(List<ChartNode> nodes) {

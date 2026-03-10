@@ -13,22 +13,16 @@ import org.springframework.stereotype.Service;
 @Service
 @DomainEventSubscriber({OnNullDesistedAttend.class})
 public class RemoveParticipantOnNullAttend {
-    private final TrainingRepository trainingRepository;
-    private final TeamRepository teamRepository;
     private final ParticipantRepository participantRepository;
     private final AttendanceRepository attendanceRepository;
 
-    public RemoveParticipantOnNullAttend(TrainingRepository trainingRepository, TeamRepository teamRepository, ParticipantRepository participantRepository, AttendanceRepository attendanceRepository) {
-        this.trainingRepository = trainingRepository;
-        this.teamRepository = teamRepository;
+    public RemoveParticipantOnNullAttend(ParticipantRepository participantRepository, AttendanceRepository attendanceRepository) {
         this.participantRepository = participantRepository;
         this.attendanceRepository = attendanceRepository;
     }
 
     @EventListener
     public void on(OnNullDesistedAttend event) {
-        var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow();
-        var team = teamRepository.findByTrainingId(training.getId());
         var user = event.getUser();
         var attendance = event.getAttendance();
 

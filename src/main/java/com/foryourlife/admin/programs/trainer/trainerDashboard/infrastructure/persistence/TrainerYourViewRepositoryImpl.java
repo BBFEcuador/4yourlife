@@ -2,28 +2,44 @@ package com.foryourlife.admin.programs.trainer.trainerDashboard.infrastructure.p
 
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
+import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNode;
+import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChartRepository;
 import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.your.FocusResumeDashboard;
+import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.your.PaymentYourDashboard;
 import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.your.TrainerYourView;
 import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.your.TrainerYourViewRepository;
+import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
+import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.exception.BaseException;
+import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.shared.domain.user.UserType;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository {
     private final AttendanceRepository attendanceRepository;
     private final TrainerFocusViewRepositoryImpl trainerFocusViewRepository;
     private final TrainingRepository trainingRepository;
+    private final PaymentRepository paymentRepository;
+    private final OrganizationChartRepository organizationChartRepository;
 
-    public TrainerYourViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainerFocusViewRepositoryImpl trainerFocusViewRepository, TrainingRepository trainingRepository) {
+    public TrainerYourViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainerFocusViewRepositoryImpl trainerFocusViewRepository, TrainingRepository trainingRepository, PaymentRepository paymentRepository, OrganizationChartRepository organizationChartRepository) {
         this.attendanceRepository = attendanceRepository;
         this.trainerFocusViewRepository = trainerFocusViewRepository;
         this.trainingRepository = trainingRepository;
+        this.paymentRepository = paymentRepository;
+        this.organizationChartRepository = organizationChartRepository;
     }
 
     @Override
@@ -32,41 +48,151 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
 
         Map<String, Participant> participants = trainerFocusViewRepository.loadParticipants(attendances);
 
-        if(attendances.isEmpty()) {
+        if (attendances.isEmpty()) {
             throw new BaseException("No attendances found for the given training ID", List.of());
         }
 
-        var focusTraining = trainingRepository.findByNextLevel_Id(attendances.getFirst().getTraining().getId()).orElseThrow(
-                () -> new BaseException("Training not found for next level", List.of())
-        );
-
-        var focusAttendance = attendanceRepository.findAttendanceByTraining(focusTraining.getId());
-
-        var focusParticipants = trainerFocusViewRepository.loadParticipants(focusAttendance);
-
         return new TrainerYourView(
                 trainerFocusViewRepository.buildGeneralAttendance(attendances, participants),
-                buildFocusResumeDashboard(focusAttendance, focusParticipants),
-                trainerFocusViewRepository.buildPaymentDashboard(attendances, participants)
+                buildPaymentYourDashboard(attendances, participants)
         );
     }
 
-    public FocusResumeDashboard buildFocusResumeDashboard(List<Attendance> attendances, Map<String, Participant> participants) {
-        var paymentsDashboard = trainerFocusViewRepository.buildPaymentDashboard(attendances, participants);
+    public List<PaymentYourDashboard> buildPaymentYourDashboard(
+            List<Attendance> attendances,
+            Map<String, Participant> participants
+    ) {
 
-        AtomicInteger yourPayment = new AtomicInteger();
-        AtomicInteger lifePayment = new AtomicInteger();
+        if (attendances.isEmpty()) return List.of();
 
-        paymentsDashboard.forEach(paymentDashboard -> {
-            yourPayment.addAndGet(paymentDashboard.getYourCompletedPaymentsCount());
-            lifePayment.addAndGet(paymentDashboard.getLifeCompletedPaymentsCount());
-        });
+        var training = attendances.getFirst().getTraining();
 
-        return new FocusResumeDashboard(
-                attendances.size(),
-                yourPayment.get(),
-                lifePayment.get(),
-                yourPayment.get() + lifePayment.get()
-        );
+        LocalDate saturday = training.getEndDate().minusDays(1);
+        LocalDate sunday = training.getEndDate();
+
+        Training pastTraining = trainingRepository
+                .findByNextLevel_Id(training.getId())
+                .orElse(null);
+
+        var organizationChart = organizationChartRepository
+                .getOrganizationChartTrainingId(training.getId());
+
+        if (organizationChart.isEmpty()) return List.of();
+
+
+        List<ChartNode> allNodes = flattenTree(organizationChart.get().getNodes());
+
+        List<ChartNode> staffNodes = allNodes.stream()
+                .filter(n -> n.getLevel() == UserType.STAFF)
+                .toList();
+
+        List<ChartNode> participantNodes = allNodes.stream()
+                .filter(n -> n.getLevel() == UserType.PARTICIPANT)
+                .toList();
+
+
+        Map<String, List<String>> staffToParticipants = participantNodes.stream()
+                .collect(Collectors.groupingBy(
+                        ChartNode::getParentNodeId,
+                        Collectors.mapping(n -> n.getMembers().getId(), Collectors.toList())
+                ));
+
+
+        List<Payment> payments = paymentRepository.findAllByParticipantIn(participants.values());
+
+        Map<String, List<Payment>> paymentsByParticipantId = payments.stream()
+                .collect(Collectors.groupingBy(
+                        p -> p.getParticipant().getUser().getId()
+                ));
+
+
+        List<PaymentYourDashboard> dashboards = new ArrayList<>();
+
+
+        for (ChartNode staffNode : staffNodes) {
+
+            List<String> staffParticipantIds =
+                    staffToParticipants.getOrDefault(staffNode.getId(), List.of());
+
+
+            List<Payment> allPayments = staffParticipantIds.stream()
+                    .flatMap(pId -> paymentsByParticipantId
+                            .getOrDefault(pId, List.of())
+                            .stream())
+                    .filter(p -> p.getTraining() != null)
+                    .filter(p -> p.getTraining().getCourseLevel() == CourseLevel.LIFE)
+                    .filter(p -> p.getStatus() == PaymentStatus.COMPLETED)
+                    .toList();
+
+
+            // -------- PAGOS PREVIOS --------
+
+            int previousLifePayments = 0;
+
+            if (pastTraining != null) {
+
+                previousLifePayments = (int) allPayments.stream()
+                        .filter(p -> p.getTraining().getId().equals(pastTraining.getId()))
+                        .count();
+            }
+
+
+            int totalLifePayments = allPayments.size();
+
+            double previousPercentage = totalLifePayments == 0
+                    ? 0
+                    : ((double) previousLifePayments / totalLifePayments) * 100;
+
+
+            // -------- SABADO --------
+
+            int saturdayPayments = (int) allPayments.stream()
+                    .filter(p -> p.getCreatedDate().toLocalDate().isEqual(saturday))
+                    .count();
+
+            int accumulatedSaturday = previousLifePayments + saturdayPayments;
+
+            double passSaturday = accumulatedSaturday == 0
+                    ? 0
+                    : ((double) saturdayPayments / accumulatedSaturday) * 100;
+
+
+            // -------- DOMINGO --------
+
+            int sundayPayments = (int) allPayments.stream()
+                    .filter(p -> p.getCreatedDate().toLocalDate().isEqual(sunday))
+                    .count();
+
+            int accumulatedSunday = accumulatedSaturday + sundayPayments;
+
+            double passSunday = accumulatedSunday == 0
+                    ? 0
+                    : ((double) sundayPayments / accumulatedSunday) * 100;
+            dashboards.add(
+                    new PaymentYourDashboard(
+                            staffNode.getMembers().getName(),
+                            previousLifePayments,
+                            previousPercentage,
+                            saturdayPayments,
+                            accumulatedSaturday,
+                            passSaturday,
+                            sundayPayments,
+                            accumulatedSunday,
+                            passSunday
+                    )
+            );
+        }
+        return dashboards;
+    }
+
+    private List<ChartNode> flattenTree(List<ChartNode> nodes) {
+        List<ChartNode> all = new ArrayList<>();
+        for (ChartNode n : nodes) {
+            all.add(n);
+            if (n.getChildren() != null && !n.getChildren().isEmpty()) {
+                all.addAll(flattenTree(n.getChildren()));
+            }
+        }
+        return all;
     }
 }

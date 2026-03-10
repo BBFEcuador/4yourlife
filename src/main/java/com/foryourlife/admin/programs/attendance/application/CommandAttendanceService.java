@@ -10,30 +10,30 @@ import com.foryourlife.admin.programs.attendance.infraestructure.httpController.
 import com.foryourlife.admin.programs.attendance.infraestructure.httpController.SaveAttendanceRequest;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.training.domain.Training;
+import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.promises.application.PromiseCommandService;
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
-import com.foryourlife.admin.programs.training.application.TrainingValidationService;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class CommandAttendanceService {
     private final AttendanceRepository _attendanceRepository;
-    private EventBus bus;
+    private final EventBus bus;
     private final CallRepository callRepository;
     private final PromiseCommandService promiseCommandService;
+    private final ParticipantRepository _participantRepository;
 
-    public CommandAttendanceService(AttendanceRepository _attendanceRepository, EventBus bus, CallRepository callRepository, PromiseCommandService promiseCommandService) {
+    public CommandAttendanceService(AttendanceRepository _attendanceRepository, EventBus bus, CallRepository callRepository, PromiseCommandService promiseCommandService, ParticipantRepository participantRepository) {
         this._attendanceRepository = _attendanceRepository;
         this.bus = bus;
         this.callRepository = callRepository;
         this.promiseCommandService = promiseCommandService;
+        _participantRepository = participantRepository;
     }
 
     public void saveAttendance(SaveAttendanceRequest attendanceRequest) {
@@ -48,20 +48,20 @@ public class CommandAttendanceService {
 
         switch (dayEnum) {
             case FRIDAY -> {
-                    attendance.setFridayAttendance(attendanceRequest.attendanceStatus);
-                    if (attendance.getFridayAttendance().equals(AttendanceStatus.ASISTIO)) {
-                        attendance.setSaturdayAttendance(AttendanceStatus.ASISTIO);
-                        attendance.setSundayAttendance(AttendanceStatus.ASISTIO);
-                    }else if (attendance.getFridayAttendance().equals(AttendanceStatus.NO_ASISTIO)) {
-                        attendance.setSaturdayAttendance(AttendanceStatus.DESERTO);
-                        attendance.setSundayAttendance(AttendanceStatus.DESERTO);
-                    }
+                attendance.setFridayAttendance(attendanceRequest.attendanceStatus);
+                if (attendance.getFridayAttendance().equals(AttendanceStatus.ASISTIO)) {
+                    attendance.setSaturdayAttendance(AttendanceStatus.ASISTIO);
+                    attendance.setSundayAttendance(AttendanceStatus.ASISTIO);
+                } else if (attendance.getFridayAttendance().equals(AttendanceStatus.NO_ASISTIO)) {
+                    attendance.setSaturdayAttendance(AttendanceStatus.DESERTO);
+                    attendance.setSundayAttendance(AttendanceStatus.DESERTO);
+                }
             }
             case SATURDAY -> {
                 attendance.setSaturdayAttendance(attendanceRequest.attendanceStatus);
                 if (attendance.getSaturdayAttendance().equals(AttendanceStatus.ASISTIO)) {
                     attendance.setSundayAttendance(AttendanceStatus.ASISTIO);
-                }else if (attendance.getSaturdayAttendance().equals(AttendanceStatus.NO_ASISTIO) || attendance.getSaturdayAttendance().equals(AttendanceStatus.DESERTO)) {
+                } else if (attendance.getSaturdayAttendance().equals(AttendanceStatus.NO_ASISTIO) || attendance.getSaturdayAttendance().equals(AttendanceStatus.DESERTO)) {
                     attendance.setSundayAttendance(AttendanceStatus.DESERTO);
                 }
             }
@@ -74,10 +74,7 @@ public class CommandAttendanceService {
 
         _attendanceRepository.save(attendance);
 
-        if (attendance.HasUnAttendance()) {
-            var events = attendance.pullDomainEvents();
-            bus.publish(events);
-        }
+        updateParticipantAttendanceStatus(attendance);
     }
 
     public void closeAttendance(String id) {
@@ -86,9 +83,7 @@ public class CommandAttendanceService {
             if (attendance.getFridayAttendance() == null) attendance.setFridayAttendance(AttendanceStatus.ASISTIO);
             if (attendance.getSaturdayAttendance() == null) attendance.setSaturdayAttendance(AttendanceStatus.ASISTIO);
             if (attendance.getSundayAttendance() == null) attendance.setSundayAttendance(AttendanceStatus.ASISTIO);
-            if (attendance.HasUnAttendance()) {
-                this.bus.publish(attendance.pullDomainEvents());
-            }
+            updateParticipantAttendanceStatus(attendance);
             _attendanceRepository.save(attendance);
         });
     }
@@ -170,5 +165,21 @@ public class CommandAttendanceService {
             }
         });
         promiseCommandService.createPromises(training.getId());
+    }
+
+    public void updateParticipantAttendanceStatus(Attendance attendance) {
+
+        var user = attendance.getUser();
+        var participant = _participantRepository.findByUserId(user.getId());
+
+        if (participant.isPresent()) {
+
+            boolean fullAttendance = attendance.HasFullAttendance();
+
+            participant.get().setIsDesertor(!fullAttendance);
+//            participant.get().setIsLingerer(!fullAttendance);
+
+            _participantRepository.save(participant.get());
+        }
     }
 }

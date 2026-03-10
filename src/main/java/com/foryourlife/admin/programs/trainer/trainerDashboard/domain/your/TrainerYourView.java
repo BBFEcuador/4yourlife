@@ -7,12 +7,10 @@ import java.util.List;
 
 public class TrainerYourView {
     private GeneralAttendance attendance;
-    private FocusResumeDashboard focusResumeDashboard;
-    private List<PaymentDashboard> paymentDashboard;
+    private List<PaymentYourDashboard> paymentDashboard;
 
-    public TrainerYourView(GeneralAttendance attendance, FocusResumeDashboard focusResumeDashboard, List<PaymentDashboard> paymentDashboard) {
+    public TrainerYourView(GeneralAttendance attendance, List<PaymentYourDashboard> paymentDashboard) {
         this.attendance = attendance;
-        this.focusResumeDashboard = focusResumeDashboard;
         this.paymentDashboard = paymentDashboard;
     }
 
@@ -24,19 +22,11 @@ public class TrainerYourView {
         this.attendance = attendance;
     }
 
-    public FocusResumeDashboard getFocusResumeDashboard() {
-        return focusResumeDashboard;
-    }
-
-    public void setFocusResumeDashboard(FocusResumeDashboard focusResumeDashboard) {
-        this.focusResumeDashboard = focusResumeDashboard;
-    }
-
-    public List<PaymentDashboard> getPaymentDashboard() {
+    public List<PaymentYourDashboard> getPaymentDashboard() {
         return paymentDashboard;
     }
 
-    public void setPaymentDashboard(List<PaymentDashboard> paymentDashboard) {
+    public void setPaymentDashboard(List<PaymentYourDashboard> paymentDashboard) {
         this.paymentDashboard = paymentDashboard;
     }
 }

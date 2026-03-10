@@ -99,11 +99,9 @@ public class Attendance extends AggregateRoot {
         this.sundayAttendance = sundayAttendance;
     }
 
-    public boolean HasUnAttendance() {
-        var unAttendance = this.fridayAttendance == AttendanceStatus.NO_ASISTIO || this.fridayAttendance == AttendanceStatus.DESERTO || this.saturdayAttendance == AttendanceStatus.NO_ASISTIO || this.saturdayAttendance == AttendanceStatus.DESERTO || this.sundayAttendance == AttendanceStatus.NO_ASISTIO || this.sundayAttendance == AttendanceStatus.DESERTO;
-//        if (unAttendance) {
-//            this.record(new OnNullDesistedAttend(this.user.getId(), this.user, this.training, this));
-//        }
-        return unAttendance;
+    public boolean HasFullAttendance() {
+        return this.fridayAttendance == AttendanceStatus.ASISTIO
+                && this.saturdayAttendance == AttendanceStatus.ASISTIO
+                && this.sundayAttendance == AttendanceStatus.ASISTIO;
     }
 }

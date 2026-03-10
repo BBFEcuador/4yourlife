@@ -202,12 +202,12 @@ public class JPAReportViewRepository implements ReportViewRepository {
             payments.forEach(payment -> {
                 Row row = operativeSheet.createRow(ref.rowIdx);
                 row.createCell(0).setCellValue(payment.getStaffName());
-                row.createCell(1).setCellValue(payment.getYourCompletedPaymentsCount());
-                row.createCell(2).setCellValue(payment.getYourPartialPaymentsCount());
-                row.createCell(3).setCellValue(payment.getLifeCompletedPaymentsCount());
-                row.createCell(4).setCellValue(payment.getLifePartialPaymentsCount());
-                row.createCell(5).setCellValue(payment.getPartialPaymentCount());
-                row.createCell(6).setCellValue(payment.getCompletedPaymentCount());
+                row.createCell(1).setCellValue(payment.getYourPaymentsSunday());
+                row.createCell(2).setCellValue(payment.getYourPlusLifePaymentsSunday());
+                row.createCell(3).setCellValue(payment.getTotalPaymentsSunday());
+                row.createCell(4).setCellValue(payment.getPassPercentageFinalSunday());
+                row.createCell(5).setCellValue(payment.getYourPaymentsFinal());
+                row.createCell(6).setCellValue(payment.getYourPlusLifePaymentsFinal());
                 ref.rowIdx++;
             });
 

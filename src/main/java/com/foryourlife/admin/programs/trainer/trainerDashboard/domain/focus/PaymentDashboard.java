@@ -2,23 +2,27 @@ package com.foryourlife.admin.programs.trainer.trainerDashboard.domain.focus;
 
 public class PaymentDashboard {
     public String staffName;
-    public int completedPaymentCount;
-    public int partialPaymentCount;
-    public int totalPayments;
-    public int yourPartialPaymentsCount;
-    public int yourCompletedPaymentsCount;
-    public int lifePartialPaymentsCount;
-    public int lifeCompletedPaymentsCount;
 
-    public PaymentDashboard(String staffName, int completedPaymentCount, int partialPaymentCount, int totalPayments, int yourPartialPaymentsCount, int yourCompletedPaymentsCount, int lifePartialPaymentsCount, int lifeCompletedPaymentsCount) {
+    public int yourPaymentsSunday;
+    public int yourPlusLifePaymentsSunday;
+    public int totalPaymentsSunday;
+    public double passPercentageFinalSunday;
+
+    public int yourPaymentsFinal;
+    public int yourPlusLifePaymentsFinal;
+    public int totalPaymentsFinal;
+    public double passPercentageFinal;
+
+    public PaymentDashboard(String staffName, int yourPaymentsSunday, int yourPlusLifePaymentsSunday, int totalPaymentsSunday, double passPercentageFinalSunday, int yourPaymentsFinal, int yourPlusLifePaymentsFinal, int totalPaymentsFinal, double passPercentageFinal) {
         this.staffName = staffName;
-        this.completedPaymentCount = completedPaymentCount;
-        this.partialPaymentCount = partialPaymentCount;
-        this.totalPayments = totalPayments;
-        this.yourPartialPaymentsCount = yourPartialPaymentsCount;
-        this.yourCompletedPaymentsCount = yourCompletedPaymentsCount;
-        this.lifePartialPaymentsCount = lifePartialPaymentsCount;
-        this.lifeCompletedPaymentsCount = lifeCompletedPaymentsCount;
+        this.yourPaymentsSunday = yourPaymentsSunday;
+        this.yourPlusLifePaymentsSunday = yourPlusLifePaymentsSunday;
+        this.totalPaymentsSunday = totalPaymentsSunday;
+        this.passPercentageFinalSunday = passPercentageFinalSunday;
+        this.yourPaymentsFinal = yourPaymentsFinal;
+        this.yourPlusLifePaymentsFinal = yourPlusLifePaymentsFinal;
+        this.totalPaymentsFinal = totalPaymentsFinal;
+        this.passPercentageFinal = passPercentageFinal;
     }
 
     public String getStaffName() {
@@ -29,59 +33,67 @@ public class PaymentDashboard {
         this.staffName = staffName;
     }
 
-    public int getCompletedPaymentCount() {
-        return completedPaymentCount;
+    public int getYourPaymentsSunday() {
+        return yourPaymentsSunday;
     }
 
-    public void setCompletedPaymentCount(int completedPaymentCount) {
-        this.completedPaymentCount = completedPaymentCount;
+    public void setYourPaymentsSunday(int yourPaymentsSunday) {
+        this.yourPaymentsSunday = yourPaymentsSunday;
     }
 
-    public int getPartialPaymentCount() {
-        return partialPaymentCount;
+    public int getYourPlusLifePaymentsSunday() {
+        return yourPlusLifePaymentsSunday;
     }
 
-    public void setPartialPaymentCount(int partialPaymentCount) {
-        this.partialPaymentCount = partialPaymentCount;
+    public void setYourPlusLifePaymentsSunday(int yourPlusLifePaymentsSunday) {
+        this.yourPlusLifePaymentsSunday = yourPlusLifePaymentsSunday;
     }
 
-    public int getTotalPayments() {
-        return totalPayments;
+    public int getTotalPaymentsSunday() {
+        return totalPaymentsSunday;
     }
 
-    public void setTotalPayments(int totalPayments) {
-        this.totalPayments = totalPayments;
+    public void setTotalPaymentsSunday(int totalPaymentsSunday) {
+        this.totalPaymentsSunday = totalPaymentsSunday;
     }
 
-    public int getYourPartialPaymentsCount() {
-        return yourPartialPaymentsCount;
+    public double getPassPercentageFinalSunday() {
+        return passPercentageFinalSunday;
     }
 
-    public void setYourPartialPaymentsCount(int yourPartialPaymentsCount) {
-        this.yourPartialPaymentsCount = yourPartialPaymentsCount;
+    public void setPassPercentageFinalSunday(double passPercentageFinalSunday) {
+        this.passPercentageFinalSunday = passPercentageFinalSunday;
     }
 
-    public int getYourCompletedPaymentsCount() {
-        return yourCompletedPaymentsCount;
+    public int getYourPaymentsFinal() {
+        return yourPaymentsFinal;
     }
 
-    public void setYourCompletedPaymentsCount(int yourCompletedPaymentsCount) {
-        this.yourCompletedPaymentsCount = yourCompletedPaymentsCount;
+    public void setYourPaymentsFinal(int yourPaymentsFinal) {
+        this.yourPaymentsFinal = yourPaymentsFinal;
     }
 
-    public int getLifePartialPaymentsCount() {
-        return lifePartialPaymentsCount;
+    public int getYourPlusLifePaymentsFinal() {
+        return yourPlusLifePaymentsFinal;
     }
 
-    public void setLifePartialPaymentsCount(int lifePartialPaymentsCount) {
-        this.lifePartialPaymentsCount = lifePartialPaymentsCount;
+    public void setYourPlusLifePaymentsFinal(int yourPlusLifePaymentsFinal) {
+        this.yourPlusLifePaymentsFinal = yourPlusLifePaymentsFinal;
     }
 
-    public int getLifeCompletedPaymentsCount() {
-        return lifeCompletedPaymentsCount;
+    public int getTotalPaymentsFinal() {
+        return totalPaymentsFinal;
     }
 
-    public void setLifeCompletedPaymentsCount(int lifeCompletedPaymentsCount) {
-        this.lifeCompletedPaymentsCount = lifeCompletedPaymentsCount;
+    public void setTotalPaymentsFinal(int totalPaymentsFinal) {
+        this.totalPaymentsFinal = totalPaymentsFinal;
+    }
+
+    public double getPassPercentageFinal() {
+        return passPercentageFinal;
+    }
+
+    public void setPassPercentageFinal(double passPercentageFinal) {
+        this.passPercentageFinal = passPercentageFinal;
     }
 }

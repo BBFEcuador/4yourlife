@@ -6,6 +6,8 @@ import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNode;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChartRepository;
 import com.foryourlife.admin.programs.trainer.trainerDashboard.domain.focus.*;
+import com.foryourlife.admin.programs.training.domain.Training;
+import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
@@ -15,6 +17,7 @@ import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.UserType;
+import org.apache.poi.ss.formula.functions.T;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,14 +35,16 @@ import java.util.stream.Collectors;
 public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepository {
     private final AttendanceRepository attendanceRepository;
     private final TrainerLifeViewRepositoryImpl trainerLifeViewRepositoryImpl;
+    private final TrainingRepository trainingRepository;
     private final ParticipantRepository participantRepository;
     private final OrganizationChartRepository organizationChartRepository;
     private final InvitationRepository invitationRepository;
     private final PaymentRepository paymentRepository;
 
-    public TrainerFocusViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainerLifeViewRepositoryImpl trainerLifeViewRepositoryImpl, ParticipantRepository participantRepository, OrganizationChartRepository organizationChartRepository, InvitationRepository invitationRepository, PaymentRepository paymentRepository) {
+    public TrainerFocusViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainerLifeViewRepositoryImpl trainerLifeViewRepositoryImpl, TrainingRepository trainingRepository, ParticipantRepository participantRepository, OrganizationChartRepository organizationChartRepository, InvitationRepository invitationRepository, PaymentRepository paymentRepository) {
         this.attendanceRepository = attendanceRepository;
         this.trainerLifeViewRepositoryImpl = trainerLifeViewRepositoryImpl;
+        this.trainingRepository = trainingRepository;
         this.participantRepository = participantRepository;
         this.organizationChartRepository = organizationChartRepository;
         this.invitationRepository = invitationRepository;
@@ -123,6 +128,8 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                     new LifeWeekendAssistant(assistant, enrolled, percentage)
             );
         }
+
+        var countLingerers = this.countLingerers(attendances.getFirst().getTraining());
 
         return new TrainerFocusView(
                 this.buildGeneralAttendance(attendances, participants),
@@ -439,4 +446,65 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         return all;
     }
 
+    public Map<String, Integer> countLingerers(Training currentTraining) {
+
+        List<Attendance> currentAttendances =
+                attendanceRepository.findAttendanceByTraining(currentTraining.getId());
+
+        Set<String> currentUsers = currentAttendances.stream()
+                .filter(this::hasAttendance)
+                .map(a -> a.getUser().getId())
+                .collect(Collectors.toSet());
+
+        int previous1 = 0;
+        int previous2 = 0;
+        int others = 0;
+
+        for (String userId : currentUsers) {
+
+            List<Attendance> pastAttendances =
+                    attendanceRepository.findAttendanceByUser(userId).stream()
+                            .filter(a -> !a.getTraining().getId().equals(currentTraining.getId()))
+                            .sorted(Comparator.comparing(
+                                    (Attendance a) -> a.getTraining().getNumber()
+                            ).reversed())
+                            .toList();
+
+            for (int i = 0; i < pastAttendances.size(); i++) {
+
+                Attendance a = pastAttendances.get(i);
+
+                 if (isDeserter(a)) {
+
+                    if (i == 0) previous1++;
+                    else if (i == 1) previous2++;
+                    else others++;
+
+                    break;
+                }
+            }
+        }
+
+        Map<String, Integer> result = new HashMap<>();
+        result.put("previousTraining", previous1);
+        result.put("twoTrainingsAgo", previous2);
+        result.put("others", others);
+
+        return result;
+    }
+
+    private boolean hasAttendance(Attendance a) {
+        return a.getFridayAttendance() == AttendanceStatus.ASISTIO
+                || a.getSaturdayAttendance() == AttendanceStatus.ASISTIO
+                || a.getSundayAttendance() == AttendanceStatus.ASISTIO;
+    }
+
+    private boolean isDeserter(Attendance a) {
+        return a.getFridayAttendance() == AttendanceStatus.NO_ASISTIO
+                || a.getFridayAttendance() == AttendanceStatus.DESERTO
+                || a.getSaturdayAttendance() == AttendanceStatus.NO_ASISTIO
+                || a.getSaturdayAttendance() == AttendanceStatus.DESERTO
+                || a.getSundayAttendance() == AttendanceStatus.NO_ASISTIO
+                || a.getSundayAttendance() == AttendanceStatus.DESERTO;
+    }
 }

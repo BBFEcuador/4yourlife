@@ -1,6 +1,7 @@
 package com.foryourlife.admin.programs.training.domain;
 
 import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -18,4 +19,5 @@ public interface TrainingRepository {
     List<Training> findByStartDateAndCampus_id(LocalDate date,String campusId);
     Optional<Training> findById(String id);
     Optional<Training> findByNextLevel_Id(String id);
+    List<Training> findByCampusIdAndCourseLevelOrderByNumberDesc(String campusId, CourseLevel courseLevel);
 }

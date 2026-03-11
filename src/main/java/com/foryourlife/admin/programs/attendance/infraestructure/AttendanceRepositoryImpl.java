@@ -2,6 +2,7 @@ package com.foryourlife.admin.programs.attendance.infraestructure;
 
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
+import com.foryourlife.admin.programs.training.domain.Training;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,5 +39,10 @@ public class AttendanceRepositoryImpl implements AttendanceRepository {
     @Override
     public List<Attendance> findAttendanceByTraining(String trainingId) {
         return _jpaAttendanceRepository.findByTraining_Id(trainingId);
+    }
+
+    @Override
+    public List<Attendance> findByUserIdAndTrainingIn(String userId, List<Training> trainingIds) {
+        return _jpaAttendanceRepository.findAllByUser_IdAndTrainingIn(userId, trainingIds);
     }
 }

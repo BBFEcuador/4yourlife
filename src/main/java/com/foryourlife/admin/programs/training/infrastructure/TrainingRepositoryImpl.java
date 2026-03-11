@@ -4,6 +4,7 @@ import com.foryourlife.admin.programs.training.domain.StartDate;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -69,5 +70,10 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     @Override
     public Optional<Training> findByNextLevel_Id(String id) {
         return this.repository.findByNextLevel_Id(id);
+    }
+
+    @Override
+    public List<Training> findByCampusIdAndCourseLevelOrderByNumberDesc(String campusId, CourseLevel courseLevel) {
+        return this.repository.findAllByCampus_IdAndCourseLevelOrderByNumberDesc(campusId, courseLevel);
     }
 }

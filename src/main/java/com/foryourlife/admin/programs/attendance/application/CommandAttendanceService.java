@@ -177,7 +177,7 @@ public class CommandAttendanceService {
             boolean fullAttendance = attendance.HasFullAttendance();
 
             participant.get().setIsDesertor(!fullAttendance);
-//            participant.get().setIsLingerer(!fullAttendance);
+            participant.get().setIsLingerer(!fullAttendance);
 
             _participantRepository.save(participant.get());
         }

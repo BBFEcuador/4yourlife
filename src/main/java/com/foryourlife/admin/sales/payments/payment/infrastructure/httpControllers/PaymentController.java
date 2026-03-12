@@ -52,7 +52,11 @@ public class PaymentController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getAllPayments(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "perPage", defaultValue = "10") int perPage, @RequestParam(value = "search", defaultValue = "") String search, @RequestParam(value = "campusId", defaultValue = "") String campusId) {
+    public ResponseEntity<?> getAllPayments(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "campusId", defaultValue = "") String campusId) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
         Criteria criteria = new Criteria(List.of(), Optional.empty(), Optional.empty());
         List<Filter> filters = new ArrayList<>();

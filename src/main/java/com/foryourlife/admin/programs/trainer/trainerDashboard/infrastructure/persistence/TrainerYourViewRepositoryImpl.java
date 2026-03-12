@@ -52,9 +52,12 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
             throw new BaseException("No attendances found for the given training ID", List.of());
         }
 
+        var lingererStats =  trainerFocusViewRepository.buildLingererStats(attendances.getFirst().getTraining(), attendances, participants);
+
         return new TrainerYourView(
                 trainerFocusViewRepository.buildGeneralAttendance(attendances, participants),
-                buildPaymentYourDashboard(attendances, participants)
+                buildPaymentYourDashboard(attendances, participants),
+                lingererStats
         );
     }
 

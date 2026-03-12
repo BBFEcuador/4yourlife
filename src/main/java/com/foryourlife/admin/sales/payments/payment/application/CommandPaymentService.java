@@ -163,7 +163,7 @@ public class CommandPaymentService {
         _paymentRepository.save(payment);
 
         BigDecimal divisor = BigDecimal.valueOf(1.15);
-        BigDecimal taxAmount = total.subtract(total.divide(divisor, 2, RoundingMode.HALF_UP));
+        BigDecimal taxAmount = total.subtract(total.divide(divisor, 2, RoundingMode.DOWN));
 
         if (!paymentReq.paymentsHistory.isEmpty()) {
             var invoice = Invoice.create(
@@ -178,10 +178,10 @@ public class CommandPaymentService {
                     products,
                     payment,
                     false,
-                    taxAmount.setScale(2, RoundingMode.HALF_UP),
-                    paymentReq.totalDiscount.setScale(2, RoundingMode.HALF_UP),
+                    taxAmount.setScale(2, RoundingMode.DOWN),
+                    paymentReq.totalDiscount.setScale(2, RoundingMode.DOWN),
                     15.0,
-                    total.setScale(2, RoundingMode.HALF_UP),
+                    total.setScale(2, RoundingMode.DOWN),
                     paymentReq.invoice.type
             );
 
@@ -223,7 +223,7 @@ public class CommandPaymentService {
 
             BigDecimal totalAmount = invoice.getAmount();
             BigDecimal taxAmount = invoice.getTaxAmount();
-            BigDecimal subtotal = totalAmount.subtract(taxAmount).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal subtotal = totalAmount.subtract(taxAmount).setScale(2, RoundingMode.DOWN);
 
             List<InvoiceContificoJson.Detalle> details = buildProductDetails(payment, subtotal);
 
@@ -313,7 +313,7 @@ public class CommandPaymentService {
     private List<InvoiceContificoJson.Detalle> buildProductDetails(Payment payment, BigDecimal subtotal) {
         List<InvoiceContificoJson.Detalle> details = new ArrayList<>();
         int productCount = payment.getProducts().size();
-        BigDecimal productSubtotal = subtotal.divide(BigDecimal.valueOf(productCount), 2, RoundingMode.HALF_UP);
+        BigDecimal productSubtotal = subtotal.divide(BigDecimal.valueOf(productCount), 2, RoundingMode.DOWN);
 
         for (var product : payment.getProducts()) {
             details.add(new InvoiceContificoJson.Detalle(product.getContificoId(), 1, productSubtotal.doubleValue(), 15, 0, 0, productSubtotal.doubleValue(), 0, 0, 0.0));
@@ -370,7 +370,7 @@ public class CommandPaymentService {
         var originalInvoice = queryInvoiceService.getByPaymentId(paymentId);
         BigDecimal amount = BigDecimal.valueOf(paymentHistory.getAmount());
         BigDecimal divisor = BigDecimal.valueOf(1.15);
-        BigDecimal taxAmount = amount.subtract(amount.divide(divisor, 2, RoundingMode.HALF_UP));
+        BigDecimal taxAmount = amount.subtract(amount.divide(divisor, 2, RoundingMode.DOWN));
 
         var newInvoice = Invoice.create(
                 UUID.randomUUID().toString(),

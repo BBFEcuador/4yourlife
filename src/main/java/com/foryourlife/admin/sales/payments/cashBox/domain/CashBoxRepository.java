@@ -9,4 +9,5 @@ public interface CashBoxRepository {
     Optional<CashBox> findByNumberAndStoreId(String number,  String storeId);
     List<CashBox> findAll();
     List<CashBox> findAllByCampus(String campusId);
+    List<CashBox> findAllByStoreId(String storeId);
 }

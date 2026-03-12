@@ -7,7 +7,11 @@ import com.foryourlife.admin.sales.payments.cashDrawer.domain.PaymentMethodSumma
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.application.CashDrawerDetailQueryService;
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetail;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -20,10 +24,12 @@ import java.util.stream.Stream;
 @Service
 public class JPACashDrawerRepository implements CashDrawerRepository {
     private final JPAImplCashDrawerRepository repository;
+    private final JPACriteriaConverter<CashDrawer> criteriaConverter;
     private final CashDrawerDetailQueryService cashDrawerDetailQueryService;
 
-    public JPACashDrawerRepository(JPAImplCashDrawerRepository repository, CashDrawerDetailQueryService cashDrawerDetailQueryService) {
+    public JPACashDrawerRepository(JPAImplCashDrawerRepository repository, JPACriteriaConverter<CashDrawer> criteriaConverter, CashDrawerDetailQueryService cashDrawerDetailQueryService) {
         this.repository = repository;
+        this.criteriaConverter = criteriaConverter;
         this.cashDrawerDetailQueryService = cashDrawerDetailQueryService;
     }
 
@@ -48,23 +54,13 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     }
 
     @Override
-    public List<CashDrawer> getByUserIdAndStatusOpenOrLock(String userid) {
-        return this.repository.findAllByStatusIsNotAndOpenedByUser_Id(CashDrawerStatus.CLOSED, userid);
-    }
-
-    @Override
-    public Optional<CashDrawer> getByIsOpenAndByUserId(String userId) {
-        return this.repository.findByStatusAndOpenedByUser_Id(CashDrawerStatus.OPEN, userId);
-    }
-
-    @Override
     public Optional<CashDrawer> findByCashBoxIdAndStatus(String cashBoxId, CashDrawerStatus status) {
         return repository.findByStatusIsAndCashBox_Id(status, cashBoxId);
     }
 
     @Override
-    public List<CashDrawer> getByCashBoxId(String id) {
-        return this.repository.findAllByCashBox_Id(id);
+    public Page<CashDrawer> getByCashBoxId(Pageable pageable, String id) {
+        return this.repository.findAllByCashBox_Id(id, pageable);
     }
 
     @Override
@@ -74,7 +70,7 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
 
     @Override
     public Optional<CashDrawer> findByStatusAndOpenedByUserId(CashDrawerStatus cashDrawerStatus, String userId) {
-        return this.repository.findByStatusAndOpenedByUser_Id(cashDrawerStatus, userId);
+        return this.repository.findAllByStatusIsNotAndOpenedByUser_Id(cashDrawerStatus, userId);
     }
 
     @Override
@@ -101,7 +97,7 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
                         return Stream.empty();
                     }
                     map.put("date", paymentHistory.getDate());
-                    map.put("productName", detail.getPayment().getProducts().getFirst().getName() + "-"+detail.getPayment().getParticipant().getUser().getName()  + " - ABONO");
+                    map.put("productName", detail.getPayment().getProducts().getFirst().getName() + "-" + detail.getPayment().getParticipant().getUser().getName() + " - ABONO");
                     map.put("paymentMethod", paymentHistory.getPaymentMethod().getType());
                     map.put("amount", paymentHistory.getAmount());
                     return Stream.of(map);

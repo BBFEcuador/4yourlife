@@ -12,4 +12,6 @@ public interface JPAImplCashBoxRepository extends JpaRepository<CashBox, String>
     List<CashBox> findAllByStore_Campus_Id(String campusId);
 
     Optional<CashBox> findByStore_IdAndNumber(String storeId, String number);
+
+    List<CashBox> findAllByStore_Id(String storeId);
 }

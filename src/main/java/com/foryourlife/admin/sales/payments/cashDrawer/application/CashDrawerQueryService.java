@@ -2,10 +2,16 @@ package com.foryourlife.admin.sales.payments.cashDrawer.application;
 
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
+import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CashDrawerQueryService {
@@ -25,7 +31,13 @@ public class CashDrawerQueryService {
         );
     }
 
-    public List<CashDrawer> getCashDrawersByCashBoxId(String id) {
-        return repository.getByCashBoxId(id);
+    public Page<CashDrawer> getCashDrawersByCashBoxId(Pageable pageable, String id) {
+
+        return repository.getByCashBoxId(pageable, id);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<CashDrawer> getCashDrawerOpenedByUser(String userId) {
+        return repository.findByStatusAndOpenedByUserId(CashDrawerStatus.OPEN, userId);
     }
 }

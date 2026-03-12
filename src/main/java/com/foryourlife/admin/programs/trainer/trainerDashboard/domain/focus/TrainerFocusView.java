@@ -10,14 +10,16 @@ public class TrainerFocusView {
     private List<PaymentDashboard> paymentDashboard;
     private List<String> totalTrainings;
     private Map<String, LifeWeekendAssistant> lifeWeekendAssistants;
+    private LingererStats lingererStats;
 
-    public TrainerFocusView(GeneralAttendance focusAttendanceDashboard, List<GenderDashboard> genderByDay, List<AgeDashboard> ageDashboard, List<PaymentDashboard> paymentDashboard, List<String> totalTrainings, Map<String, LifeWeekendAssistant> lifeWeekendAssistants) {
+    public TrainerFocusView(GeneralAttendance focusAttendanceDashboard, List<GenderDashboard> genderByDay, List<AgeDashboard> ageDashboard, List<PaymentDashboard> paymentDashboard, List<String> totalTrainings, Map<String, LifeWeekendAssistant> lifeWeekendAssistants, LingererStats lingererStats) {
         this.focusAttendanceDashboard = focusAttendanceDashboard;
         this.genderByDay = genderByDay;
         this.ageDashboard = ageDashboard;
         this.paymentDashboard = paymentDashboard;
         this.totalTrainings = totalTrainings;
         this.lifeWeekendAssistants = lifeWeekendAssistants;
+        this.lingererStats = lingererStats;
     }
 
     public List<PaymentDashboard> getPaymentDashboard() {
@@ -66,5 +68,13 @@ public class TrainerFocusView {
 
     public void setLifeWeekendAssistants(Map<String, LifeWeekendAssistant> lifeWeekendAssistants) {
         this.lifeWeekendAssistants = lifeWeekendAssistants;
+    }
+
+    public LingererStats getLingererStats() {
+        return lingererStats;
+    }
+
+    public void setLingererStats(LingererStats lingererStats) {
+        this.lingererStats = lingererStats;
     }
 }

@@ -56,20 +56,18 @@ public class CashDrawer {
             "cashDrawer"
     )
     @ManyToOne
-    @JoinColumn(
-            name = "cash_box_id",
-            referencedColumnName = "id"
-    )
+    @JoinColumn(name = "cash_box_id")
     private CashBox cashBox;
+
     @CreatedDate
     @Column(name = "created_at", updatable = false)
-    private LocalDate created_at = LocalDate.now();
+    private LocalDate createdAt = LocalDate.now();
 
     @LastModifiedDate
     @Column(name = "updated_at")
     private Instant updated_at;
+
     @OneToMany(mappedBy = "cashDrawer", fetch = FetchType.EAGER)
-    @JsonIgnoreProperties("cashDrawer")
     @JsonIgnore
     private List<CashDrawerDetail> cashDrawerDetails;
 
@@ -109,8 +107,8 @@ public class CashDrawer {
         this.status = status;
     }
 
-    public LocalDate getCreated_at() {
-        return created_at;
+    public LocalDate getCreatedAt() {
+        return createdAt;
     }
 
     public User getOpenedByUser() {

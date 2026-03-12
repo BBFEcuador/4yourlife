@@ -9,11 +9,8 @@ public class AdminLoginResponse {
 
     public String token;
 
-    public List<CashDrawer> cashDrawer;
-
-    public AdminLoginResponse(Admin admin, String token, List<CashDrawer> cashDrawer) {
+    public AdminLoginResponse(Admin admin, String token) {
         this.admin = admin;
-        this.cashDrawer = cashDrawer;
         this.token = token;
     }
 }

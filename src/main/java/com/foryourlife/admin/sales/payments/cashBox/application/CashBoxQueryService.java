@@ -29,11 +29,7 @@ public class CashBoxQueryService {
         return repository.findById(id).orElseThrow(() -> new BaseException("Cashbox not found", List.of("The cashbox with id " + id + " does not exist")));
     }
 
-    public List<CashBox> getCashBoxNotOpened(String campusId) {
-        return repository.findAll()
-                .stream()
-                .filter(cashBox ->
-                        (cashBox.cashDrawer.isEmpty() || cashBox.cashDrawer.stream().noneMatch(cashDrawer -> cashDrawer.getStatus() == CashDrawerStatus.OPEN)) && cashBox.getStore().getCampus().getId().equals(campusId))
-                .collect(Collectors.toList());
+    public List<CashBox> getAllCashBoxByStoreId(String storeId) {
+        return repository.findAllByStoreId(storeId);
     }
 }

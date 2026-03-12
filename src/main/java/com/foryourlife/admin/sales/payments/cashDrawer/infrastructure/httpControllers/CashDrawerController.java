@@ -6,6 +6,8 @@ import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,8 +36,13 @@ public class CashDrawerController {
     }
 
     @GetMapping("cash-box/{id}")
-    public ResponseEntity<?> getCashDrawersByCashBoxId(@PathVariable String id) {
-        return ResponseEntity.ok(queryService.getCashDrawersByCashBoxId(id));
+    public ResponseEntity<?> getCashDrawersByCashBoxId(
+            @PathVariable String id,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage
+    ) {
+        var pageable = PageRequest.of(page, perPage, Sort.by("createdAt").descending());
+        return ResponseEntity.ok(queryService.getCashDrawersByCashBoxId(pageable, id));
     }
 
     @PutMapping("/open/{cashBoxId}")
@@ -69,15 +76,20 @@ public class CashDrawerController {
     @PostMapping("generate-report")
     public ResponseEntity<?> getDrawerReport(@RequestParam(value = "id", defaultValue = "") String id) {
         if (!id.isEmpty()) {
-        ByteArrayOutputStream pdfBytes = commandService.getCloseReport(id);
+            ByteArrayOutputStream pdfBytes = commandService.getCloseReport(id);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("filename", "cash-drawer-report.pdf");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("filename", "cash-drawer-report.pdf");
 
-        return new ResponseEntity<>(pdfBytes.toByteArray(), headers, HttpStatus.OK);
+            return new ResponseEntity<>(pdfBytes.toByteArray(), headers, HttpStatus.OK);
         } else {
             throw new BaseException("Id esta vacío", List.of(""));
         }
+    }
+
+    @GetMapping("opened-user/{userId}")
+    public ResponseEntity<?> getOpenedUser(@PathVariable String userId) {
+        return new ResponseEntity<>(queryService.getCashDrawerOpenedByUser(userId), HttpStatus.OK);
     }
 }

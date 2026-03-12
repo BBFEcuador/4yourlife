@@ -129,7 +129,11 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
             );
         }
 
-        var countLingerers = this.countLingerers(attendances.getFirst().getTraining());
+        var lingererStats = this.buildLingererStats(
+                attendances.getFirst().getTraining(),
+                attendances,
+                participants
+        );
 
         return new TrainerFocusView(
                 this.buildGeneralAttendance(attendances, participants),
@@ -137,7 +141,8 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                 this.buildAgeDashboard(attendances, participants),
                 this.buildPaymentDashboard(attendances, participants),
                 trainingNames,
-                lifeWeekendAssistants
+                lifeWeekendAssistants,
+                lingererStats
         );
     }
 
@@ -186,7 +191,17 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                 })
                 .count();
 
-        return new GeneralAttendance(totalFocus, totalLingerers, userAttendances);
+        int totalDistorter = (int) attendances.stream()
+                .filter(a -> {
+                    Participant p = participants.get(a.getUser().getId());
+                    return p != null && !Boolean.TRUE.equals(p.getDesertor());
+                })
+                .count();
+
+        int initialPx = attendances.getFirst().getTraining().getOriginalTeam().getUsers().size();
+
+        double distortionPercentage = initialPx == 0 ? 0 : ((double) totalDistorter / initialPx) * 100;
+        return new GeneralAttendance(initialPx ,totalFocus, totalLingerers,totalDistorter, distortionPercentage,userAttendances);
     }
 
     public List<GenderDashboard> buildGenderDashboard(
@@ -446,65 +461,67 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         return all;
     }
 
-    public Map<String, Integer> countLingerers(Training currentTraining) {
+    public LingererStats buildLingererStats(
+            Training currentTraining,
+            List<Attendance> currentAttendances,
+            Map<String, Participant> participants
+    ) {
 
-        List<Attendance> currentAttendances =
-                attendanceRepository.findAttendanceByTraining(currentTraining.getId());
-
-        Set<String> currentUsers = currentAttendances.stream()
-                .filter(this::hasAttendance)
-                .map(a -> a.getUser().getId())
-                .collect(Collectors.toSet());
+        int total = 0;
+        int attended = 0;
+        int notAttended = 0;
 
         int previous1 = 0;
         int previous2 = 0;
         int others = 0;
 
-        for (String userId : currentUsers) {
+        for (Attendance attendance : currentAttendances) {
+
+            Participant participant = participants.get(attendance.getUser().getId());
+
+            if (participant == null) continue;
+
+            if (!Boolean.TRUE.equals(participant.getIsLingerer())) continue;
+
+            total++;
+
+            boolean hasAttendance =
+                    attendance.getFridayAttendance() == AttendanceStatus.ASISTIO
+                            || attendance.getSaturdayAttendance() == AttendanceStatus.ASISTIO
+                            || attendance.getSundayAttendance() == AttendanceStatus.ASISTIO;
+
+            if (hasAttendance) attended++;
+            else notAttended++;
 
             List<Attendance> pastAttendances =
-                    attendanceRepository.findAttendanceByUser(userId).stream()
-                            .filter(a -> !a.getTraining().getId().equals(currentTraining.getId()))
+                    attendanceRepository.findAttendanceByUser(attendance.getUser().getId())
+                            .stream()
+                            .filter(a ->
+                                    !a.getTraining().getId().equals(currentTraining.getId()) &&
+                                            a.getTraining().getEndDate().isBefore(currentTraining.getEndDate())
+                            )
                             .sorted(Comparator.comparing(
-                                    (Attendance a) -> a.getTraining().getNumber()
+                                    (Attendance a) -> a.getTraining().getEndDate()
                             ).reversed())
                             .toList();
 
             for (int i = 0; i < pastAttendances.size(); i++) {
 
-                Attendance a = pastAttendances.get(i);
+                if (i == 0) previous1++;
+                else if (i == 1) previous2++;
+                else others++;
 
-                 if (isDeserter(a)) {
-
-                    if (i == 0) previous1++;
-                    else if (i == 1) previous2++;
-                    else others++;
-
-                    break;
-                }
+                break;
             }
         }
 
-        Map<String, Integer> result = new HashMap<>();
-        result.put("previousTraining", previous1);
-        result.put("twoTrainingsAgo", previous2);
-        result.put("others", others);
-
-        return result;
-    }
-
-    private boolean hasAttendance(Attendance a) {
-        return a.getFridayAttendance() == AttendanceStatus.ASISTIO
-                || a.getSaturdayAttendance() == AttendanceStatus.ASISTIO
-                || a.getSundayAttendance() == AttendanceStatus.ASISTIO;
-    }
-
-    private boolean isDeserter(Attendance a) {
-        return a.getFridayAttendance() == AttendanceStatus.NO_ASISTIO
-                || a.getFridayAttendance() == AttendanceStatus.DESERTO
-                || a.getSaturdayAttendance() == AttendanceStatus.NO_ASISTIO
-                || a.getSaturdayAttendance() == AttendanceStatus.DESERTO
-                || a.getSundayAttendance() == AttendanceStatus.NO_ASISTIO
-                || a.getSundayAttendance() == AttendanceStatus.DESERTO;
+        return new LingererStats(
+                total,
+                attended,
+                notAttended,
+                previous1,
+                previous2,
+                others
+        );
     }
 }

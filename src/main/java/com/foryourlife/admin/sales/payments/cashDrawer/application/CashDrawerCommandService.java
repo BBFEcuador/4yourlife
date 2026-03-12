@@ -38,38 +38,30 @@ public class CashDrawerCommandService {
         return repository.save(cashDrawer);
     }
 
+    @Transactional
     public ByteArrayOutputStream closeDrawer(String id, String userId) {
-        var existingDrawer = repository.findByCashBoxIdAndStatusAndUserId(id, CashDrawerStatus.OPEN, userId).orElseThrow(
-                () -> new BaseException("No hay cajas abiertas para el cash box", List.of(""))
-        );
+
+        var existingDrawer = repository
+                .findByCashBoxIdAndStatusAndUserId(id, CashDrawerStatus.OPEN, userId)
+                .orElseThrow(() -> new BaseException("No hay cajas abiertas para el cash box", List.of("")));
 
         if (existingDrawer.getStatus() == CashDrawerStatus.CLOSED) {
             throw new BaseException("La caja esta cerrada", List.of(""));
         }
+
         existingDrawer.setStatus(CashDrawerStatus.CLOSED);
         existingDrawer.setCloseDate(LocalDateTime.now());
+
+        existingDrawer.getCashBox().setOpened(false);
+        existingDrawer.getCashBox().setOpenedByUser(null);
+
         existingDrawer.setClosedByUser(existingDrawer.getOpenedByUser());
         existingDrawer.setClosedBalance(getActualBalance(existingDrawer));
+
         repository.save(existingDrawer);
-        ByteArrayOutputStream pdf = new ByteArrayOutputStream();
 
-        try {
-            ITextRenderer renderer = new ITextRenderer();
-            renderer.setDocumentFromString(repository.generatePdfReport(existingDrawer));
-            renderer.layout();
-            renderer.createPDF(pdf);
-//            String fileName = "invoice_" + existingDrawer.getId() + ".pdf";
-//            String filePath = Paths.get("").toAbsolutePath().toString() + File.separator + fileName;
-//
-//            try (FileOutputStream fos = new FileOutputStream(filePath)) {
-//                fos.write(pdf.toByteArray());
-//            }
-            return pdf;
-        } catch (Exception e) {
-            throw new BaseException("Error generating invoice", List.of(e.getMessage()));
-        }
+        return  this.getCloseReport(existingDrawer.getId());
     }
-
     @Transactional
     public CashDrawer openDrawer(String cashBoxId, String userId, Double openingBalance, String detail) {
 
@@ -81,7 +73,7 @@ public class CashDrawerCommandService {
                 () -> new BaseException("User not found", List.of(""))
         );
 
-        var userOpenDrawer = repository.findByStatusAndOpenedByUserId(CashDrawerStatus.OPEN, userId);
+        var userOpenDrawer = repository.findByStatusAndOpenedByUserId(CashDrawerStatus.CLOSED, userId);
 
         if (userOpenDrawer.isPresent()) {
             var drawer = userOpenDrawer.get();
@@ -103,6 +95,8 @@ public class CashDrawerCommandService {
             );
         }
 
+        cashBox.setOpened(true);
+        cashBox.setOpenedByUser(user.getName());
         var newDrawer = new CashDrawer(
                 UUID.randomUUID().toString(),
                 CashDrawerStatus.OPEN,

@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,20 +21,19 @@ public class CashBoxController {
     private CashBoxQueryService queryService;
 
     @PostMapping("")
-    public ResponseEntity<?> saveCashDrawer(@RequestBody @Valid CashBoxRequest cashDrawer) {
+    public ResponseEntity<?> saveCashBox(@RequestBody @Valid CashBoxRequest cashDrawer) {
         commandService.addCashBox(cashDrawer.toDomain());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getCashDrawerById(@PathVariable String id) {
+    public ResponseEntity<?> getCashBoxById(@PathVariable String id) {
         return new ResponseEntity<>(queryService.getCashBoxById(id), HttpStatus.OK);
     }
 
 
     @GetMapping("")
-    public ResponseEntity<?> getAllCashDrawers(@RequestParam(value = "campusId", defaultValue = "") String campusId) {
-        List<CashBox> cashboxes;
+    public ResponseEntity<?> getAllCashBoxes(@RequestParam(value = "campusId", defaultValue = "") String campusId) {
         if (!campusId.isEmpty()) {
             return new ResponseEntity<>(queryService.getAllCashBoxByCampus(campusId), HttpStatus.OK);
         } else {
@@ -43,12 +41,8 @@ public class CashBoxController {
         }
     }
 
-    @GetMapping("available")
-    public ResponseEntity<?> getAvailableCashDrawers(@RequestParam(value = "campusId", defaultValue = "") String campusId) {
-        if (!campusId.isEmpty()) {
-            return new ResponseEntity<>(queryService.getCashBoxNotOpened(campusId), HttpStatus.OK);
-        } else {
-            throw new BaseException("Seleccione un campus para continuar", List.of(""));
-        }
+    @GetMapping("store/{storeId}")
+    public ResponseEntity<List<CashBox>> getCashBoxByStoreId(@PathVariable String storeId) {
+        return new ResponseEntity<>(queryService.getAllCashBoxByStoreId(storeId), HttpStatus.OK);
     }
 }

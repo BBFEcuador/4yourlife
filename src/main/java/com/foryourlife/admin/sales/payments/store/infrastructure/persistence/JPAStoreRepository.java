@@ -2,6 +2,10 @@ package com.foryourlife.admin.sales.payments.store.infrastructure.persistence;
 
 import com.foryourlife.admin.sales.payments.store.domain.Store;
 import com.foryourlife.admin.sales.payments.store.domain.StoreRepository;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +14,11 @@ import java.util.Optional;
 @Service
 public class JPAStoreRepository implements StoreRepository {
     private final JPAImplStoreRepository repository;
+    private final JPACriteriaConverter<Store> criteriaConverter;
 
-    public JPAStoreRepository(JPAImplStoreRepository repository) {
+    public JPAStoreRepository(JPAImplStoreRepository repository, JPACriteriaConverter<Store> criteriaConverter) {
         this.repository = repository;
+        this.criteriaConverter = criteriaConverter;
     }
 
     @Override
@@ -41,7 +47,10 @@ public class JPAStoreRepository implements StoreRepository {
     }
 
     @Override
-    public List<Store> getAll() {
-        return repository.findAll();
+    public Page<Store> getAll(Pageable pageable, Criteria criteria) {
+        return repository.findAll(
+                criteriaConverter.getJpaSpecifications(criteria),
+                pageable
+        );
     }
 }

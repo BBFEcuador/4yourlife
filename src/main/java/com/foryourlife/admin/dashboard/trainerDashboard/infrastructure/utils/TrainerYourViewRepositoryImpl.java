@@ -64,7 +64,8 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
                 buildPaymentYourDashboard(attendances, participants),
                 lingererStats,
                 trainingDashboardUtils.buildNextTrainingAttendance(attendances),
-                previousTrainingStats
+                previousTrainingStats,
+                trainingDashboardUtils.buildYourRecoveryPaymentStats(attendances.getFirst().getTraining(), attendances, participants)
                 );
     }
 

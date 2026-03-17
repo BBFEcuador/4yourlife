@@ -10,16 +10,18 @@ import java.util.List;
 public class TrainerYourView {
     private GeneralAttendance attendance;
     private List<PaymentYourDashboard> paymentDashboard;
-    private LingererStats  lingererStats;
+    private LingererStats lingererStats;
     private NextTrainingAttendance nextTrainingAttendance;
-    private PreviousTrainingStats  previousTrainingStats;
+    private PreviousTrainingStats previousTrainingStats;
+    private YourRecoveryPaymentStats yourRecoveryPaymentStats;
 
-    public TrainerYourView(GeneralAttendance attendance, List<PaymentYourDashboard> paymentDashboard, LingererStats lingererStats, NextTrainingAttendance nextTrainingAttendance, PreviousTrainingStats previousTrainingStats) {
+    public TrainerYourView(GeneralAttendance attendance, List<PaymentYourDashboard> paymentDashboard, LingererStats lingererStats, NextTrainingAttendance nextTrainingAttendance, PreviousTrainingStats previousTrainingStats, YourRecoveryPaymentStats yourRecoveryPaymentStats) {
         this.attendance = attendance;
         this.paymentDashboard = paymentDashboard;
         this.lingererStats = lingererStats;
         this.nextTrainingAttendance = nextTrainingAttendance;
         this.previousTrainingStats = previousTrainingStats;
+        this.yourRecoveryPaymentStats = yourRecoveryPaymentStats;
     }
 
     public GeneralAttendance getAttendance() {
@@ -60,5 +62,13 @@ public class TrainerYourView {
 
     public void setPreviousTrainingStats(PreviousTrainingStats previousTrainingStats) {
         this.previousTrainingStats = previousTrainingStats;
+    }
+
+    public YourRecoveryPaymentStats getYourRecoveryPaymentStats() {
+        return yourRecoveryPaymentStats;
+    }
+
+    public void setYourRecoveryPaymentStats(YourRecoveryPaymentStats yourRecoveryPaymentStats) {
+        this.yourRecoveryPaymentStats = yourRecoveryPaymentStats;
     }
 }

@@ -6,6 +6,7 @@ import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -66,6 +67,7 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
 
         List<Attendance> attendances = attendanceRepository.findAttendanceByTraining(training.getId());
         List<Promise> promises = promiseRepository.findByTrainingId(training.getId());
+        Map<String, Participant> participants = trainingDashboardUtils.loadParticipants(attendances);
 
         Map<String, Promise> promiseMap = promises.stream()
                 .filter(p -> p.getUser() != null)
@@ -99,7 +101,8 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
                 training.getName(),
                 attendanceDashboard,
                 promiseDashboard,
-                userDashboards
+                userDashboards,
+                trainingDashboardUtils.buildLingererStats(training, attendances, participants )
         );
     }
 

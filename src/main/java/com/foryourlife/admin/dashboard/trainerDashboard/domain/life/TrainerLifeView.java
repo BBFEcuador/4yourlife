@@ -1,5 +1,7 @@
 package com.foryourlife.admin.dashboard.trainerDashboard.domain.life;
 
+import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.LingererStats;
+
 import java.util.List;
 
 public class TrainerLifeView {
@@ -8,13 +10,16 @@ public class TrainerLifeView {
     private AttendanceDashboard attendanceDashboard;
     private PromiseDashboard promiseDashboard;
     private List<UserDashboardDto> users;
+    private LingererStats lingererStats;
 
-    public TrainerLifeView(String trainingName, String trainerName, AttendanceDashboard attendanceDashboard, PromiseDashboard promiseDashboard, List<UserDashboardDto> users) {
+
+    public TrainerLifeView(String trainingName, String trainerName, AttendanceDashboard attendanceDashboard, PromiseDashboard promiseDashboard, List<UserDashboardDto> users, LingererStats lingererStats) {
         this.trainingName = trainingName;
         this.trainerName = trainerName;
         this.attendanceDashboard = attendanceDashboard;
         this.promiseDashboard = promiseDashboard;
         this.users = users;
+        this.lingererStats = lingererStats;
     }
 
     public String getTrainingName() {
@@ -55,5 +60,13 @@ public class TrainerLifeView {
 
     public void setUsers(List<UserDashboardDto> users) {
         this.users = users;
+    }
+
+    public LingererStats getLingererStats() {
+        return lingererStats;
+    }
+
+    public void setLingererStats(LingererStats lingererStats) {
+        this.lingererStats = lingererStats;
     }
 }

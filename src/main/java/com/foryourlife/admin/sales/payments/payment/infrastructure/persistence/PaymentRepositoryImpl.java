@@ -120,4 +120,9 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     public List<Payment> findAllByTrainingId(String trainingId) {
         return _jpaPaymentRepository.findAllByTraining_Id(trainingId);
     }
+
+    @Override
+    public List<Payment> findAllByParticipantIds(List<String> participantIds) {
+        return _jpaPaymentRepository.findAllByParticipant_Ids(participantIds);
+    }
 }

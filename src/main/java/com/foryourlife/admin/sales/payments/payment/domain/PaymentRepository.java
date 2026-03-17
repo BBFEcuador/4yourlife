@@ -26,4 +26,6 @@ public interface PaymentRepository {
     List<Payment> findAllByParticipantIn(Collection<Participant> participantIds);
     List<Payment> findAllBetweenDates(LocalDateTime startDate, LocalDateTime endDate);
     List<Payment> findAllByTrainingId(String trainingId);
+
+    List<Payment> findAllByParticipantIds(List<String> participantIds);
 }

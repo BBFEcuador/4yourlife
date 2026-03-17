@@ -3,6 +3,7 @@ package com.foryourlife.admin.programs.attendance.infraestructure;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.training.domain.Training;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -14,4 +15,10 @@ public interface JPAAttendanceRepository extends JpaRepository<Attendance,String
     List<Attendance> findByUser_Id(String userId);
 
     List<Attendance> findAllByUser_IdAndTrainingIn(String userId, Collection<Training> trainings);
+
+    @Query("""
+    SELECT a FROM Attendance a
+    WHERE a.user.id IN :userIds
+""")
+    List<Attendance> findAllByUser_Ids(List<String> userIds);
 }

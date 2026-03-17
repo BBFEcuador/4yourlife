@@ -5,19 +5,20 @@ public class LingererStats {
     private int attended;
     private int notAttended;
 
-    private LingererGroupStats previousTraining;
-    private LingererGroupStats twoTrainingsAgo;
-    private LingererGroupStats threeTrainingsAgo;
-    private LingererGroupStats others;
+    private LingererGroupStats finalJornal;
+    private LingererGroupStats penultimateJornal;
+    private LingererGroupStats penultimateMatchJornal;
+    private LingererGroupStats recovered;
 
-    public LingererStats(int total, int attended, int notAttended, LingererGroupStats previousTraining, LingererGroupStats twoTrainingsAgo, LingererGroupStats threeTrainingsAgo, LingererGroupStats others) {
+
+    public LingererStats(int total, int attended, int notAttended, LingererGroupStats finalJornal, LingererGroupStats penultimateJornal, LingererGroupStats penultimateMatchJornal, LingererGroupStats recovered) {
         this.total = total;
         this.attended = attended;
         this.notAttended = notAttended;
-        this.previousTraining = previousTraining;
-        this.twoTrainingsAgo = twoTrainingsAgo;
-        this.threeTrainingsAgo = threeTrainingsAgo;
-        this.others = others;
+        this.finalJornal = finalJornal;
+        this.penultimateJornal = penultimateJornal;
+        this.penultimateMatchJornal = penultimateMatchJornal;
+        this.recovered = recovered;
     }
 
     public int getTotal() {
@@ -44,35 +45,35 @@ public class LingererStats {
         this.notAttended = notAttended;
     }
 
-    public LingererGroupStats getPreviousTraining() {
-        return previousTraining;
+    public LingererGroupStats getFinalJornal() {
+        return finalJornal;
     }
 
-    public void setPreviousTraining(LingererGroupStats previousTraining) {
-        this.previousTraining = previousTraining;
+    public void setFinalJornal(LingererGroupStats finalJornal) {
+        this.finalJornal = finalJornal;
     }
 
-    public LingererGroupStats getTwoTrainingsAgo() {
-        return twoTrainingsAgo;
+    public LingererGroupStats getPenultimateJornal() {
+        return penultimateJornal;
     }
 
-    public void setTwoTrainingsAgo(LingererGroupStats twoTrainingsAgo) {
-        this.twoTrainingsAgo = twoTrainingsAgo;
+    public void setPenultimateJornal(LingererGroupStats penultimateJornal) {
+        this.penultimateJornal = penultimateJornal;
     }
 
-    public LingererGroupStats getThreeTrainingsAgo() {
-        return threeTrainingsAgo;
+    public LingererGroupStats getPenultimateMatchJornal() {
+        return penultimateMatchJornal;
     }
 
-    public void setThreeTrainingsAgo(LingererGroupStats threeTrainingsAgo) {
-        this.threeTrainingsAgo = threeTrainingsAgo;
+    public void setPenultimateMatchJornal(LingererGroupStats penultimateMatchJornal) {
+        this.penultimateMatchJornal = penultimateMatchJornal;
     }
 
-    public LingererGroupStats getOthers() {
-        return others;
+    public LingererGroupStats getRecovered() {
+        return recovered;
     }
 
-    public void setOthers(LingererGroupStats others) {
-        this.others = others;
+    public void setRecovered(LingererGroupStats recovered) {
+        this.recovered = recovered;
     }
 }

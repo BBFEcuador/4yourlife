@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -31,4 +33,13 @@ public interface JPAPaymentRepository extends JpaRepository<Payment, String>, Jp
     List<Payment> findAllByCreatedDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     List<Payment> findAllByTraining_Id(String trainingId);
+
+    @Query("""
+    SELECT p
+    FROM Payment p
+    WHERE p.participant.id IN :participantIds
+""")
+    List<Payment> findAllByParticipant_Ids(
+            @Param("participantIds") List<String> participantIds
+    );
 }

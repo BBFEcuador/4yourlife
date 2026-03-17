@@ -3,6 +3,8 @@ package com.foryourlife.admin.sales.payments.cashDrawer.infrastructure.httpContr
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerCommandService;
 import com.foryourlife.admin.sales.payments.cashDrawer.application.CashDrawerQueryService;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
+import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/cash-drawer")
@@ -24,11 +28,6 @@ public class CashDrawerController {
     private CashDrawerCommandService commandService;
     @Autowired
     private CashDrawerQueryService queryService;
-
-    @GetMapping("")
-    public ResponseEntity<?> getAllCashDrawers() {
-        return ResponseEntity.ok(queryService.getAllCashDrawers());
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCashDrawerById(@PathVariable String id) {
@@ -39,10 +38,20 @@ public class CashDrawerController {
     public ResponseEntity<?> getCashDrawersByCashBoxId(
             @PathVariable String id,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "perPage", defaultValue = "10") int perPage
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(value = "search", defaultValue = "") String search
     ) {
+        Criteria criteria = new Criteria(List.of(), Optional.empty(), Optional.empty());
+        List<Filter> filters = new ArrayList<>();
+        filters.add(new Filter("id", id, "cashBox", Filter.Operation.EQUAL, Filter.LogicalOperator.AND));
+        if (!search.isEmpty()) {
+            filters.add(
+                    new Filter("name", search, "openedByUser", Filter.Operation.LIKE, Filter.LogicalOperator.OR)
+            );
+        }
+        criteria.filters = filters;
         var pageable = PageRequest.of(page, perPage, Sort.by("createdAt").descending());
-        return ResponseEntity.ok(queryService.getCashDrawersByCashBoxId(pageable, id));
+        return ResponseEntity.ok(queryService.getAllCashDrawers(criteria, pageable));
     }
 
     @PutMapping("/open/{cashBoxId}")

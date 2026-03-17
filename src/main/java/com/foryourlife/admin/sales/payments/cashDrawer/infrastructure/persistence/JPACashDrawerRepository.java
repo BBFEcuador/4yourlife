@@ -49,8 +49,11 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     }
 
     @Override
-    public List<CashDrawer> getAll() {
-        return this.repository.findAll();
+    public Page<CashDrawer> getAll(Criteria criteria, Pageable pageable) {
+        return this.repository.findAll(
+                criteriaConverter.getJpaSpecifications(criteria),
+                pageable
+        );
     }
 
     @Override
@@ -69,8 +72,13 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     }
 
     @Override
-    public Optional<CashDrawer> findByStatusAndOpenedByUserId(CashDrawerStatus cashDrawerStatus, String userId) {
+    public Optional<CashDrawer> findByStatusIsNotAndOpenedByUserId(CashDrawerStatus cashDrawerStatus, String userId) {
         return this.repository.findAllByStatusIsNotAndOpenedByUser_Id(cashDrawerStatus, userId);
+    }
+
+    @Override
+    public Optional<CashDrawer> findByStatusIsAndOpenedByUserId(CashDrawerStatus cashDrawerStatus, String userId) {
+        return this.repository.findAllByStatusIsAndOpenedByUser_Id(cashDrawerStatus, userId);
     }
 
     @Override

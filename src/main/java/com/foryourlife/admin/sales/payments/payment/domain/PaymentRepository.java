@@ -17,8 +17,8 @@ public interface PaymentRepository {
             String participantId,
             PaymentStatus status
     );
-    Page<Payment> findByParticipantId(String id, Pageable pageable);
-    List<Payment> findByParticipantId(String id);
+    Page<Payment> findByAllParticipantId(String id, Pageable pageable);
+    List<Payment> findByAllParticipantId(String id);
     Page<Payment> findAll(Pageable pageable);
     Page<Payment> findAll(Pageable pageable, Criteria criteria);
     String generatePdf(Payment payment);

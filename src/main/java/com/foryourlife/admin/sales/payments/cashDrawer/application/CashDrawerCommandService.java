@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -73,7 +72,7 @@ public class CashDrawerCommandService {
                 () -> new BaseException("User not found", List.of(""))
         );
 
-        var userOpenDrawer = repository.findByStatusAndOpenedByUserId(CashDrawerStatus.CLOSED, userId);
+        var userOpenDrawer = repository.findByStatusIsNotAndOpenedByUserId(CashDrawerStatus.CLOSED, userId);
 
         if (userOpenDrawer.isPresent()) {
             var drawer = userOpenDrawer.get();

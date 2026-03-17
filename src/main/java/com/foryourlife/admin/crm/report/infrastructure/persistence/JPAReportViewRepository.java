@@ -5,24 +5,21 @@ import com.foryourlife.admin.crm.callLogs.domain.CallLog;
 import com.foryourlife.admin.crm.report.domain.ReportViewRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
-import com.foryourlife.admin.programs.trainer.trainerDashboard.infrastructure.persistence.TrainerFocusViewRepositoryImpl;
+import com.foryourlife.admin.dashboard.trainerDashboard.infrastructure.utils.TrainerFocusViewRepositoryImpl;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
-import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.UserEntities;
 import com.foryourlife.shared.domain.user.UserType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xddf.usermodel.chart.*;
 import org.apache.poi.xssf.usermodel.*;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -187,7 +184,7 @@ public class JPAReportViewRepository implements ReportViewRepository {
                             p -> p
                     )) : new HashMap<String, Participant>();
 
-            var payments = trainerFocusViewRepository.buildPaymentDashboard(attendances, participants);
+            var payments = trainerFocusViewRepository.buildFocusPaymentDashboard(attendances, participants);
 
             Row paymentHeader = operativeSheet.createRow(ref.rowIdx);
             paymentHeader.createCell(0).setCellValue("Staff");

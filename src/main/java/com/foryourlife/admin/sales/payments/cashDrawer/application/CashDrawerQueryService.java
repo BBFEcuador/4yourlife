@@ -21,8 +21,8 @@ public class CashDrawerQueryService {
         this.repository = repository;
     }
 
-    public List<CashDrawer> getAllCashDrawers() {
-        return repository.getAll();
+    public Page<CashDrawer> getAllCashDrawers(Criteria criteria, Pageable pageable) {
+        return repository.getAll(criteria, pageable);
     }
 
     public CashDrawer getCashDrawerById(String id) {
@@ -32,12 +32,11 @@ public class CashDrawerQueryService {
     }
 
     public Page<CashDrawer> getCashDrawersByCashBoxId(Pageable pageable, String id) {
-
         return repository.getByCashBoxId(pageable, id);
     }
 
     @Transactional(readOnly = true)
     public Optional<CashDrawer> getCashDrawerOpenedByUser(String userId) {
-        return repository.findByStatusAndOpenedByUserId(CashDrawerStatus.OPEN, userId);
+        return repository.findByStatusIsAndOpenedByUserId(CashDrawerStatus.OPEN, userId);
     }
 }

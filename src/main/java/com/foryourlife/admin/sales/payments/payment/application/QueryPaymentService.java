@@ -6,7 +6,6 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,10 +30,10 @@ public class QueryPaymentService {
     }
 
     public Page<Payment> findByParticipantId(String id, Pageable pageable){
-        return  _paymentRepository.findByParticipantId(id, pageable);
+        return  _paymentRepository.findByAllParticipantId(id, pageable);
     }
 
     public List<Payment> findAllByParticipantIn(String id) {
-        return  _paymentRepository.findByParticipantId(id);
+        return  _paymentRepository.findByAllParticipantId(id);
     }
 }

@@ -19,5 +19,7 @@ interface JPAImplCashDrawerRepository extends JpaRepository<CashDrawer, String>,
 
     Optional<CashDrawer> findByStatusIsAndCashBox_IdAndOpenedByUser_Id(CashDrawerStatus status, String cashBoxId, String openedByUserId);
 
-    Page<CashDrawer> findAllByCashBox_Id(String cashBoxId, Pageable pageable);
+    Page<CashDrawer> findAllByCashBox_Id( String cashBoxId, Pageable pageable);
+
+    Optional<CashDrawer> findAllByStatusIsAndOpenedByUser_Id(CashDrawerStatus status, String openedByUserId);
 }

@@ -8,6 +8,7 @@ import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNode;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChartRepository;
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
@@ -29,13 +30,15 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
     private final InvitationRepository invitationRepository;
     private final OrganizationChartRepository organizationChartRepository;
     private final PaymentRepository paymentRepository;
+    private final TeamRepository teamRepository;
 
-    public TrainerFocusViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainingDashboardUtils trainingDashboardUtils, InvitationRepository invitationRepository, OrganizationChartRepository organizationChartRepository, PaymentRepository paymentRepository) {
+    public TrainerFocusViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainingDashboardUtils trainingDashboardUtils, InvitationRepository invitationRepository, OrganizationChartRepository organizationChartRepository, PaymentRepository paymentRepository, TeamRepository teamRepository) {
         this.attendanceRepository = attendanceRepository;
         this.trainingDashboardUtils = trainingDashboardUtils;
         this.invitationRepository = invitationRepository;
         this.organizationChartRepository = organizationChartRepository;
         this.paymentRepository = paymentRepository;
+        this.teamRepository = teamRepository;
     }
 
     @Override
@@ -52,7 +55,13 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
 
         var nextTrainingAttendanceCount = trainingDashboardUtils.buildNextTrainingAttendance(attendances);
 
+        var trainerName = attendances.getFirst().getTraining().getOriginalTeam().getTrainer().getName() != null ? attendances.getFirst().getTraining().getOriginalTeam().getTrainer().getName() : teamRepository.findByTrainingId(attendances.getFirst().getTraining().getId()).map(t -> t.getTrainer().getName()).orElse("Sin entrenador");
+
+
         return new TrainerFocusView(
+                trainerName,
+                attendances.getFirst().getTraining().getName(),
+                attendances.getFirst().getTraining().getStartDate().toString() + " - " + attendances.getFirst().getTraining().getEndDate().toString(),
                 trainingDashboardUtils.buildGeneralAttendance(attendances, participants),
                 trainingDashboardUtils.buildGenderDashboard(attendances, participants),
                 trainingDashboardUtils.buildAgeDashboard(attendances, participants),

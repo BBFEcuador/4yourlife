@@ -2,10 +2,14 @@ package com.foryourlife.admin.dashboard.trainerDashboard.domain.focus;
 
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 public class TrainerFocusView {
+    private String trainerName;
+    private String trainingName;
+    private String trainingDate;
     private GeneralAttendance focusAttendanceDashboard;
     private List<GenderDashboard> genderByDay;
     private List<AgeDashboard> ageDashboard;
@@ -14,7 +18,10 @@ public class TrainerFocusView {
     private LingererStats lingererStats;
     private NextTrainingAttendance nextTrainingAttendance;
 
-    public TrainerFocusView(GeneralAttendance focusAttendanceDashboard, List<GenderDashboard> genderByDay, List<AgeDashboard> ageDashboard, List<PaymentFocusDashboard> paymentFocusDashboard, Map<String, LifeWeekendAssistant> lifeWeekendAssistants, LingererStats lingererStats, NextTrainingAttendance nextTrainingAttendance) {
+    public TrainerFocusView(String trainerName, String trainingName, String trainingDate, GeneralAttendance focusAttendanceDashboard, List<GenderDashboard> genderByDay, List<AgeDashboard> ageDashboard, List<PaymentFocusDashboard> paymentFocusDashboard, Map<String, LifeWeekendAssistant> lifeWeekendAssistants, LingererStats lingererStats, NextTrainingAttendance nextTrainingAttendance) {
+        this.trainerName = trainerName;
+        this.trainingName = trainingName;
+        this.trainingDate = trainingDate;
         this.focusAttendanceDashboard = focusAttendanceDashboard;
         this.genderByDay = genderByDay;
         this.ageDashboard = ageDashboard;
@@ -22,6 +29,14 @@ public class TrainerFocusView {
         this.lifeWeekendAssistants = lifeWeekendAssistants;
         this.lingererStats = lingererStats;
         this.nextTrainingAttendance = nextTrainingAttendance;
+    }
+
+    public String getTrainingDate() {
+        return trainingDate;
+    }
+
+    public void setTrainingDate(String trainingDate) {
+        this.trainingDate = trainingDate;
     }
 
     public List<PaymentFocusDashboard> getPaymentDashboard() {
@@ -78,5 +93,29 @@ public class TrainerFocusView {
 
     public void setNextTrainingAttendance(NextTrainingAttendance nextTrainingAttendance) {
         this.nextTrainingAttendance = nextTrainingAttendance;
+    }
+
+    public String getTrainerName() {
+        return trainerName;
+    }
+
+    public void setTrainerName(String trainerName) {
+        this.trainerName = trainerName;
+    }
+
+    public String getTrainingName() {
+        return trainingName;
+    }
+
+    public void setTrainingName(String trainingName) {
+        this.trainingName = trainingName;
+    }
+
+    public List<PaymentFocusDashboard> getPaymentFocusDashboard() {
+        return paymentFocusDashboard;
+    }
+
+    public void setPaymentFocusDashboard(List<PaymentFocusDashboard> paymentFocusDashboard) {
+        this.paymentFocusDashboard = paymentFocusDashboard;
     }
 }

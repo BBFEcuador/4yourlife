@@ -1,6 +1,6 @@
 package com.foryourlife.admin.dashboard.trainerDashboard.domain.life;
 
-public class AttendanceDashboard {
+public class LifeAttendanceDashboard {
     private long fridayCount;
     private long saturdayCount;
     private long sundayCount;
@@ -9,8 +9,10 @@ public class AttendanceDashboard {
     private long masterSaturdayCount;
     private long masterSundayCount;
     private long totalMasterParticipants;
+    private long deserterParticipantsCount;
+    private double deserterParticipantsPercentage;
 
-    public AttendanceDashboard(long fridayCount, long saturdayCount, long sundayCount, long totalParticipants, long masterFridayCount, long masterSaturdayCount, long masterSundayCount, long totalMasterParticipants) {
+    public LifeAttendanceDashboard(long fridayCount, long saturdayCount, long sundayCount, long totalParticipants, long masterFridayCount, long masterSaturdayCount, long masterSundayCount, long totalMasterParticipants, long deserterParticipantsCount, double deserterParticipantsPercentage) {
         this.fridayCount = fridayCount;
         this.saturdayCount = saturdayCount;
         this.sundayCount = sundayCount;
@@ -19,6 +21,8 @@ public class AttendanceDashboard {
         this.masterSaturdayCount = masterSaturdayCount;
         this.masterSundayCount = masterSundayCount;
         this.totalMasterParticipants = totalMasterParticipants;
+        this.deserterParticipantsCount = deserterParticipantsCount;
+        this.deserterParticipantsPercentage = deserterParticipantsPercentage;
     }
 
     public long getFridayCount() {
@@ -83,5 +87,21 @@ public class AttendanceDashboard {
 
     public void setTotalParticipants(long totalParticipants) {
         this.totalParticipants = totalParticipants;
+    }
+
+    public long getDeserterParticipantsCount() {
+        return deserterParticipantsCount;
+    }
+
+    public void setDeserterParticipantsCount(long deserterParticipantsCount) {
+        this.deserterParticipantsCount = deserterParticipantsCount;
+    }
+
+    public double getDeserterParticipantsPercentage() {
+        return deserterParticipantsPercentage;
+    }
+
+    public void setDeserterParticipantsPercentage(double deserterParticipantsPercentage) {
+        this.deserterParticipantsPercentage = deserterParticipantsPercentage;
     }
 }

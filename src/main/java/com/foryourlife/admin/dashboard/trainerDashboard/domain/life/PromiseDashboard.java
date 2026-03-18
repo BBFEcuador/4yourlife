@@ -12,6 +12,10 @@ public class PromiseDashboard {
     private int totalMasterLifePaid;
     private int totalAchieved;
     private int totalPaid;
+    private double enrollmentIndex;
+    private double realEnrollmentIndex;
+    private int  enrollerPersonsCount;
+    private double enrollerPersonsPercent;
 
     public PromiseDashboard(int totalFirstPromise, int totalSecondPromise, int totalThirdPromise, int totalFirstMasterLifePromise, int totalSecondMasterLifePromise, int totalThirdMasterLifePromise, int totalMasterLifePromise, int totalMasterLifeAchieved, int totalMasterLifePaid, int totalAchieved, int totalPaid) {
         this.totalFirstPromise = totalFirstPromise;
@@ -113,5 +117,37 @@ public class PromiseDashboard {
 
     public void setTotalPaid(int totalPaid) {
         this.totalPaid = totalPaid;
+    }
+
+    public double getEnrollmentIndex() {
+        return enrollmentIndex;
+    }
+
+    public void setEnrollmentIndex(double enrollmentIndex) {
+        this.enrollmentIndex = enrollmentIndex;
+    }
+
+    public double getRealEnrollmentIndex() {
+        return realEnrollmentIndex;
+    }
+
+    public void setRealEnrollmentIndex(double realEnrollmentIndex) {
+        this.realEnrollmentIndex = realEnrollmentIndex;
+    }
+
+    public int getEnrollerPersonsCount() {
+        return enrollerPersonsCount;
+    }
+
+    public void setEnrollerPersonsCount(int enrollerPersonsCount) {
+        this.enrollerPersonsCount = enrollerPersonsCount;
+    }
+
+    public double getEnrollerPersonsPercent() {
+        return enrollerPersonsPercent;
+    }
+
+    public void setEnrollerPersonsPercent(double enrollerPersonsPercent) {
+        this.enrollerPersonsPercent = enrollerPersonsPercent;
     }
 }

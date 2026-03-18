@@ -4,6 +4,7 @@ import com.foryourlife.admin.dashboard.trainerDashboard.domain.life.*;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
@@ -12,7 +13,6 @@ import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.User;
-import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.UserType;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +28,14 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
     private final AttendanceRepository attendanceRepository;
     private final TrainingDashboardUtils trainingDashboardUtils;
     private final PromiseRepository promiseRepository;
+    private final TeamRepository teamRepository;
 
-    public TrainerLifeViewRepositoryImpl(TrainingRepository jpaTrainingRepository, AttendanceRepository attendanceRepository, TrainingDashboardUtils trainingDashboardUtils, PromiseRepository promiseRepository) {
+    public TrainerLifeViewRepositoryImpl(TrainingRepository jpaTrainingRepository, AttendanceRepository attendanceRepository, TrainingDashboardUtils trainingDashboardUtils, PromiseRepository promiseRepository, TeamRepository teamRepository) {
         this.jpaTrainingRepository = jpaTrainingRepository;
         this.attendanceRepository = attendanceRepository;
         this.trainingDashboardUtils = trainingDashboardUtils;
         this.promiseRepository = promiseRepository;
+        this.teamRepository = teamRepository;
     }
 
     @Override
@@ -93,22 +95,36 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
                     );
                 }).toList();
 
-        AttendanceDashboard attendanceDashboard = buildAttendanceDashboard(attendances);
+        LifeAttendanceDashboard lifeAttendanceDashboard = buildAttendanceDashboard(attendances);
         PromiseDashboard promiseDashboard = buildPromiseDashboard(promises);
+
+        int finalParticipants = Math.toIntExact(lifeAttendanceDashboard.getTotalParticipants() + lifeAttendanceDashboard.getTotalParticipants());
+        double enrollmentIndex = (finalParticipants) / (double) promiseDashboard.getTotalAchieved();
+        double realEnrollmentIndex = attendances.size() / (double) promiseDashboard.getTotalAchieved();
+        int enrollerCount = promises.stream().filter(p -> p.getAchievedCount() > 0).map(p -> p.getUser().getId()).collect(Collectors.toSet()).size();
+        double enrollerPercentage = (double) enrollerCount / finalParticipants;
+
+        promiseDashboard.setEnrollmentIndex(enrollmentIndex);
+        promiseDashboard.setRealEnrollmentIndex(realEnrollmentIndex);
+        promiseDashboard.setEnrollerPersonsCount(enrollerCount);
+        promiseDashboard.setEnrollerPersonsPercent(enrollerPercentage);
+
+        var trainerName = training.getOriginalTeam().getTrainer().getName() != null ? training.getOriginalTeam().getTrainer().getName() : teamRepository.findByTrainingId(training.getId()).map(t -> t.getTrainer().getName()).orElse("Sin entrenador");
 
         return new TrainerLifeView(
                 training.getName(),
-                training.getName(),
-                attendanceDashboard,
+                trainerName,
+                training.getStartDate().toString() + " - " + training.getEndDate().toString(),
+                lifeAttendanceDashboard,
                 promiseDashboard,
                 userDashboards,
-                trainingDashboardUtils.buildLingererStats(training, attendances, participants )
+                trainingDashboardUtils.buildLingererStats(training, attendances, participants)
         );
     }
 
-    private AttendanceDashboard buildAttendanceDashboard(List<Attendance> attendances) {
+    private LifeAttendanceDashboard buildAttendanceDashboard(List<Attendance> attendances) {
         if (attendances == null || attendances.isEmpty()) {
-            return new AttendanceDashboard(0, 0, 0, 0, 0, 0, 0, 0);
+            return new LifeAttendanceDashboard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0);
         }
 
         Predicate<Attendance> isParticipant = a ->
@@ -135,10 +151,22 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
         long masterSaturdayCount = attendances.stream().filter(isMasterLife).filter(a -> a.getSaturdayAttendance() == AttendanceStatus.ASISTIO).count();
         long masterSundayCount = attendances.stream().filter(isMasterLife).filter(a -> a.getSundayAttendance() == AttendanceStatus.ASISTIO).count();
 
+        long deserterCount = attendances.stream().filter(isParticipant)
+                .filter(a -> a.getFridayAttendance() == AttendanceStatus.NO_ASISTIO ||
+                        a.getFridayAttendance() == AttendanceStatus.DESERTO ||
+                        a.getSaturdayAttendance() == AttendanceStatus.NO_ASISTIO ||
+                        a.getSaturdayAttendance() == AttendanceStatus.DESERTO ||
+                        a.getSundayAttendance() == AttendanceStatus.NO_ASISTIO ||
+                        a.getSundayAttendance() == AttendanceStatus.DESERTO
+                )
+                .count();
+
         long totalParticipants = fridayCount + saturdayCount + sundayCount;
         long totalMasterParticipants = masterFridayCount + masterSaturdayCount + masterSundayCount;
 
-        return new AttendanceDashboard(
+        double deserterPercentage = (double) deserterCount / totalParticipants;
+
+        return new LifeAttendanceDashboard(
                 fridayCount,
                 saturdayCount,
                 sundayCount,
@@ -146,13 +174,15 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
                 masterFridayCount,
                 masterSaturdayCount,
                 masterSundayCount,
-                totalMasterParticipants
+                totalMasterParticipants,
+                deserterCount,
+                deserterPercentage
         );
     }
 
     private PromiseDashboard buildPromiseDashboard(List<Promise> promises) {
         if (promises == null || promises.isEmpty()) {
-            return new PromiseDashboard(0, 0, 0, 0, 0, 0, 0, 0, 0,0,0 );
+            return new PromiseDashboard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         }
 
         Predicate<Promise> isParticipant = p ->

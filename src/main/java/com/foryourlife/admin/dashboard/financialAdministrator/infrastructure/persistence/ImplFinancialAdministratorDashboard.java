@@ -3,7 +3,7 @@ package com.foryourlife.admin.dashboard.financialAdministrator.infrastructure.pe
 import com.foryourlife.admin.dashboard.financialAdministrator.domain.FinancialAdministratorDashboard;
 import com.foryourlife.admin.dashboard.financialAdministrator.domain.FinancialAdministratorDashboardRepository;
 import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.WeeklyPaymentStats;
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.infrastructure.persistence.ImplOperativeAssistantDashboardRepository;
+import com.foryourlife.admin.dashboard.operativeAssitantDashboard.infrastructure.utils.ImplOperativeAssistantDashboardRepository;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
@@ -13,7 +13,6 @@ import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.transaction.Transactional;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -106,12 +105,10 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
                 .map(pm -> BigDecimal.valueOf(pm.getTotalAmount()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<WeeklyPaymentStats> weeklyTable = operativeAssistantDashboardRepository.buildWeeklyTable(training,team);
-
         return new FinancialAdministratorDashboard(
                 totalIncome,
                 paymentMethods,
-                weeklyTable,
+                null,
                 pendingPaymentsAmount.get(),
                 totalPendingPayments.get(),
                 totalPaymentsAmount.get(),

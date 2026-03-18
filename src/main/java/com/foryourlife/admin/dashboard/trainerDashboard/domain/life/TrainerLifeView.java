@@ -7,19 +7,36 @@ import java.util.List;
 public class TrainerLifeView {
     private String trainingName;
     private String trainerName;
-    private AttendanceDashboard attendanceDashboard;
+    private String trainingDate;
+    private LifeAttendanceDashboard lifeAttendanceDashboard;
     private PromiseDashboard promiseDashboard;
     private List<UserDashboardDto> users;
     private LingererStats lingererStats;
 
-
-    public TrainerLifeView(String trainingName, String trainerName, AttendanceDashboard attendanceDashboard, PromiseDashboard promiseDashboard, List<UserDashboardDto> users, LingererStats lingererStats) {
+    public TrainerLifeView(String trainingName, String trainerName, String trainingDate, LifeAttendanceDashboard lifeAttendanceDashboard, PromiseDashboard promiseDashboard, List<UserDashboardDto> users, LingererStats lingererStats) {
         this.trainingName = trainingName;
         this.trainerName = trainerName;
-        this.attendanceDashboard = attendanceDashboard;
+        this.trainingDate = trainingDate;
+        this.lifeAttendanceDashboard = lifeAttendanceDashboard;
         this.promiseDashboard = promiseDashboard;
         this.users = users;
         this.lingererStats = lingererStats;
+    }
+
+    public String getTrainingDate() {
+        return trainingDate;
+    }
+
+    public void setTrainingDate(String trainingDate) {
+        this.trainingDate = trainingDate;
+    }
+
+    public LifeAttendanceDashboard getLifeAttendanceDashboard() {
+        return lifeAttendanceDashboard;
+    }
+
+    public void setLifeAttendanceDashboard(LifeAttendanceDashboard lifeAttendanceDashboard) {
+        this.lifeAttendanceDashboard = lifeAttendanceDashboard;
     }
 
     public String getTrainingName() {
@@ -38,12 +55,12 @@ public class TrainerLifeView {
         this.trainerName = trainerName;
     }
 
-    public AttendanceDashboard getAttendanceDashboard() {
-        return attendanceDashboard;
+    public LifeAttendanceDashboard getAttendanceDashboard() {
+        return lifeAttendanceDashboard;
     }
 
-    public void setAttendanceDashboard(AttendanceDashboard attendanceDashboard) {
-        this.attendanceDashboard = attendanceDashboard;
+    public void setAttendanceDashboard(LifeAttendanceDashboard lifeAttendanceDashboard) {
+        this.lifeAttendanceDashboard = lifeAttendanceDashboard;
     }
 
     public PromiseDashboard getPromiseDashboard() {

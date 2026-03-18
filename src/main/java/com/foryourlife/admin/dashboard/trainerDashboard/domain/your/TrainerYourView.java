@@ -8,6 +8,9 @@ import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.PreviousTr
 import java.util.List;
 
 public class TrainerYourView {
+    private String trainerName;
+    private String trainingName;
+    private String trainingDate;
     private GeneralAttendance attendance;
     private List<PaymentYourDashboard> paymentDashboard;
     private LingererStats lingererStats;
@@ -15,7 +18,10 @@ public class TrainerYourView {
     private PreviousTrainingStats previousTrainingStats;
     private YourRecoveryPaymentStats yourRecoveryPaymentStats;
 
-    public TrainerYourView(GeneralAttendance attendance, List<PaymentYourDashboard> paymentDashboard, LingererStats lingererStats, NextTrainingAttendance nextTrainingAttendance, PreviousTrainingStats previousTrainingStats, YourRecoveryPaymentStats yourRecoveryPaymentStats) {
+    public TrainerYourView(String trainerName, String trainingName, String trainingDate, GeneralAttendance attendance, List<PaymentYourDashboard> paymentDashboard, LingererStats lingererStats, NextTrainingAttendance nextTrainingAttendance, PreviousTrainingStats previousTrainingStats, YourRecoveryPaymentStats yourRecoveryPaymentStats) {
+        this.trainerName = trainerName;
+        this.trainingName = trainingName;
+        this.trainingDate = trainingDate;
         this.attendance = attendance;
         this.paymentDashboard = paymentDashboard;
         this.lingererStats = lingererStats;
@@ -70,5 +76,29 @@ public class TrainerYourView {
 
     public void setYourRecoveryPaymentStats(YourRecoveryPaymentStats yourRecoveryPaymentStats) {
         this.yourRecoveryPaymentStats = yourRecoveryPaymentStats;
+    }
+
+    public String getTrainerName() {
+        return trainerName;
+    }
+
+    public void setTrainerName(String trainerName) {
+        this.trainerName = trainerName;
+    }
+
+    public String getTrainingName() {
+        return trainingName;
+    }
+
+    public void setTrainingName(String trainingName) {
+        this.trainingName = trainingName;
+    }
+
+    public String getTrainingDate() {
+        return trainingDate;
+    }
+
+    public void setTrainingDate(String trainingDate) {
+        this.trainingDate = trainingDate;
     }
 }

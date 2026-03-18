@@ -7,6 +7,7 @@ import com.foryourlife.admin.programs.charts.organizationChart.domain.Organizati
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.your.PaymentYourDashboard;
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.your.TrainerYourView;
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.your.TrainerYourViewRepository;
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
@@ -31,13 +32,15 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
     private final TrainingRepository trainingRepository;
     private final PaymentRepository paymentRepository;
     private final OrganizationChartRepository organizationChartRepository;
+    private final TeamRepository teamRepository;
 
-    public TrainerYourViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainingDashboardUtils trainingDashboardUtils, TrainingRepository trainingRepository, PaymentRepository paymentRepository, OrganizationChartRepository organizationChartRepository) {
+    public TrainerYourViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainingDashboardUtils trainingDashboardUtils, TrainingRepository trainingRepository, PaymentRepository paymentRepository, OrganizationChartRepository organizationChartRepository, TeamRepository teamRepository) {
         this.attendanceRepository = attendanceRepository;
         this.trainingDashboardUtils = trainingDashboardUtils;
         this.trainingRepository = trainingRepository;
         this.paymentRepository = paymentRepository;
         this.organizationChartRepository = organizationChartRepository;
+        this.teamRepository = teamRepository;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
             throw new BaseException("No attendances found for the given training ID", List.of());
         }
 
-        var lingererStats =  trainingDashboardUtils.buildLingererStats(attendances.getFirst().getTraining(), attendances, participants);
+        var lingererStats = trainingDashboardUtils.buildLingererStats(attendances.getFirst().getTraining(), attendances, participants);
 
 
         var previousTrainingStats = trainingDashboardUtils.buildPreviousTrainingStats(
@@ -59,14 +62,19 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
                 participants
         );
 
+        var trainerName = attendances.getFirst().getTraining().getOriginalTeam().getTrainer().getName() != null ? attendances.getFirst().getTraining().getOriginalTeam().getTrainer().getName() : teamRepository.findByTrainingId(attendances.getFirst().getTraining().getId()).map(t -> t.getTrainer().getName()).orElse("Sin entrenador");
+
         return new TrainerYourView(
+                trainerName,
+                attendances.getFirst().getTraining().getName(),
+                attendances.getFirst().getTraining().getStartDate().toString() + " - " + attendances.getFirst().getTraining().getEndDate().toString(),
                 trainingDashboardUtils.buildGeneralAttendance(attendances, participants),
                 buildPaymentYourDashboard(attendances, participants),
                 lingererStats,
                 trainingDashboardUtils.buildNextTrainingAttendance(attendances),
                 previousTrainingStats,
                 trainingDashboardUtils.buildYourRecoveryPaymentStats(attendances.getFirst().getTraining(), attendances, participants)
-                );
+        );
     }
 
     public List<PaymentYourDashboard> buildPaymentYourDashboard(

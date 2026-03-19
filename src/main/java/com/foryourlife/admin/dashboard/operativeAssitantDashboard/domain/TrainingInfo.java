@@ -1,5 +1,6 @@
 package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain;
 
+import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.common.CallTypeStats;
 import com.foryourlife.shared.domain.level.CourseLevel;
 
 import java.util.List;

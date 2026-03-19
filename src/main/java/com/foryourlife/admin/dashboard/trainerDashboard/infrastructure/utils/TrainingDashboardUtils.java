@@ -5,6 +5,9 @@ import com.foryourlife.admin.dashboard.trainerDashboard.domain.your.YourRecovery
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
+import com.foryourlife.admin.programs.teams.domain.Team;
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
@@ -24,6 +27,7 @@ import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,11 +38,13 @@ public class TrainingDashboardUtils {
     private final AttendanceRepository attendanceRepository;
     private final ParticipantRepository participantRepository;
     private final PaymentRepository paymentRepository;
+    private final TeamRepository teamRepository;
 
-    public TrainingDashboardUtils(AttendanceRepository attendanceRepository, ParticipantRepository participantRepository, PaymentRepository paymentRepository) {
+    public TrainingDashboardUtils(AttendanceRepository attendanceRepository, ParticipantRepository participantRepository, PaymentRepository paymentRepository, TeamRepository teamRepository) {
         this.attendanceRepository = attendanceRepository;
         this.participantRepository = participantRepository;
         this.paymentRepository = paymentRepository;
+        this.teamRepository = teamRepository;
     }
 
     public GeneralAttendance buildGeneralAttendance(
@@ -99,98 +105,6 @@ public class TrainingDashboardUtils {
         return new GeneralAttendance(initialPx, totalFocus, totalLingerers, totalDistorter, distortionPercentage, userAttendances);
     }
 
-
-    public List<GenderDashboard> buildGenderDashboard(
-            List<Attendance> attendances,
-            Map<String, Participant> participants
-    ) {
-
-        Map<String, String> genderMap = participants.values().stream()
-                .collect(Collectors.toMap(
-                        p -> p.getUser().getId(),
-                        p -> p.getProfile().getGender().toUpperCase()
-                ));
-
-        BiFunction<Function<Attendance, AttendanceStatus>, String, Long> count =
-                (dayExtractor, gender) -> attendances.stream()
-                        .filter(a -> gender.equals(genderMap.get(a.getUser().getId())))
-                        .filter(a -> dayExtractor.apply(a) == AttendanceStatus.ASISTIO)
-                        .count();
-
-        return List.of(
-                new GenderDashboard("Viernes",
-                        count.apply(Attendance::getFridayAttendance, "H").intValue(),
-                        count.apply(Attendance::getFridayAttendance, "M").intValue()
-                ),
-                new GenderDashboard("Sábado",
-                        count.apply(Attendance::getSaturdayAttendance, "H").intValue(),
-                        count.apply(Attendance::getSaturdayAttendance, "M").intValue()
-                ),
-                new GenderDashboard("Domingo",
-                        count.apply(Attendance::getSundayAttendance, "H").intValue(),
-                        count.apply(Attendance::getSundayAttendance, "M").intValue()
-                )
-        );
-    }
-
-    public List<AgeDashboard> buildAgeDashboard(
-            List<Attendance> attendances,
-            Map<String, Participant> participants
-    ) {
-
-        Function<Integer, String> classifyAge = age -> {
-            if (age == null) return "unknown";
-
-            if (age < 18) return "less_18";
-            if (age <= 27) return "18_27";
-            if (age <= 40) return "28_40";
-            if (age <= 65) return "41_65";
-            return "above_65";
-        };
-
-        Map<String, String> ageMap = participants.values().stream()
-                .collect(Collectors.toMap(
-                        p -> p.getUser().getId(),
-                        p -> {
-                            Integer age = calculateAge(LocalDate.ofInstant(p.getProfile().getBirthday().toInstant(), ZoneId.systemDefault()));
-                            return classifyAge.apply(age);
-                        }
-                ));
-
-        BiFunction<Function<Attendance, AttendanceStatus>, String, Long> countByAgeRange =
-                (dayExtractor, ageRange) -> attendances.stream()
-                        .filter(a -> dayExtractor.apply(a) == AttendanceStatus.ASISTIO)
-                        .filter(a -> ageRange.equals(ageMap.get(a.getUser().getId())))
-                        .count();
-
-        AgeDashboard friday = new AgeDashboard();
-        friday.day = "Viernes";
-        friday.age_less_18 = countByAgeRange.apply(Attendance::getFridayAttendance, "less_18").intValue();
-        friday.age_18_27 = countByAgeRange.apply(Attendance::getFridayAttendance, "18_27").intValue();
-        friday.age_28_40 = countByAgeRange.apply(Attendance::getFridayAttendance, "28_40").intValue();
-        friday.age_41_65 = countByAgeRange.apply(Attendance::getFridayAttendance, "41_65").intValue();
-        friday.age_above_65 = countByAgeRange.apply(Attendance::getFridayAttendance, "above_65").intValue();
-
-        AgeDashboard saturday = new AgeDashboard();
-        saturday.day = "Sábado";
-        saturday.age_less_18 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "less_18").intValue();
-        saturday.age_18_27 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "18_27").intValue();
-        saturday.age_28_40 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "28_40").intValue();
-        saturday.age_41_65 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "41_65").intValue();
-        saturday.age_above_65 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "above_65").intValue();
-
-        AgeDashboard sunday = new AgeDashboard();
-        sunday.day = "Domingo";
-        sunday.age_less_18 = countByAgeRange.apply(Attendance::getSundayAttendance, "less_18").intValue();
-        sunday.age_18_27 = countByAgeRange.apply(Attendance::getSundayAttendance, "18_27").intValue();
-        sunday.age_28_40 = countByAgeRange.apply(Attendance::getSundayAttendance, "28_40").intValue();
-        sunday.age_41_65 = countByAgeRange.apply(Attendance::getSundayAttendance, "41_65").intValue();
-        sunday.age_above_65 = countByAgeRange.apply(Attendance::getSundayAttendance, "above_65").intValue();
-
-        return List.of(friday, saturday, sunday);
-    }
-
-
     public Map<String, Participant> loadParticipants(List<Attendance> attendances) {
         List<String> userIds = attendances.stream()
                 .map(a -> a.getUser().getId())
@@ -203,11 +117,6 @@ public class TrainingDashboardUtils {
                         p -> p.getUser().getId(),
                         p -> p
                 ));
-    }
-
-    private Integer calculateAge(LocalDate birthday) {
-        if (birthday == null) return null;
-        return Period.between(birthday, LocalDate.now()).getYears();
     }
 
     public LingererStats buildLingererStats(
@@ -473,5 +382,18 @@ public class TrainingDashboardUtils {
                 recoveredWithPreviousLifePayment,
                 percentage
         );
+    }
+
+    public String getTrainerName(Training training, Team team) {
+        return Optional.ofNullable(team)
+                .map(Team::getTrainer)
+                .map(Trainer::getName)
+                .orElseGet(() ->
+                        teamRepository.findByTrainingId(training.getId())
+                                .map(Team::getTrainer)
+                                .map(Trainer::getName)
+                                .orElse("Sin entrenador")
+                );
+
     }
 }

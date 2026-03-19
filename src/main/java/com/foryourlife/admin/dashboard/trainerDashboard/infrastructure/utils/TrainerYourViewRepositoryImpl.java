@@ -7,7 +7,9 @@ import com.foryourlife.admin.programs.charts.organizationChart.domain.Organizati
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.your.PaymentYourDashboard;
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.your.TrainerYourView;
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.your.TrainerYourViewRepository;
+import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
+import com.foryourlife.admin.programs.trainer.domain.Trainer;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
@@ -18,11 +20,13 @@ import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.UserType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +47,7 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
         this.teamRepository = teamRepository;
     }
 
+    @Transactional
     @Override
     public TrainerYourView getTrainerYourViewByTrainingId(String trainingId) {
         var attendances = attendanceRepository.findAttendanceByTraining(trainingId);
@@ -55,14 +60,16 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
 
         var lingererStats = trainingDashboardUtils.buildLingererStats(attendances.getFirst().getTraining(), attendances, participants);
 
-
         var previousTrainingStats = trainingDashboardUtils.buildPreviousTrainingStats(
                 attendances.getFirst().getTraining(),
                 attendances,
                 participants
         );
 
-        var trainerName = attendances.getFirst().getTraining().getOriginalTeam().getTrainer().getName() != null ? attendances.getFirst().getTraining().getOriginalTeam().getTrainer().getName() : teamRepository.findByTrainingId(attendances.getFirst().getTraining().getId()).map(t -> t.getTrainer().getName()).orElse("Sin entrenador");
+        var training = attendances.getFirst().getTraining();
+        var team = training.getOriginalTeam();
+
+        var trainerName = trainingDashboardUtils.getTrainerName(training, team);
 
         return new TrainerYourView(
                 trainerName,
@@ -98,7 +105,6 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
 
         if (organizationChart.isEmpty()) return List.of();
 
-
         List<ChartNode> allNodes = flattenTree(organizationChart.get().getNodes());
 
         List<ChartNode> staffNodes = allNodes.stream()
@@ -109,13 +115,11 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
                 .filter(n -> n.getLevel() == UserType.PARTICIPANT)
                 .toList();
 
-
         Map<String, List<String>> staffToParticipants = participantNodes.stream()
                 .collect(Collectors.groupingBy(
                         ChartNode::getParentNodeId,
                         Collectors.mapping(n -> n.getMembers().getId(), Collectors.toList())
                 ));
-
 
         List<Payment> payments = paymentRepository.findAllByParticipantIn(participants.values());
 
@@ -124,15 +128,12 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
                         p -> p.getParticipant().getUser().getId()
                 ));
 
-
         List<PaymentYourDashboard> dashboards = new ArrayList<>();
-
 
         for (ChartNode staffNode : staffNodes) {
 
             List<String> staffParticipantIds =
                     staffToParticipants.getOrDefault(staffNode.getId(), List.of());
-
 
             List<Payment> allPayments = staffParticipantIds.stream()
                     .flatMap(pId -> paymentsByParticipantId
@@ -143,9 +144,7 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
                     .filter(p -> p.getStatus() == PaymentStatus.COMPLETED)
                     .toList();
 
-
             // -------- PAGOS PREVIOS --------
-
             int previousLifePayments = 0;
 
             if (pastTraining != null) {
@@ -155,7 +154,6 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
                         .count();
             }
 
-
             int totalLifePayments = allPayments.size();
 
             double previousPercentage = totalLifePayments == 0
@@ -164,29 +162,30 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
 
 
             // -------- SABADO --------
-
             int saturdayPayments = (int) allPayments.stream()
                     .filter(p -> p.getCreatedDate().toLocalDate().isEqual(saturday))
                     .count();
 
             int accumulatedSaturday = previousLifePayments + saturdayPayments;
 
-            double passSaturday = accumulatedSaturday == 0
-                    ? 0
-                    : ((double) saturdayPayments / accumulatedSaturday) * 100;
+            int totalYour = (int) attendances.stream()
+                    .filter(a -> {
+                        Participant p = participants.get(a.getUser().getId());
+                        return p != null && !Boolean.TRUE.equals(p.getIsLingerer());
+                    })
+                    .count();
 
+            double passSaturday = (double) accumulatedSaturday / totalYour;
 
             // -------- DOMINGO --------
-
             int sundayPayments = (int) allPayments.stream()
                     .filter(p -> p.getCreatedDate().toLocalDate().isEqual(sunday))
                     .count();
 
             int accumulatedSunday = accumulatedSaturday + sundayPayments;
 
-            double passSunday = accumulatedSunday == 0
-                    ? 0
-                    : ((double) sundayPayments / accumulatedSunday) * 100;
+            double passSunday = (double) accumulatedSunday / totalYour;
+
             dashboards.add(
                     new PaymentYourDashboard(
                             staffNode.getMembers().getName(),

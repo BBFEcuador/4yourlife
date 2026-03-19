@@ -1,6 +1,7 @@
 package com.foryourlife.admin.dashboard.trainerDashboard.domain.life;
 
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.LingererStats;
+import com.foryourlife.shared.domain.level.CourseLevel;
 
 import java.util.List;
 
@@ -8,15 +9,17 @@ public class TrainerLifeView {
     private String trainingName;
     private String trainerName;
     private String trainingDate;
+    private String courseLevel;
     private LifeAttendanceDashboard lifeAttendanceDashboard;
     private PromiseDashboard promiseDashboard;
     private List<UserDashboardDto> users;
     private LingererStats lingererStats;
 
-    public TrainerLifeView(String trainingName, String trainerName, String trainingDate, LifeAttendanceDashboard lifeAttendanceDashboard, PromiseDashboard promiseDashboard, List<UserDashboardDto> users, LingererStats lingererStats) {
+    public TrainerLifeView(String trainingName, String trainerName, String trainingDate, String courseLevel, LifeAttendanceDashboard lifeAttendanceDashboard, PromiseDashboard promiseDashboard, List<UserDashboardDto> users, LingererStats lingererStats) {
         this.trainingName = trainingName;
         this.trainerName = trainerName;
         this.trainingDate = trainingDate;
+        this.courseLevel = courseLevel;
         this.lifeAttendanceDashboard = lifeAttendanceDashboard;
         this.promiseDashboard = promiseDashboard;
         this.users = users;
@@ -85,5 +88,13 @@ public class TrainerLifeView {
 
     public void setLingererStats(LingererStats lingererStats) {
         this.lingererStats = lingererStats;
+    }
+
+    public String getCourseLevel() {
+        return courseLevel;
+    }
+
+    public void setCourseLevel(String courseLevel) {
+        this.courseLevel = courseLevel;
     }
 }

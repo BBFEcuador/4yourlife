@@ -1,4 +1,4 @@
-package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain;
+package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.common;
 
 import com.foryourlife.admin.crm.callLogs.domain.CallType;
 
@@ -8,8 +8,8 @@ public class CallTypeStats {
     private CallType callType;
     private List<CallsInfo> statuses;
     private int cuadre;
-    private float effectivenessPercentage;
-    private float projectedCallsPercentage;
+    private double effectivenessPercentage;
+    private double projectedCallsPercentage;
 
     public CallType getCallType() {
         return callType;
@@ -35,19 +35,19 @@ public class CallTypeStats {
         this.cuadre = cuadre;
     }
 
-    public float getEffectivenessPercentage() {
+    public double getEffectivenessPercentage() {
         return effectivenessPercentage;
     }
 
-    public void setEffectivenessPercentage(float effectivenessPercentage) {
+    public void setEffectivenessPercentage(double effectivenessPercentage) {
         this.effectivenessPercentage = effectivenessPercentage;
     }
 
-    public float getProjectedCallsPercentage() {
+    public double getProjectedCallsPercentage() {
         return projectedCallsPercentage;
     }
 
-    public void setProjectedCallsPercentage(float projectedCallsPercentage) {
+    public void setProjectedCallsPercentage(double projectedCallsPercentage) {
         this.projectedCallsPercentage = projectedCallsPercentage;
     }
 }

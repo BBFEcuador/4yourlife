@@ -1,14 +1,13 @@
 package com.foryourlife.admin.dashboard.trainerDashboard.infrastructure.utils;
 
-import com.foryourlife.admin.dashboard.trainerDashboard.domain.focus.LifeWeekendAssistant;
-import com.foryourlife.admin.dashboard.trainerDashboard.domain.focus.PaymentFocusDashboard;
-import com.foryourlife.admin.dashboard.trainerDashboard.domain.focus.TrainerFocusView;
-import com.foryourlife.admin.dashboard.trainerDashboard.domain.focus.TrainerFocusViewRepository;
+import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.AgeDashboard;
+import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.GenderDashboard;
+import com.foryourlife.admin.dashboard.trainerDashboard.domain.focus.*;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
+import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 import com.foryourlife.admin.programs.charts.chartNodes.domain.ChartNode;
 import com.foryourlife.admin.programs.charts.organizationChart.domain.OrganizationChartRepository;
-import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
@@ -18,9 +17,14 @@ import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.UserType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,17 +34,16 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
     private final InvitationRepository invitationRepository;
     private final OrganizationChartRepository organizationChartRepository;
     private final PaymentRepository paymentRepository;
-    private final TeamRepository teamRepository;
 
-    public TrainerFocusViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainingDashboardUtils trainingDashboardUtils, InvitationRepository invitationRepository, OrganizationChartRepository organizationChartRepository, PaymentRepository paymentRepository, TeamRepository teamRepository) {
+    public TrainerFocusViewRepositoryImpl(AttendanceRepository attendanceRepository, TrainingDashboardUtils trainingDashboardUtils, InvitationRepository invitationRepository, OrganizationChartRepository organizationChartRepository, PaymentRepository paymentRepository) {
         this.attendanceRepository = attendanceRepository;
         this.trainingDashboardUtils = trainingDashboardUtils;
         this.invitationRepository = invitationRepository;
         this.organizationChartRepository = organizationChartRepository;
         this.paymentRepository = paymentRepository;
-        this.teamRepository = teamRepository;
     }
 
+    @Transactional
     @Override
     public TrainerFocusView getTrainerFocusViewByTrainingId(String trainingId) {
         var attendances = attendanceRepository.findAttendanceByTraining(trainingId);
@@ -55,16 +58,19 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
 
         var nextTrainingAttendanceCount = trainingDashboardUtils.buildNextTrainingAttendance(attendances);
 
-        var trainerName = attendances.getFirst().getTraining().getOriginalTeam().getTrainer().getName() != null ? attendances.getFirst().getTraining().getOriginalTeam().getTrainer().getName() : teamRepository.findByTrainingId(attendances.getFirst().getTraining().getId()).map(t -> t.getTrainer().getName()).orElse("Sin entrenador");
+        var training = attendances.getFirst().getTraining();
+        var team = training.getOriginalTeam();
 
+        var trainerName = trainingDashboardUtils.getTrainerName(training, team);
 
         return new TrainerFocusView(
                 trainerName,
                 attendances.getFirst().getTraining().getName(),
                 attendances.getFirst().getTraining().getStartDate().toString() + " - " + attendances.getFirst().getTraining().getEndDate().toString(),
                 trainingDashboardUtils.buildGeneralAttendance(attendances, participants),
-                trainingDashboardUtils.buildGenderDashboard(attendances, participants),
-                trainingDashboardUtils.buildAgeDashboard(attendances, participants),
+                this.buildCityDashboard(attendances, participants),
+                this.buildGenderDashboard(attendances, participants),
+                this.buildAgeDashboard(attendances, participants),
                 this.buildFocusPaymentDashboard(attendances, participants),
                 this.buildLifeWeekendAssistants(attendances, participants),
                 lingererStats,
@@ -159,7 +165,7 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
         LocalDate sunday = training.getEndDate();
 
         var organizationChart = organizationChartRepository
-                .getOrganizationChartTrainingId(training.getId());
+                .getOrganizationChartByTeamIdAndCourseLevel(training.getOriginalTeam().getId(), CourseLevel.FOCUS);
 
         if (organizationChart.isEmpty()) return List.of();
 
@@ -256,14 +262,11 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                     })
                     .count();
 
-            double passPercentageSunday = totalSunday == 0
-                    ? 0
-                    : ((double) yourPlusLifeSunday / totalFocus) * 100;
+            double passPercentageSunday = (double) totalSunday / totalFocus;
+
+            double passPercentageTotal = (double) totalFinal / totalFocus;
 
 
-            double passPercentageTotal = totalFinal == 0
-                    ? 0
-                    : ((double) yourPlusLifeFinal / totalFocus) * 100;
             dashboards.add(
                     new PaymentFocusDashboard(
                             staffNode.getMembers().getName(),
@@ -291,6 +294,146 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
             }
         }
         return all;
+    }
+
+    public List<GenderDashboard> buildGenderDashboard(
+            List<Attendance> attendances,
+            Map<String, Participant> participants
+    ) {
+
+        Map<String, String> genderMap = participants.values().stream()
+                .collect(Collectors.toMap(
+                        p -> p.getUser().getId(),
+                        p -> p.getProfile().getGender().toUpperCase()
+                ));
+
+        BiFunction<Function<Attendance, AttendanceStatus>, String, Long> count =
+                (dayExtractor, gender) -> attendances.stream()
+                        .filter(a -> gender.equals(genderMap.get(a.getUser().getId())))
+                        .filter(a -> dayExtractor.apply(a) == AttendanceStatus.ASISTIO)
+                        .count();
+
+        return List.of(
+                new GenderDashboard("Viernes",
+                        count.apply(Attendance::getFridayAttendance, "H").intValue(),
+                        count.apply(Attendance::getFridayAttendance, "M").intValue()
+                ),
+                new GenderDashboard("Sábado",
+                        count.apply(Attendance::getSaturdayAttendance, "H").intValue(),
+                        count.apply(Attendance::getSaturdayAttendance, "M").intValue()
+                ),
+                new GenderDashboard("Domingo",
+                        count.apply(Attendance::getSundayAttendance, "H").intValue(),
+                        count.apply(Attendance::getSundayAttendance, "M").intValue()
+                )
+        );
+    }
+
+    public List<AgeDashboard> buildAgeDashboard(
+            List<Attendance> attendances,
+            Map<String, Participant> participants
+    ) {
+        Function<Integer, String> classifyAge = age -> {
+            if (age == null) return "unknown";
+
+            if (age < 18) return "less_18";
+            if (age <= 27) return "18_27";
+            if (age <= 40) return "28_40";
+            if (age <= 65) return "41_65";
+            return "above_65";
+        };
+
+        Map<String, String> ageMap = participants.values().stream()
+                .collect(Collectors.toMap(
+                        p -> p.getUser().getId(),
+                        p -> {
+                            Integer age = calculateAge(LocalDate.ofInstant(p.getProfile().getBirthday().toInstant(), ZoneId.systemDefault()));
+                            return classifyAge.apply(age);
+                        }
+                ));
+
+        BiFunction<Function<Attendance, AttendanceStatus>, String, Long> countByAgeRange =
+                (dayExtractor, ageRange) -> attendances.stream()
+                        .filter(a -> dayExtractor.apply(a) == AttendanceStatus.ASISTIO)
+                        .filter(a -> ageRange.equals(ageMap.get(a.getUser().getId())))
+                        .count();
+
+        AgeDashboard friday = new AgeDashboard();
+        friday.day = "Viernes";
+        friday.age_less_18 = countByAgeRange.apply(Attendance::getFridayAttendance, "less_18").intValue();
+        friday.age_18_27 = countByAgeRange.apply(Attendance::getFridayAttendance, "18_27").intValue();
+        friday.age_28_40 = countByAgeRange.apply(Attendance::getFridayAttendance, "28_40").intValue();
+        friday.age_41_65 = countByAgeRange.apply(Attendance::getFridayAttendance, "41_65").intValue();
+        friday.age_above_65 = countByAgeRange.apply(Attendance::getFridayAttendance, "above_65").intValue();
+
+        AgeDashboard saturday = new AgeDashboard();
+        saturday.day = "Sábado";
+        saturday.age_less_18 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "less_18").intValue();
+        saturday.age_18_27 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "18_27").intValue();
+        saturday.age_28_40 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "28_40").intValue();
+        saturday.age_41_65 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "41_65").intValue();
+        saturday.age_above_65 = countByAgeRange.apply(Attendance::getSaturdayAttendance, "above_65").intValue();
+
+        AgeDashboard sunday = new AgeDashboard();
+        sunday.day = "Domingo";
+        sunday.age_less_18 = countByAgeRange.apply(Attendance::getSundayAttendance, "less_18").intValue();
+        sunday.age_18_27 = countByAgeRange.apply(Attendance::getSundayAttendance, "18_27").intValue();
+        sunday.age_28_40 = countByAgeRange.apply(Attendance::getSundayAttendance, "28_40").intValue();
+        sunday.age_41_65 = countByAgeRange.apply(Attendance::getSundayAttendance, "41_65").intValue();
+        sunday.age_above_65 = countByAgeRange.apply(Attendance::getSundayAttendance, "above_65").intValue();
+
+        return List.of(friday, saturday, sunday);
+    }
+
+    private Integer calculateAge(LocalDate birthday) {
+        if (birthday == null) return null;
+        return Period.between(birthday, LocalDate.now()).getYears();
+    }
+
+    public List<CityParticipantDashboard> buildCityDashboard(
+            List<Attendance> attendances,
+            Map<String, Participant> participants
+    ) {
+        Map<String, String> cityMap = participants.values().stream()
+                .collect(Collectors.toMap(
+                        p -> p.getUser().getId(),
+                        p -> {
+                            String city = p.getProfile().getCity();
+                            return city == null ? "" : city.toUpperCase();
+                        }
+                ));
+
+        return List.of(
+                new CityParticipantDashboard("Viernes",
+                        countQuito(attendances, cityMap, Attendance::getFridayAttendance, true),   // Quito
+                        countQuito(attendances, cityMap, Attendance::getFridayAttendance, false)  // Otros
+                ),
+                new CityParticipantDashboard("Sábado",
+                        countQuito(attendances, cityMap, Attendance::getSaturdayAttendance, true),
+                        countQuito(attendances, cityMap, Attendance::getSaturdayAttendance, false)
+                ),
+                new CityParticipantDashboard("Domingo",
+                        countQuito(attendances, cityMap, Attendance::getSundayAttendance, true),
+                        countQuito(attendances, cityMap, Attendance::getSundayAttendance, false)
+                )
+        );
+    }
+
+    private int countQuito(
+            List<Attendance> attendances,
+            Map<String, String> cityMap,
+            Function<Attendance, AttendanceStatus> dayExtractor,
+            boolean onlyQuito
+    ) {
+        return (int) attendances.stream()
+                .filter(a -> {
+                    String city = cityMap.get(a.getUser().getId());
+                    return onlyQuito
+                            ? "QUITO".equals(city)
+                            : !"QUITO".equals(city);
+                })
+                .filter(a -> dayExtractor.apply(a) == AttendanceStatus.ASISTIO)
+                .count();
     }
 
 }

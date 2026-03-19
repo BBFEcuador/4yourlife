@@ -4,6 +4,7 @@ import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.GeneralAtt
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.LingererStats;
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.NextTrainingAttendance;
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.PreviousTrainingStats;
+import com.foryourlife.shared.domain.level.CourseLevel;
 
 import java.util.List;
 
@@ -11,19 +12,20 @@ public class TrainerYourView {
     private String trainerName;
     private String trainingName;
     private String trainingDate;
+    private CourseLevel courseLevel = CourseLevel.YOUR;
     private GeneralAttendance attendance;
-    private List<PaymentYourDashboard> paymentDashboard;
+    private List<PaymentYourDashboard> paymentYourDashboard;
     private LingererStats lingererStats;
     private NextTrainingAttendance nextTrainingAttendance;
     private PreviousTrainingStats previousTrainingStats;
     private YourRecoveryPaymentStats yourRecoveryPaymentStats;
 
-    public TrainerYourView(String trainerName, String trainingName, String trainingDate, GeneralAttendance attendance, List<PaymentYourDashboard> paymentDashboard, LingererStats lingererStats, NextTrainingAttendance nextTrainingAttendance, PreviousTrainingStats previousTrainingStats, YourRecoveryPaymentStats yourRecoveryPaymentStats) {
+    public TrainerYourView(String trainerName, String trainingName, String trainingDate, GeneralAttendance attendance, List<PaymentYourDashboard> paymentYourDashboard, LingererStats lingererStats, NextTrainingAttendance nextTrainingAttendance, PreviousTrainingStats previousTrainingStats, YourRecoveryPaymentStats yourRecoveryPaymentStats) {
         this.trainerName = trainerName;
         this.trainingName = trainingName;
         this.trainingDate = trainingDate;
         this.attendance = attendance;
-        this.paymentDashboard = paymentDashboard;
+        this.paymentYourDashboard = paymentYourDashboard;
         this.lingererStats = lingererStats;
         this.nextTrainingAttendance = nextTrainingAttendance;
         this.previousTrainingStats = previousTrainingStats;
@@ -38,12 +40,12 @@ public class TrainerYourView {
         this.attendance = attendance;
     }
 
-    public List<PaymentYourDashboard> getPaymentDashboard() {
-        return paymentDashboard;
+    public List<PaymentYourDashboard> getPaymentYourDashboard() {
+        return paymentYourDashboard;
     }
 
-    public void setPaymentDashboard(List<PaymentYourDashboard> paymentDashboard) {
-        this.paymentDashboard = paymentDashboard;
+    public void setPaymentYourDashboard(List<PaymentYourDashboard> paymentYourDashboard) {
+        this.paymentYourDashboard = paymentYourDashboard;
     }
 
     public LingererStats getLingererStats() {
@@ -100,5 +102,13 @@ public class TrainerYourView {
 
     public void setTrainingDate(String trainingDate) {
         this.trainingDate = trainingDate;
+    }
+
+    public CourseLevel getCourseLevel() {
+        return courseLevel;
+    }
+
+    public void setCourseLevel(CourseLevel courseLevel) {
+        this.courseLevel = courseLevel;
     }
 }

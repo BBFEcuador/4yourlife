@@ -5,14 +5,14 @@ import com.foryourlife.admin.crm.callLogs.domain.CallLog;
 import com.foryourlife.admin.crm.callLogs.domain.CallStatus;
 import com.foryourlife.admin.crm.callLogs.domain.CallType;
 import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.*;
+import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.common.CallTypeStats;
+import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.common.CallsInfo;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
-import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
-import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -20,15 +20,12 @@ import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ImplOperativeAssistantDashboardRepository implements OperativeAssistantDashboardRepository {
@@ -51,6 +48,7 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
     @Override
     @Transactional
     public OperativeAssistantDashboard getOpAssistDashboardByTeamId(String trainingId) {
+
         return (OperativeAssistantDashboard) List.of();
     }
 
@@ -490,4 +488,104 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
         }
     }
 
+    public List<CallTypeStats> buildCallsTable(Training training) {
+        Map<CallType, Map<CallStatus, CallsInfo>> callsByType = new HashMap<>();
+
+        for (CallType type : CallType.values()) {
+
+            Map<CallStatus, CallsInfo> statusMap = new HashMap<>();
+
+            for (CallStatus status : CallStatus.values()) {
+                CallsInfo info = new CallsInfo();
+                info.setStatus(status);
+                info.setTotalCalls(0);
+                statusMap.put(status, info);
+            }
+
+            callsByType.put(type, statusMap);
+        }
+
+        callRepository.findAllByTrainingId(training.getId())
+                .forEach(call -> {
+
+                    if (call.getCallLogs() == null || call.getCallLogs().isEmpty()) {
+                        CallsInfo info = callsByType
+                                .get(CallType.LOGISTIC)
+                                .get(CallStatus.NO_CALLED);
+
+                        info.setTotalCalls(info.getTotalCalls() + 1);
+                        return;
+                    }
+
+                    CallLog lastCallLog = call.getCallLogs().stream()
+                            .filter(Objects::nonNull)
+                            .max(Comparator.comparing(CallLog::getDate))
+                            .orElse(null);
+
+                    if (lastCallLog == null) {
+                        CallsInfo info = callsByType
+                                .get(CallType.LOGISTIC)
+                                .get(CallStatus.NO_CALLED);
+
+                        info.setTotalCalls(info.getTotalCalls() + 1);
+                        return;
+                    }
+
+                    CallType type = lastCallLog.getType();
+                    CallStatus status = lastCallLog.getStatus();
+
+                    CallsInfo info = callsByType
+                            .get(type)
+                            .get(status);
+
+                    info.setTotalCalls(info.getTotalCalls() + 1);
+                });
+
+        List<CallTypeStats> finalList = new ArrayList<>();
+
+        for (CallType type : callsByType.keySet()) {
+
+            Collection<CallsInfo> infos = callsByType.get(type).values();
+
+            int totalCalls = infos.stream()
+                    .mapToInt(CallsInfo::getTotalCalls)
+                    .sum();
+
+            int done = callsByType.get(type)
+                    .get(CallStatus.DONE)
+                    .getTotalCalls();
+
+            int anotherCampus = callsByType.get(type)
+                    .get(CallStatus.ANOTHER_CAMPUS)
+                    .getTotalCalls();
+
+            int notInterested = callsByType.get(type)
+                    .get(CallStatus.NOT_INTERESTED)
+                    .getTotalCalls();
+
+            int nextDate = callsByType.get(type)
+                    .get(CallStatus.NEXT_DATE)
+                    .getTotalCalls();
+
+            CallTypeStats stats = new CallTypeStats();
+            stats.setCallType(type);
+            stats.setStatuses(new ArrayList<>(infos));
+
+            stats.setCuadre(stats.getStatuses().size() - totalCalls);
+
+            double effectiveness = ((double) (done + anotherCampus) / totalCalls) ;
+
+            stats.setEffectivenessPercentage(effectiveness);
+
+            double projectedCalls = totalCalls == 0
+                    ? 0
+                    : ((double) (totalCalls - notInterested - nextDate) / totalCalls);
+
+            stats.setProjectedCallsPercentage(projectedCalls);
+
+            finalList.add(stats);
+        }
+
+        return finalList;
+    }
 }

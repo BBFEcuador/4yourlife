@@ -1,6 +1,7 @@
 package com.foryourlife.admin.dashboard.trainerDashboard.domain.focus;
 
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.*;
+import com.foryourlife.shared.domain.level.CourseLevel;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,7 +11,9 @@ public class TrainerFocusView {
     private String trainerName;
     private String trainingName;
     private String trainingDate;
+    private CourseLevel courseLevel = CourseLevel.FOCUS;
     private GeneralAttendance focusAttendanceDashboard;
+    private List<CityParticipantDashboard> cityParticipantDashboard;
     private List<GenderDashboard> genderByDay;
     private List<AgeDashboard> ageDashboard;
     private List<PaymentFocusDashboard> paymentFocusDashboard;
@@ -18,11 +21,12 @@ public class TrainerFocusView {
     private LingererStats lingererStats;
     private NextTrainingAttendance nextTrainingAttendance;
 
-    public TrainerFocusView(String trainerName, String trainingName, String trainingDate, GeneralAttendance focusAttendanceDashboard, List<GenderDashboard> genderByDay, List<AgeDashboard> ageDashboard, List<PaymentFocusDashboard> paymentFocusDashboard, Map<String, LifeWeekendAssistant> lifeWeekendAssistants, LingererStats lingererStats, NextTrainingAttendance nextTrainingAttendance) {
+    public TrainerFocusView(String trainerName, String trainingName, String trainingDate, GeneralAttendance focusAttendanceDashboard, List<CityParticipantDashboard> cityParticipantDashboard, List<GenderDashboard> genderByDay, List<AgeDashboard> ageDashboard, List<PaymentFocusDashboard> paymentFocusDashboard, Map<String, LifeWeekendAssistant> lifeWeekendAssistants, LingererStats lingererStats, NextTrainingAttendance nextTrainingAttendance) {
         this.trainerName = trainerName;
         this.trainingName = trainingName;
         this.trainingDate = trainingDate;
         this.focusAttendanceDashboard = focusAttendanceDashboard;
+        this.cityParticipantDashboard = cityParticipantDashboard;
         this.genderByDay = genderByDay;
         this.ageDashboard = ageDashboard;
         this.paymentFocusDashboard = paymentFocusDashboard;
@@ -117,5 +121,21 @@ public class TrainerFocusView {
 
     public void setPaymentFocusDashboard(List<PaymentFocusDashboard> paymentFocusDashboard) {
         this.paymentFocusDashboard = paymentFocusDashboard;
+    }
+
+    public List<CityParticipantDashboard> getCityParticipantDashboard() {
+        return cityParticipantDashboard;
+    }
+
+    public void setCityParticipantDashboard(List<CityParticipantDashboard> cityParticipantDashboard) {
+        this.cityParticipantDashboard = cityParticipantDashboard;
+    }
+
+    public CourseLevel getCourseLevel() {
+        return courseLevel;
+    }
+
+    public void setCourseLevel(CourseLevel courseLevel) {
+        this.courseLevel = courseLevel;
     }
 }

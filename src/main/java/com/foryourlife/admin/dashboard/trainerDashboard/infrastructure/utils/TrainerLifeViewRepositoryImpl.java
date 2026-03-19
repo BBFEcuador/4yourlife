@@ -15,10 +15,12 @@ import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,7 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
         this.teamRepository = teamRepository;
     }
 
+    @Transactional
     @Override
     public List<TrainerLifeView> getTrainerLifeViewByTraining(String trainingId) {
         var training = jpaTrainingRepository.findById(trainingId)
@@ -109,12 +112,16 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
         promiseDashboard.setEnrollerPersonsCount(enrollerCount);
         promiseDashboard.setEnrollerPersonsPercent(enrollerPercentage);
 
-        var trainerName = training.getOriginalTeam().getTrainer().getName() != null ? training.getOriginalTeam().getTrainer().getName() : teamRepository.findByTrainingId(training.getId()).map(t -> t.getTrainer().getName()).orElse("Sin entrenador");
+        var team = training.getOriginalTeam();
+
+        var trainerName = trainingDashboardUtils.getTrainerName(training, team);
+
 
         return new TrainerLifeView(
                 training.getName(),
                 trainerName,
                 training.getStartDate().toString() + " - " + training.getEndDate().toString(),
+                training.getCourseLevelDisplay(),
                 lifeAttendanceDashboard,
                 promiseDashboard,
                 userDashboards,

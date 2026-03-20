@@ -12,7 +12,6 @@ import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
-import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -20,16 +19,11 @@ import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserType;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,10 +123,10 @@ public class TrainingDashboardUtils {
         int attended = 0;
         int notAttended = 0;
 
-        LingererGroupStats previous1 = new LingererGroupStats(0,0);
-        LingererGroupStats previous2 = new LingererGroupStats(0,0);
-        LingererGroupStats previous3 = new LingererGroupStats(0,0);
-        LingererGroupStats others = new LingererGroupStats(0,0);
+        LingererGroupStats previous1 = new LingererGroupStats(0, 0);
+        LingererGroupStats previous2 = new LingererGroupStats(0, 0);
+        LingererGroupStats previous3 = new LingererGroupStats(0, 0);
+        LingererGroupStats others = new LingererGroupStats(0, 0);
 
         // 🔥 PRELOAD (1 sola query)
         List<String> userIds = currentAttendances.stream()
@@ -247,6 +241,7 @@ public class TrainingDashboardUtils {
 
         int attendeesFromPreviousTraining = 0;
         int previousLifePayments = 0;
+        int finalPaymentsFromPreviousTraining = 0;
 
         for (Attendance attendance : attendances) {
 
@@ -284,10 +279,42 @@ public class TrainingDashboardUtils {
             List<Payment> payments =
                     paymentRepository.findByAllParticipantId(participant.getId());
 
+            int yourFinal = (int) payments.stream()
+                    .filter(p ->
+                            p.getProducts() != null &&
+                                    p.getProducts().stream().anyMatch(product ->
+                                            product.getPrograms() != null &&
+                                                    product.getPrograms().stream().anyMatch(program ->
+                                                            CourseLevel.YOUR.equals(program.getCourseLevel())
+                                                    )
+                                    ) &&
+                                    p.getStatus() == PaymentStatus.COMPLETED)
+                    .count();
+
+            int lifeFinal = (int) payments.stream()
+                    .filter(p ->
+                            p.getProducts() != null &&
+                                    p.getProducts().stream().anyMatch(product ->
+                                            product.getPrograms() != null &&
+                                                    product.getPrograms().stream().anyMatch(program ->
+                                                            CourseLevel.LIFE.equals(program.getCourseLevel())
+                                                    )
+                                    ) &&
+                                    p.getStatus() == PaymentStatus.COMPLETED)
+                    .count();
+
+            int finalTotal = yourFinal + lifeFinal;
+
             boolean hasPreviousLifePayment = payments.stream()
                     .anyMatch(p ->
                             p.getTraining() != null &&
-                                    p.getTraining().getCourseLevel() == CourseLevel.LIFE &&
+                                    p.getProducts() != null &&
+                                    p.getProducts().stream().anyMatch(product ->
+                                            product.getPrograms() != null &&
+                                                    product.getPrograms().stream().anyMatch(program ->
+                                                            program.getCourseLevel() == CourseLevel.LIFE
+                                                    )
+                                    ) &&
                                     p.getStatus() == PaymentStatus.COMPLETED &&
                                     p.getCreatedDate().toLocalDate().isBefore(currentTraining.getStartDate())
                     );
@@ -297,9 +324,18 @@ public class TrainingDashboardUtils {
             }
         }
 
+        var attendanceFromPreviousTrainingPercentage = attendances.isEmpty() ? 0 :
+                (double) attendeesFromPreviousTraining / attendances.size() * 100.0;
+
+        var finalPaymentsFromPreviousTrainingPercentage = attendances.isEmpty() ? 0 :
+                (double) finalPaymentsFromPreviousTraining / attendances.size() * 100.0;
+
         return new PreviousTrainingStats(
                 attendeesFromPreviousTraining,
-                previousLifePayments
+                finalPaymentsFromPreviousTraining,
+                previousLifePayments,
+                attendanceFromPreviousTrainingPercentage,
+                finalPaymentsFromPreviousTrainingPercentage
         );
     }
 
@@ -358,13 +394,14 @@ public class TrainingDashboardUtils {
                     .anyMatch(p -> {
                         if (p.getProducts() == null || p.getProducts().isEmpty()) return false;
 
-                        Product product = p.getProducts().getFirst();
-
-                        if (product.getPrograms() == null || product.getPrograms().isEmpty()) return false;
-
                         LocalDateTime createdAt = LocalDateTime.parse(p.getCreated_at());
 
-                        return product.getPrograms().getFirst().getCourseLevel() == CourseLevel.LIFE
+                        return p.getProducts().stream().anyMatch(product ->
+                                product.getPrograms() != null &&
+                                        product.getPrograms().stream().anyMatch(program ->
+                                                program.getCourseLevel() == CourseLevel.LIFE
+                                        )
+                        )
                                 && p.getStatus() == PaymentStatus.COMPLETED
                                 && createdAt.toLocalDate().isBefore(currentTraining.getStartDate());
                     });
@@ -374,11 +411,9 @@ public class TrainingDashboardUtils {
             }
         }
 
-        double percentage = recovered == 0 ? 0 :
-                (double) recoveredWithPreviousLifePayment / recovered * 100;
+        double percentage = (double) recoveredWithPreviousLifePayment / recovered;
 
         return new YourRecoveryPaymentStats(
-                recovered,
                 recoveredWithPreviousLifePayment,
                 percentage
         );

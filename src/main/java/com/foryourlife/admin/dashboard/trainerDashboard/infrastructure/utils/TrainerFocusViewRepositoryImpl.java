@@ -223,15 +223,31 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
             // ---------- DOMINGO ----------
 
             int yourSunday = (int) sundayPayments.stream()
-                    .filter(p -> p.getTraining() != null
-                            && CourseLevel.YOUR.equals(p.getTraining().getCourseLevel())
-                            && p.getStatus() == PaymentStatus.COMPLETED)
+                    .filter(p ->
+                            p.getProducts() != null &&
+                                    p.getProducts().stream().anyMatch(product ->
+                                            product.getPrograms() != null &&
+                                                    product.getPrograms().stream().anyMatch(program ->
+                                                            CourseLevel.YOUR.equals(program.getCourseLevel())
+                                                    )
+                                    ) &&
+                                    p.getStatus() == PaymentStatus.COMPLETED &&
+                                    p.getCreatedDate().isBefore(training.getStartDate().atStartOfDay())
+                    )
                     .count();
 
             int lifeSunday = (int) sundayPayments.stream()
-                    .filter(p -> p.getTraining() != null
-                            && CourseLevel.YOUR.equals(p.getTraining().getCourseLevel())
-                            && p.getStatus() == PaymentStatus.COMPLETED)
+                    .filter(p ->
+                            p.getProducts() != null &&
+                                    p.getProducts().stream().anyMatch(product ->
+                                            product.getPrograms() != null &&
+                                                    product.getPrograms().stream().anyMatch(program ->
+                                                            CourseLevel.LIFE.equals(program.getCourseLevel())
+                                                    )
+                                    ) &&
+                                    p.getStatus() == PaymentStatus.COMPLETED &&
+                                    p.getCreatedDate().isBefore(training.getStartDate().atStartOfDay())
+                    )
                     .count();
 
             int yourPlusLifeSunday = yourSunday + lifeSunday;
@@ -240,15 +256,27 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
 
 
             int yourFinal = (int) allPayments.stream()
-                    .filter(p -> p.getTraining() != null
-                            && CourseLevel.YOUR.equals(p.getTraining().getCourseLevel())
-                            && p.getStatus() == PaymentStatus.COMPLETED)
+                    .filter(p ->
+                            p.getProducts() != null &&
+                                    p.getProducts().stream().anyMatch(product ->
+                                            product.getPrograms() != null &&
+                                                    product.getPrograms().stream().anyMatch(program ->
+                                                            CourseLevel.YOUR.equals(program.getCourseLevel())
+                                                    )
+                                    ) &&
+                                    p.getStatus() == PaymentStatus.COMPLETED)
                     .count();
 
             int lifeFinal = (int) allPayments.stream()
-                    .filter(p -> p.getTraining() != null
-                            && CourseLevel.YOUR.equals(p.getTraining().getCourseLevel())
-                            && p.getStatus() == PaymentStatus.COMPLETED)
+                    .filter(p ->
+                            p.getProducts() != null &&
+                                    p.getProducts().stream().anyMatch(product ->
+                                            product.getPrograms() != null &&
+                                                    product.getPrograms().stream().anyMatch(program ->
+                                                            CourseLevel.LIFE.equals(program.getCourseLevel())
+                                                    )
+                                    ) &&
+                                    p.getStatus() == PaymentStatus.COMPLETED)
                     .count();
 
             int yourPlusLifeFinal = yourFinal + lifeFinal;

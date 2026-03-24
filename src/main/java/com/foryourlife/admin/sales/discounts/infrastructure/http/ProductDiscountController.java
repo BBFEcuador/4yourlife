@@ -67,12 +67,6 @@ public class ProductDiscountController {
                                     null,
                                     Filter.Operation.LIKE,
                                     Filter.LogicalOperator.OR
-                            ),new Filter(
-                                    "id",
-                                    campusId,
-                                    "campus",
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
                             )
                     );
         }

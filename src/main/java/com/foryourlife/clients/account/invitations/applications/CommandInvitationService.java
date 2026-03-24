@@ -10,6 +10,8 @@ import com.foryourlife.clients.account.invitations.infrastructure.GenericInvitat
 import com.foryourlife.clients.account.invitations.infrastructure.InvitationRequest;
 import com.foryourlife.clients.account.participant.application.ParticipantCommandService;
 import com.foryourlife.clients.account.participant.application.ParticipantQueryService;
+import com.foryourlife.masterLife.domain.MasterLife;
+import com.foryourlife.masterLife.domain.MasterLifeRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.UserRepository;
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,14 +34,16 @@ public class CommandInvitationService {
 
     private final TrainingRepository trainingRepository;
     private final Logger logger = LoggerFactory.getLogger(CommandInvitationService.class);
+    private final MasterLifeRepository masterLifeRepository;
 
-    public CommandInvitationService(InvitationRepository repository, ParticipantQueryService participantQueryService, UserRepository userRepository, QueryCampusService campusService, AdminFinderService adminFinderService, TrainingRepository trainingRepository) {
+    public CommandInvitationService(InvitationRepository repository, ParticipantQueryService participantQueryService, UserRepository userRepository, QueryCampusService campusService, AdminFinderService adminFinderService, TrainingRepository trainingRepository, MasterLifeRepository masterLifeRepository) {
         this.repository = repository;
         this.participantQueryService = participantQueryService;
         this.userRepository = userRepository;
         this.campusService = campusService;
         this.adminFinderService = adminFinderService;
         this.trainingRepository = trainingRepository;
+        this.masterLifeRepository = masterLifeRepository;
     }
 
     public String createInvitationByUser(String id, String campusId) {
@@ -93,32 +98,49 @@ public class CommandInvitationService {
         return token;
     }
 
-    public String createInvitationByUserWithQuantity(String userId, String quantity) {
-        var invitations = this.repository.findBySenderId(userId)
-                .stream()
-                .anyMatch(invitation -> invitation.getQuantity() > 0);
-        if (invitations) {
-            throw new BaseException("Tiene invitacion activa", List.of());
+    public String createInvitationByUserWithQuantity(String userId, int quantity) {
+
+        if (quantity <= 0) {
+            throw new BaseException("La cantidad debe ser mayor a 0", List.of());
         }
-        var user = userRepository.findById(userId).orElseThrow(
-                () -> new BaseException("Usuario no encontrado", List.of())
-        );
+
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException("Usuario no encontrado", List.of()));
+
         var participant = participantQueryService.getByUserId(userId);
-        var token = UUID.randomUUID().toString();
-        var campus = campusService.findById(participant.getCampus().getId());
         var team = participant.getTeam();
+
         if (team == null) {
             throw new BaseException("El participante no tiene equipo asignado", List.of());
         }
 
-        if (team.getTraining().getCourseLevel().equals(CourseLevel.FOCUS)
-                || team.getTraining().getCourseLevel().equals(CourseLevel.YOUR)) {
-            var userEntity = user.getEntityMap();
-            var isMasterlife = userEntity != null && "MASTER_LIFE".equalsIgnoreCase(userEntity.toString());
+        var training = team.getTraining();
+
+        if (CourseLevel.FOCUS.equals(training.getCourseLevel()) ||
+                CourseLevel.YOUR.equals(training.getCourseLevel())) {
+
+            var isMasterlife = user.getEntityMap() != null &&
+                    "MASTER_LIFE".equalsIgnoreCase(user.getEntityMap().toString());
+
             if (!isMasterlife) {
                 throw new BaseException("El participante no puede crear invitaciones en este nivel", List.of());
             }
         }
+
+        var invitations = repository.findBySenderId(userId);
+
+        boolean alreadyExists = invitations.stream()
+                .anyMatch(invitation ->
+                        invitation.getEnrolled() != null &&
+                                invitation.getEnrolled().getTrainingName().equals(training.getName())
+                );
+
+        if (alreadyExists) {
+            throw new BaseException("Ya tiene una invitacion activa en este nivel", List.of());
+        }
+
+        var token = UUID.randomUUID().toString();
+        var campus = campusService.findById(participant.getCampus().getId());
 
         var invitation = Invitation.create(
                 UUID.randomUUID().toString(),
@@ -126,9 +148,12 @@ public class CommandInvitationService {
                 null,
                 false,
                 userId,
-                new Sender(user.getId(), user.getName(), participant.getTeam().getTraining().getName(), user.getPhone()),
-                Integer.parseInt(quantity), campus);
-        this.repository.save(invitation);
+                new Sender(user.getId(), user.getName(), training.getName(), user.getPhone()),
+                quantity,
+                campus
+        );
+
+        repository.save(invitation);
         return token;
     }
 

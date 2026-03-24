@@ -163,7 +163,7 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
 
             // -------- SABADO --------
             int saturdayPayments = (int) allPayments.stream()
-                    .filter(p -> p.getCreatedDate().toLocalDate().isEqual(saturday))
+                    .filter(p -> p.getCreatedDate().toLocalDate().isBefore(saturday))
                     .count();
 
             int accumulatedSaturday = previousLifePayments + saturdayPayments;
@@ -179,7 +179,7 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
 
             // -------- DOMINGO --------
             int sundayPayments = (int) allPayments.stream()
-                    .filter(p -> p.getCreatedDate().toLocalDate().isEqual(sunday))
+                    .filter(p -> p.getCreatedDate().toLocalDate().isBefore(sunday))
                     .count();
 
             int accumulatedSunday = accumulatedSaturday + sundayPayments;

@@ -32,8 +32,8 @@ public class InvitationController {
     }
 
     @PostMapping("/create-by-user-quantity")
-    public ResponseEntity<String> userInvitation(@RequestParam String id, @RequestParam String quantity) {
-        return new ResponseEntity<>(this.service.createInvitationByUserWithQuantity(id,quantity), HttpStatus.CREATED);
+    public ResponseEntity<String> userInvitation(@RequestParam String id, @RequestParam int quantity) {
+        return new ResponseEntity<>(this.service.createInvitationByUserWithQuantity(id, quantity), HttpStatus.CREATED);
     }
 
     @PostMapping("/generic")

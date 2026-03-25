@@ -4,13 +4,14 @@ public enum StatementStatusEnum {
     NO_INTERESTED("No Interesa"),
     CONFIRMED("Confirmado"),
     POSSIBILITY("Posibilidad"),
-    AGREEMENT("Acuerdo"),
-    ;
+    AGREEMENT("Acuerdo");
 
     private final String value;
+
     StatementStatusEnum(String value) {
         this.value = value;
     }
+
     public String getValue() {
         return value;               }
 }

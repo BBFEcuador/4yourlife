@@ -36,29 +36,6 @@ public class UpdateCourseLevelOnTeamAssigned {
     public void on(TeamToTrainingAssigned event) {
         var training = trainingRepository.findById(event.getTraining().getId()).orElseThrow(() -> new RuntimeException(""));
         var team = this.teamRepository.findById(event.getTeam().getId()).orElseThrow(() -> new RuntimeException(""));
-        team.getUsers().forEach(user -> {
-            var participant = participantRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException(""));
-            switch (training.getCourseLevel()) {
-                case LIFE_2, LIFE_3 -> {
-                    participant.setParticipantLevel(
-                            (participantLevelRepository.findOneByCriteria(
-                                    (root, query, cb) ->
-                                            cb.equal(root.get("courseLevel"), cb.literal(CourseLevel.LIFE.toString()))
-                            ).orElseThrow(() -> new RuntimeException(""))
-                            )
-                    );
-                }
-                default -> {
-                    participant.setParticipantLevel(
-                            (participantLevelRepository.findOneByCriteria(
-                                    (root, query, cb) ->
-                                            cb.equal(root.get("courseLevel"), training.getCourseLevel())
-                            ).orElseThrow(() -> new RuntimeException(""))
-                            )
-                    );
-                }
-            }
-            participantRepository.save(participant);
-        });
+        CommandTeamService.assignLevelParticipant(training, team, participantRepository, participantLevelRepository);
     }
 }

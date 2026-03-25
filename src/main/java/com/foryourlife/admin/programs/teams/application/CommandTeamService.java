@@ -2,6 +2,8 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.crm.call.domain.Call;
 import com.foryourlife.admin.crm.call.domain.CallRepository;
+import com.foryourlife.admin.crm.statement.application.StatementCommandService;
+import com.foryourlife.admin.crm.statement.domain.Statement;
 import com.foryourlife.admin.programs.attendance.application.CommandAttendanceService;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.FylStage;
@@ -64,8 +66,9 @@ public class CommandTeamService {
     private final ParticipantLevelRepository participantLevelRepository;
     private final TeamBadgePdfService teamBadgePdfService;
     private final CommandAttendanceService commandAttendanceService;
+    private final StatementCommandService statementCommandService;
 
-    public CommandTeamService(AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, TrainingRepository trainingRepository, TeamRepository _teamRepository, EventBus bus, PromiseRepository promiseRepository, ParticipantRepository _participantRepository, MasterLifeRepository masterLifeRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, ParticipantLevelRepository participantLevelRepository, TeamBadgePdfService teamBadgePdfService, CommandAttendanceService commandAttendanceService) {
+    public CommandTeamService(AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, TrainingRepository trainingRepository, TeamRepository _teamRepository, EventBus bus, PromiseRepository promiseRepository, ParticipantRepository _participantRepository, MasterLifeRepository masterLifeRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, ParticipantLevelRepository participantLevelRepository, TeamBadgePdfService teamBadgePdfService, CommandAttendanceService commandAttendanceService, StatementCommandService statementCommandService) {
         this.attendanceRepository = attendanceRepository;
         this.callRepository = callRepository;
         this.trainingRepository = trainingRepository;
@@ -83,6 +86,7 @@ public class CommandTeamService {
         this.participantLevelRepository = participantLevelRepository;
         this.teamBadgePdfService = teamBadgePdfService;
         this.commandAttendanceService = commandAttendanceService;
+        this.statementCommandService = statementCommandService;
     }
 
     public void save(Team team) {
@@ -182,8 +186,12 @@ public class CommandTeamService {
                 new ArrayList<>()
         );
         this._teamRepository.save(team);
+        assignLevelParticipant(training, team, _participantRepository, participantLevelRepository);
+    }
+
+    static void assignLevelParticipant(Training training, Team team, ParticipantRepository participantRepository, ParticipantLevelRepository participantLevelRepository) {
         team.getUsers().forEach(user -> {
-            var participant = _participantRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException(""));
+            var participant = participantRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException(""));
             switch (training.getCourseLevel()) {
                 case LIFE_2, LIFE_3 -> {
                     participant.setParticipantLevel(
@@ -204,7 +212,7 @@ public class CommandTeamService {
                     );
                 }
             }
-            _participantRepository.save(participant);
+            participantRepository.save(participant);
         });
     }
 
@@ -663,10 +671,10 @@ public class CommandTeamService {
 
     public void updateTrainer(String id, String trainerId) {
         var trainer = trainerQueryService.findTrainerById(trainerId).orElseThrow(() ->
-                new BaseException("Error",List.of("Entrenador no encontrado"))
+                new BaseException("Error", List.of("Entrenador no encontrado"))
         );
         var team = _teamRepository.findById(id).orElseThrow(() ->
-            new BaseException("Error",List.of("Equipo no encontrado"))
+                new BaseException("Error", List.of("Equipo no encontrado"))
         );
         team.setTrainer(trainer);
         _teamRepository.save(team);

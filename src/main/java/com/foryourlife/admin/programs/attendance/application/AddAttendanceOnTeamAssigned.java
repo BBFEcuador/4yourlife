@@ -20,14 +20,12 @@ import java.util.UUID;
 public class AddAttendanceOnTeamAssigned {
     private final TrainingRepository trainingRepository;
     private final TeamRepository teamRepository;
-    private final AttendanceRepository attendanceRepository;
     private final PromiseCommandService promiseCommandService;
     private final CommandAttendanceService commandAttendanceService;
 
-    public AddAttendanceOnTeamAssigned(TrainingRepository trainingRepository, TeamRepository teamRepository, AttendanceRepository attendanceRepository, PromiseCommandService promiseCommandService, CommandAttendanceService commandAttendanceService) {
+    public AddAttendanceOnTeamAssigned(TrainingRepository trainingRepository, TeamRepository teamRepository, PromiseCommandService promiseCommandService, CommandAttendanceService commandAttendanceService) {
         this.trainingRepository = trainingRepository;
         this.teamRepository = teamRepository;
-        this.attendanceRepository = attendanceRepository;
         this.promiseCommandService = promiseCommandService;
         this.commandAttendanceService = commandAttendanceService;
     }

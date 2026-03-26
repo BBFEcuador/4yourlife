@@ -42,4 +42,9 @@ public class JPACallRepository implements CallRepository {
     public List<Call> findAllByTrainingId(String trainingId) {
         return jpaImplCallRepository.findAllByTraining_Id(trainingId);
     }
+
+    @Override
+    public void saveAll(List<Call> calls) {
+        jpaImplCallRepository.saveAll(calls);
+    }
 }

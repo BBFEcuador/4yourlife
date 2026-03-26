@@ -21,7 +21,11 @@ public class Statement {
     )
     private Participant participant;
     @Enumerated(EnumType.STRING)
-    private StatementStatusEnum status;
+    private StatementStatusEnum status = StatementStatusEnum.EMPTY;
+    @Column(
+            name = "course_level"
+
+    )
     @Enumerated(EnumType.STRING)
     private CourseLevel courseLevel;
     private String comment;

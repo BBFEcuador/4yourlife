@@ -6,13 +6,15 @@ public class OperativeYourPayments {
     private int sundayPayments;
     private int totalPayments;
     private double totalPaymentsPercentage;
+    private YourDailyStats yourDailyStats;
 
-    public OperativeYourPayments(int previousPayments, int saturdayPayments, int sundayPayments, int totalPayments, double totalPaymentsPercentage) {
+    public OperativeYourPayments(int previousPayments, int saturdayPayments, int sundayPayments, int totalPayments, double totalPaymentsPercentage, YourDailyStats yourDailyStats) {
         this.previousPayments = previousPayments;
         this.saturdayPayments = saturdayPayments;
         this.sundayPayments = sundayPayments;
         this.totalPayments = totalPayments;
         this.totalPaymentsPercentage = totalPaymentsPercentage;
+        this.yourDailyStats = yourDailyStats;
     }
 
     public int getPreviousPayments() {

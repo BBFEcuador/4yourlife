@@ -2,6 +2,7 @@ package com.foryourlife.admin.crm.statement.domain;
 
 public enum StatementStatusEnum {
     NO_INTERESTED("No Interesa"),
+    EMPTY("Vacio"),
     CONFIRMED("Confirmado"),
     POSSIBILITY("Posibilidad"),
     AGREEMENT("Acuerdo");

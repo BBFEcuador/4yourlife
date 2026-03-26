@@ -215,8 +215,8 @@ public class CommandPaymentService {
             InvoiceContificoJson.Cliente client = new InvoiceContificoJson.Cliente(
                     invoice.getDocument(),
                     invoice.getFullName(),
-                    invoice.getPhone(),
-                    invoice.getAddress(),
+                    this.normalizeString(invoice.getPhone()),
+                    this.normalizeString(invoice.getAddress()),
                     invoice.getClientType(),
                     invoice.getEmail()
             );
@@ -243,7 +243,7 @@ public class CommandPaymentService {
                     BigDecimal.ZERO,
                     taxAmount,
                     totalAmount,
-                    invoice.getPayment().getNote(),
+                    this.normalizeString(invoice.getPayment().getNote()),
                     details,
                     BigDecimal.ZERO,
                     "Generado en 4YourLife",
@@ -264,6 +264,11 @@ public class CommandPaymentService {
             e.printStackTrace();
             return invoice;
         }
+    }
+
+    private String normalizeString(String value) {
+        if (value == null) return "";
+        return value.replaceAll("[^\\p{L}\\p{N}.,\\s]", "");
     }
 
     private List<InvoiceContificoJson.Cobros> buildCobros(List<PaymentHistory> paymentHistories, String formattedDate) {
@@ -316,7 +321,16 @@ public class CommandPaymentService {
         BigDecimal productSubtotal = subtotal.divide(BigDecimal.valueOf(productCount), 2, RoundingMode.DOWN);
 
         for (var product : payment.getProducts()) {
-            details.add(new InvoiceContificoJson.Detalle(product.getContificoId(), 1, productSubtotal.doubleValue(), 15, 0, 0, productSubtotal.doubleValue(), 0, 0, 0.0));
+            details.add(new InvoiceContificoJson.Detalle(product.getContificoId(),
+                    1,
+                    productSubtotal.doubleValue(),
+                    15,
+                    0,
+                    0,
+                    productSubtotal.doubleValue(),
+                    0,
+                    0,
+                    0.0));
         }
 
         return details;

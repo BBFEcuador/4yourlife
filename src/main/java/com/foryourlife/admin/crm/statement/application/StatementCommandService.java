@@ -1,8 +1,10 @@
 package com.foryourlife.admin.crm.statement.application;
 
 import com.foryourlife.admin.crm.statement.domain.Statement;
+import com.foryourlife.admin.crm.statement.domain.StatementDtoStatusEnum;
 import com.foryourlife.admin.crm.statement.domain.StatementRepository;
 import com.foryourlife.admin.crm.statement.domain.StatementStatusEnum;
+import com.foryourlife.admin.crm.statement.infrastructure.http.StatementChangeStatusRequest;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
@@ -78,12 +80,14 @@ public class StatementCommandService {
     }
 
 
-    public void changeStatementStatus(String id, StatementStatusEnum status) {
+    public void changeStatementStatus(StatementChangeStatusRequest request, String id) {
         Statement statement = statementRepository.findById(id).orElseThrow(
                 () -> new BaseException("Statement not found with id: " + id, List.of(""))
         );
 
+        statement.setStatus(StatementStatusEnum.valueOf(request.getStatus()));
+        statement.setComment(request.getComment());
 
-        return;
+        statementRepository.save(statement);
     }
 }

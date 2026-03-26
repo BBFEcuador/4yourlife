@@ -50,18 +50,9 @@ public class StatementController {
         return new ResponseEntity<>(queryService.findAll(p, criteria, trainingId), HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Statement> findById(@PathVariable String id) {
-        Statement statement = queryService.findById(id);
-        if (statement == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(statement, HttpStatus.OK);
-    }
-
-    @GetMapping("training/{id}")
-    public ResponseEntity<List<Statement>> findByTrainingId(@PathVariable String id) {
-        var statements = queryService.findAllByTrainingId(id);
-        return new ResponseEntity<>(statements, HttpStatus.OK);
+    @PutMapping("{id}")
+    public ResponseEntity<Void> updateStatus(@RequestBody StatementChangeStatusRequest request, @PathVariable String id){
+        commandService.changeStatementStatus(request, id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

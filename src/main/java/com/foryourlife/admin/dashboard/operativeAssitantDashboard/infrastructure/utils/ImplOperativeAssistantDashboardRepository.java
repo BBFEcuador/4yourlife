@@ -588,4 +588,212 @@ public class ImplOperativeAssistantDashboardRepository implements OperativeAssis
 
         return finalList;
     }
+
+//    public TrainingInfo buildOperativeAssistantDashboardSection(Training training, Team team) {
+//        var attendances = attendanceRepository.findAttendanceByTraining(training.getId());
+//        var teamT = training.getOriginalTeam() != null ? training.getOriginalTeam() : team;
+//        int participantDeclarations = 0, masterLifesDeclarations = 0, enrolmentsDeclarations;
+//        if (training.getCourseLevel() != CourseLevel.YOUR) {
+//            var declarations = promiseRepository.findByTrainingId(training.getId());
+//
+//            if (!declarations.isEmpty()) {
+//                for (var declaration : declarations) {
+//                    var participant = teamT.getUsers().stream().filter(user -> user.getUser().getId().equals(declaration.getUser().getId())).findFirst();
+//                    if (participant.isPresent()) {
+//                        participantDeclarations += declaration.getThirdPromise();
+//                    } else {
+//                        var masterLife = teamT.getMasterLife().stream().filter(ml -> ml.getUser().getId().equals(declaration.getUser().getId())).findFirst();
+//                        if (masterLife.isPresent()) {
+//                            masterLifesDeclarations += declaration.getThirdPromise();
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        enrolmentsDeclarations = participantDeclarations + masterLifesDeclarations;
+//
+//        Map<CallType, Map<CallStatus, CallsInfo>> callsByType = new HashMap<>();
+//
+//        for (CallType type : CallType.values()) {
+//
+//            Map<CallStatus, CallsInfo> statusMap = new HashMap<>();
+//
+//            for (CallStatus status : CallStatus.values()) {
+//                CallsInfo info = new CallsInfo();
+//                info.setStatus(status);
+//                info.setTotalCalls(0);
+//                statusMap.put(status, info);
+//            }
+//
+//            callsByType.put(type, statusMap);
+//        }
+//
+//        callRepository.findAllByTrainingId(training.getId())
+//                .forEach(call -> {
+//
+//                    if (call.getCallLogs() == null || call.getCallLogs().isEmpty()) {
+//                        CallsInfo info = callsByType
+//                                .get(CallType.LOGISTIC)
+//                                .get(CallStatus.NO_CALLED);
+//
+//                        info.setTotalCalls(info.getTotalCalls() + 1);
+//                        return;
+//                    }
+//
+//                    CallLog lastCallLog = call.getCallLogs().stream()
+//                            .filter(Objects::nonNull)
+//                            .max(Comparator.comparing(CallLog::getDate))
+//                            .orElse(null);
+//
+//                    if (lastCallLog == null) {
+//                        CallsInfo info = callsByType
+//                                .get(CallType.LOGISTIC)
+//                                .get(CallStatus.NO_CALLED);
+//
+//                        info.setTotalCalls(info.getTotalCalls() + 1);
+//                        return;
+//                    }
+//
+//                    CallType type = lastCallLog.getType();
+//                    CallStatus status = lastCallLog.getStatus();
+//
+//                    CallsInfo info = callsByType
+//                            .get(type)
+//                            .get(status);
+//
+//                    info.setTotalCalls(info.getTotalCalls() + 1);
+//                });
+//
+//        List<CallTypeStats> finalList = new ArrayList<>();
+//
+//        for (CallType type : callsByType.keySet()) {
+//
+//            Collection<CallsInfo> infos = callsByType.get(type).values();
+//
+//            int totalCalls = infos.stream()
+//                    .mapToInt(CallsInfo::getTotalCalls)
+//                    .sum();
+//
+//            int done = callsByType.get(type)
+//                    .get(CallStatus.DONE)
+//                    .getTotalCalls();
+//
+//            int anotherCampus = callsByType.get(type)
+//                    .get(CallStatus.ANOTHER_CAMPUS)
+//                    .getTotalCalls();
+//
+//            int notInterested = callsByType.get(type)
+//                    .get(CallStatus.NOT_INTERESTED)
+//                    .getTotalCalls();
+//
+//            int nextDate = callsByType.get(type)
+//                    .get(CallStatus.NEXT_DATE)
+//                    .getTotalCalls();
+//
+//            CallTypeStats stats = new CallTypeStats();
+//            stats.setCallType(type);
+//            stats.setStatuses(new ArrayList<>(infos));
+//
+//            stats.setCuadre(totalCalls - totalCalls);
+//
+//            float effectiveness = totalCalls == 0
+//                    ? 0
+//                    : ((float) (done + anotherCampus) / totalCalls) * 100;
+//
+//            stats.setEffectivenessPercentage(effectiveness);
+//
+//            float projectedCalls = totalCalls == 0
+//                    ? 0
+//                    : ((float) (totalCalls - notInterested - nextDate) / totalCalls) * 100;
+//
+//            stats.setProjectedCallsPercentage(projectedCalls);
+//
+//            finalList.add(stats);
+//        }
+//
+//        var participantAttendances = attendances.stream()
+//                .filter(attendance -> teamT.getUsers().stream()
+//                        .anyMatch(participant -> participant.getUser().getId().equals(attendance.getUser().getId()))
+//                ).count();
+//        var masterLifeAttendances = attendances.stream()
+//                .filter(attendance -> teamT.getMasterLife().stream()
+//                        .anyMatch(ml -> ml.getUser().getId().equals(attendance.getUser().getId()))
+//                ).count();
+//        List<WeeklyPaymentStats> weeklyTable;
+//        weeklyTable = buildWeeklyTable(training,teamT);
+//        var visSize = teamT.getVisionaries() != null ? teamT.getVisionaries().size(): 0;
+//        var staffSize = teamT.getStaffs() != null ? teamT.getStaffs().size(): 0;
+//        return new TrainingInfo(
+//                training.getCourseLevel(),
+//                teamT.getTrainer().getName(),
+//                teamT.getName(),
+//                teamT.getTrainingNumber().toString(),
+//                teamT.getUsers().size(),
+//                (int) participantAttendances,
+//                participantDeclarations,
+//                teamT.getMasterLife().size(),
+//                (int) masterLifeAttendances,
+//                masterLifesDeclarations,
+//                teamT.getUsers().size() + teamT.getMasterLife().size(),
+//                (int) (participantAttendances + masterLifeAttendances),
+//                enrolmentsDeclarations,
+//                visSize,
+//                staffSize,
+//                finalList,
+//                weeklyTable
+//        );
+//    }
+//
+//    public List<WeeklyPaymentStats> buildWeeklyTable(Training training,Team team) {
+//
+//        LocalDate startFriday = training.getStartDate();
+//        LocalDate nextFriday = training.getNextLevel().getStartDate();
+//
+//        List<LocalDate> fridayBoundaries = getFridayBoundaries(startFriday, nextFriday);
+//
+//        List<Payment> payments = new java.util.ArrayList<>(List.of());
+//        team.getUsers().forEach(participant ->
+//                paymentRepository.findAllBetweenDates(training.getStartDate().atStartOfDay(), training.getNextLevel().getStartDate().atStartOfDay()).forEach(
+//                        payment -> {
+//                            if (payment.getParticipant().getId().equals(participant.getId())) {
+//                                payments.add(payment);
+//                            }
+//                        }
+//                )
+//        );
+//
+//        Map<LocalDate, List<Payment>> paymentsByDay = payments.stream()
+//                .collect(Collectors.groupingBy(p -> p.getCreatedDate().toLocalDate()));
+//
+//        List<WeeklyPaymentStats> weeklyStats = new ArrayList<>();
+//
+//        for (int i = 0; i < fridayBoundaries.size() - 1; i++) {
+//
+//            LocalDate weekStart = fridayBoundaries.get(i);
+//            LocalDate weekEnd = fridayBoundaries.get(i + 1); // exclusivo
+//
+//            WeeklyPaymentStats weekStats = new WeeklyPaymentStats();
+//            weekStats.setWeekNumber(i + 1);
+//
+//            Map<DayOfWeek, DailyStats> dayStatsMap = new EnumMap<>(DayOfWeek.class);
+//
+//            LocalDate date = weekStart;
+//
+//            while (date.isBefore(weekEnd)) {
+//
+//                List<Payment> dayPayments = paymentsByDay.getOrDefault(date, List.of());
+//
+//                DailyStats daily = calculateDailyStats(dayPayments);
+//                dayStatsMap.put(date.getDayOfWeek(), daily);
+//
+//                date = date.plusDays(1);
+//            }
+//
+//            weekStats.setStatsPerDay(dayStatsMap);
+//            weeklyStats.add(weekStats);
+//        }
+//
+//        return weeklyStats;
+//    }
 }

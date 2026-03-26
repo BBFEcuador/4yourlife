@@ -24,7 +24,6 @@ public class InvoiceContificoJson implements Serializable {
     public boolean electronico = true;
     public List<Cobros> cobros;
 
-
     public static class Cliente {
         public String ruc;
         public String cedula;

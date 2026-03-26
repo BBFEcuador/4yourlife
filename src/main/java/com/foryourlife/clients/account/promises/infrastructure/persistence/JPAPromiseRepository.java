@@ -58,4 +58,9 @@ public class JPAPromiseRepository implements PromiseRepository {
     public Optional<Promise> findLastByUserIdAndTrainingId(String userId, String trainingId) {
         return this.jpaImplPromiseRepository.findByUser_IdAndTraining_Id(userId, trainingId);
     }
+
+    @Override
+    public void saveAll(List<Promise> promises) {
+        this.jpaImplPromiseRepository.saveAll(promises);
+    }
 }

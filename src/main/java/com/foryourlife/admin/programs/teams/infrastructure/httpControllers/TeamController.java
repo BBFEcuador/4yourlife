@@ -87,18 +87,6 @@ public class TeamController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/save/life")
-    public ResponseEntity<?> saveTeamLife(@Valid @RequestBody SaveLifeTeamRequest request) {
-        commandTeamService.saveLifeTeam(request);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @PostMapping("/save/your")
-    public ResponseEntity<?> saveTeamYour(@Valid @RequestBody SaveYourTeamRequest request) {
-        commandTeamService.saveYourTeam(request);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
     @PutMapping("/promotion/life")
     public ResponseEntity<?> promoTeamToLife(@Valid @RequestBody PromotionLifeRequest request) {
         commandTeamService.promotionLifeTeam(request);
@@ -120,15 +108,6 @@ public class TeamController {
     public ResponseEntity<?> updateTeam(@RequestBody SaveTeamRequest request) {
         commandTeamService.update(request.toDomain());
         return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @PutMapping("/updatePhoto/{id}")
-    public ResponseEntity<?> updatePhoto(@PathVariable String id, @RequestParam("photo") MultipartFile photo) {
-        try {
-            return new ResponseEntity<>(commandTeamService.updatePhoto(id, photo), HttpStatus.CREATED);
-        } catch (IOException e) {
-            throw new BaseException(e.getMessage(), List.of(""));
-        }
     }
 
     @PostMapping("/assignParticipants")

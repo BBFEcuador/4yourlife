@@ -2,8 +2,6 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.crm.call.domain.Call;
 import com.foryourlife.admin.crm.call.domain.CallRepository;
-import com.foryourlife.admin.crm.statement.application.StatementCommandService;
-import com.foryourlife.admin.crm.statement.domain.Statement;
 import com.foryourlife.admin.programs.attendance.application.CommandAttendanceService;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.FylStage;
@@ -11,7 +9,9 @@ import com.foryourlife.admin.programs.attendance.infraestructure.AttendanceRepos
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.AddUsersToTeamRequest;
-import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.*;
+import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.PromotionLifeRequest;
+import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.PromotionYourRequest;
+import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.SaveFocusTeamsRequest;
 import com.foryourlife.admin.programs.trainer.application.TrainerQueryService;
 import com.foryourlife.admin.programs.training.application.QueryTrainingService;
 import com.foryourlife.admin.programs.training.domain.Training;
@@ -37,9 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +48,6 @@ public class CommandTeamService {
     private final AttendanceRepositoryImpl attendanceRepository;
     private final CallRepository callRepository;
     private final TrainingRepository trainingRepository;
-    private String baseUrl;
     private final TeamRepository _teamRepository;
     private final EventBus bus;
     private final PromiseRepository promiseRepository;
@@ -61,14 +58,12 @@ public class CommandTeamService {
     private final QueryTrainingService queryTrainingService;
     private final TrainerQueryService trainerQueryService;
     private final QueryMasterLifeService queryMasterLifeService;
-    private final QueryTeamService queryTeamService;
     private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
     private final ParticipantLevelRepository participantLevelRepository;
     private final TeamBadgePdfService teamBadgePdfService;
     private final CommandAttendanceService commandAttendanceService;
-    private final StatementCommandService statementCommandService;
 
-    public CommandTeamService(AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, TrainingRepository trainingRepository, TeamRepository _teamRepository, EventBus bus, PromiseRepository promiseRepository, ParticipantRepository _participantRepository, MasterLifeRepository masterLifeRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, QueryTeamService queryTeamService, ParticipantLevelRepository participantLevelRepository, TeamBadgePdfService teamBadgePdfService, CommandAttendanceService commandAttendanceService, StatementCommandService statementCommandService) {
+    public CommandTeamService(AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, TrainingRepository trainingRepository, TeamRepository _teamRepository, EventBus bus, PromiseRepository promiseRepository, ParticipantRepository _participantRepository, MasterLifeRepository masterLifeRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, ParticipantLevelRepository participantLevelRepository, TeamBadgePdfService teamBadgePdfService, CommandAttendanceService commandAttendanceService) {
         this.attendanceRepository = attendanceRepository;
         this.callRepository = callRepository;
         this.trainingRepository = trainingRepository;
@@ -82,11 +77,9 @@ public class CommandTeamService {
         this.queryTrainingService = queryTrainingService;
         this.trainerQueryService = trainerQueryService;
         this.queryMasterLifeService = queryMasterLifeService;
-        this.queryTeamService = queryTeamService;
         this.participantLevelRepository = participantLevelRepository;
         this.teamBadgePdfService = teamBadgePdfService;
         this.commandAttendanceService = commandAttendanceService;
-        this.statementCommandService = statementCommandService;
     }
 
     public void save(Team team) {
@@ -94,38 +87,10 @@ public class CommandTeamService {
         this.bus.publish(team.pullDomainEvents());
     }
 
-    public void saveLifeTeam(SaveLifeTeamRequest request) {
-        var training = queryTrainingService.getTrainingById(request.training);
-        var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
-        var users = request.users.stream().map(participant -> {
-            var p = _participantRepository.findById(participant.getId()).orElseThrow();
-            if (p.getTeam() != null) {
-                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getUser().getName() + " ya tiene un equipo"));
-            }
-            if (p.getModules().getHasLife()) return p;
-            return null;
-        }).toList();
-        var masterLife = request.masterLife.stream().map(participant -> {
-            return queryMasterLifeService.findById(participant.getId());
-        }).toList();
-        var team = Team.create(
-                request.id != null ? request.id : UUID.randomUUID().toString(),
-                request.name,
-                null,
-                training,
-                training.getNumber(),
-                users,
-                trainer,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                masterLife
-        );
-        this._teamRepository.save(team);
-        this.bus.publish(team.pullDomainEvents());
-    }
-
+    @Transactional
     public void saveFocusTeam(SaveFocusTeamsRequest request) {
         var training = queryTrainingService.getTrainingById(request.training);
+//        if( training)
         var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();
@@ -153,40 +118,8 @@ public class CommandTeamService {
                 new ArrayList<>()
         );
         this._teamRepository.save(team);
-        this.bus.publish(team.pullDomainEvents());
-        this.addOriginalTeam(team);
-    }
-
-    public void saveYourTeam(SaveYourTeamRequest request) {
-        var training = queryTrainingService.getTrainingById(request.training);
-        var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
-        var users = request.users.stream().map(participant -> {
-            var p = _participantRepository.findById(participant.getId()).orElseThrow();
-            if (p.getTeam() != null) {
-                throw new BaseException("Usuario no disponible", List.of("El usuario " + p.getUser().getName() + " ya tiene un equipo"));
-            }
-            if (p.getModules().getHasYour()) return p;
-            return null;
-        }).toList();
-        var staff = request.staffs.stream().map(participant -> {
-            return staffRepository.findById(participant.getId()).orElseThrow(
-                    () -> new BaseException("Staff no disponible", List.of("El staff no existe"))
-            );
-        }).toList();
-        var team = Team.create(
-                request.id != null ? request.id : UUID.randomUUID().toString(),
-                request.name,
-                null,
-                training,
-                training.getNumber(),
-                users,
-                trainer,
-                staff,
-                new ArrayList<>(),
-                new ArrayList<>()
-        );
-        this._teamRepository.save(team);
-        assignLevelParticipant(training, team, _participantRepository, participantLevelRepository);
+        commandAttendanceService.assignAttendancesAndDeclarations(team, team.getTraining());
+        initializeTeamProperties(team);
     }
 
     static void assignLevelParticipant(Training training, Team team, ParticipantRepository participantRepository, ParticipantLevelRepository participantLevelRepository) {
@@ -279,50 +212,6 @@ public class CommandTeamService {
             throw new BaseException("Staff not found", List.of(""));
         }
         _teamRepository.removeStaffs(teamId, userId);
-    }
-
-    public String updatePhoto(String id, MultipartFile photo) throws IOException {
-        String imagePath = null;
-        try {
-            if (photo != null && !photo.isEmpty()) {
-                imagePath = saveImage(id, photo);
-                var team = queryTeamService.getTeamById(id);
-                team.setPhoto(imagePath);
-                save(team);
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw e;
-        }
-        return baseUrl + imagePath;
-    }
-
-    public String saveImage(String id, MultipartFile photo) throws IOException {
-        String projectDir = System.getProperty("user.dir");
-        String uploadDir = projectDir + "/src/main/resources/assets/teamPhotos/";
-        String originalFilename = photo.getOriginalFilename();
-
-        if (originalFilename == null) {
-            throw new IOException("El nombre del archivo es nulo.");
-        }
-
-        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
-
-        String newFileName = id + fileExtension;
-
-        String relativeFilePath = "resources/assets/teamPhotos/" + newFileName;
-
-        String filePath = uploadDir + newFileName;
-
-        File directory = new File(uploadDir);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
-        File dest = new File(filePath);
-        photo.transferTo(dest);
-
-        return relativeFilePath;
     }
 
     @Transactional

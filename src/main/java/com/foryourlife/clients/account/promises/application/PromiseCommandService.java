@@ -2,19 +2,22 @@ package com.foryourlife.clients.account.promises.application;
 
 import com.foryourlife.admin.programs.attendance.infraestructure.httpController.DaysEnum;
 import com.foryourlife.admin.programs.teams.application.QueryTeamService;
+import com.foryourlife.admin.programs.training.application.TrainingValidationService;
 import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.clients.account.promises.infrastructure.http.PromiseRequest;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
-import com.foryourlife.admin.programs.training.application.TrainingValidationService;
+import com.foryourlife.shared.domain.user.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 public class PromiseCommandService {
@@ -32,40 +35,47 @@ public class PromiseCommandService {
         this.promiseRepository.deleteById(id);
     }
 
+    @Transactional
     public void createPromises(String trainingId) {
+
         var team = queryTeamService.getByTrainingId(trainingId);
+        var training = team.getTraining();
 
-        EnumSet<CourseLevel> availableLevels = EnumSet.of(CourseLevel.LIFE, CourseLevel.LIFE_2, CourseLevel.LIFE_3, CourseLevel.LIFE_GRADUATE);
+        EnumSet<CourseLevel> availableLevels = EnumSet.of(
+                CourseLevel.LIFE,
+                CourseLevel.LIFE_2,
+                CourseLevel.LIFE_3,
+                CourseLevel.LIFE_GRADUATE
+        );
 
-        if (!availableLevels.contains(team.getTraining().getCourseLevel())) {
-            System.err.println(team.getTraining().getCourseLevel() + " is not available");
+        if (!availableLevels.contains(training.getCourseLevel())) {
             return;
         }
 
-        team.getUsers().forEach(it -> {
-            Promise promise = new Promise(
-                    UUID.randomUUID().toString(),
-                    team.getTraining(),
-                    it.getUser()
-            );
-            promise.setStartDate(team.getTraining().getEndDate().plusDays(1));
-            promise.setEndDate(team.getTraining().getEndDate().plusDays(5));
+        var startDate = training.getEndDate().plusDays(1);
+        var endDate = training.getEndDate().plusDays(5);
 
-            this.promiseRepository.save(promise);
-        });
+        List<User> allUsers = Stream.concat(
+                        team.getUsers().stream().map(u -> u.getUser()),
+                        team.getMasterLife().stream().map(m -> m.getUser())
+                )
+                .distinct()
+                .toList();
 
-        team.getMasterLife().forEach(it -> {
-            Promise promise = new Promise(
-                    UUID.randomUUID().toString(),
-                    team.getTraining(),
-                    it.getUser()
-            );
-            promise.setStartDate(team.getTraining().getEndDate().plusDays(1));
-            promise.setEndDate(team.getTraining().getEndDate().plusDays(5));
+        List<Promise> promises = allUsers.stream()
+                .map(user -> {
+                    Promise promise = new Promise(
+                            UUID.randomUUID().toString(),
+                            training,
+                            user
+                    );
+                    promise.setStartDate(startDate);
+                    promise.setEndDate(endDate);
+                    return promise;
+                })
+                .toList();
 
-            this.promiseRepository.save(promise);
-        });
-
+        promiseRepository.saveAll(promises);
     }
 
     public void savePromise(PromiseRequest promiseRequest) {

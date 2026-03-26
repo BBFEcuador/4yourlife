@@ -12,4 +12,5 @@ public interface CallRepository {
     Page<Call> findAll(Pageable p, Criteria criteria);
     Optional<Call> findById(String id);
     List<Call> findAllByTrainingId(String trainingId);
+    void saveAll(List<Call> calls);
 }

@@ -15,4 +15,5 @@ public interface PromiseRepository {
     List<Promise> findByTrainingId(String trainingId);
     Optional<Promise> findLastByUserId(String userId);
     Optional<Promise> findLastByUserIdAndTrainingId(String userId, String trainingId);
+    void saveAll(List<Promise> promises);
 }

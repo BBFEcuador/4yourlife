@@ -1,20 +1,22 @@
 package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.your;
 
+import java.util.List;
+
 public class OperativeYourPayments {
     private int previousPayments;
     private int saturdayPayments;
     private int sundayPayments;
     private int totalPayments;
     private double totalPaymentsPercentage;
-    private YourDailyStats yourDailyStats;
+    private List<YourWeeklyPaymentStats> weeklyPaymentStats;
 
-    public OperativeYourPayments(int previousPayments, int saturdayPayments, int sundayPayments, int totalPayments, double totalPaymentsPercentage, YourDailyStats yourDailyStats) {
+    public OperativeYourPayments(int previousPayments, int saturdayPayments, int sundayPayments, int totalPayments, double totalPaymentsPercentage, List<YourWeeklyPaymentStats> weeklyPaymentStats) {
         this.previousPayments = previousPayments;
         this.saturdayPayments = saturdayPayments;
         this.sundayPayments = sundayPayments;
         this.totalPayments = totalPayments;
         this.totalPaymentsPercentage = totalPaymentsPercentage;
-        this.yourDailyStats = yourDailyStats;
+        this.weeklyPaymentStats = weeklyPaymentStats;
     }
 
     public int getPreviousPayments() {
@@ -55,5 +57,13 @@ public class OperativeYourPayments {
 
     public void setTotalPaymentsPercentage(double totalPaymentsPercentage) {
         this.totalPaymentsPercentage = totalPaymentsPercentage;
+    }
+
+    public List<YourWeeklyPaymentStats> getWeeklyPaymentStats() {
+        return weeklyPaymentStats;
+    }
+
+    public void setWeeklyPaymentStats(List<YourWeeklyPaymentStats> weeklyPaymentStats) {
+        this.weeklyPaymentStats = weeklyPaymentStats;
     }
 }

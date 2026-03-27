@@ -7,14 +7,6 @@ public class YourDailyStats {
     private double passPaymentsPercentage;
     private double projectedPaymentsPercentage;
 
-    public YourDailyStats(int finalPaymentsCount, int agreedPaymentsCount, int totalPaymentsCount, double passPaymentsPercentage, double projectedPaymentsPercentage) {
-        this.finalPaymentsCount = finalPaymentsCount;
-        this.agreedPaymentsCount = agreedPaymentsCount;
-        this.totalPaymentsCount = totalPaymentsCount;
-        this.passPaymentsPercentage = passPaymentsPercentage;
-        this.projectedPaymentsPercentage = projectedPaymentsPercentage;
-    }
-
     public int getFinalPaymentsCount() {
         return finalPaymentsCount;
     }

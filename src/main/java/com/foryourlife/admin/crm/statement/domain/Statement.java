@@ -3,7 +3,12 @@ package com.foryourlife.admin.crm.statement.domain;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
+import org.apache.xmpbox.type.TextType;
+import org.hibernate.annotations.Type;
+
+import java.util.List;
 
 @Entity
 @Table(name = "statements")
@@ -29,6 +34,12 @@ public class Statement {
     @Enumerated(EnumType.STRING)
     private CourseLevel courseLevel;
     private String comment;
+    @Column(
+            name = "statement_status_history",
+            columnDefinition = "jsonb"
+    )
+    @Type(JsonType.class)
+    private List<StatementStatusHistory> statementStatusHistory;
 
     protected Statement() {
     }
@@ -88,5 +99,13 @@ public class Statement {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public List<StatementStatusHistory> getStatementStatusHistory() {
+        return statementStatusHistory;
+    }
+
+    public void setStatementStatusHistory(List<StatementStatusHistory> statementStatusHistory) {
+        this.statementStatusHistory = statementStatusHistory;
     }
 }

@@ -1,0 +1,1 @@
+ALTER TABLE statements ADD COLUMN IF NOT EXISTS statement_status_history JSONB;

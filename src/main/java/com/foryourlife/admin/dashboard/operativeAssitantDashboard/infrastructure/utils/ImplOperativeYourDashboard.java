@@ -1,11 +1,11 @@
 package com.foryourlife.admin.dashboard.operativeAssitantDashboard.infrastructure.utils;
 
+import com.foryourlife.admin.crm.statement.domain.Statement;
 import com.foryourlife.admin.crm.statement.domain.StatementRepository;
+import com.foryourlife.admin.crm.statement.domain.StatementStatusEnum;
 import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.DailyStats;
 import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.WeeklyPaymentStats;
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.your.OperativeYourDashboard;
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.your.OperativeYourDashboardRepository;
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.your.OperativeYourPayments;
+import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.your.*;
 import com.foryourlife.admin.dashboard.trainerDashboard.infrastructure.utils.TrainingDashboardUtils;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
@@ -18,6 +18,7 @@ import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import org.jline.reader.History;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -35,13 +36,15 @@ public class ImplOperativeYourDashboard implements OperativeYourDashboardReposit
     private final AttendanceRepository attendanceRepository;
     private final PaymentRepository paymentRepository;
     private final StatementRepository statementRepository;
+    private final History history;
 
-    public ImplOperativeYourDashboard(TrainingRepository trainingRepository, TrainingDashboardUtils trainingDashboardUtils, AttendanceRepository attendanceRepository, PaymentRepository paymentRepository, StatementRepository statementRepository) {
+    public ImplOperativeYourDashboard(TrainingRepository trainingRepository, TrainingDashboardUtils trainingDashboardUtils, AttendanceRepository attendanceRepository, PaymentRepository paymentRepository, StatementRepository statementRepository, History history) {
         this.trainingRepository = trainingRepository;
         this.trainingDashboardUtils = trainingDashboardUtils;
         this.attendanceRepository = attendanceRepository;
         this.paymentRepository = paymentRepository;
         this.statementRepository = statementRepository;
+        this.history = history;
     }
 
     @Override
@@ -70,11 +73,11 @@ public class ImplOperativeYourDashboard implements OperativeYourDashboardReposit
                 training.getName(),
                 trainerName,
                 attendanceDashboard,
-                buildOperativeYourPayments(attendances, participants)
+                buildOperativeYourPayments(attendances, participants, team)
         );
     }
 
-    public OperativeYourPayments buildOperativeYourPayments(List<Attendance> attendances, Map<String, Participant> participants) {
+    public OperativeYourPayments buildOperativeYourPayments(List<Attendance> attendances, Map<String, Participant> participants, Team team) {
         if (attendances.isEmpty()) return null;
 
         var training = attendances.getFirst().getTraining();
@@ -108,121 +111,77 @@ public class ImplOperativeYourDashboard implements OperativeYourDashboardReposit
 
         double totalPaymentsPercentage = (double) totalPayments / participants.size() * 100;
 
-
-
         return new OperativeYourPayments(
                 previousLifePayments,
                 saturdayPayments,
                 sundayPayments,
                 totalPayments,
                 totalPaymentsPercentage,
-                null
+                buildWeeklyTable(training, team, payments, null)
         );
     }
 
-    public List<WeeklyPaymentStats> buildWeeklyTable(Training training, Team team) {
+    public List<YourWeeklyPaymentStats> buildWeeklyTable(Training training, Team team, List<Payment> payments, List<Statement> statements) {
 
         LocalDate startFriday = training.getStartDate();
         LocalDate nextFriday = training.getNextLevel().getStartDate();
 
         List<LocalDate> fridayBoundaries = getFridayBoundaries(startFriday, nextFriday);
 
-        List<Payment> payments = new java.util.ArrayList<>(List.of());
-        team.getUsers().forEach(participant ->
-                paymentRepository.findAllBetweenDates(training.getStartDate().atStartOfDay(), training.getNextLevel().getStartDate().atStartOfDay()).forEach(
-                        payment -> {
-                            if (payment.getParticipant().getId().equals(participant.getId())) {
-                                payments.add(payment);
-                            }
-                        }
-                )
-        );
-
         Map<LocalDate, List<Payment>> paymentsByDay = payments.stream()
                 .collect(Collectors.groupingBy(p -> p.getCreatedDate().toLocalDate()));
 
-        List<WeeklyPaymentStats> weeklyStats = new ArrayList<>();
+        List<YourWeeklyPaymentStats> weeklyStats = new ArrayList<>();
 
         for (int i = 0; i < fridayBoundaries.size() - 1; i++) {
 
             LocalDate weekStart = fridayBoundaries.get(i);
-            LocalDate weekEnd = fridayBoundaries.get(i + 1); // exclusivo
+            LocalDate weekEnd = fridayBoundaries.get(i + 1);
 
-            WeeklyPaymentStats weekStats = new WeeklyPaymentStats();
+            YourWeeklyPaymentStats weekStats = new YourWeeklyPaymentStats();
             weekStats.setWeekNumber(i + 1);
 
-            Map<DayOfWeek, DailyStats> dayStatsMap = new EnumMap<>(DayOfWeek.class);
+            Map<DayOfWeek, YourDailyStats> dayStatsMap = new EnumMap<>(DayOfWeek.class);
 
             LocalDate date = weekStart;
 
             while (date.isBefore(weekEnd)) {
-
                 List<Payment> dayPayments = paymentsByDay.getOrDefault(date, List.of());
 
-                DailyStats daily = calculateDailyStats(dayPayments);
+                YourDailyStats daily = calculateDailyStats(dayPayments, statements);
                 dayStatsMap.put(date.getDayOfWeek(), daily);
 
                 date = date.plusDays(1);
             }
 
-            weekStats.setStatsPerDay(dayStatsMap);
+            weekStats.setWeeklyPayments(dayStatsMap);
             weeklyStats.add(weekStats);
         }
 
         return weeklyStats;
     }
 
-    private DailyStats calculateDailyStats(List<Payment> payments) {
+    private YourDailyStats calculateDailyStats(List<Payment> payments, List<Statement> statements) {
 
-        DailyStats stats = new DailyStats();
+        YourDailyStats stats = new YourDailyStats();
 
-        stats.setParticipantsFinal(
-                (int) payments.stream()
-                        .map(p -> p.getParticipant().getId())
-                        .distinct()
-                        .count()
-        );
+        var finalPaymentsCount =
+                (int) payments.stream().filter(p ->
+                        p.getProducts() != null &&
+                                p.getProducts().stream().anyMatch(product ->
+                                        product.getPrograms() != null &&
+                                                product.getPrograms().stream().anyMatch(program ->
+                                                        CourseLevel.LIFE.equals(program.getCourseLevel())
+                                                )
+                                ) &&
+                                p.getStatus() == PaymentStatus.COMPLETED
+                ).count();
 
-        stats.setYourCount(
-                (int) payments.stream()
-                        .filter(p -> p.getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.YOUR)
-                        .count()
-        );
+        var agreedPaymentsCount = (int) statements.stream().filter(statement ->
+                statement.getStatus().equals(StatementStatusEnum.AGREEMENT)
+        ).count();
 
-        stats.setYourLifeCount(
-                (int) payments.stream()
-                        .filter(p -> {
-                            var level = p.getParticipant().getParticipantLevel().getCourseLevel();
-                            return level == CourseLevel.YOUR || level == CourseLevel.LIFE;
-                        })
-                        .count()
-        );
-
-        stats.setTotalPayments(payments.size());
-
-        stats.setPartialPayments(
-                (int) payments.stream()
-                        .filter(p -> p.getStatus() == PaymentStatus.PENDING)
-                        .count()
-        );
-
-        if (stats.getParticipantsFinal() > 0) {
-            stats.setPassPercent(
-                    (stats.getYourLifeCount() * 100.0) / stats.getParticipantsFinal()
-            );
-        } else {
-            stats.setPassPercent(0.0);
-        }
-
-        if (stats.getParticipantsFinal() > 0) {
-            stats.setProjectedPercent(
-                    ((stats.getYourLifeCount() + stats.getPartialPayments()) * 100.0)
-                            / stats.getParticipantsFinal()
-            );
-        } else {
-            stats.setProjectedPercent(0.0);
-        }
-
+//        stats.setTotalPaymentsCount();
         return stats;
     }
 

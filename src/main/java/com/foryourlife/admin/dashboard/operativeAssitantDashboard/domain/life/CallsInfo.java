@@ -1,4 +1,4 @@
-package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.common;
+package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.life;
 
 import com.foryourlife.admin.crm.callLogs.domain.CallStatus;
 

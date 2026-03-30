@@ -1,6 +1,6 @@
-package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.common;
+package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.life;
 
-public class WeekendReport {
+public class WeekendLifeReport {
     private int initialParticipantsCount;
     private int realParticipantsCount;
     private int participantsDeclarationsCount;
@@ -14,7 +14,7 @@ public class WeekendReport {
     private double declarationIndex;
     private double realIndex;
 
-    public WeekendReport(int initialParticipantsCount, int realParticipantsCount, int participantsDeclarationsCount, int initialMasterLifesCount, int realMasterLifesCount, int masterLifesDeclarationsCount, int initialTotalCount, int realTotalCount, int totalDeclarationsCount, int totalEnrollmentsCount, double declarationIndex, double realIndex) {
+    public WeekendLifeReport(int initialParticipantsCount, int realParticipantsCount, int participantsDeclarationsCount, int initialMasterLifesCount, int realMasterLifesCount, int masterLifesDeclarationsCount, int initialTotalCount, int realTotalCount, int totalDeclarationsCount, int totalEnrollmentsCount, double declarationIndex, double realIndex) {
         this.initialParticipantsCount = initialParticipantsCount;
         this.realParticipantsCount = realParticipantsCount;
         this.participantsDeclarationsCount = participantsDeclarationsCount;

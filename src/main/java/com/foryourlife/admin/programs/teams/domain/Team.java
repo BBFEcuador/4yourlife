@@ -35,7 +35,6 @@ public class Team extends AggregateRoot implements Serializable {
     @Column(name = "training_number")
     private Integer trainingNumber;
 
-
     @ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.MERGE})
     @Fetch(FetchMode.SUBSELECT)
     @BatchSize(size = 50)

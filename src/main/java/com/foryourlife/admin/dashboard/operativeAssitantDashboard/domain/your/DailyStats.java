@@ -1,4 +1,4 @@
-package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain;
+package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.your;
 
 public class DailyStats {
     int participantsFinal;

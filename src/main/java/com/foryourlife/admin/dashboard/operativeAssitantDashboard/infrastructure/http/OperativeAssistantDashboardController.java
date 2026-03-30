@@ -24,38 +24,32 @@ public class OperativeAssistantDashboardController {
         this.operativeAssistantDashboardService = operativeAssistantDashboardService;
     }
 
-    @GetMapping("/{teamId}")
-    public ResponseEntity<OperativeAssistantDashboard> getDashboardByTeamId(@PathVariable String teamId) {
-        OperativeAssistantDashboard dashboard = operativeAssistantDashboardService.getDashboardByTeamId(teamId);
-        return ResponseEntity.ok(dashboard);
-    }
-
-    @PostMapping("generate/{teamId}")
-    public ResponseEntity<byte[]> generateReport(@PathVariable String teamId) {
-
-        String timestamp = LocalDateTime.now().format(
-                DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
-        );
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ));
-
-        headers.set(
-                HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=AdminFinan_" + timestamp + ".xlsx"
-        );
-
-        byte[] excelBytes = operativeAssistantDashboardService
-                .generateReport(teamId)
-                .toByteArray();
-
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .body(excelBytes);
-    }
+//    @PostMapping("generate/{teamId}")
+//    public ResponseEntity<byte[]> generateReport(@PathVariable String teamId) {
+//
+//        String timestamp = LocalDateTime.now().format(
+//                DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+//        );
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.parseMediaType(
+//                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+//        ));
+//
+//        headers.set(
+//                HttpHeaders.CONTENT_DISPOSITION,
+//                "attachment; filename=AdminFinan_" + timestamp + ".xlsx"
+//        );
+//
+//        byte[] excelBytes = operativeAssistantDashboardService
+//                .generateReport(teamId)
+//                .toByteArray();
+//
+//        return ResponseEntity
+//                .ok()
+//                .headers(headers)
+//                .body(excelBytes);
+//    }
 
     @GetMapping("focus/{trainingId}")
     public ResponseEntity<OperativeFocusDashboard> getFocusDashboardByTrainingId(@PathVariable String trainingId) {

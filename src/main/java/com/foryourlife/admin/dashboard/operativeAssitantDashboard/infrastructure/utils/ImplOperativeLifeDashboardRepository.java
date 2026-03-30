@@ -1,9 +1,10 @@
 package com.foryourlife.admin.dashboard.operativeAssitantDashboard.infrastructure.utils;
 
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.common.WeekendReport;
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.life.OperativeLifeDashboard;
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.life.OperativeLifeDashboardRepository;
-import com.foryourlife.admin.dashboard.trainerDashboard.domain.life.TrainerLifeView;
+import com.foryourlife.admin.crm.call.domain.CallRepository;
+import com.foryourlife.admin.crm.callLogs.domain.CallLog;
+import com.foryourlife.admin.crm.callLogs.domain.CallStatus;
+import com.foryourlife.admin.crm.callLogs.domain.CallType;
+import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.life.*;
 import com.foryourlife.admin.dashboard.trainerDashboard.infrastructure.utils.TrainingDashboardUtils;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.teams.domain.Team;
@@ -14,25 +15,24 @@ import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashboardRepository {
     private final TrainingRepository trainingRepository;
-    private final ImplOperativeAssistantDashboardRepository implOperativeAssistantDashboardRepository;
     private final TrainingDashboardUtils trainingDashboardUtils;
     private final AttendanceRepository attendanceRepository;
     private final PromiseRepository promiseRepository;
     private final JPATrainingRepository jPATrainingRepository;
+    private final CallRepository callRepository;
 
-    public ImplOperativeLifeDashboardRepository(TrainingRepository trainingRepository, ImplOperativeAssistantDashboardRepository implOperativeAssistantDashboardRepository, TrainingDashboardUtils trainingDashboardUtils, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, JPATrainingRepository jPATrainingRepository) {
+    public ImplOperativeLifeDashboardRepository(TrainingRepository trainingRepository, TrainingDashboardUtils trainingDashboardUtils, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, JPATrainingRepository jPATrainingRepository, CallRepository callRepository) {
         this.trainingRepository = trainingRepository;
-        this.implOperativeAssistantDashboardRepository = implOperativeAssistantDashboardRepository;
         this.trainingDashboardUtils = trainingDashboardUtils;
         this.attendanceRepository = attendanceRepository;
         this.promiseRepository = promiseRepository;
         this.jPATrainingRepository = jPATrainingRepository;
+        this.callRepository = callRepository;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
     }
 
     public OperativeLifeDashboard buildOperativeLifeDashboard(Training training) {
-        var callInfoList = implOperativeAssistantDashboardRepository.buildCallsTable(training);
+        var callInfoList = this.buildCallsTable(training);
 
         var team = training.getOriginalTeam();
 
@@ -70,12 +70,13 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
         return new OperativeLifeDashboard(
                 training.getName(),
                 trainerName,
+                training.getCourseLevelDisplay(),
                 weekendReport,
                 callInfoList
         );
     }
 
-    public WeekendReport BuildWeekendReport(Training training, Team team) {
+    public WeekendLifeReport BuildWeekendReport(Training training, Team team) {
         var attendances = attendanceRepository.findAttendanceByTraining(training.getId());
         var teamT = training.getOriginalTeam() != null ? training.getOriginalTeam() : team;
         int participantDeclarations = 0, masterLifesDeclarations = 0, enrolmentsDeclarations;
@@ -110,7 +111,7 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
 
         double declarationIndex = (double) (participantAttendances + masterLifeAttendances) / totalDeclarations * 100;
 
-        return new WeekendReport(
+        return new WeekendLifeReport(
                 teamT.getUsers().size(),
                 (int) participantAttendances,
                 participantDeclarations,
@@ -124,5 +125,106 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
                 declarationIndex,
                 0 // TODO: 3/19/2026 calcular realIndex
         );
+    }
+
+    public List<CallTypeStats> buildCallsTable(Training training) {
+        Map<CallType, Map<CallStatus, CallsInfo>> callsByType = new HashMap<>();
+
+        for (CallType type : CallType.values()) {
+
+            Map<CallStatus, CallsInfo> statusMap = new HashMap<>();
+
+            for (CallStatus status : CallStatus.values()) {
+                CallsInfo info = new CallsInfo();
+                info.setStatus(status);
+                info.setTotalCalls(0);
+                statusMap.put(status, info);
+            }
+
+            callsByType.put(type, statusMap);
+        }
+
+        callRepository.findAllByTrainingId(training.getId())
+                .forEach(call -> {
+
+                    if (call.getCallLogs() == null || call.getCallLogs().isEmpty()) {
+                        CallsInfo info = callsByType
+                                .get(CallType.LOGISTIC)
+                                .get(CallStatus.NO_CALLED);
+
+                        info.setTotalCalls(info.getTotalCalls() + 1);
+                        return;
+                    }
+
+                    CallLog lastCallLog = call.getCallLogs().stream()
+                            .filter(Objects::nonNull)
+                            .max(Comparator.comparing(CallLog::getDate))
+                            .orElse(null);
+
+                    if (lastCallLog == null) {
+                        CallsInfo info = callsByType
+                                .get(CallType.LOGISTIC)
+                                .get(CallStatus.NO_CALLED);
+
+                        info.setTotalCalls(info.getTotalCalls() + 1);
+                        return;
+                    }
+
+                    CallType type = lastCallLog.getType();
+                    CallStatus status = lastCallLog.getStatus();
+
+                    CallsInfo info = callsByType
+                            .get(type)
+                            .get(status);
+
+                    info.setTotalCalls(info.getTotalCalls() + 1);
+                });
+
+        List<CallTypeStats> finalList = new ArrayList<>();
+
+        for (CallType type : callsByType.keySet()) {
+
+            Collection<CallsInfo> infos = callsByType.get(type).values();
+
+            int totalCalls = infos.stream()
+                    .mapToInt(CallsInfo::getTotalCalls)
+                    .sum();
+
+            int done = callsByType.get(type)
+                    .get(CallStatus.DONE)
+                    .getTotalCalls();
+
+            int anotherCampus = callsByType.get(type)
+                    .get(CallStatus.ANOTHER_CAMPUS)
+                    .getTotalCalls();
+
+            int notInterested = callsByType.get(type)
+                    .get(CallStatus.NOT_INTERESTED)
+                    .getTotalCalls();
+
+            int nextDate = callsByType.get(type)
+                    .get(CallStatus.NEXT_DATE)
+                    .getTotalCalls();
+
+            CallTypeStats stats = new CallTypeStats();
+            stats.setCallType(type);
+            stats.setStatuses(new ArrayList<>(infos));
+
+            stats.setCuadre(stats.getStatuses().size() - totalCalls);
+
+            double effectiveness = ((double) (done + anotherCampus) / totalCalls) ;
+
+            stats.setEffectivenessPercentage(effectiveness);
+
+            double projectedCalls = totalCalls == 0
+                    ? 0
+                    : ((double) (totalCalls - notInterested - nextDate) / totalCalls);
+
+            stats.setProjectedCallsPercentage(projectedCalls);
+
+            finalList.add(stats);
+        }
+
+        return finalList;
     }
 }

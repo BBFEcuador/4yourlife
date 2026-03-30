@@ -57,8 +57,7 @@ public class TrainingDashboardUtils {
                     String invitationInfo = null;
 
                     if (participant != null && !participant.getUser().getInvitations().isEmpty()) {
-                        invitationInfo = participant.getUser().getInvitations().getFirst().getEnrolled().getTrainingName();
-
+                        invitationInfo = participant.getOriginalTraining();
                     }
 
                     return new UserAttendance(

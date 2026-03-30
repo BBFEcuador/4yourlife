@@ -2,9 +2,6 @@ package com.foryourlife.admin.dashboard.financialAdministrator.infrastructure.pe
 
 import com.foryourlife.admin.dashboard.financialAdministrator.domain.FinancialAdministratorDashboard;
 import com.foryourlife.admin.dashboard.financialAdministrator.domain.FinancialAdministratorDashboardRepository;
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.WeeklyPaymentStats;
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.infrastructure.utils.ImplOperativeAssistantDashboardRepository;
-import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.PaymentMethodSummary;
@@ -25,14 +22,10 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ImplFinancialAdministratorDashboard implements FinancialAdministratorDashboardRepository {
     private final PaymentRepository paymentRepository;
     private final TrainingRepository trainingRepository;
-    private final ImplOperativeAssistantDashboardRepository operativeAssistantDashboardRepository;
-    private final TeamRepository teamRepository;
 
-    public ImplFinancialAdministratorDashboard(PaymentRepository paymentRepository, TrainingRepository trainingRepository, ImplOperativeAssistantDashboardRepository operativeAssistantDashboardRepository, TeamRepository teamRepository) {
+    public ImplFinancialAdministratorDashboard(PaymentRepository paymentRepository, TrainingRepository trainingRepository) {
         this.paymentRepository = paymentRepository;
         this.trainingRepository = trainingRepository;
-        this.operativeAssistantDashboardRepository = operativeAssistantDashboardRepository;
-        this.teamRepository = teamRepository;
     }
 
     @Override

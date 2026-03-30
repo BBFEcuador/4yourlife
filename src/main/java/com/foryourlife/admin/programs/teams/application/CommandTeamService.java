@@ -90,7 +90,6 @@ public class CommandTeamService {
     @Transactional
     public void saveFocusTeam(SaveFocusTeamsRequest request) {
         var training = queryTrainingService.getTrainingById(request.training);
-//        if( training)
         var trainer = trainerQueryService.findTrainerById(request.trainer).orElseThrow();
         var users = request.users.stream().map(participant -> {
             var p = _participantRepository.findById(participant.getId()).orElseThrow();

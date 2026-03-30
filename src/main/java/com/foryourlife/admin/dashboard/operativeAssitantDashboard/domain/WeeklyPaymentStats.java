@@ -1,5 +1,7 @@
 package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain;
 
+import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.your.DailyStats;
+
 import java.time.DayOfWeek;
 import java.util.Map;
 

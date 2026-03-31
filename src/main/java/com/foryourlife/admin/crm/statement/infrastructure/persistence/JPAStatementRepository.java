@@ -3,6 +3,7 @@ package com.foryourlife.admin.crm.statement.infrastructure.persistence;
 import com.foryourlife.admin.crm.statement.domain.Statement;
 import com.foryourlife.admin.crm.statement.domain.StatementRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,5 +46,10 @@ public class JPAStatementRepository implements StatementRepository {
     @Override
     public void saveAll(List<Statement> statements) {
         repository.saveAll(statements);
+    }
+
+    @Override
+    public Optional<Statement> findByParticipantAndCourseLevel(String participantId, CourseLevel courseLevel) {
+        return repository.findByParticipant_IdAndCourseLevel(participantId, courseLevel);
     }
 }

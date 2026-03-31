@@ -1,6 +1,8 @@
 package com.foryourlife.admin.sales.payments.payment.application;
 
 import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
+import com.foryourlife.admin.crm.statement.domain.StatementRepository;
+import com.foryourlife.admin.crm.statement.domain.StatementStatusEnum;
 import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
@@ -62,8 +64,9 @@ public class CommandPaymentService {
     private final ParticipantRepository participantRepository;
     private final ParticipantLevelService participantLevelRepository;
     private final TrainingRepository trainingRepository;
+    private final StatementRepository statementRepository;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, TrainingRepository trainingRepository) {
+    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, TrainingRepository trainingRepository, StatementRepository statementRepository) {
         this._paymentRepository = _paymentRepository;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
@@ -80,6 +83,7 @@ public class CommandPaymentService {
         this.participantRepository = participantRepository;
         this.participantLevelRepository = participantLevelRepository;
         this.trainingRepository = trainingRepository;
+        this.statementRepository = statementRepository;
     }
 
     @Transactional
@@ -100,18 +104,30 @@ public class CommandPaymentService {
 
         var total = BigDecimal.valueOf(paymentReq.paymentsHistory.stream().mapToDouble(PaymentHistory::getAmount).sum());
 
+
+        List<Product> products = paymentReq.products.stream().map(productId -> {
+            return _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
+        }).collect(Collectors.toList());
+
+
         if (total.compareTo(paymentReq.total) > 0) {
             throw new BaseException("El pago no puede superar el total de la compra", List.of(""));
 
         } else if (total.equals(paymentReq.total)) {
             paymentReq.status = PaymentStatus.COMPLETED;
+
+            products.forEach(product -> {
+                product.getPrograms().forEach(program -> {
+                    statementRepository.findByParticipantAndCourseLevel(participant.getId(), program.getCourseLevel()).ifPresent(statement ->
+                            statement.setStatus(StatementStatusEnum.CONFIRMED)
+                    );
+                });
+            });
         }
 
-        List<Product> products = paymentReq.products.stream().map(productId -> {
-            return _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
-        }).collect(Collectors.toList());
         EnumSet<CourseLevel> activeLevels = EnumSet.noneOf(CourseLevel.class);
         var modules = participant.getModules();
+
         if (modules != null) {
             if (Boolean.TRUE.equals(modules.getHasFocus())) activeLevels.add(CourseLevel.FOCUS);
             if (Boolean.TRUE.equals(modules.getHasYour())) activeLevels.add(CourseLevel.YOUR);
@@ -200,7 +216,8 @@ public class CommandPaymentService {
     }
 
     @Transactional
-    public Invoice createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment payment, List<PaymentHistory> paymentHistories) {
+    public Invoice createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment
+            payment, List<PaymentHistory> paymentHistories) {
         try {
             String invoiceNumber = getNextInvoiceNumber(cashDrawer);
             invoice.setInvoiceNumber(invoiceNumber);
@@ -271,7 +288,8 @@ public class CommandPaymentService {
         return value.replaceAll("[^\\p{L}\\p{N}.,\\s]", "");
     }
 
-    private List<InvoiceContificoJson.Cobros> buildCobros(List<PaymentHistory> paymentHistories, String formattedDate) {
+    private List<InvoiceContificoJson.Cobros> buildCobros(List<PaymentHistory> paymentHistories, String
+            formattedDate) {
         Set<String> unique = new HashSet<>();
         List<InvoiceContificoJson.Cobros> result = new ArrayList<>();
 
@@ -367,10 +385,6 @@ public class CommandPaymentService {
             );
         }
 
-        if (BigDecimal.valueOf(newTotal).compareTo(payment.getTotal()) == 0 && payment.getStatus() != PaymentStatus.COMPLETED) {
-            payment.setStatus(PaymentStatus.COMPLETED);
-        }
-
         boolean duplicateExists = payment.getPaymentshistory().stream()
                 .anyMatch(h -> h.getTransactionId().equals(paymentHistory.getTransactionId()));
 
@@ -379,6 +393,17 @@ public class CommandPaymentService {
                     "El pago con el código de transacción: " + paymentHistory.getTransactionId() + " ya existe",
                     List.of("")
             );
+        }
+
+        if (BigDecimal.valueOf(newTotal).compareTo(payment.getTotal()) == 0 && payment.getStatus() != PaymentStatus.COMPLETED) {
+            payment.setStatus(PaymentStatus.COMPLETED);
+            payment.getProducts().forEach(product -> {
+                product.getPrograms().forEach(program -> {
+                    statementRepository.findByParticipantAndCourseLevel(payment.getParticipant().getId(), program.getCourseLevel()).ifPresent(statement ->
+                            statement.setStatus(StatementStatusEnum.CONFIRMED)
+                    );
+                });
+            });
         }
 
         var originalInvoice = queryInvoiceService.getByPaymentId(paymentId);

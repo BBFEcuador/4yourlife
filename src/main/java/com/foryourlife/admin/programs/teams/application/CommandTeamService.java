@@ -2,6 +2,9 @@ package com.foryourlife.admin.programs.teams.application;
 
 import com.foryourlife.admin.crm.call.domain.Call;
 import com.foryourlife.admin.crm.call.domain.CallRepository;
+import com.foryourlife.admin.crm.statement.application.StatementCommandService;
+import com.foryourlife.admin.crm.statement.domain.Statement;
+import com.foryourlife.admin.crm.statement.domain.StatementStatusEnum;
 import com.foryourlife.admin.programs.attendance.application.CommandAttendanceService;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.FylStage;
@@ -62,8 +65,9 @@ public class CommandTeamService {
     private final ParticipantLevelRepository participantLevelRepository;
     private final TeamBadgePdfService teamBadgePdfService;
     private final CommandAttendanceService commandAttendanceService;
+    private final StatementCommandService statementCommandService;
 
-    public CommandTeamService(AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, TrainingRepository trainingRepository, TeamRepository _teamRepository, EventBus bus, PromiseRepository promiseRepository, ParticipantRepository _participantRepository, MasterLifeRepository masterLifeRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, ParticipantLevelRepository participantLevelRepository, TeamBadgePdfService teamBadgePdfService, CommandAttendanceService commandAttendanceService) {
+    public CommandTeamService(AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, TrainingRepository trainingRepository, TeamRepository _teamRepository, EventBus bus, PromiseRepository promiseRepository, ParticipantRepository _participantRepository, MasterLifeRepository masterLifeRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, ParticipantLevelRepository participantLevelRepository, TeamBadgePdfService teamBadgePdfService, CommandAttendanceService commandAttendanceService, StatementCommandService statementCommandService) {
         this.attendanceRepository = attendanceRepository;
         this.callRepository = callRepository;
         this.trainingRepository = trainingRepository;
@@ -80,6 +84,7 @@ public class CommandTeamService {
         this.participantLevelRepository = participantLevelRepository;
         this.teamBadgePdfService = teamBadgePdfService;
         this.commandAttendanceService = commandAttendanceService;
+        this.statementCommandService = statementCommandService;
     }
 
     public void save(Team team) {
@@ -416,6 +421,19 @@ public class CommandTeamService {
                                 team.getTraining()
                         )
                 );
+                if (team.getTraining().getCourseLevel().equals(CourseLevel.FOCUS) || team.getTraining().getCourseLevel().equals(CourseLevel.YOUR)) {
+                    ;
+                    new Statement(
+                            UUID.randomUUID().toString(),
+                            team.getTraining(),
+                            participant,
+                            StatementStatusEnum.EMPTY,
+                            team.getTraining().getCourseLevel(),
+                            null
+                    );
+
+//                    statementCommandService.save(statements);
+                }
                 return participant;
             }).toList();
             team.getUsers().addAll(listParticipants);

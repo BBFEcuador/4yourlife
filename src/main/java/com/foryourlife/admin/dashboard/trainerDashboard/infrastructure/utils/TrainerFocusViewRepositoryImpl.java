@@ -169,18 +169,16 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
 
         if (organizationChart.isEmpty()) return List.of();
 
-        List<ChartNode> allNodes = flattenTree(organizationChart.get().getNodes());
 
-        List<ChartNode> staffNodes = allNodes.stream()
+        List<ChartNode> staffNodes = organizationChart.get().getNodes().stream()
                 .filter(n -> n.getLevel() == UserType.STAFF)
                 .toList();
 
-        List<ChartNode> participantNodes = allNodes.stream()
+        List<ChartNode> participantNodes = organizationChart.get().getNodes().stream()
                 .filter(n -> n.getLevel() == UserType.PARTICIPANT)
                 .toList();
 
 
-        // staff -> participants
         Map<String, List<String>> staffToParticipants = participantNodes.stream()
                 .collect(Collectors.groupingBy(
                         ChartNode::getParentNodeId,
@@ -188,18 +186,14 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                 ));
 
 
-        // obtener todos los pagos
         List<Payment> payments = paymentRepository.findAllByParticipantIn(participants.values());
 
-        // pagos por participante
         Map<String, List<Payment>> paymentsByParticipantId = payments.stream()
                 .collect(Collectors.groupingBy(
                         p -> p.getParticipant().getUser().getId()
                 ));
 
-
         List<PaymentFocusDashboard> dashboards = new ArrayList<>();
-
 
         for (ChartNode staffNode : staffNodes) {
 
@@ -213,15 +207,12 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                             .stream())
                     .toList();
 
-
             // pagos hasta domingo
             List<Payment> sundayPayments = allPayments.stream()
                     .filter(p -> !p.getCreatedDate().toLocalDate().isAfter(sunday))
                     .toList();
 
-
             // ---------- DOMINGO ----------
-
             int yourSunday = (int) sundayPayments.stream()
                     .filter(p ->
                             p.getProducts() != null &&
@@ -252,9 +243,6 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
 
             int yourPlusLifeSunday = yourSunday + lifeSunday;
 
-            int totalSunday = sundayPayments.size();
-
-
             int yourFinal = (int) allPayments.stream()
                     .filter(p ->
                             p.getProducts() != null &&
@@ -281,8 +269,6 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
 
             int yourPlusLifeFinal = yourFinal + lifeFinal;
 
-            int totalFinal = allPayments.size();
-
             int totalFocus = (int) attendances.stream()
                     .filter(a -> {
                         Participant p = participants.get(a.getUser().getId());
@@ -290,21 +276,21 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                     })
                     .count();
 
-            double passPercentageSunday = (double) totalSunday / totalFocus;
+            double passPercentageSunday = (double) yourPlusLifeSunday / totalFocus;
 
-            double passPercentageTotal = (double) totalFinal / totalFocus;
+            double passPercentageTotal = (double) yourPlusLifeFinal / totalFocus;
 
 
             dashboards.add(
                     new PaymentFocusDashboard(
                             staffNode.getMembers().getName(),
                             yourSunday,
+                            lifeSunday,
                             yourPlusLifeSunday,
-                            totalSunday,
                             passPercentageSunday,
                             yourFinal,
+                            lifeFinal,
                             yourPlusLifeFinal,
-                            totalFinal,
                             passPercentageTotal
                     )
             );

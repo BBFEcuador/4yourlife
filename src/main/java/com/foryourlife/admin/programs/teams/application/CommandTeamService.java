@@ -32,7 +32,10 @@ import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.events.TeamCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.shared.domain.user.User;
+import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
+import com.foryourlife.visionary.domain.Visionary;
 import com.foryourlife.visionary.domain.VisionaryRepository;
 import org.apache.commons.lang3.SerializationUtils;
 import org.hibernate.Hibernate;
@@ -43,8 +46,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Service
 public class CommandTeamService {
@@ -152,7 +157,6 @@ public class CommandTeamService {
             participantRepository.save(participant);
         });
     }
-
 
     public void update(Team team) {
         this._teamRepository.findById(team.getId())
@@ -379,159 +383,208 @@ public class CommandTeamService {
 
     @Transactional
     public void addParticipants(String teamId, AddUsersToTeamRequest request) {
-        var team = _teamRepository.findById(teamId).orElseThrow(
-                () -> new BaseException("Team not found", List.of(""))
-        );
 
-        if (request.getUserIds() != null) {
-            var listParticipants = request.getUserIds().stream().map(userId -> {
-                var participant = _participantRepository.findById(userId).orElseThrow(
-                        () -> new BaseException("Participant not found", List.of(""))
-                );
-                team.getUsers().forEach(user -> {
-                    if (user.getId().equals(userId)) {
-                        throw new BaseException("El usuario" + user.getUser().getName() + " ya se encuentra en el equipo asignado", List.of(""));
-                    }
-                });
-                if (team.getTraining().getCourseLevel().equals(CourseLevel.LIFE)) {
-                    Promise promise = new Promise(
-                            UUID.randomUUID().toString(),
-                            team.getTraining(),
-                            participant.getUser()
-                    );
-                    promise.setStartDate(team.getTraining().getEndDate().plusDays(1));
-                    promise.setEndDate(team.getTraining().getEndDate().plusDays(5));
-                    promiseRepository.save(promise);
-                }
-                attendanceRepository.save(
-                        Attendance.create(
-                                UUID.randomUUID().toString(),
-                                null,
-                                null,
-                                null,
-                                FylStage.LIFE_GRADUATE,
-                                participant.getUser(),
-                                team.getTraining()
-                        )
-                );
-                callRepository.save(
-                        new Call(
-                                UUID.randomUUID().toString(),
-                                participant.getUser(),
-                                team.getTraining()
-                        )
-                );
-                if (team.getTraining().getCourseLevel().equals(CourseLevel.FOCUS) || team.getTraining().getCourseLevel().equals(CourseLevel.YOUR)) {
-                    ;
-                    new Statement(
-                            UUID.randomUUID().toString(),
-                            team.getTraining(),
-                            participant,
-                            StatementStatusEnum.EMPTY,
-                            team.getTraining().getCourseLevel(),
-                            null
-                    );
+        var team = _teamRepository.findById(teamId)
+                .orElseThrow(() -> new BaseException("Team not found", List.of("")));
 
-//                    statementCommandService.save(statements);
-                }
-                return participant;
-            }).toList();
-            team.getUsers().addAll(listParticipants);
-        }
+        addParticipantsToTeam(team, request.getUserIds());
+        addStaffToTeam(team, request.getStaffIds());
+        addVisionaryToTeam(team, request.getVisitorIds());
+        addMasterLifeToTeam(team, request.getMasterLifeIds());
 
-        if (request.getStaffIds() != null) {
-            var listStaffs = request.getStaffIds().stream().map(staffId -> {
-                var staff = staffRepository.findById(staffId).orElseThrow(
-                        () -> new BaseException("Staff not found", List.of(""))
-                );
-                team.getStaffs().forEach(s -> {
-                    if (s.getId().equals(staffId)) {
-                        throw new BaseException("El staff " + staff.getUser().getName() + " ya se encuentra en el equipo asignado", List.of(""));
-                    }
-                });
-                return staff;
-            }).toList();
-            team.getStaffs().addAll(listStaffs);
-        }
-
-        if (request.getVisitorIds() != null) {
-            var listVisionaries = request.getVisitorIds().stream().map(visionaryId -> {
-                var visionary = visionaryRepository.findById(visionaryId).orElseThrow(
-                        () -> new BaseException("Visionary not found", List.of(""))
-                );
-                team.getVisionaries().forEach(v -> {
-                    if (v.getId().equals(visionaryId)) {
-                        throw new BaseException("El visionario " + visionary.getUser().getName() + " ya se encuentra en el equipo asignado", List.of(""));
-                    }
-                });
-                return visionary;
-            }).toList();
-            team.getVisionaries().addAll(listVisionaries);
-        }
-
-        if (request.getMasterLifeIds() != null) {
-            var listMasterLife = request.getMasterLifeIds().stream().map(masterLifeId -> {
-                var masterLife = queryMasterLifeService.findById(masterLifeId);
-                team.getMasterLife().forEach(m -> {
-                    if (m.getId().equals(masterLifeId)) {
-                        throw new BaseException("El master life " + masterLife.getUser().getName() + " ya se encuentra en el equipo asignado", List.of(""));
-                    }
-                });
-                if (team.getTraining().getCourseLevel().equals(CourseLevel.LIFE)) {
-                    attendanceRepository.save(
-                            Attendance.create(
-                                    UUID.randomUUID().toString(),
-                                    null,
-                                    null,
-                                    null,
-                                    FylStage.LIFE_1,
-                                    masterLife.getUser(),
-                                    team.getTraining()
-                            )
-                    );
-                }
-                if (team.getTraining().getCourseLevel().equals(CourseLevel.LIFE_2)) {
-                    attendanceRepository.save(
-                            Attendance.create(
-                                    UUID.randomUUID().toString(),
-                                    null,
-                                    null,
-                                    null,
-                                    FylStage.LIFE_2,
-                                    masterLife.getUser(),
-                                    team.getTraining()
-                            )
-                    );
-                }
-                if (team.getTraining().getCourseLevel().equals(CourseLevel.LIFE_3)) {
-                    attendanceRepository.save(
-                            Attendance.create(
-                                    UUID.randomUUID().toString(),
-                                    null,
-                                    null,
-                                    null,
-                                    FylStage.LIFE_3,
-                                    masterLife.getUser(),
-                                    team.getTraining()
-                            )
-                    );
-                }
-                Promise promise = new Promise(
-                        UUID.randomUUID().toString(),
-                        team.getTraining(),
-                        masterLife.getUser()
-                );
-                promise.setStartDate(team.getTraining().getEndDate().plusDays(1));
-                promise.setEndDate(team.getTraining().getEndDate().plusDays(5));
-                promiseRepository.save(promise);
-                return masterLife;
-            }).toList();
-
-            team.getMasterLife().addAll(listMasterLife);
-        }
         _teamRepository.save(team);
+
         team.record(new TeamCreated(team.getId(), team));
         bus.publish(team.pullDomainEvents());
+    }
+
+    private void addParticipantsToTeam(Team team, List<String> userIds) {
+        if (userIds == null) return;
+
+        var participants = userIds.stream().map(userId -> {
+
+            var participant = _participantRepository.findById(userId)
+                    .orElseThrow(() -> new BaseException("Participant not found", List.of("")));
+
+            validateNotInTeam(
+                    team.getUsers(),
+                    userId,
+                    Participant::getId,
+                    "usuario",
+                    participant.getUser().getName()
+            );
+
+            handleParticipantLogic(team, participant);
+
+            return participant;
+
+        }).toList();
+
+        team.getUsers().addAll(participants);
+    }
+
+    private void addStaffToTeam(Team team, List<String> staffsIds) {
+        if (staffsIds == null) return;
+
+        var staffs = staffsIds.stream().map(staffId -> {
+            var staff = staffRepository.findById(staffId)
+                    .orElseThrow(() -> new BaseException("Staff not found", List.of("")));
+
+            validateNotInTeam(
+                    team.getStaffs(),
+                    staffId,
+                    Staff::getId,
+                    "staff",
+                    staff.getUser().getName()
+            );
+
+            return staff;
+        }).toList();
+
+        team.getStaffs().addAll(staffs);
+    }
+
+    private void addVisionaryToTeam(Team team, List<String> visionaryIds) {
+        if (visionaryIds == null) return;
+        var visionaries = visionaryIds.stream().map(visionaryId -> {
+            var visionary = visionaryRepository.findById(visionaryId)
+                    .orElseThrow(() -> new BaseException("Visionary not found", List.of("")));
+
+            validateNotInTeam(
+                    team.getVisionaries(),
+                    visionaryId,
+                    Visionary::getId,
+                    "visionario",
+                    visionary.getUser().getName()
+            );
+
+            return visionary;
+        }).toList();
+
+        team.getVisionaries().addAll(visionaries);
+    }
+
+    private void addMasterLifeToTeam(Team team, List<String> ids) {
+        if (ids == null) return;
+
+        var list = ids.stream().map(id -> {
+
+            var master = queryMasterLifeService.findById(id);
+
+            validateNotInTeam(
+                    team.getMasterLife(),
+                    id,
+                    MasterLife::getId,
+                    "master life",
+                    master.getUser().getName()
+            );
+
+            handleMasterLifeAttendance(team, master);
+
+            createPromise(team.getTraining(), master.getUser());
+
+            return master;
+
+        }).toList();
+
+        team.getMasterLife().addAll(list);
+    }
+
+    private void handleParticipantLogic(Team team, Participant participant) {
+
+        var training = team.getTraining();
+        var user = participant.getUser();
+
+        if (training.getCourseLevel().equals(CourseLevel.LIFE)) {
+            createPromise(training, user);
+        }
+
+        attendanceRepository.save(
+                Attendance.create(
+                        UUID.randomUUID().toString(),
+                        null, null, null,
+                        FylStage.LIFE_GRADUATE,
+                        user,
+                        training
+                )
+        );
+
+        callRepository.save(new Call(
+                UUID.randomUUID().toString(),
+                user,
+                training
+        ));
+
+        if (training.getCourseLevel().equals(CourseLevel.FOCUS) ||
+                training.getCourseLevel().equals(CourseLevel.YOUR)) {
+
+            var statement = new Statement(
+                    UUID.randomUUID().toString(),
+                    training,
+                    participant,
+                    StatementStatusEnum.EMPTY,
+                    training.getCourseLevel(),
+                    null
+            );
+
+            statementCommandService.saveAll(List.of(statement));
+        }
+    }
+
+    private <T> void validateNotInTeam(
+            Collection<T> collection,
+            String id,
+            Function<T, String> getId,
+            String type,
+            String name
+    ) {
+        boolean exists = collection.stream()
+                .anyMatch(e -> getId.apply(e).equals(id));
+
+        if (exists) {
+            throw new BaseException(
+                    "El " + type + " " + name + " ya se encuentra en el equipo asignado",
+                    List.of("")
+            );
+        }
+    }
+
+    private void createPromise(Training training, User user) {
+        var promise = new Promise(
+                UUID.randomUUID().toString(),
+                training,
+                user
+        );
+
+        promise.setStartDate(training.getEndDate().plusDays(1));
+        promise.setEndDate(training.getEndDate().plusDays(5));
+
+        promiseRepository.save(promise);
+    }
+
+    private void handleMasterLifeAttendance(Team team, MasterLife master) {
+
+        var training = team.getTraining();
+        FylStage stage;
+
+        switch (training.getCourseLevel()) {
+            case LIFE -> stage = FylStage.LIFE_1;
+            case LIFE_2 -> stage = FylStage.LIFE_2;
+            case LIFE_3 -> stage = FylStage.LIFE_3;
+            default -> {
+                return;
+            }
+        }
+
+        attendanceRepository.save(
+                Attendance.create(
+                        UUID.randomUUID().toString(),
+                        null, null, null,
+                        stage,
+                        master.getUser(),
+                        training
+                )
+        );
     }
 
     private void assignParticipantLevelToUsers(
@@ -554,7 +607,6 @@ public class CommandTeamService {
 
         _participantRepository.saveAll(participants);
     }
-
 
     private void addOriginalTeam(Team team) {
         team.setName(team.getName());

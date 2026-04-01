@@ -8,12 +8,15 @@ import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.life.*;
 import com.foryourlife.admin.dashboard.trainerDashboard.infrastructure.utils.TrainingDashboardUtils;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.teams.domain.Team;
+import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.programs.training.infrastructure.JPATrainingRepository;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
+import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -25,17 +28,20 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
     private final PromiseRepository promiseRepository;
     private final JPATrainingRepository jPATrainingRepository;
     private final CallRepository callRepository;
+    private final TeamRepository teamRepository;
 
-    public ImplOperativeLifeDashboardRepository(TrainingRepository trainingRepository, TrainingDashboardUtils trainingDashboardUtils, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, JPATrainingRepository jPATrainingRepository, CallRepository callRepository) {
+    public ImplOperativeLifeDashboardRepository(TrainingRepository trainingRepository, TrainingDashboardUtils trainingDashboardUtils, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, JPATrainingRepository jPATrainingRepository, CallRepository callRepository, TeamRepository teamRepository) {
         this.trainingRepository = trainingRepository;
         this.trainingDashboardUtils = trainingDashboardUtils;
         this.attendanceRepository = attendanceRepository;
         this.promiseRepository = promiseRepository;
         this.jPATrainingRepository = jPATrainingRepository;
         this.callRepository = callRepository;
+        this.teamRepository = teamRepository;
     }
 
     @Override
+    @Transactional
     public List<OperativeLifeDashboard> getOperativeLifeDashboard(String trainingId) {
         var training = trainingRepository.findById(trainingId).orElseThrow(() -> new RuntimeException("Training not found"));
 
@@ -62,7 +68,12 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
     public OperativeLifeDashboard buildOperativeLifeDashboard(Training training) {
         var callInfoList = this.buildCallsTable(training);
 
-        var team = training.getOriginalTeam();
+        var team = Optional.ofNullable(training.getOriginalTeam())
+                .or(() -> teamRepository.findByTrainingId(training.getId()))
+                .orElseThrow(() -> new BaseException(
+                        "No existe equipo para el entrenamiento con id: " + training.getId(),
+                        List.of("TEAM_NOT_FOUND")
+                ));
 
         var trainerName = trainingDashboardUtils.getTrainerName(training, team);
         var weekendReport = BuildWeekendReport(training, team);
@@ -78,18 +89,17 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
 
     public WeekendLifeReport BuildWeekendReport(Training training, Team team) {
         var attendances = attendanceRepository.findAttendanceByTraining(training.getId());
-        var teamT = training.getOriginalTeam() != null ? training.getOriginalTeam() : team;
         int participantDeclarations = 0, masterLifesDeclarations = 0, enrolmentsDeclarations;
         if (training.getCourseLevel() != CourseLevel.YOUR) {
             var declarations = promiseRepository.findByTrainingId(training.getId());
 
             if (!declarations.isEmpty()) {
                 for (var declaration : declarations) {
-                    var participant = teamT.getUsers().stream().filter(user -> user.getUser().getId().equals(declaration.getUser().getId())).findFirst();
+                    var participant = team.getUsers().stream().filter(user -> user.getUser().getId().equals(declaration.getUser().getId())).findFirst();
                     if (participant.isPresent()) {
                         participantDeclarations += declaration.getThirdPromise();
                     } else {
-                        var masterLife = teamT.getMasterLife().stream().filter(ml -> ml.getUser().getId().equals(declaration.getUser().getId())).findFirst();
+                        var masterLife = team.getMasterLife().stream().filter(ml -> ml.getUser().getId().equals(declaration.getUser().getId())).findFirst();
                         if (masterLife.isPresent()) {
                             masterLifesDeclarations += declaration.getThirdPromise();
                         }
@@ -99,11 +109,11 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
         }
 
         var participantAttendances = attendances.stream()
-                .filter(attendance -> teamT.getUsers().stream()
+                .filter(attendance -> team.getUsers().stream()
                         .anyMatch(participant -> participant.getUser().getId().equals(attendance.getUser().getId()))
                 ).count();
         var masterLifeAttendances = attendances.stream()
-                .filter(attendance -> teamT.getMasterLife().stream()
+                .filter(attendance -> team.getMasterLife().stream()
                         .anyMatch(ml -> ml.getUser().getId().equals(attendance.getUser().getId()))
                 ).count();
 
@@ -112,13 +122,13 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
         double declarationIndex = (double) (participantAttendances + masterLifeAttendances) / totalDeclarations * 100;
 
         return new WeekendLifeReport(
-                teamT.getUsers().size(),
+                team.getUsers().size(),
                 (int) participantAttendances,
                 participantDeclarations,
-                teamT.getMasterLife().size(),
+                team.getMasterLife().size(),
                 (int) masterLifeAttendances,
                 masterLifesDeclarations,
-                teamT.getUsers().size() + teamT.getMasterLife().size(),
+                team.getUsers().size() + team.getMasterLife().size(),
                 (int) (participantAttendances + masterLifeAttendances),
                 totalDeclarations,
                 0,// TODO: 3/19/2026 encontrar por query totalEnrollmentsCount)

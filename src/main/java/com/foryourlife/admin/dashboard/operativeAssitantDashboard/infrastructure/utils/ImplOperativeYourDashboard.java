@@ -15,6 +15,7 @@ import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
+import com.foryourlife.admin.sales.programs.domain.Program;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -136,61 +137,88 @@ public class ImplOperativeYourDashboard implements OperativeYourDashboardReposit
         );
     }
 
-    public List<YourWeeklyPaymentStats> buildWeeklyTable(Training training, Team team, List<Payment> payments, List<Statement> statements) {
+    public List<YourWeeklyPaymentStats> buildWeeklyTable(
+            Training training,
+            Team team,
+            List<Payment> payments,
+            List<Statement> statements
+    ) {
 
-        LocalDate startFriday = training.getStartDate();
-        LocalDate nextFriday = training.getNextLevel().getStartDate();
+        LocalDate start = training.getStartDate();
+        LocalDate end = training.getNextLevel().getStartDate();
 
-        List<LocalDate> fridayBoundaries = getFridayBoundaries(startFriday, nextFriday);
+        List<YourWeeklyPaymentStats> result = new ArrayList<>();
 
         Map<LocalDate, List<Payment>> paymentsByDay = payments.stream()
                 .collect(Collectors.groupingBy(p -> p.getCreatedDate().toLocalDate()));
 
-        List<YourWeeklyPaymentStats> weeklyStats = new ArrayList<>();
+        Map<LocalDate, List<Statement>> statementsByDay = statements.stream()
+                .flatMap(statement -> {
 
-        for (int i = 0; i < fridayBoundaries.size() - 1; i++) {
+                    List<StatementStatusHistory> history =
+                            Optional.ofNullable(statement.getStatementStatusHistory())
+                                    .orElse(List.of());
 
-            LocalDate weekStart = fridayBoundaries.get(i);
-            LocalDate weekEnd = fridayBoundaries.get(i + 1);
+                    return history.stream()
+                            .filter(h -> h.getStatus() == StatementStatusEnum.AGREEMENT)
+                            .map(h -> Map.entry(h.getChangedAt().toLocalDate(), statement));
+                })
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+                ));
 
-            YourWeeklyPaymentStats weekStats = new YourWeeklyPaymentStats();
-            weekStats.setWeekNumber(i + 1);
+        LocalDate date = start;
+        int weekNumber = 1;
 
-            Map<DayOfWeek, YourDailyStats> dayStatsMap = new EnumMap<>(DayOfWeek.class);
+        YourWeeklyPaymentStats currentWeek = new YourWeeklyPaymentStats();
+        currentWeek.setWeekNumber(weekNumber);
 
-            LocalDate date = weekStart;
+        Map<DayOfWeek, YourDailyStats> dayStatsMap = new EnumMap<>(DayOfWeek.class);
 
-            Map<LocalDate, List<Statement>> statementsByDay = statements.stream()
-                    .flatMap(statement -> {
+        int dayCount = 0;
 
-                        List<StatementStatusHistory> history =
-                                Optional.ofNullable(statement.getStatementStatusHistory())
-                                        .orElse(List.of());
+        while (!date.isAfter(end)) {
 
-                        return history.stream()
-                                .filter(h -> h.getStatus() == StatementStatusEnum.AGREEMENT)
-                                .map(h -> Map.entry(h.getChangedAt().toLocalDate(), statement));
-                    })
-                    .collect(Collectors.groupingBy(Map.Entry::getKey,
-                            Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
-            while (date.isBefore(weekEnd)) {
-                List<Payment> dayPayments = paymentsByDay.getOrDefault(date, List.of());
-                LocalDate finalDate = date;
-                List<Statement> dayStatements = statementsByDay.entrySet().stream()
-                        .filter(entry -> !entry.getKey().isAfter(finalDate))
-                        .flatMap(entry -> entry.getValue().stream())
-                        .toList();
-                YourDailyStats daily = calculateDailyStats(dayPayments, dayStatements, team);
-                dayStatsMap.put(date.getDayOfWeek(), daily);
+            LocalDate currentDate = date;
 
-                date = date.plusDays(1);
+            List<Payment> dayPayments = paymentsByDay.entrySet().stream()
+                    .filter(e -> !e.getKey().isAfter(currentDate))
+                    .flatMap(e -> e.getValue().stream())
+                    .toList();
+
+            List<Statement> dayStatements = statementsByDay.entrySet().stream()
+                    .filter(e -> !e.getKey().isAfter(currentDate))
+                    .flatMap(e -> e.getValue().stream())
+                    .toList();
+
+            YourDailyStats dailyStats = calculateDailyStats(
+                    dayPayments,
+                    dayStatements,
+                    team
+            );
+
+            dayStatsMap.put(date.getDayOfWeek(), dailyStats);
+
+            dayCount++;
+
+            if (dayCount == 7 || date.equals(end)) {
+
+                currentWeek.setWeeklyPayments(dayStatsMap);
+                result.add(currentWeek);
+
+                weekNumber++;
+                currentWeek = new YourWeeklyPaymentStats();
+                currentWeek.setWeekNumber(weekNumber);
+
+                dayStatsMap = new EnumMap<>(DayOfWeek.class);
+                dayCount = 0;
             }
 
-            weekStats.setWeeklyPayments(dayStatsMap);
-            weeklyStats.add(weekStats);
+            date = date.plusDays(1);
         }
 
-        return weeklyStats;
+        return result;
     }
 
     private YourDailyStats calculateDailyStats(
@@ -198,59 +226,66 @@ public class ImplOperativeYourDashboard implements OperativeYourDashboardReposit
             List<Statement> statements,
             Team team
     ) {
+
         YourDailyStats stats = new YourDailyStats();
 
-        var finalPaymentsCount =
-                (int) payments.stream().filter(p ->
-                        p.getProducts() != null &&
-                                p.getProducts().stream().anyMatch(product ->
-                                        product.getPrograms() != null &&
-                                                product.getPrograms().stream().anyMatch(program ->
-                                                        CourseLevel.LIFE.equals(program.getCourseLevel())
-                                                )
-                                ) &&
-                                p.getStatus() == PaymentStatus.COMPLETED
-                ).count();
+        List<Payment> safePayments = Optional.ofNullable(payments).orElse(List.of());
+        List<Statement> safeStatements = Optional.ofNullable(statements).orElse(List.of());
 
-        var agreedPaymentsCount = (int) statements.stream()
-                .filter(statement -> {
+        int finalPaymentsCount = 0;
 
-                    List<StatementStatusHistory> history =
-                            Optional.ofNullable(statement.getStatementStatusHistory())
-                                    .orElse(List.of());
+        for (Payment p : safePayments) {
 
-                    return history.stream()
-                            .anyMatch(h -> h.getStatus() == StatementStatusEnum.AGREEMENT);
-                })
+            if (p == null || p.getProducts() == null) continue;
+
+            boolean hasLife = p.getProducts().stream()
+                    .filter(prod -> prod.getPrograms() != null)
+                    .flatMap(prod -> prod.getPrograms().stream())
+                    .map(Program::getCourseLevel)
+                    .anyMatch(CourseLevel.LIFE::equals);
+
+            if (p.getStatus() == PaymentStatus.COMPLETED && hasLife) {
+                finalPaymentsCount++;
+            }
+        }
+
+        int agreedPaymentsCount = (int) safeStatements.stream()
+                .filter(s -> getLastStatus(s) == StatementStatusEnum.AGREEMENT)
                 .count();
 
         stats.setAgreedPaymentsCount(agreedPaymentsCount);
+
         int finalCount = Math.max(0, finalPaymentsCount - agreedPaymentsCount);
         stats.setFinalPaymentsCount(finalCount);
-        stats.setTotalPaymentsCount(stats.getAgreedPaymentsCount() + stats.getFinalPaymentsCount());
-        int teamSize = team.getUsers() != null ? team.getUsers().size() : 0;
+
+        stats.setTotalPaymentsCount(
+                stats.getAgreedPaymentsCount() + stats.getFinalPaymentsCount()
+        );
+
+        int teamSize = Optional.ofNullable(team.getUsers()).map(List::size).orElse(0);
 
         if (teamSize == 0) {
             stats.setPassPaymentsPercentage(0);
             stats.setProjectedPaymentsPercentage(0);
         } else {
-            stats.setPassPaymentsPercentage(stats.getFinalPaymentsCount() / (double) teamSize);
+            stats.setPassPaymentsPercentage(
+                    stats.getFinalPaymentsCount() / (double) teamSize
+            );
             stats.setProjectedPaymentsPercentage(
                     (stats.getFinalPaymentsCount() + stats.getAgreedPaymentsCount()) / (double) teamSize
             );
         }
+
         return stats;
     }
 
-    private List<LocalDate> getFridayBoundaries(LocalDate start, LocalDate nextFriday) {
-        List<LocalDate> fridays = new ArrayList<>();
-        LocalDate current = start;
-
-        while (!current.isAfter(nextFriday)) {
-            fridays.add(current);
-            current = current.plusWeeks(1);
-        }
-
-        return fridays;
+    private StatementStatusEnum getLastStatus(Statement s) {
+        return Optional.ofNullable(s.getStatementStatusHistory())
+                .orElse(List.of())
+                .stream()
+                .filter(Objects::nonNull)
+                .max(Comparator.comparing(StatementStatusHistory::getChangedAt))
+                .map(StatementStatusHistory::getStatus)
+                .orElse(StatementStatusEnum.EMPTY);
     }
 }

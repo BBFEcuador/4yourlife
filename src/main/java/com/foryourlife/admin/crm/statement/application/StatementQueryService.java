@@ -134,7 +134,7 @@ public class StatementQueryService {
 
         String staffName = "Sin staff";
         if (participantNode != null) {
-            var parentNode = nodeById.get(participantNode.getParentId());
+            var parentNode = nodeById.get(participantNode.getParentNodeId());
             if (parentNode != null && parentNode.getMembers() != null) {
                 staffName = parentNode.getMembers().getName();
             }

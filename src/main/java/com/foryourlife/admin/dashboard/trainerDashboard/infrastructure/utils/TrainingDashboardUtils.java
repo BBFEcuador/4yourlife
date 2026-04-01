@@ -45,6 +45,9 @@ public class TrainingDashboardUtils {
             List<Attendance> attendances,
             Map<String, Participant> participants
     ) {
+        if (attendances == null || attendances.isEmpty()) {
+            return new GeneralAttendance(0, 0, 0, 0, 0.0, List.of());
+        }
         List<UserAttendance> userAttendances = attendances.stream()
                 .filter(a -> a.getUser() != null)
                 .map(a -> {

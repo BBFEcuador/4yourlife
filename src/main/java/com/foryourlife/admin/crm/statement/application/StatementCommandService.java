@@ -30,7 +30,7 @@ public class StatementCommandService {
 
         var participants = statements.stream()
                 .filter(statement -> statement.getParticipant() != null)
-                .collect(java.util.stream.Collectors.toMap(Statement::getParticipant, Statement::getParticipant, (existing, replacement) -> existing));
+                .collect(Collectors.toMap(Statement::getParticipant, Statement::getParticipant, (existing, replacement) -> existing));
 
         List<Payment> payments = paymentRepository.findAllByParticipantIn(participants.values());
 
@@ -49,14 +49,24 @@ public class StatementCommandService {
             List<Payment> participantPayments = paymentsByParticipantId
                     .getOrDefault(participantId, List.of());
 
-            // aquí ya trabajas con los pagos del participante
-
             boolean isConfirmed = participantPayments.stream()
                     .filter(p -> PaymentStatus.COMPLETED.equals(p.getStatus()))
                     .anyMatch(p -> hasMatchingCourseLevel(p, statement));
 
+            statement.setStatementStatusHistory(List.of(
+                    new StatementStatusHistory(
+                            LocalDateTime.now(),
+                            StatementStatusEnum.EMPTY
+                    )
+            ));
             if (isConfirmed) {
                 statement.setStatus(StatementStatusEnum.CONFIRMED);
+                statement.setStatementStatusHistory(List.of(
+                        new StatementStatusHistory(
+                                LocalDateTime.now(),
+                                StatementStatusEnum.CONFIRMED
+                        )
+                ));
             }
 
 

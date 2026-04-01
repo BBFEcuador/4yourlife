@@ -156,7 +156,7 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
 
         for (Payment p : payments) {
 
-            if (p == null || p.getProducts() == null) continue;
+            if (p == null || p.getProducts() == null || p.getCreatedDate().toLocalDate().isBefore(training.getNextLevel().getEndDate()) ) continue;
 
             Set<CourseLevel> levels = p.getProducts().stream()
                     .filter(prod -> prod.getPrograms() != null)
@@ -197,70 +197,90 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
         );
     }
 
-    public List<FocusWeeklyPaymentStats> buildFocusWeeklyPaymentStats(Training training, Team team, List<Statement> statements, List<Payment> payments) {
-        LocalDate startFriday = training.getStartDate();
-        LocalDate nextFriday = training.getNextLevel().getStartDate();
+    private List<FocusWeeklyPaymentStats> buildFocusWeeklyPaymentStats(
+            Training training,
+            Team team,
+            List<Statement> statements,
+            List<Payment> payments
+    ) {
+        LocalDate start = training.getEndDate().plusDays(1);
+        LocalDate end = training.getNextLevel().getEndDate();
 
-        List<LocalDate> fridayBoundaries = getFridayBoundaries(startFriday, nextFriday);
+        List<FocusWeeklyPaymentStats> result = new ArrayList<>();
 
         Map<LocalDate, List<Payment>> paymentsByDay = payments.stream()
                 .collect(Collectors.groupingBy(p -> p.getCreatedDate().toLocalDate()));
 
-        List<FocusWeeklyPaymentStats> weeklyStats = new ArrayList<>();
+        Map<LocalDate, List<Statement>> statementsByDay = statements.stream()
+                .flatMap(statement -> {
+                    List<StatementStatusHistory> history =
+                            Optional.ofNullable(statement.getStatementStatusHistory())
+                                    .orElse(List.of());
 
-        for (int i = 0; i < fridayBoundaries.size() - 1; i++) {
+                    return history.stream()
+                            .filter(h -> h.getStatus() == StatementStatusEnum.AGREEMENT)
+                            .map(h -> Map.entry(h.getChangedAt().toLocalDate(), statement));
+                })
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+                ));
 
-            LocalDate weekStart = fridayBoundaries.get(i);
-            LocalDate weekEnd = fridayBoundaries.get(i + 1);
+        LocalDate date = start;
+        int weekNumber = 1;
 
-            FocusWeeklyPaymentStats weekStats = new FocusWeeklyPaymentStats();
-            weekStats.setWeekNumber(i + 1);
+        FocusWeeklyPaymentStats currentWeek = new FocusWeeklyPaymentStats();
+        currentWeek.setWeekNumber(weekNumber);
 
-            Map<DayOfWeek, FocusDailyStats> dayStatsMap = new EnumMap<>(DayOfWeek.class);
+        Map<DayOfWeek, FocusDailyStats> dayStatsMap = new EnumMap<>(DayOfWeek.class);
 
-            LocalDate date = weekStart;
+        int dayCount = 0;
 
-            Map<LocalDate, List<Statement>> statementsByDay = statements.stream()
-                    .flatMap(statement -> {
+        while (!date.isAfter(end)) {
 
-                        List<StatementStatusHistory> history =
-                                Optional.ofNullable(statement.getStatementStatusHistory())
-                                        .orElse(List.of());
+            LocalDate currentDate = date;
 
-                        return history.stream()
-                                .filter(h -> h.getStatus() == StatementStatusEnum.AGREEMENT)
-                                .map(h -> Map.entry(h.getChangedAt().toLocalDate(), statement));
-                    })
-                    .collect(Collectors.groupingBy(Map.Entry::getKey,
-                            Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
-            while (date.isBefore(weekEnd)) {
-                List<Payment> dayPayments = paymentsByDay.getOrDefault(date, List.of());
-                LocalDate finalDate = date;
-                List<Statement> dayStatements = statementsByDay.entrySet().stream()
-                        .filter(entry -> !entry.getKey().isAfter(finalDate))
-                        .flatMap(entry -> entry.getValue().stream())
-                        .toList();
-                FocusDailyStats daily = calculateDailyStats(
-                        dayPayments,
-                        dayStatements.size(),
-                        dayStatements,
-                        team);
+            List<Payment> dayPayments = paymentsByDay.entrySet().stream()
+                    .filter(e -> !e.getKey().isAfter(currentDate))
+                    .flatMap(e -> e.getValue().stream())
+                    .toList();
 
-                dayStatsMap.put(date.getDayOfWeek(), daily);
+            List<Statement> dayStatements = statementsByDay.entrySet().stream()
+                    .filter(e -> !e.getKey().isAfter(currentDate))
+                    .flatMap(e -> e.getValue().stream())
+                    .toList();
 
-                date = date.plusDays(1);
+            FocusDailyStats dailyStats = calculateDailyStats(
+                    dayPayments,
+                    dayStatements,
+                    team
+            );
+
+            dayStatsMap.put(date.getDayOfWeek(), dailyStats);
+
+            dayCount++;
+
+            if (dayCount == 7 || date.equals(end)) {
+
+                currentWeek.setFocusWeeklyPayments(dayStatsMap);
+                result.add(currentWeek);
+
+                weekNumber++;
+                currentWeek = new FocusWeeklyPaymentStats();
+                currentWeek.setWeekNumber(weekNumber);
+
+                dayStatsMap = new EnumMap<>(DayOfWeek.class);
+                dayCount = 0;
             }
 
-            weekStats.setFocusWeeklyPayments(dayStatsMap);
-            weeklyStats.add(weekStats);
+            date = date.plusDays(1);
         }
 
-        return weeklyStats;
+        return result;
     }
 
     private FocusDailyStats calculateDailyStats(
             List<Payment> payments,
-            long agreedPaymentsCount,
             List<Statement> statements,
             Team team
     ) {
@@ -287,11 +307,11 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
 
             if (p.getStatus() == PaymentStatus.COMPLETED) {
 
-                if (levels.contains(CourseLevel.YOUR) && levels.size() == 1) {
+                if (levels.contains(CourseLevel.YOUR) && !levels.contains(CourseLevel.LIFE)) {
                     yourPayments++;
                 }
 
-                if (levels.contains(CourseLevel.YOUR) && levels.contains(CourseLevel.LIFE)) {
+                if (levels.contains(CourseLevel.LIFE)) {
                     yourPlusLife++;
                 }
             }
@@ -302,24 +322,26 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
         }
 
         int possible = (int) safeStatements.stream()
-                .filter(s -> Optional.ofNullable(s.getStatementStatusHistory())
-                        .orElse(List.of())
-                        .stream()
-                        .anyMatch(h -> h.getStatus() == StatementStatusEnum.POSSIBILITY))
+                .filter(s -> getLastStatus(s) == StatementStatusEnum.POSSIBILITY)
+                .count();
+
+        int agreed = (int) safeStatements.stream()
+                .filter(s -> getLastStatus(s) == StatementStatusEnum.AGREEMENT)
                 .count();
 
         int notInterested = (int) safeStatements.stream()
-                .filter(s -> Optional.ofNullable(s.getStatementStatusHistory())
-                        .orElse(List.of())
-                        .stream()
-                        .anyMatch(h -> h.getStatus() == StatementStatusEnum.NO_INTERESTED))
+                .filter(s -> {
+                    var status = getLastStatus(s);
+                    return status == StatementStatusEnum.NO_INTERESTED
+                            || status == StatementStatusEnum.EMPTY;
+                })
                 .count();
 
         stats.setYourPaymentsCount(yourPayments);
         stats.setYourPlusLifePaymentsCount(yourPlusLife);
         stats.setTotalPaymentsCount(yourPayments + yourPlusLife);
         stats.setPendingPaymentsCount(pending);
-        stats.setAgreedPaymentsCount((int) agreedPaymentsCount);
+        stats.setAgreedPaymentsCount(agreed);
         stats.setPossiblePaymentsCount(possible);
         stats.setNotInterestPaymentsCount(notInterested);
 
@@ -338,15 +360,13 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
         return stats;
     }
 
-    private List<LocalDate> getFridayBoundaries(LocalDate start, LocalDate nextFriday) {
-        List<LocalDate> fridays = new ArrayList<>();
-        LocalDate current = start;
-
-        while (!current.isAfter(nextFriday)) {
-            fridays.add(current);
-            current = current.plusWeeks(1);
-        }
-
-        return fridays;
+    private StatementStatusEnum getLastStatus(Statement s) {
+        return Optional.ofNullable(s.getStatementStatusHistory())
+                .orElse(List.of())
+                .stream()
+                .filter(Objects::nonNull)
+                .max(Comparator.comparing(StatementStatusHistory::getChangedAt))
+                .map(StatementStatusHistory::getStatus)
+                .orElse(StatementStatusEnum.EMPTY);
     }
 }

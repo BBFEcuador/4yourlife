@@ -15,7 +15,6 @@ import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.promises.application.PromiseCommandService;
-import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
@@ -109,7 +108,6 @@ public class CommandAttendanceService {
                 ))
                 .toList();
 
-        // 🔹 2. Calls users
         List<Call> calls = team.getUsers().stream()
                 .map(user -> new Call(
                         UUID.randomUUID().toString(),
@@ -118,7 +116,6 @@ public class CommandAttendanceService {
                 ))
                 .toList();
 
-        // 🔹 3. Attendances masterLife (solo si aplica)
         List<Attendance> masterAttendances = team.getMasterLife().stream()
                 .filter(m -> isLifeLevel(training.getCourseLevel()))
                 .map(m -> Attendance.create(

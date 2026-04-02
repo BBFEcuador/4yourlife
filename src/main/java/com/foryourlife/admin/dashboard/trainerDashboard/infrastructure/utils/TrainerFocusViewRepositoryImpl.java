@@ -276,9 +276,13 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                     })
                     .count();
 
-            double passPercentageSunday = (double) yourPlusLifeSunday / totalFocus;
+            double passPercentageSunday = totalFocus > 0
+                    ? (double) yourPlusLifeSunday / totalFocus
+                    : 0.0;
 
-            double passPercentageTotal = (double) yourPlusLifeFinal / totalFocus;
+            double passPercentageTotal = totalFocus > 0
+                    ? (double) yourPlusLifeFinal / totalFocus
+                    : 0.0;
 
 
             dashboards.add(

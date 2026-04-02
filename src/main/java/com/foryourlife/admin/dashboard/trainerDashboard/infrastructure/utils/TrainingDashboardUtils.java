@@ -305,8 +305,6 @@ public class TrainingDashboardUtils {
                                     p.getStatus() == PaymentStatus.COMPLETED)
                     .count();
 
-            int finalTotal = yourFinal + lifeFinal;
-
             boolean hasPreviousLifePayment = payments.stream()
                     .anyMatch(p ->
                             p.getTraining() != null &&
@@ -326,11 +324,13 @@ public class TrainingDashboardUtils {
             }
         }
 
-        var attendanceFromPreviousTrainingPercentage = attendances.isEmpty() ? 0 :
-                (double) attendeesFromPreviousTraining / attendances.size() * 100.0;
+        double attendanceFromPreviousTrainingPercentage = !attendances.isEmpty()
+                ? ((double) attendeesFromPreviousTraining / attendances.size()) * 100.0
+                : 0.0;
 
-        var finalPaymentsFromPreviousTrainingPercentage = attendances.isEmpty() ? 0 :
-                (double) finalPaymentsFromPreviousTraining / attendances.size() * 100.0;
+        double finalPaymentsFromPreviousTrainingPercentage = !attendances.isEmpty()
+                ? ((double) finalPaymentsFromPreviousTraining / attendances.size()) * 100.0
+                : 0.0;
 
         return new PreviousTrainingStats(
                 attendeesFromPreviousTraining,

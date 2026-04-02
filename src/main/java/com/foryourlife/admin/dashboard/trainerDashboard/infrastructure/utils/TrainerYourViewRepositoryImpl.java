@@ -175,7 +175,10 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
                     })
                     .count();
 
-            double passSaturday = (double) accumulatedSaturday / totalYour;
+            double passSaturday = Optional.of(totalYour)
+                    .filter(t -> t > 0)
+                    .map(t -> (double) accumulatedSaturday / t)
+                    .orElse(0.0);
 
             // -------- DOMINGO --------
             int sundayPayments = (int) allPayments.stream()
@@ -184,7 +187,9 @@ public class TrainerYourViewRepositoryImpl implements TrainerYourViewRepository 
 
             int accumulatedSunday = accumulatedSaturday + sundayPayments;
 
-            double passSunday = (double) accumulatedSunday / totalYour;
+            double passSunday = totalYour > 0
+                    ? ((double) accumulatedSunday / totalYour) * 100
+                    : 0.0;
 
             dashboards.add(
                     new PaymentYourDashboard(

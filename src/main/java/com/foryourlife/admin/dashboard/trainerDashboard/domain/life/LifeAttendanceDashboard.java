@@ -1,99 +1,95 @@
 package com.foryourlife.admin.dashboard.trainerDashboard.domain.life;
 
 public class LifeAttendanceDashboard {
-    private long fridayCount;
-    private long saturdayCount;
-    private long sundayCount;
-    private long totalParticipants;
-    private long masterFridayCount;
-    private long masterSaturdayCount;
-    private long masterSundayCount;
-    private long totalMasterParticipants;
-    private long deserterParticipantsCount;
+    private int participantAttendancesCount;
+    private int masterAttendancesCount;
+    private int totalAttendancesCount;
+    private int totalParticipants;
+    private int totalMasterParticipants;
+    private int totalTotalUsers;
+    private int deserterParticipantsCount;
     private double deserterParticipantsPercentage;
+    private int participantEnrolledCount;
+    private int masterEnrolledCount;
+    private int totalEnrollmentCount;
+    private double enrollmentIndex;
+    private double realEnrollmentIndex;
+    private int totalUsersEnrollersCount;
+    private int totalFocusAttendancesCount;
+    private double enrollmentEffectiveness;
 
-    public LifeAttendanceDashboard(long fridayCount, long saturdayCount, long sundayCount, long totalParticipants, long masterFridayCount, long masterSaturdayCount, long masterSundayCount, long totalMasterParticipants, long deserterParticipantsCount, double deserterParticipantsPercentage) {
-        this.fridayCount = fridayCount;
-        this.saturdayCount = saturdayCount;
-        this.sundayCount = sundayCount;
+    public LifeAttendanceDashboard(int participantAttendancesCount, int masterAttendancesCount, int totalAttendancesCount, int totalParticipants, int totalMasterParticipants, int totalTotalUsers, int deserterParticipantsCount, double deserterParticipantsPercentage, int participantEnrolledCount, int masterEnrolledCount, int totalEnrollmentCount, double enrollmentIndex, double realEnrollmentIndex, int totalUsersEnrollersCount, int totalFocusAttendancesCount, double enrollmentEffectiveness) {
+        this.participantAttendancesCount = participantAttendancesCount;
+        this.masterAttendancesCount = masterAttendancesCount;
+        this.totalAttendancesCount = totalAttendancesCount;
         this.totalParticipants = totalParticipants;
-        this.masterFridayCount = masterFridayCount;
-        this.masterSaturdayCount = masterSaturdayCount;
-        this.masterSundayCount = masterSundayCount;
         this.totalMasterParticipants = totalMasterParticipants;
+        this.totalTotalUsers = totalTotalUsers;
         this.deserterParticipantsCount = deserterParticipantsCount;
         this.deserterParticipantsPercentage = deserterParticipantsPercentage;
+        this.participantEnrolledCount = participantEnrolledCount;
+        this.masterEnrolledCount = masterEnrolledCount;
+        this.totalEnrollmentCount = totalEnrollmentCount;
+        this.enrollmentIndex = enrollmentIndex;
+        this.realEnrollmentIndex = realEnrollmentIndex;
+        this.totalUsersEnrollersCount = totalUsersEnrollersCount;
+        this.totalFocusAttendancesCount = totalFocusAttendancesCount;
+        this.enrollmentEffectiveness = enrollmentEffectiveness;
     }
 
-    public long getFridayCount() {
-        return fridayCount;
+    public int getParticipantAttendancesCount() {
+        return participantAttendancesCount;
     }
 
-    public void setFridayCount(long fridayCount) {
-        this.fridayCount = fridayCount;
+    public void setParticipantAttendancesCount(int participantAttendancesCount) {
+        this.participantAttendancesCount = participantAttendancesCount;
     }
 
-    public long getMasterFridayCount() {
-        return masterFridayCount;
+    public int getMasterAttendancesCount() {
+        return masterAttendancesCount;
     }
 
-    public void setMasterFridayCount(long masterFridayCount) {
-        this.masterFridayCount = masterFridayCount;
+    public void setMasterAttendancesCount(int masterAttendancesCount) {
+        this.masterAttendancesCount = masterAttendancesCount;
     }
 
-    public long getMasterSaturdayCount() {
-        return masterSaturdayCount;
+    public int getTotalAttendancesCount() {
+        return totalAttendancesCount;
     }
 
-    public void setMasterSaturdayCount(long masterSaturdayCount) {
-        this.masterSaturdayCount = masterSaturdayCount;
+    public void setTotalAttendancesCount(int totalAttendancesCount) {
+        this.totalAttendancesCount = totalAttendancesCount;
     }
 
-    public long getMasterSundayCount() {
-        return masterSundayCount;
-    }
-
-    public void setMasterSundayCount(long masterSundayCount) {
-        this.masterSundayCount = masterSundayCount;
-    }
-
-    public long getTotalMasterParticipants() {
-        return totalMasterParticipants;
-    }
-
-    public void setTotalMasterParticipants(long totalMasterParticipants) {
-        this.totalMasterParticipants = totalMasterParticipants;
-    }
-
-    public long getSaturdayCount() {
-        return saturdayCount;
-    }
-
-    public void setSaturdayCount(long saturdayCount) {
-        this.saturdayCount = saturdayCount;
-    }
-
-    public long getSundayCount() {
-        return sundayCount;
-    }
-
-    public void setSundayCount(long sundayCount) {
-        this.sundayCount = sundayCount;
-    }
-
-    public long getTotalParticipants() {
+    public int getTotalParticipants() {
         return totalParticipants;
     }
 
-    public void setTotalParticipants(long totalParticipants) {
+    public void setTotalParticipants(int totalParticipants) {
         this.totalParticipants = totalParticipants;
     }
 
-    public long getDeserterParticipantsCount() {
+    public int getTotalMasterParticipants() {
+        return totalMasterParticipants;
+    }
+
+    public void setTotalMasterParticipants(int totalMasterParticipants) {
+        this.totalMasterParticipants = totalMasterParticipants;
+    }
+
+    public int getTotalTotalUsers() {
+        return totalTotalUsers;
+    }
+
+    public void setTotalTotalUsers(int totalTotalUsers) {
+        this.totalTotalUsers = totalTotalUsers;
+    }
+
+    public int getDeserterParticipantsCount() {
         return deserterParticipantsCount;
     }
 
-    public void setDeserterParticipantsCount(long deserterParticipantsCount) {
+    public void setDeserterParticipantsCount(int deserterParticipantsCount) {
         this.deserterParticipantsCount = deserterParticipantsCount;
     }
 
@@ -103,5 +99,69 @@ public class LifeAttendanceDashboard {
 
     public void setDeserterParticipantsPercentage(double deserterParticipantsPercentage) {
         this.deserterParticipantsPercentage = deserterParticipantsPercentage;
+    }
+
+    public int getParticipantEnrolledCount() {
+        return participantEnrolledCount;
+    }
+
+    public void setParticipantEnrolledCount(int participantEnrolledCount) {
+        this.participantEnrolledCount = participantEnrolledCount;
+    }
+
+    public int getMasterEnrolledCount() {
+        return masterEnrolledCount;
+    }
+
+    public void setMasterEnrolledCount(int masterEnrolledCount) {
+        this.masterEnrolledCount = masterEnrolledCount;
+    }
+
+    public int getTotalEnrollmentCount() {
+        return totalEnrollmentCount;
+    }
+
+    public void setTotalEnrollmentCount(int totalEnrollmentCount) {
+        this.totalEnrollmentCount = totalEnrollmentCount;
+    }
+
+    public double getEnrollmentIndex() {
+        return enrollmentIndex;
+    }
+
+    public void setEnrollmentIndex(double enrollmentIndex) {
+        this.enrollmentIndex = enrollmentIndex;
+    }
+
+    public double getRealEnrollmentIndex() {
+        return realEnrollmentIndex;
+    }
+
+    public void setRealEnrollmentIndex(double realEnrollmentIndex) {
+        this.realEnrollmentIndex = realEnrollmentIndex;
+    }
+
+    public int getTotalUsersEnrollersCount() {
+        return totalUsersEnrollersCount;
+    }
+
+    public void setTotalUsersEnrollersCount(int totalUsersEnrollersCount) {
+        this.totalUsersEnrollersCount = totalUsersEnrollersCount;
+    }
+
+    public int getTotalFocusAttendancesCount() {
+        return totalFocusAttendancesCount;
+    }
+
+    public void setTotalFocusAttendancesCount(int totalFocusAttendancesCount) {
+        this.totalFocusAttendancesCount = totalFocusAttendancesCount;
+    }
+
+    public double getEnrollmentEffectiveness() {
+        return enrollmentEffectiveness;
+    }
+
+    public void setEnrollmentEffectiveness(double enrollmentEffectiveness) {
+        this.enrollmentEffectiveness = enrollmentEffectiveness;
     }
 }

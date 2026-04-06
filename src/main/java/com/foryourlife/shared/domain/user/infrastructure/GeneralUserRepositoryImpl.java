@@ -4,6 +4,7 @@ import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,5 +29,10 @@ public class GeneralUserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findById(String id) {
         return repository.findById(id);
+    }
+
+    @Override
+    public List<User> findAllByIds(List<String> ids) {
+        return repository.findAllByIdIn(ids);
     }
 }

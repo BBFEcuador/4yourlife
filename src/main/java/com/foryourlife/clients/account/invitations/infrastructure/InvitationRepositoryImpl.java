@@ -2,8 +2,6 @@ package com.foryourlife.clients.account.invitations.infrastructure;
 
 import com.foryourlife.clients.account.invitations.domain.Invitation;
 import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
-import com.foryourlife.shared.domain.criteria.Criteria;
-import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +35,8 @@ public class InvitationRepositoryImpl implements InvitationRepository {
     }
 
     @Override
-    public Optional<Invitation> findTopBySenderIdOrderByQuantityDesc(String id) {
-        return this.repository.findTopBySenderIdOrderByQuantityDesc(id);
+    public List<Invitation> findTopBySenderIdOrderByQuantityDesc(String id) {
+        return this.repository.findAllBySenderIdOrderByQuantityDesc(id);
     }
 
     public List<Invitation> findAllByTokenIn(List<String> ids) {

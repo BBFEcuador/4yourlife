@@ -12,6 +12,9 @@ import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.programs.training.infrastructure.JPATrainingRepository;
+import com.foryourlife.clients.account.invitations.domain.Invitation;
+import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
+import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashboardRepository {
@@ -29,8 +33,9 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
     private final JPATrainingRepository jPATrainingRepository;
     private final CallRepository callRepository;
     private final TeamRepository teamRepository;
+    private final InvitationRepository invitationRepository;
 
-    public ImplOperativeLifeDashboardRepository(TrainingRepository trainingRepository, TrainingDashboardUtils trainingDashboardUtils, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, JPATrainingRepository jPATrainingRepository, CallRepository callRepository, TeamRepository teamRepository) {
+    public ImplOperativeLifeDashboardRepository(TrainingRepository trainingRepository, TrainingDashboardUtils trainingDashboardUtils, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, JPATrainingRepository jPATrainingRepository, CallRepository callRepository, TeamRepository teamRepository, InvitationRepository invitationRepository) {
         this.trainingRepository = trainingRepository;
         this.trainingDashboardUtils = trainingDashboardUtils;
         this.attendanceRepository = attendanceRepository;
@@ -38,6 +43,7 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
         this.jPATrainingRepository = jPATrainingRepository;
         this.callRepository = callRepository;
         this.teamRepository = teamRepository;
+        this.invitationRepository = invitationRepository;
     }
 
     @Override
@@ -76,6 +82,7 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
                 ));
 
         var trainerName = trainingDashboardUtils.getTrainerName(training, team);
+
         var weekendReport = BuildWeekendReport(training, team);
 
         return new OperativeLifeDashboard(
@@ -119,7 +126,32 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
 
         int totalDeclarations = participantDeclarations + masterLifesDeclarations;
 
-        double declarationIndex = (double) (participantAttendances + masterLifeAttendances) / totalDeclarations * 100;
+        double declarationIndex = totalDeclarations > 0
+                ? ((double) (participantAttendances + masterLifeAttendances) / totalDeclarations) * 100
+                : 0.0;
+
+        var participants = trainingDashboardUtils.loadParticipants(attendances);
+
+        List<String> invitationTokens = participants.values().stream()
+                .map(Participant::getInvitationToken)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        Map<String, Invitation> invitationsByToken = invitationTokens.isEmpty()
+                ? Map.of()
+                : invitationRepository.findAllByTokenIn(invitationTokens)
+                  .stream()
+                  .collect(Collectors.toMap(
+                          Invitation::getToken,
+                          i -> i
+                  ));
+
+        int trainingInvitations = (int) invitationsByToken.values().stream().filter(invitation -> invitation.getEnrolled().getTrainingName() != null && invitation.getEnrolled().getTrainingName().equals(training.getName())).count();
+
+        double realIndex = trainingInvitations > 0
+                ? ((double) (participantAttendances + masterLifeAttendances) / totalDeclarations) * 100
+                : 0.0;
 
         return new WeekendLifeReport(
                 team.getUsers().size(),
@@ -131,9 +163,9 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
                 team.getUsers().size() + team.getMasterLife().size(),
                 (int) (participantAttendances + masterLifeAttendances),
                 totalDeclarations,
-                0,// TODO: 3/19/2026 encontrar por query totalEnrollmentsCount)
+                trainingInvitations,
                 declarationIndex,
-                0 // TODO: 3/19/2026 calcular realIndex
+                realIndex
         );
     }
 

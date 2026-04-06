@@ -7,20 +7,22 @@ import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
+import com.foryourlife.clients.account.invitations.domain.EnrolledUsers;
+import com.foryourlife.clients.account.invitations.domain.Invitation;
+import com.foryourlife.clients.account.invitations.domain.InvitationRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
+import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import com.foryourlife.shared.domain.user.User;
+import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.UserType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -31,13 +33,17 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
     private final TrainingDashboardUtils trainingDashboardUtils;
     private final PromiseRepository promiseRepository;
     private final TeamRepository teamRepository;
+    private final InvitationRepository invitationRepository;
+    private final UserRepository userRepository;
 
-    public TrainerLifeViewRepositoryImpl(TrainingRepository jpaTrainingRepository, AttendanceRepository attendanceRepository, TrainingDashboardUtils trainingDashboardUtils, PromiseRepository promiseRepository, TeamRepository teamRepository) {
+    public TrainerLifeViewRepositoryImpl(TrainingRepository jpaTrainingRepository, AttendanceRepository attendanceRepository, TrainingDashboardUtils trainingDashboardUtils, PromiseRepository promiseRepository, TeamRepository teamRepository, InvitationRepository invitationRepository, UserRepository userRepository) {
         this.jpaTrainingRepository = jpaTrainingRepository;
         this.attendanceRepository = attendanceRepository;
         this.trainingDashboardUtils = trainingDashboardUtils;
         this.promiseRepository = promiseRepository;
         this.teamRepository = teamRepository;
+        this.invitationRepository = invitationRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -98,7 +104,14 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
                     );
                 }).toList();
 
-        LifeAttendanceDashboard lifeAttendanceDashboard = buildAttendanceDashboard(attendances);
+        var team = Optional.ofNullable(training.getOriginalTeam())
+                .or(() -> teamRepository.findByTrainingId(training.getId()))
+                .orElseThrow(() -> new BaseException(
+                        "No existe equipo para el entrenamiento con id: " + training.getId(),
+                        List.of("TEAM_NOT_FOUND")
+                ));
+
+        LifeAttendanceDashboard lifeAttendanceDashboard = buildAttendanceDashboard(attendances, participants, team.getMasterLife());
         PromiseDashboard promiseDashboard = buildPromiseDashboard(promises);
 
         int finalParticipants = Math.toIntExact(lifeAttendanceDashboard.getTotalParticipants() + lifeAttendanceDashboard.getTotalParticipants());
@@ -112,10 +125,8 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
         promiseDashboard.setEnrollerPersonsCount(enrollerCount);
         promiseDashboard.setEnrollerPersonsPercent(enrollerPercentage);
 
-        var team = training.getOriginalTeam();
 
         var trainerName = trainingDashboardUtils.getTrainerName(training, team);
-
 
         return new TrainerLifeView(
                 training.getName(),
@@ -129,9 +140,9 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
         );
     }
 
-    private LifeAttendanceDashboard buildAttendanceDashboard(List<Attendance> attendances) {
+    private LifeAttendanceDashboard buildAttendanceDashboard(List<Attendance> attendances, Map<String, Participant> participants, List<MasterLife> masterLifes) {
         if (attendances == null || attendances.isEmpty()) {
-            return new LifeAttendanceDashboard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0);
+            return new LifeAttendanceDashboard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, 0, 0, 0);
         }
 
         Predicate<Attendance> isParticipant = a ->
@@ -150,15 +161,17 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
                         a.getUser().getEntityMap().stream()
                                 .anyMatch(e -> e.getEntity().equals(UserType.MASTER_LIFE.name()));
 
-        long fridayCount = attendances.stream().filter(isParticipant).filter(a -> a.getFridayAttendance() == AttendanceStatus.ASISTIO).count();
-        long saturdayCount = attendances.stream().filter(isParticipant).filter(a -> a.getSaturdayAttendance() == AttendanceStatus.ASISTIO).count();
-        long sundayCount = attendances.stream().filter(isParticipant).filter(a -> a.getSundayAttendance() == AttendanceStatus.ASISTIO).count();
+        int totalParticipants = (int) attendances.stream().filter(isParticipant).count();
 
-        long masterFridayCount = attendances.stream().filter(isMasterLife).filter(a -> a.getFridayAttendance() == AttendanceStatus.ASISTIO).count();
-        long masterSaturdayCount = attendances.stream().filter(isMasterLife).filter(a -> a.getSaturdayAttendance() == AttendanceStatus.ASISTIO).count();
-        long masterSundayCount = attendances.stream().filter(isMasterLife).filter(a -> a.getSundayAttendance() == AttendanceStatus.ASISTIO).count();
+        int totalMasterLifes = (int) attendances.stream().filter(isMasterLife).count();
 
-        long deserterCount = attendances.stream().filter(isParticipant)
+        int totalUsers = totalParticipants + totalMasterLifes;
+
+        int sundayCount = (int) attendances.stream().filter(isParticipant).filter(a -> a.getSundayAttendance() == AttendanceStatus.ASISTIO).count();
+
+        int masterSundayCount = (int) attendances.stream().filter(isMasterLife).filter(a -> a.getSundayAttendance() == AttendanceStatus.ASISTIO).count();
+
+        int deserterCount = (int) attendances.stream()
                 .filter(a -> a.getFridayAttendance() == AttendanceStatus.NO_ASISTIO ||
                         a.getFridayAttendance() == AttendanceStatus.DESERTO ||
                         a.getSaturdayAttendance() == AttendanceStatus.NO_ASISTIO ||
@@ -168,22 +181,111 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
                 )
                 .count();
 
-        long totalParticipants = fridayCount + saturdayCount + sundayCount;
-        long totalMasterParticipants = masterFridayCount + masterSaturdayCount + masterSundayCount;
+        int totalAttendancesCount = sundayCount + masterSundayCount;
 
-        double deserterPercentage = (double) deserterCount / totalParticipants;
+        double deserterPercentage = (double) deserterCount / totalAttendancesCount;
+
+        var training = attendances.getFirst().getTraining();
+
+        List<String> invitationTokens = participants.values().stream()
+                .map(Participant::getInvitationToken)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        Map<String, Invitation> invitationsByToken = invitationTokens.isEmpty()
+                ? Map.of()
+                : invitationRepository.findAllByTokenIn(invitationTokens)
+                  .stream()
+                  .collect(Collectors.toMap(
+                          Invitation::getToken,
+                          i -> i
+                  ));
+
+        List<Invitation> trainingInvitations = invitationsByToken.values().stream()
+                .filter(invitation ->
+                        invitation.getEnrolled() != null &&
+                                Objects.equals(
+                                        invitation.getEnrolled().getTrainingName(),
+                                        training.getName()
+                                )
+                )
+                .toList();
+
+        List<String> masterLifesIds = masterLifes.stream().map(MasterLife::getId).toList();
+
+        Map<String, Invitation> masterLifesInvitations = masterLifesIds.isEmpty()
+                ? Map.of()
+                : invitationRepository.findAllByTokenIn(masterLifesIds)
+                  .stream()
+                  .collect(Collectors.toMap(
+                          Invitation::getSenderId,
+                          i -> i
+                  ));
+
+        List<Invitation> masterInvitations = masterLifesInvitations.values().stream()
+                .filter(invitation ->
+                        invitation.getEnrolled() != null &&
+                                Objects.equals(
+                                        invitation.getEnrolled().getTrainingName(),
+                                        training.getName()
+                                )
+                )
+                .toList();
+
+        int participantEnrolledCount = (int) trainingInvitations.stream()
+                .filter(invitation -> invitation.getUsers() != null)
+                .flatMap(invitation -> invitation.getUsers().stream())
+                .filter(Objects::nonNull)
+                .count();
+
+        int masterLifesEnrolledCount = (int) masterInvitations.stream()
+                .filter(invitation -> invitation.getUsers() != null)
+                .flatMap(invitation -> invitation.getUsers().stream())
+                .filter(Objects::nonNull)
+                .count();
+
+        List<String> userIds = trainingInvitations.stream()
+                .filter(invitation -> invitation.getUsers() != null)
+                .flatMap(invitation -> invitation.getUsers().stream())
+                .map(EnrolledUsers::getUserId)
+                .toList();
+
+        List<User> invitedUsers = userRepository.findAllByIds(userIds);
+
+        var focusAttendances = attendanceRepository.findAllByTrainingNumberAndUsersIdsAndCampusId(
+                training.getNumber(),
+                userIds,
+                training.getCampus().getId()
+        );
+
+        int focusAttendancesCount = (int) focusAttendances.stream()
+                .filter(a -> a.getFridayAttendance() == AttendanceStatus.ASISTIO ||
+                        a.getSaturdayAttendance() == AttendanceStatus.ASISTIO ||
+                        a.getSundayAttendance() == AttendanceStatus.ASISTIO)
+                .count();
+
+        double enrollmentEffectiveness = trainingInvitations.isEmpty() ? 0.0 : (double) focusAttendancesCount / trainingInvitations.size();
 
         return new LifeAttendanceDashboard(
-                fridayCount,
-                saturdayCount,
                 sundayCount,
-                totalParticipants,
-                masterFridayCount,
-                masterSaturdayCount,
                 masterSundayCount,
-                totalMasterParticipants,
+                totalAttendancesCount,
+                totalParticipants,
+                totalMasterLifes,
+                totalUsers,
                 deserterCount,
-                deserterPercentage
+                deserterPercentage,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+
+
         );
     }
 

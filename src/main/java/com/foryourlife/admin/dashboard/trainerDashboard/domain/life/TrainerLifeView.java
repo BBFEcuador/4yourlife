@@ -10,6 +10,7 @@ public class TrainerLifeView {
     private String trainerName;
     private String trainingDate;
     private String courseLevel;
+
     private LifeAttendanceDashboard lifeAttendanceDashboard;
     private PromiseDashboard promiseDashboard;
     private List<UserDashboardDto> users;

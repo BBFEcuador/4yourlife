@@ -4,9 +4,6 @@ import com.foryourlife.admin.auth.domain.AdminRepository;
 import com.foryourlife.admin.programs.campus.domain.CampusRepository;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
-import com.foryourlife.admin.sales.payments.payment.domain.Payment;
-import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
-import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.clients.account.contact.domain.ContactRepository;
 import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
@@ -24,13 +21,10 @@ import com.foryourlife.clients.account.profileDetails.domain.ProfileDetailsRepos
 import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
-import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,7 +105,7 @@ public class ParticipantCommandService {
     @Transactional
     public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest, SaveContactRequest contact, DataInvoice dataInvoice) {
         var token = queryInvitationServices.findInvitationByToken(user.getInvitationToken());
-        if (token.getUsed())
+        if (token.getActive())
             throw new BaseException("Token expirado", List.of("El token ya fue utilizado"));
         _profileDetailsRepository.findByDni(user.getProfile().getDni()).ifPresent(profileDetails -> {
             throw new BaseException("Error al crear", List.of("Ya existe un participante con el documento "+user.getProfile().getDni()));

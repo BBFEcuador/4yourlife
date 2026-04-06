@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,16 +35,14 @@ public class CommandInvitationService {
 
     private final TrainingRepository trainingRepository;
     private final Logger logger = LoggerFactory.getLogger(CommandInvitationService.class);
-    private final MasterLifeRepository masterLifeRepository;
 
-    public CommandInvitationService(InvitationRepository repository, ParticipantQueryService participantQueryService, UserRepository userRepository, QueryCampusService campusService, AdminFinderService adminFinderService, TrainingRepository trainingRepository, MasterLifeRepository masterLifeRepository) {
+    public CommandInvitationService(InvitationRepository repository, ParticipantQueryService participantQueryService, UserRepository userRepository, QueryCampusService campusService, AdminFinderService adminFinderService, TrainingRepository trainingRepository) {
         this.repository = repository;
         this.participantQueryService = participantQueryService;
         this.userRepository = userRepository;
         this.campusService = campusService;
         this.adminFinderService = adminFinderService;
         this.trainingRepository = trainingRepository;
-        this.masterLifeRepository = masterLifeRepository;
     }
 
     public String createInvitationByUser(String id, String campusId) {
@@ -54,7 +53,6 @@ public class CommandInvitationService {
             var invitation = Invitation.create(
                     UUID.randomUUID().toString(),
                     token,
-                    null,
                     false,
                     id,
                     new Sender(
@@ -77,7 +75,7 @@ public class CommandInvitationService {
         var user = adminFinderService.findById(id);
         var token = UUID.randomUUID().toString();
         var campus = campusService.findById(campusId);
-        var invitation = Invitation.create(UUID.randomUUID().toString(), token, null, true, id, new Sender(user.getUser().getId(), user.getName(), "Administrativo", user.getEmail()), 1, campus);
+        var invitation = Invitation.create(UUID.randomUUID().toString(), token, true, id, new Sender(user.getUser().getId(), user.getName(), "Administrativo", user.getEmail()), 1, campus);
         this.repository.save(invitation);
         return token;
     }
@@ -89,7 +87,6 @@ public class CommandInvitationService {
         var invitation = Invitation.create(
                 UUID.randomUUID().toString(),
                 token,
-                null,
                 true,
                 request.id,
                 new Sender(user.getUser().getId(), user.getName(), "Administrativo", user.getEmail()), Integer.parseInt(request.quantity)
@@ -98,6 +95,7 @@ public class CommandInvitationService {
         return token;
     }
 
+    @Transactional
     public String createInvitationByUserWithQuantity(String userId, int quantity) {
 
         if (quantity <= 0) {
@@ -139,13 +137,18 @@ public class CommandInvitationService {
             throw new BaseException("Ya tiene una invitacion activa en este nivel", List.of());
         }
 
+        invitations.forEach(invitation -> {
+                    invitation.setActive(false);
+                    repository.save(invitation);
+                }
+        );
+
         var token = UUID.randomUUID().toString();
         var campus = campusService.findById(participant.getCampus().getId());
 
         var invitation = Invitation.create(
                 UUID.randomUUID().toString(),
                 token,
-                null,
                 false,
                 userId,
                 new Sender(user.getId(), user.getName(), training.getName(), user.getPhone()),
@@ -164,7 +167,6 @@ public class CommandInvitationService {
         var invitation = Invitation.create(
                 UUID.randomUUID().toString(),
                 token,
-                null,
                 true,
                 request.id,
                 new Sender(

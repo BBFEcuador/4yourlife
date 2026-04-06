@@ -21,4 +21,6 @@ public interface JPAAttendanceRepository extends JpaRepository<Attendance,String
     WHERE a.user.id IN :userIds
 """)
     List<Attendance> findAllByUser_Ids(List<String> userIds);
+
+    List<Attendance> findAllByTraining_NumberAndTraining_Campus_IdAndUser_IdIn(Integer trainingNumber, String trainingCampusId, Collection<String> userIds);
 }

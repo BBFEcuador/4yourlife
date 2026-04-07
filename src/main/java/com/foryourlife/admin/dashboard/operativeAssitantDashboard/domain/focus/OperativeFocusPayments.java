@@ -1,7 +1,5 @@
 package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.focus;
 
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.your.YourWeeklyPaymentStats;
-
 import java.util.List;
 
 public class OperativeFocusPayments {

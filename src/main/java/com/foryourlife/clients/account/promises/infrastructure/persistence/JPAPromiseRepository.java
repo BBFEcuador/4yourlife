@@ -55,12 +55,12 @@ public class JPAPromiseRepository implements PromiseRepository {
     }
 
     @Override
-    public Optional<Promise> findLastByUserIdAndTrainingId(String userId, String trainingId) {
-        return this.jpaImplPromiseRepository.findByUser_IdAndTraining_Id(userId, trainingId);
+    public void saveAll(List<Promise> promises) {
+        this.jpaImplPromiseRepository.saveAll(promises);
     }
 
     @Override
-    public void saveAll(List<Promise> promises) {
-        this.jpaImplPromiseRepository.saveAll(promises);
+    public Optional<Promise> findByTrainingNameAndUserId(String trainingName, String userId) {
+        return this.jpaImplPromiseRepository.findByUser_IdAndTraining_Name(userId, trainingName);
     }
 }

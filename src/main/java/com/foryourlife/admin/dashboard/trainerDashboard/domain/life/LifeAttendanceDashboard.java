@@ -1,12 +1,12 @@
 package com.foryourlife.admin.dashboard.trainerDashboard.domain.life;
 
 public class LifeAttendanceDashboard {
-    private int participantAttendancesCount;
-    private int masterAttendancesCount;
-    private int totalAttendancesCount;
     private int totalParticipants;
     private int totalMasterParticipants;
     private int totalTotalUsers;
+    private int participantAttendancesCount;
+    private int masterAttendancesCount;
+    private int totalAttendancesCount;
     private int deserterParticipantsCount;
     private double deserterParticipantsPercentage;
     private int participantEnrolledCount;
@@ -15,16 +15,17 @@ public class LifeAttendanceDashboard {
     private double enrollmentIndex;
     private double realEnrollmentIndex;
     private int totalUsersEnrollersCount;
+    private double totalUsersEnrollersPercentage;
     private int totalFocusAttendancesCount;
     private double enrollmentEffectiveness;
 
-    public LifeAttendanceDashboard(int participantAttendancesCount, int masterAttendancesCount, int totalAttendancesCount, int totalParticipants, int totalMasterParticipants, int totalTotalUsers, int deserterParticipantsCount, double deserterParticipantsPercentage, int participantEnrolledCount, int masterEnrolledCount, int totalEnrollmentCount, double enrollmentIndex, double realEnrollmentIndex, int totalUsersEnrollersCount, int totalFocusAttendancesCount, double enrollmentEffectiveness) {
-        this.participantAttendancesCount = participantAttendancesCount;
-        this.masterAttendancesCount = masterAttendancesCount;
-        this.totalAttendancesCount = totalAttendancesCount;
+    public LifeAttendanceDashboard(int totalParticipants, int totalMasterParticipants, int totalTotalUsers, int participantAttendancesCount, int masterAttendancesCount, int totalAttendancesCount, int deserterParticipantsCount, double deserterParticipantsPercentage, int participantEnrolledCount, int masterEnrolledCount, int totalEnrollmentCount, double enrollmentIndex, double realEnrollmentIndex, int totalUsersEnrollersCount, double totalUsersEnrollersPercentage, int totalFocusAttendancesCount, double enrollmentEffectiveness) {
         this.totalParticipants = totalParticipants;
         this.totalMasterParticipants = totalMasterParticipants;
         this.totalTotalUsers = totalTotalUsers;
+        this.participantAttendancesCount = participantAttendancesCount;
+        this.masterAttendancesCount = masterAttendancesCount;
+        this.totalAttendancesCount = totalAttendancesCount;
         this.deserterParticipantsCount = deserterParticipantsCount;
         this.deserterParticipantsPercentage = deserterParticipantsPercentage;
         this.participantEnrolledCount = participantEnrolledCount;
@@ -33,8 +34,17 @@ public class LifeAttendanceDashboard {
         this.enrollmentIndex = enrollmentIndex;
         this.realEnrollmentIndex = realEnrollmentIndex;
         this.totalUsersEnrollersCount = totalUsersEnrollersCount;
+        this.totalUsersEnrollersPercentage = totalUsersEnrollersPercentage;
         this.totalFocusAttendancesCount = totalFocusAttendancesCount;
         this.enrollmentEffectiveness = enrollmentEffectiveness;
+    }
+
+    public double getTotalUsersEnrollersPercentage() {
+        return totalUsersEnrollersPercentage;
+    }
+
+    public void setTotalUsersEnrollersPercentage(double totalUsersEnrollersPercentage) {
+        this.totalUsersEnrollersPercentage = totalUsersEnrollersPercentage;
     }
 
     public int getParticipantAttendancesCount() {

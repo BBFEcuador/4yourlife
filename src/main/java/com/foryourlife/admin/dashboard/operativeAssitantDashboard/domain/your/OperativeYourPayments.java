@@ -4,19 +4,49 @@ import java.util.List;
 
 public class OperativeYourPayments {
     private int previousPayments;
+    private double previousPaymentsPercentage;
     private int saturdayPayments;
+    private double saturdayPaymentsPercentage;
     private int sundayPayments;
+    private double sundayPaymentsPercentage;
     private int totalPayments;
     private double totalPaymentsPercentage;
     private List<YourWeeklyPaymentStats> weeklyPaymentStats;
 
-    public OperativeYourPayments(int previousPayments, int saturdayPayments, int sundayPayments, int totalPayments, double totalPaymentsPercentage, List<YourWeeklyPaymentStats> weeklyPaymentStats) {
+    public OperativeYourPayments(int previousPayments, double previousPaymentsPercentage, int saturdayPayments, double saturdayPaymentsPercentage, int sundayPayments, double sundayPaymentsPercentage, int totalPayments, double totalPaymentsPercentage, List<YourWeeklyPaymentStats> weeklyPaymentStats) {
         this.previousPayments = previousPayments;
+        this.previousPaymentsPercentage = previousPaymentsPercentage;
         this.saturdayPayments = saturdayPayments;
+        this.saturdayPaymentsPercentage = saturdayPaymentsPercentage;
         this.sundayPayments = sundayPayments;
+        this.sundayPaymentsPercentage = sundayPaymentsPercentage;
         this.totalPayments = totalPayments;
         this.totalPaymentsPercentage = totalPaymentsPercentage;
         this.weeklyPaymentStats = weeklyPaymentStats;
+    }
+
+    public double getPreviousPaymentsPercentage() {
+        return previousPaymentsPercentage;
+    }
+
+    public void setPreviousPaymentsPercentage(double previousPaymentsPercentage) {
+        this.previousPaymentsPercentage = previousPaymentsPercentage;
+    }
+
+    public double getSaturdayPaymentsPercentage() {
+        return saturdayPaymentsPercentage;
+    }
+
+    public void setSaturdayPaymentsPercentage(double saturdayPaymentsPercentage) {
+        this.saturdayPaymentsPercentage = saturdayPaymentsPercentage;
+    }
+
+    public double getSundayPaymentsPercentage() {
+        return sundayPaymentsPercentage;
+    }
+
+    public void setSundayPaymentsPercentage(double sundayPaymentsPercentage) {
+        this.sundayPaymentsPercentage = sundayPaymentsPercentage;
     }
 
     public int getPreviousPayments() {

@@ -363,12 +363,10 @@ public class TrainingDashboardUtils {
             Map<String, Participant> participants
     ) {
 
-        // 🔹 obtener participantIds
         List<String> participantIds = participants.values().stream()
                 .map(Participant::getId)
                 .toList();
 
-        // 🔹 traer TODOS los payments (sin filtrar)
         Map<String, List<Payment>> paymentsByParticipant =
                 paymentRepository.findAllByParticipantIds(participantIds)
                         .stream()
@@ -413,7 +411,9 @@ public class TrainingDashboardUtils {
             }
         }
 
-        double percentage = (double) recoveredWithPreviousLifePayment / recovered;
+        double percentage = recovered > 0
+                ? ((double) recoveredWithPreviousLifePayment / recovered) * 100
+                : 0.0;
 
         return new YourRecoveryPaymentStats(
                 recoveredWithPreviousLifePayment,

@@ -18,8 +18,12 @@ public class LifeAttendanceDashboard {
     private double totalUsersEnrollersPercentage;
     private int totalFocusAttendancesCount;
     private double enrollmentEffectiveness;
+    private int  focusDeclarationsCount;
+    private double focusDeclarationPercentage;
+    private int staffMembersCount;
+    private double staffMembersPercentage;
 
-    public LifeAttendanceDashboard(int totalParticipants, int totalMasterParticipants, int totalTotalUsers, int participantAttendancesCount, int masterAttendancesCount, int totalAttendancesCount, int deserterParticipantsCount, double deserterParticipantsPercentage, int participantEnrolledCount, int masterEnrolledCount, int totalEnrollmentCount, double enrollmentIndex, double realEnrollmentIndex, int totalUsersEnrollersCount, double totalUsersEnrollersPercentage, int totalFocusAttendancesCount, double enrollmentEffectiveness) {
+    public LifeAttendanceDashboard(int totalParticipants, int totalMasterParticipants, int totalTotalUsers, int participantAttendancesCount, int masterAttendancesCount, int totalAttendancesCount, int deserterParticipantsCount, double deserterParticipantsPercentage, int participantEnrolledCount, int masterEnrolledCount, int totalEnrollmentCount, double enrollmentIndex, double realEnrollmentIndex, int totalUsersEnrollersCount, double totalUsersEnrollersPercentage, int totalFocusAttendancesCount, double enrollmentEffectiveness, int focusDeclarationsCount, double focusDeclarationPercentage, int staffMembersCount, double staffMembersPercentage) {
         this.totalParticipants = totalParticipants;
         this.totalMasterParticipants = totalMasterParticipants;
         this.totalTotalUsers = totalTotalUsers;
@@ -37,6 +41,42 @@ public class LifeAttendanceDashboard {
         this.totalUsersEnrollersPercentage = totalUsersEnrollersPercentage;
         this.totalFocusAttendancesCount = totalFocusAttendancesCount;
         this.enrollmentEffectiveness = enrollmentEffectiveness;
+        this.focusDeclarationsCount = focusDeclarationsCount;
+        this.focusDeclarationPercentage = focusDeclarationPercentage;
+        this.staffMembersCount = staffMembersCount;
+        this.staffMembersPercentage = staffMembersPercentage;
+    }
+
+    public int getFocusDeclarationsCount() {
+        return focusDeclarationsCount;
+    }
+
+    public void setFocusDeclarationsCount(int focusDeclarationsCount) {
+        this.focusDeclarationsCount = focusDeclarationsCount;
+    }
+
+    public double getFocusDeclarationPercentage() {
+        return focusDeclarationPercentage;
+    }
+
+    public void setFocusDeclarationPercentage(double focusDeclarationPercentage) {
+        this.focusDeclarationPercentage = focusDeclarationPercentage;
+    }
+
+    public int getStaffMembersCount() {
+        return staffMembersCount;
+    }
+
+    public void setStaffMembersCount(int staffMembersCount) {
+        this.staffMembersCount = staffMembersCount;
+    }
+
+    public double getStaffMembersPercentage() {
+        return staffMembersPercentage;
+    }
+
+    public void setStaffMembersPercentage(double staffMembersPercentage) {
+        this.staffMembersPercentage = staffMembersPercentage;
     }
 
     public double getTotalUsersEnrollersPercentage() {

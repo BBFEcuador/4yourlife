@@ -139,7 +139,7 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
 
     public LifeAttendanceDashboard buildAttendanceDashboard(List<Attendance> attendances, Map<String, Participant> participants, List<MasterLife> masterLifes, List<UserDashboardDto> users) {
         if (attendances == null || attendances.isEmpty()) {
-            return new LifeAttendanceDashboard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, 0, 0.0, 0, 0.0);
+            return new LifeAttendanceDashboard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, 0, 0.0, 0, 0.0, 0, 0.0, 0, 0.0);
         }
 
         Predicate<Attendance> isParticipant = a ->
@@ -340,6 +340,15 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
                 ? 0.0
                 : Math.round(((double) totalFocusAttendances / userIds.size()) * 100.0) / 100.0;
 
+        int focusDeclarationsCount = 0;
+        double focusDeclarationPercentage = 0.0;
+        int staffMembersCount = 0;
+        double staffMembersPercentage = 0.0;
+
+        if (training.getCourseLevel().equals(CourseLevel.LIFE_GRADUATE)){
+
+        }
+
         return new LifeAttendanceDashboard(
                 totalParticipants,
                 totalMasterLifes,
@@ -357,7 +366,11 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
                 totalInvitationUsed,
                 totalUsersEnrollersPercentage,
                 totalFocusAttendances,
-                enrollmentEffectiveness
+                enrollmentEffectiveness,
+                focusDeclarationsCount,
+                focusDeclarationPercentage,
+                staffMembersCount,
+                staffMembersPercentage
         );
     }
 
@@ -478,13 +491,13 @@ public class TrainerLifeViewRepositoryImpl implements TrainerViewRepository {
 
         return new DeclarationStats(
                 masterLifePromisesCount,
-                participantPromisesCount,
-                totalTeamPromisesCount,
                 masterLifeAchievedCount,
-                participantAchievedCount,
-                totalTeamAchievedCount,
                 masterLifePaidCount,
+                participantPromisesCount,
+                participantAchievedCount,
                 participantPaidCount,
+                totalTeamPromisesCount,
+                totalTeamAchievedCount,
                 totalTeamPaidCount,
                 accomplishmentMasterLife,
                 accomplishmentParticipant,

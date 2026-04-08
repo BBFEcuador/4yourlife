@@ -8,6 +8,7 @@ import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.your.*;
 import com.foryourlife.admin.dashboard.trainerDashboard.infrastructure.utils.TrainingDashboardUtils;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
+import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
 import com.foryourlife.admin.programs.teams.domain.Team;
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
@@ -127,10 +128,27 @@ public class ImplOperativeYourDashboard implements OperativeYourDashboardReposit
 
         List<Statement> statements = statementRepository.findByTrainingId(training.getId());
 
+        int realParticipants = (int) attendances.stream().filter(
+                attendance -> attendance.getSundayAttendance() != null && attendance.getSundayAttendance().equals(AttendanceStatus.ASISTIO)
+        ).count();
+
+        double previousPaymentsPercentage = participants.isEmpty() ? 0 : (double) previousLifePayments / participants.size() * 100;
+
+        double saturdayPaymentsPercentage = realParticipants > 0 ?
+                (double) (saturdayPayments + previousLifePayments) / realParticipants * 100
+                : 0;
+
+        double sundayPaymentsPercentage = realParticipants > 0 ?
+                (double) (sundayPayments + saturdayPayments + previousLifePayments) / realParticipants * 100
+                : 0;
+
         return new OperativeYourPayments(
                 previousLifePayments,
+                previousPaymentsPercentage,
                 saturdayPayments,
+                saturdayPaymentsPercentage,
                 sundayPayments,
+                sundayPaymentsPercentage,
                 totalPayments,
                 totalPaymentsPercentage,
                 buildWeeklyTable(training, team, payments, statements)

@@ -128,7 +128,9 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
                 initialParticipantCount,
                 realParticipantCount,
                 deserterParticipantCount,
+                deserterParticipantPercentage,
                 statementsCount,
+                statementsPercentage,
                 visionariesCount,
                 captainCount,
                 staffCount
@@ -203,6 +205,7 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
                 yourPaymentsCount,
                 yourPlusLifePaymentsCount,
                 totalPaymentsCount,
+                totalPaymentsPercentage,
                 pendingPaymentsCount,
                 possibilityPaymentsCount,
                 buildFocusWeeklyPaymentStats(training, team, safeStatements, payments)

@@ -5,6 +5,10 @@ import com.foryourlife.admin.crm.callLogs.domain.CallLog;
 import com.foryourlife.admin.crm.callLogs.domain.CallStatus;
 import com.foryourlife.admin.crm.callLogs.domain.CallType;
 import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.life.*;
+import com.foryourlife.admin.dashboard.trainerDashboard.domain.life.DeclarationStats;
+import com.foryourlife.admin.dashboard.trainerDashboard.domain.life.LifeAttendanceDashboard;
+import com.foryourlife.admin.dashboard.trainerDashboard.domain.life.UserDashboardDto;
+import com.foryourlife.admin.dashboard.trainerDashboard.infrastructure.utils.TrainerLifeViewRepositoryImpl;
 import com.foryourlife.admin.dashboard.trainerDashboard.infrastructure.utils.TrainingDashboardUtils;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.teams.domain.Team;
@@ -12,13 +16,16 @@ import com.foryourlife.admin.programs.teams.domain.TeamRepository;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.programs.training.infrastructure.JPATrainingRepository;
+import com.foryourlife.clients.account.promises.domain.Promise;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
+import com.foryourlife.shared.domain.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashboardRepository {
@@ -29,8 +36,9 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
     private final JPATrainingRepository jPATrainingRepository;
     private final CallRepository callRepository;
     private final TeamRepository teamRepository;
+    private final TrainerLifeViewRepositoryImpl trainerLifeViewRepositoryImpl;
 
-    public ImplOperativeLifeDashboardRepository(TrainingRepository trainingRepository, TrainingDashboardUtils trainingDashboardUtils, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, JPATrainingRepository jPATrainingRepository, CallRepository callRepository, TeamRepository teamRepository) {
+    public ImplOperativeLifeDashboardRepository(TrainingRepository trainingRepository, TrainingDashboardUtils trainingDashboardUtils, AttendanceRepository attendanceRepository, PromiseRepository promiseRepository, JPATrainingRepository jPATrainingRepository, CallRepository callRepository, TeamRepository teamRepository, TrainerLifeViewRepositoryImpl trainerLifeViewRepositoryImpl) {
         this.trainingRepository = trainingRepository;
         this.trainingDashboardUtils = trainingDashboardUtils;
         this.attendanceRepository = attendanceRepository;
@@ -38,6 +46,7 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
         this.jPATrainingRepository = jPATrainingRepository;
         this.callRepository = callRepository;
         this.teamRepository = teamRepository;
+        this.trainerLifeViewRepositoryImpl = trainerLifeViewRepositoryImpl;
     }
 
     @Override
@@ -45,7 +54,7 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
     public List<OperativeLifeDashboard> getOperativeLifeDashboard(String trainingId) {
         var training = trainingRepository.findById(trainingId).orElseThrow(() -> new RuntimeException("Training not found"));
 
-        Training life1 = null, life2 = null, life3 = null;
+        Training life1 = null, life2 = null, life3 = null, life4 = null;
 
         if (training.getCourseLevel().equals(CourseLevel.LIFE)) {
             life1 = training;
@@ -56,12 +65,18 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
             life3 = training;
             life2 = jPATrainingRepository.findByNextLevel_Id(training.getId()).orElse(null);
             life1 = (life2 != null) ? jPATrainingRepository.findByNextLevel_Id(life2.getId()).orElse(null) : null;
+        } else if (training.getCourseLevel().equals(CourseLevel.LIFE_GRADUATE)) {
+            life4 = training;
+            life3 = jPATrainingRepository.findByNextLevel_Id(training.getId()).orElse(null);
+            life2 = (life3 != null) ? jPATrainingRepository.findByNextLevel_Id(life3.getId()).orElse(null) : null;
+            life1 = (life2 != null) ? jPATrainingRepository.findByNextLevel_Id(life2.getId()).orElse(null) : null;
         }
 
         List<OperativeLifeDashboard> dashboards = new ArrayList<>();
         if (life1 != null) dashboards.add(buildOperativeLifeDashboard(life1));
         if (life2 != null) dashboards.add(buildOperativeLifeDashboard(life2));
         if (life3 != null) dashboards.add(buildOperativeLifeDashboard(life3));
+        if (life4 != null) dashboards.add(buildOperativeLifeDashboard(life4));
         return dashboards;
     }
 
@@ -76,6 +91,7 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
                 ));
 
         var trainerName = trainingDashboardUtils.getTrainerName(training, team);
+
         var weekendReport = BuildWeekendReport(training, team);
 
         return new OperativeLifeDashboard(
@@ -89,51 +105,61 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
 
     public WeekendLifeReport BuildWeekendReport(Training training, Team team) {
         var attendances = attendanceRepository.findAttendanceByTraining(training.getId());
-        int participantDeclarations = 0, masterLifesDeclarations = 0, enrolmentsDeclarations;
-        if (training.getCourseLevel() != CourseLevel.YOUR) {
-            var declarations = promiseRepository.findByTrainingId(training.getId());
 
-            if (!declarations.isEmpty()) {
-                for (var declaration : declarations) {
-                    var participant = team.getUsers().stream().filter(user -> user.getUser().getId().equals(declaration.getUser().getId())).findFirst();
-                    if (participant.isPresent()) {
-                        participantDeclarations += declaration.getThirdPromise();
-                    } else {
-                        var masterLife = team.getMasterLife().stream().filter(ml -> ml.getUser().getId().equals(declaration.getUser().getId())).findFirst();
-                        if (masterLife.isPresent()) {
-                            masterLifesDeclarations += declaration.getThirdPromise();
-                        }
-                    }
-                }
-            }
-        }
+        var participants = trainingDashboardUtils.loadParticipants(attendances);
 
-        var participantAttendances = attendances.stream()
-                .filter(attendance -> team.getUsers().stream()
-                        .anyMatch(participant -> participant.getUser().getId().equals(attendance.getUser().getId()))
-                ).count();
-        var masterLifeAttendances = attendances.stream()
-                .filter(attendance -> team.getMasterLife().stream()
-                        .anyMatch(ml -> ml.getUser().getId().equals(attendance.getUser().getId()))
-                ).count();
 
-        int totalDeclarations = participantDeclarations + masterLifesDeclarations;
+        List<Promise> promises = promiseRepository.findByTrainingId(training.getId());
 
-        double declarationIndex = (double) (participantAttendances + masterLifeAttendances) / totalDeclarations * 100;
+        Map<String, Promise> promiseMap = promises.stream()
+                .filter(p -> p.getUser() != null)
+                .collect(Collectors.toMap(p -> p.getUser().getId(), p -> p, (a, b) -> a));
+
+        List<UserDashboardDto> userDashboards = attendances.stream()
+                .filter(a -> a.getUser() != null)
+                .map(a -> {
+                    User user = a.getUser();
+                    String entity = trainingDashboardUtils.resolveUserType(user);
+                    Promise userPromise = promiseMap.get(a.getUser().getId());
+                    return new UserDashboardDto(
+                            user.getName(),
+                            entity,
+                            a.getFridayAttendance(),
+                            a.getSaturdayAttendance(),
+                            a.getSundayAttendance(),
+                            userPromise != null ? userPromise.getFirstPromise() : 0,
+                            userPromise != null ? userPromise.getSecondPromise() : 0,
+                            userPromise != null ? userPromise.getThirdPromise() : 0,
+                            userPromise != null ? userPromise.getAchievedCount() : 0,
+                            userPromise != null ? userPromise.getPaidCount() : 0
+                    );
+                }).toList();
+
+        LifeAttendanceDashboard lifeAttendanceDashboard = trainerLifeViewRepositoryImpl.buildAttendanceDashboard(attendances, participants, team.getMasterLife(), userDashboards);
+
+        DeclarationStats declarationStats = trainerLifeViewRepositoryImpl.buildDeclarationStats(userDashboards);
+
+        double enrollmentIndex = declarationStats.getTotalTeamLifePromisesCount() > 0
+                ? Math.round(((double) lifeAttendanceDashboard.getTotalAttendancesCount() / declarationStats.getTotalTeamLifePromisesCount()) * 100.0) / 100.0
+                : 0.0;
+
+        double realEnrollmentIndex = declarationStats.getTotalTeamLifePromisesCount() > 0
+                ? Math.round(((double) declarationStats.getTotalUsersEnrollersCount() / declarationStats.getTotalTeamLifePromisesCount()) * 100.0) / 100.0
+                : 0.0;
 
         return new WeekendLifeReport(
-                team.getUsers().size(),
-                (int) participantAttendances,
-                participantDeclarations,
-                team.getMasterLife().size(),
-                (int) masterLifeAttendances,
-                masterLifesDeclarations,
-                team.getUsers().size() + team.getMasterLife().size(),
-                (int) (participantAttendances + masterLifeAttendances),
-                totalDeclarations,
-                0,// TODO: 3/19/2026 encontrar por query totalEnrollmentsCount)
-                declarationIndex,
-                0 // TODO: 3/19/2026 calcular realIndex
+                lifeAttendanceDashboard.getTotalParticipants(),
+                lifeAttendanceDashboard.getParticipantAttendancesCount(),
+                declarationStats.getTotalParticipantPromisesCount(),
+                lifeAttendanceDashboard.getTotalMasterParticipants(),
+                lifeAttendanceDashboard.getMasterAttendancesCount(),
+                declarationStats.getTotalMasterLifePromisesCount(),
+                lifeAttendanceDashboard.getTotalTotalUsers(),
+                lifeAttendanceDashboard.getTotalAttendancesCount(),
+                declarationStats.getTotalTeamLifePromisesCount(),
+                declarationStats.getTotalUsersEnrollersCount(),
+                enrollmentIndex,
+                realEnrollmentIndex
         );
     }
 
@@ -154,51 +180,42 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
             callsByType.put(type, statusMap);
         }
 
-        callRepository.findAllByTrainingId(training.getId())
-                .forEach(call -> {
+        var totalCallsInTraining = callRepository.findAllByTrainingId(training.getId());
+        totalCallsInTraining.forEach(call -> {
 
-                    if (call.getCallLogs() == null || call.getCallLogs().isEmpty()) {
-                        CallsInfo info = callsByType
-                                .get(CallType.LOGISTIC)
-                                .get(CallStatus.NO_CALLED);
+            List<CallLog> logs = Optional.ofNullable(call.getCallLogs())
+                    .orElse(List.of());
 
-                        info.setTotalCalls(info.getTotalCalls() + 1);
-                        return;
-                    }
+            for (CallType type : CallType.values()) {
 
-                    CallLog lastCallLog = call.getCallLogs().stream()
-                            .filter(Objects::nonNull)
-                            .max(Comparator.comparing(CallLog::getDate))
-                            .orElse(null);
+                CallLog lastLogByType = logs.stream()
+                        .filter(Objects::nonNull)
+                        .filter(log -> log.getType() == type)
+                        .max(Comparator.comparing(CallLog::getDate))
+                        .orElse(null);
 
-                    if (lastCallLog == null) {
-                        CallsInfo info = callsByType
-                                .get(CallType.LOGISTIC)
-                                .get(CallStatus.NO_CALLED);
+                CallStatus status;
 
-                        info.setTotalCalls(info.getTotalCalls() + 1);
-                        return;
-                    }
+                if (lastLogByType == null) {
+                    status = CallStatus.NO_CALLED;
+                } else {
+                    status = lastLogByType.getStatus();
+                }
 
-                    CallType type = lastCallLog.getType();
-                    CallStatus status = lastCallLog.getStatus();
+                CallsInfo info = callsByType
+                        .get(type)
+                        .get(status);
 
-                    CallsInfo info = callsByType
-                            .get(type)
-                            .get(status);
-
-                    info.setTotalCalls(info.getTotalCalls() + 1);
-                });
-
+                info.setTotalCalls(info.getTotalCalls() + 1);
+            }
+        });
         List<CallTypeStats> finalList = new ArrayList<>();
 
         for (CallType type : callsByType.keySet()) {
 
             Collection<CallsInfo> infos = callsByType.get(type).values();
 
-            int totalCalls = infos.stream()
-                    .mapToInt(CallsInfo::getTotalCalls)
-                    .sum();
+            int totalCalls = totalCallsInTraining.size();
 
             int done = callsByType.get(type)
                     .get(CallStatus.DONE)
@@ -216,19 +233,41 @@ public class ImplOperativeLifeDashboardRepository implements OperativeLifeDashbo
                     .get(CallStatus.NEXT_DATE)
                     .getTotalCalls();
 
+            int forConfirmation = callsByType.get(type)
+                    .get(CallStatus.FOR_CONFIRMATION)
+                    .getTotalCalls();
+
+            int notAnswered = callsByType.get(type)
+                    .get(CallStatus.NOT_ANSWERED)
+                    .getTotalCalls();
+
+            int noCalled = callsByType.get(type)
+                    .get(CallStatus.NO_CALLED)
+                    .getTotalCalls();
+
+            int reAgendado = callsByType.get(type)
+                    .get(CallStatus.RE_SCHEDULED)
+                    .getTotalCalls();
+
             CallTypeStats stats = new CallTypeStats();
             stats.setCallType(type);
             stats.setStatuses(new ArrayList<>(infos));
 
-            stats.setCuadre(stats.getStatuses().size() - totalCalls);
+            int cuadre = totalCalls - (
+                    done + anotherCampus + notInterested + nextDate + forConfirmation + notAnswered + noCalled + reAgendado
+            );
 
-            double effectiveness = ((double) (done + anotherCampus) / totalCalls) ;
+            stats.setCuadre(cuadre);
+
+            double effectiveness = totalCalls > 0
+                    ? Math.round(((double) (done + anotherCampus) / totalCalls) * 100.0)
+                    : 0.0;
 
             stats.setEffectivenessPercentage(effectiveness);
 
-            double projectedCalls = totalCalls == 0
-                    ? 0
-                    : ((double) (totalCalls - notInterested - nextDate) / totalCalls);
+            double projectedCalls = totalCalls > 0
+                    ? Math.round(((double) (totalCalls - notInterested - nextDate) / totalCalls) * 100.0)
+                    : 0.0;
 
             stats.setProjectedCallsPercentage(projectedCalls);
 

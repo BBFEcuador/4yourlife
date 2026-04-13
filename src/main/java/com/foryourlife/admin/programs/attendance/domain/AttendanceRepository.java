@@ -19,4 +19,6 @@ public interface AttendanceRepository {
     List<Attendance> findByUserIdAndTrainingIn(String userId, List<Training> trainingIds);
 
     List<Attendance> findAllByUserIds(List<String> userIds);
+
+    List<Attendance> findAllByTrainingNumberAndUsersIdsAndCampusId(Integer trainingNumber, List<String> userId, String campusId);
 }

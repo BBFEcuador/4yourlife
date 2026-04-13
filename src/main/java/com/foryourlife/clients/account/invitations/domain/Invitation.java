@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,18 +25,21 @@ public class Invitation extends AggregateRoot implements Serializable {
     @JoinColumn(referencedColumnName = "id", name = "campus_id")
     private Campus campus;
     private Boolean isAdmin;
-    private Boolean isUsed;
+    @Column(
+            name = "isUsed"
+    )
+    private Boolean isActive;
     private String senderId;
     private Integer quantity;
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Sender enrolled;
 
-    private Invitation(String id, String token, Boolean isAdmin, Boolean isUsed, String senderId, Sender enrolled, Integer quantity, Campus campus) {
+    private Invitation(String id, String token, Boolean isAdmin, Boolean isActive, String senderId, Sender enrolled, Integer quantity, Campus campus) {
         this.id = id;
         this.token = token;
         this.isAdmin = isAdmin;
-        this.isUsed = isUsed;
+        this.isActive = isActive;
         this.senderId = senderId;
         this.quantity = quantity;
         this.enrolled = enrolled;
@@ -49,8 +51,8 @@ public class Invitation extends AggregateRoot implements Serializable {
     }
 
 
-    public static Invitation create(String id, String token, Participant users, Boolean isAdmin, String senderId, Sender enrolled, Integer quantity, Campus campus) {
-        var invitation = new Invitation(id, token, isAdmin, false, senderId, enrolled, quantity, campus);
+    public static Invitation create(String id, String token, Boolean isAdmin, String senderId, Sender enrolled, Integer quantity, Campus campus) {
+        var invitation = new Invitation(id, token, isAdmin, true, senderId, enrolled, quantity, campus);
         invitation.record(new InvitationCreated(id, invitation));
         return invitation;
     }
@@ -79,8 +81,8 @@ public class Invitation extends AggregateRoot implements Serializable {
         return isAdmin;
     }
 
-    public Boolean getUsed() {
-        return isUsed;
+    public Boolean getActive() {
+        return isActive;
     }
 
     public String getSenderId() {
@@ -94,7 +96,7 @@ public class Invitation extends AggregateRoot implements Serializable {
     public void consumeToken() {
         if (this.quantity == 0) return;
         this.quantity--;
-        if (this.quantity == 0) this.isUsed = true;
+        if (this.quantity == 0) this.isActive = true;
     }
 
     public void setUsers(List<EnrolledUsers> users) {
@@ -109,5 +111,7 @@ public class Invitation extends AggregateRoot implements Serializable {
         isAdmin = admin;
     }
 
-
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
 }

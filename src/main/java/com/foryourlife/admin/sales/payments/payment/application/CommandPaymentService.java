@@ -29,7 +29,6 @@ import com.foryourlife.clients.account.participant.domain.Participant;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participantLevel.application.ParticipantLevelService;
 import com.foryourlife.clients.account.promises.domain.PromiseRepository;
-import com.foryourlife.shared.domain.events.PaymentCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,6 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -207,7 +205,7 @@ public class CommandPaymentService {
             var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
             _paymentRepository.save(payment);
             var newInvoice = createInvoice(invoice, cashDrawer, payment, payment.getPaymentshistory());
-            this.paymentCreated(new PaymentCreated(payment, newInvoice, cashDrawer));
+            this.paymentCreated(payment);
         }
 
         cashDrawerDetailCommandService.save(null, paymentReq.cashDrawerId, payment);
@@ -278,7 +276,7 @@ public class CommandPaymentService {
             return saved;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return invoice;
         }
     }
@@ -440,7 +438,7 @@ public class CommandPaymentService {
         cashDrawerDetailCommandService.save(paymentHistory.getId(), cashDrawer.getId(), payment);
 
         createInvoice(newInvoice, cashDrawer, payment, List.of(paymentHistory));
-        this.paymentCreated(new PaymentCreated(payment, newInvoice, cashDrawer));
+        this.paymentCreated(payment);
     }
 
     public void changeStatus(String id, String status) {
@@ -478,30 +476,23 @@ public class CommandPaymentService {
         }
     }
 
-    public void paymentCreated(PaymentCreated event) {
-        if (event.getPayment().getStatus() == PaymentStatus.COMPLETED) {
-            Participant participant = event.getPayment().getParticipant();
-            event.getPayment().getProducts().forEach(product -> {
+    public void paymentCreated(Payment payment) {
+        if (payment.getStatus() == PaymentStatus.COMPLETED) {
+            Participant participant = payment.getParticipant();
+            payment.getProducts().forEach(product -> {
 
                 var invitation = queryInvitationServices.findInvitationByToken(participant.getInvitationToken());
 
-                var promiseOpt = promiseRepository.findLastByUserId(invitation.getSenderId());
+                var promiseOpt = promiseRepository.findByTrainingNameAndUserId(invitation.getEnrolled().getTrainingName(), invitation.getSenderId());
 
                 if (promiseOpt.isPresent()) {
                     var promise = promiseOpt.get();
+                    promise.setPaidCount(promise.getPaidCount() + 1);
+                    promiseRepository.save(promise);
 
-                    LocalDate createdDate = participant.getCreatedDate().toLocalDate();
-                    LocalDate startDate = promise.getStartDate();
-                    LocalDate endDate = promise.getEndDate();
-
-                    if ((createdDate.isEqual(startDate) || createdDate.isAfter(startDate)) &&
-                            (createdDate.isEqual(endDate) || createdDate.isBefore(endDate))) {
-
-                        promise.setPaidCount(promise.getPaidCount() + 1);
-                        promiseRepository.save(promise);
-                    }
                 }
-                var prod = event.getPayment().getProducts().getFirst();
+                
+                var prod = payment.getProducts().getFirst();
 
                 prod.getPrograms().forEach(program -> {
                     switch (program.getCourseLevel()) {
@@ -511,8 +502,8 @@ public class CommandPaymentService {
                         default -> throw new BaseException("Invalid course level", List.of(""));
                     }
                 });
-                if (event.getPayment().getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.INIT) {
-                    participant.setOriginalTraining(event.getPayment().getTraining().getName());
+                if (payment.getParticipant().getParticipantLevel().getCourseLevel() == CourseLevel.INIT) {
+                    participant.setOriginalTraining(payment.getTraining().getName());
                     var pl = participantLevelRepository.getRolByLevel(CourseLevel.FOCUS);
                     participant.setParticipantLevel(pl);
                     participantRepository.save(participant);

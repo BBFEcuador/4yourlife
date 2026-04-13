@@ -1,21 +1,21 @@
 package com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.focus;
 
-import com.foryourlife.admin.dashboard.operativeAssitantDashboard.domain.your.YourWeeklyPaymentStats;
-
 import java.util.List;
 
 public class OperativeFocusPayments {
     private int yourPaymentsCount;
     private int yourPlusLifePaymentsCount;
     private int totalPaymentsCount;
+    private double totalPaymentsPercentage;
     private int pendingPaymentsCount;
     private int possibilityPaymentsCount;
     private List<FocusWeeklyPaymentStats> focusWeeklyPaymentStats;
 
-    public OperativeFocusPayments(int yourPaymentsCount, int yourPlusLifePaymentsCount, int totalPaymentsCount, int pendingPaymentsCount, int possibilityPaymentsCount, List<FocusWeeklyPaymentStats> focusWeeklyPaymentStats) {
+    public OperativeFocusPayments(int yourPaymentsCount, int yourPlusLifePaymentsCount, int totalPaymentsCount, double totalPaymentsPercentage, int pendingPaymentsCount, int possibilityPaymentsCount, List<FocusWeeklyPaymentStats> focusWeeklyPaymentStats) {
         this.yourPaymentsCount = yourPaymentsCount;
         this.yourPlusLifePaymentsCount = yourPlusLifePaymentsCount;
         this.totalPaymentsCount = totalPaymentsCount;
+        this.totalPaymentsPercentage = totalPaymentsPercentage;
         this.pendingPaymentsCount = pendingPaymentsCount;
         this.possibilityPaymentsCount = possibilityPaymentsCount;
         this.focusWeeklyPaymentStats = focusWeeklyPaymentStats;
@@ -67,5 +67,13 @@ public class OperativeFocusPayments {
 
     public void setFocusWeeklyPaymentStats(List<FocusWeeklyPaymentStats> focusWeeklyPaymentStats) {
         this.focusWeeklyPaymentStats = focusWeeklyPaymentStats;
+    }
+
+    public double getTotalPaymentsPercentage() {
+        return totalPaymentsPercentage;
+    }
+
+    public void setTotalPaymentsPercentage(double totalPaymentsPercentage) {
+        this.totalPaymentsPercentage = totalPaymentsPercentage;
     }
 }

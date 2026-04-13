@@ -104,9 +104,13 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
                         || AttendanceStatus.DESERTO.equals(a.getSundayAttendance()))
                 .count();
 
+        double deserterParticipantPercentage = initialParticipantCount > 0 ? (double) deserterParticipantCount / initialParticipantCount : 0;
+
         int statementsCount = (int) safeStatements.stream()
                 .filter(s -> s.getStatus() != null && s.getStatus() != StatementStatusEnum.EMPTY)
                 .count();
+
+        double statementsPercentage = initialParticipantCount > 0 ? (double) statementsCount / initialParticipantCount : 0;
 
         int visionariesCount = Optional.ofNullable(team.getVisionaries())
                 .map(List::size)
@@ -124,7 +128,9 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
                 initialParticipantCount,
                 realParticipantCount,
                 deserterParticipantCount,
+                deserterParticipantPercentage,
                 statementsCount,
+                statementsPercentage,
                 visionariesCount,
                 captainCount,
                 staffCount
@@ -183,6 +189,14 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
 
         int totalPaymentsCount = yourPaymentsCount + yourPlusLifePaymentsCount;
 
+        int realParticipantCount = (int) safeAttendances.stream()
+                .filter(a -> AttendanceStatus.ASISTIO.equals(a.getSundayAttendance()))
+                .count();
+
+        double totalPaymentsPercentage = realParticipantCount > 0
+                ? Math.round((double) totalPaymentsCount /  realParticipantCount * 100)
+                : 0;
+
         int possibilityPaymentsCount = (int) safeStatements.stream()
                 .filter(s -> StatementStatusEnum.POSSIBILITY.equals(s.getStatus()))
                 .count();
@@ -191,6 +205,7 @@ public class ImplOperativeFocusDashboardRepository implements OperativeFocusDash
                 yourPaymentsCount,
                 yourPlusLifePaymentsCount,
                 totalPaymentsCount,
+                totalPaymentsPercentage,
                 pendingPaymentsCount,
                 possibilityPaymentsCount,
                 buildFocusWeeklyPaymentStats(training, team, safeStatements, payments)

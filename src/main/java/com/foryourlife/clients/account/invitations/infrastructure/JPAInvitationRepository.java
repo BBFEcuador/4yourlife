@@ -18,7 +18,9 @@ public interface JPAInvitationRepository extends JpaRepository<Invitation, Strin
     List<Invitation> findBySenderId(String token);
 
     @Query("SELECT i FROM Invitation i WHERE i.senderId = :senderId AND i.quantity > 0 ORDER BY i.quantity DESC LIMIT 1")
-    Optional<Invitation> findTopBySenderIdOrderByQuantityDesc(@Param("senderId") String senderId);
+    List<Invitation> findTopBySenderIdOrderByQuantityDesc(@Param("senderId") String senderId);
 
     List<Invitation> findAllByTokenIn(Collection<String> tokens);
+
+    List<Invitation> findAllBySenderIdOrderByQuantityDesc(String senderId);
 }

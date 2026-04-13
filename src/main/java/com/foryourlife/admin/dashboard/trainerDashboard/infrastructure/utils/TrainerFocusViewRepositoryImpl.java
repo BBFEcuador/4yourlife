@@ -454,4 +454,8 @@ public class TrainerFocusViewRepositoryImpl implements TrainerFocusViewRepositor
                 .count();
     }
 
+    @Override
+    public String generateExcelReport(TrainerFocusView trainerFocusView) {
+        return "";
+    }
 }

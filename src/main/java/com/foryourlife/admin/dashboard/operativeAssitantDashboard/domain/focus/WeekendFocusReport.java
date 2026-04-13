@@ -4,19 +4,39 @@ public class WeekendFocusReport {
     private int initialParticipantsCount;
     private int realParticipantsCount;
     private int deserterParticipantsCount;
+    private double desertionPercentage;
     private int declarationsCount;
+    private double declarationPercentage;
     private int visionariesCount;
     private int captainsCount;
     private int staffsCount;
 
-    public WeekendFocusReport(int initialParticipantsCount, int realParticipantsCount, int deserterParticipantsCount, int declarationsCount, int visionariesCount, int captainsCount, int staffsCount) {
+    public WeekendFocusReport(int initialParticipantsCount, int realParticipantsCount, int deserterParticipantsCount, double desertionPercentage, int declarationsCount, double declarationPercentage, int visionariesCount, int captainsCount, int staffsCount) {
         this.initialParticipantsCount = initialParticipantsCount;
         this.realParticipantsCount = realParticipantsCount;
         this.deserterParticipantsCount = deserterParticipantsCount;
+        this.desertionPercentage = desertionPercentage;
         this.declarationsCount = declarationsCount;
+        this.declarationPercentage = declarationPercentage;
         this.visionariesCount = visionariesCount;
         this.captainsCount = captainsCount;
         this.staffsCount = staffsCount;
+    }
+
+    public double getDesertionPercentage() {
+        return desertionPercentage;
+    }
+
+    public void setDesertionPercentage(double desertionPercentage) {
+        this.desertionPercentage = desertionPercentage;
+    }
+
+    public double getDeclarationPercentage() {
+        return declarationPercentage;
+    }
+
+    public void setDeclarationPercentage(double declarationPercentage) {
+        this.declarationPercentage = declarationPercentage;
     }
 
     public int getInitialParticipantsCount() {

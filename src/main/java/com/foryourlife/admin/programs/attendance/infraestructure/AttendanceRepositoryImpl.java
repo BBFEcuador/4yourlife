@@ -50,4 +50,18 @@ public class AttendanceRepositoryImpl implements AttendanceRepository {
     public List<Attendance> findAllByUserIds(List<String> userIds) {
         return _jpaAttendanceRepository.findAllByUser_Ids(userIds);
     }
+
+    @Override
+    public List<Attendance> findAllByTrainingNumberAndUsersIdsAndCampusId(
+            Integer trainingNumber,
+            List<String> userIds,
+            String campusId
+    ) {
+        return _jpaAttendanceRepository
+                .findAllByTraining_NumberAndTraining_Campus_IdAndUser_IdIn(
+                        trainingNumber,
+                        campusId,
+                        userIds
+                );
+    }
 }

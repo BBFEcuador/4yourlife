@@ -1,6 +1,7 @@
 package com.foryourlife.admin.dashboard.trainerDashboard.domain.life;
 
 import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.LingererStats;
+import com.foryourlife.admin.dashboard.trainerDashboard.domain.common.PreviousTrainingStats;
 import com.foryourlife.shared.domain.level.CourseLevel;
 
 import java.util.List;
@@ -10,36 +11,23 @@ public class TrainerLifeView {
     private String trainerName;
     private String trainingDate;
     private String courseLevel;
-    private LifeAttendanceDashboard lifeAttendanceDashboard;
-    private PromiseDashboard promiseDashboard;
+
+    private PreviousTrainingStats previousTrainingStats;
     private List<UserDashboardDto> users;
+    private DeclarationStats  declarationStats;
+    private LifeAttendanceDashboard lifeAttendanceDashboard;
     private LingererStats lingererStats;
 
-    public TrainerLifeView(String trainingName, String trainerName, String trainingDate, String courseLevel, LifeAttendanceDashboard lifeAttendanceDashboard, PromiseDashboard promiseDashboard, List<UserDashboardDto> users, LingererStats lingererStats) {
+    public TrainerLifeView(String trainingName, String trainerName, String trainingDate, String courseLevel, PreviousTrainingStats previousTrainingStats, List<UserDashboardDto> users, DeclarationStats declarationStats, LifeAttendanceDashboard lifeAttendanceDashboard, LingererStats lingererStats) {
         this.trainingName = trainingName;
         this.trainerName = trainerName;
         this.trainingDate = trainingDate;
         this.courseLevel = courseLevel;
-        this.lifeAttendanceDashboard = lifeAttendanceDashboard;
-        this.promiseDashboard = promiseDashboard;
+        this.previousTrainingStats = previousTrainingStats;
         this.users = users;
-        this.lingererStats = lingererStats;
-    }
-
-    public String getTrainingDate() {
-        return trainingDate;
-    }
-
-    public void setTrainingDate(String trainingDate) {
-        this.trainingDate = trainingDate;
-    }
-
-    public LifeAttendanceDashboard getLifeAttendanceDashboard() {
-        return lifeAttendanceDashboard;
-    }
-
-    public void setLifeAttendanceDashboard(LifeAttendanceDashboard lifeAttendanceDashboard) {
+        this.declarationStats = declarationStats;
         this.lifeAttendanceDashboard = lifeAttendanceDashboard;
+        this.lingererStats = lingererStats;
     }
 
     public String getTrainingName() {
@@ -58,20 +46,28 @@ public class TrainerLifeView {
         this.trainerName = trainerName;
     }
 
-    public LifeAttendanceDashboard getAttendanceDashboard() {
+    public String getTrainingDate() {
+        return trainingDate;
+    }
+
+    public void setTrainingDate(String trainingDate) {
+        this.trainingDate = trainingDate;
+    }
+
+    public String getCourseLevel() {
+        return courseLevel;
+    }
+
+    public void setCourseLevel(String courseLevel) {
+        this.courseLevel = courseLevel;
+    }
+
+    public LifeAttendanceDashboard getLifeAttendanceDashboard() {
         return lifeAttendanceDashboard;
     }
 
-    public void setAttendanceDashboard(LifeAttendanceDashboard lifeAttendanceDashboard) {
+    public void setLifeAttendanceDashboard(LifeAttendanceDashboard lifeAttendanceDashboard) {
         this.lifeAttendanceDashboard = lifeAttendanceDashboard;
-    }
-
-    public PromiseDashboard getPromiseDashboard() {
-        return promiseDashboard;
-    }
-
-    public void setPromiseDashboard(PromiseDashboard promiseDashboard) {
-        this.promiseDashboard = promiseDashboard;
     }
 
     public List<UserDashboardDto> getUsers() {
@@ -90,11 +86,19 @@ public class TrainerLifeView {
         this.lingererStats = lingererStats;
     }
 
-    public String getCourseLevel() {
-        return courseLevel;
+    public PreviousTrainingStats getPreviousTrainingStats() {
+        return previousTrainingStats;
     }
 
-    public void setCourseLevel(String courseLevel) {
-        this.courseLevel = courseLevel;
+    public void setPreviousTrainingStats(PreviousTrainingStats previousTrainingStats) {
+        this.previousTrainingStats = previousTrainingStats;
+    }
+
+    public DeclarationStats getDeclarationStats() {
+        return declarationStats;
+    }
+
+    public void setDeclarationStats(DeclarationStats declarationStats) {
+        this.declarationStats = declarationStats;
     }
 }

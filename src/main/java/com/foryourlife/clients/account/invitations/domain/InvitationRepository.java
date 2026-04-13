@@ -7,6 +7,6 @@ public interface InvitationRepository {
     void save(Invitation invitation);
     Optional<Invitation> findByToken(String token);
     List<Invitation> findBySenderId(String token);
-    Optional<Invitation> findTopBySenderIdOrderByQuantityDesc(String id);
+    List<Invitation> findTopBySenderIdOrderByQuantityDesc(String id);
     List<Invitation> findAllByTokenIn(List<String> ids);
 }

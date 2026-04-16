@@ -147,7 +147,6 @@ public class ParticipantCommandService {
         if (this._participantRepository.findByEmail(user.getUser().getEmail()).isPresent())
             throw new UserAlreadyCreatedException("El email " + user.getUser().getEmail() + " ya esta registrado");
         try {
-            var ensureRolExist = this._rolRepository.getRoleById(user.getRoleId());
             this._participantRepository.save(user);
 
             this.bus.publish(user.pullDomainEvents());

@@ -105,7 +105,7 @@ public class ParticipantCommandService {
     @Transactional
     public void createInitUser(Participant user, MedicalRecordSaveRequest medicalRecordRequest, SaveContactRequest contact, DataInvoice dataInvoice) {
         var token = queryInvitationServices.findInvitationByToken(user.getInvitationToken());
-        if (token.getActive())
+        if (!token.getActive())
             throw new BaseException("Token expirado", List.of("El token ya fue utilizado"));
         _profileDetailsRepository.findByDni(user.getProfile().getDni()).ifPresent(profileDetails -> {
             throw new BaseException("Error al crear", List.of("Ya existe un participante con el documento "+user.getProfile().getDni()));

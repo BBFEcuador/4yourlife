@@ -52,14 +52,16 @@ public class StaffController {
             return new ResponseEntity<>(staffFinderService.getAll(p), HttpStatus.OK);
         }
 
-        String normalized = search.trim().replaceAll("\\s+", " ");
+        String[] terms = search.trim().toLowerCase().split("\\s+");
 
-        List<Filter> filters = List.of(
-                new Filter("name", normalized, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                new Filter("email", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                new Filter("phone", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR)
+        List<Filter> filters = new ArrayList<>();
 
-        );
+        filters.add(new Filter("email", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR));
+        filters.add(new Filter("phone", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR));
+
+        for (String term : terms) {
+            filters.add(new Filter("name", term, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR));
+        }
 
         Criteria criteria = new Criteria(filters, Optional.empty(), Optional.empty());
 

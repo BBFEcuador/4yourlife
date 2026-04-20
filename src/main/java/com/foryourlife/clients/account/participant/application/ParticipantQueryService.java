@@ -34,6 +34,11 @@ public class ParticipantQueryService {
     public Page<Participant> getAll(Pageable pageable,Criteria criteria) {
         return this._participantRepository.getAll(pageable,criteria);
     }
+
+    public Page<Participant> getAll(Pageable pageable) {
+        return this._participantRepository.getAll(pageable);
+    }
+
     public List<Participant> matchers(Criteria criteria) {
         return this._participantRepository.match(criteria);
     }

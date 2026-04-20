@@ -92,6 +92,11 @@ public class ParticipantRepositoryImpl implements ParticipantRepository {
     }
 
     @Override
+    public Page<Participant> getAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    @Override
     public Optional<Participant> findById(String id) {
         return repository.findById(id);
     }

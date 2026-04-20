@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,36 +42,25 @@ public class VisionaryController {
             @RequestParam(value = "search", defaultValue = "") String search
     ) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-        if (search.isEmpty()) {
+
+        if (search == null || search.trim().isEmpty()) {
             return new ResponseEntity<>(finderService.getAll(p), HttpStatus.OK);
-        }else{
-            Criteria criteria = new Criteria(
-                    List.of(
-                            new Filter(
-                                    "name",
-                                    search,
-                                    "user",
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            ),
-                            new Filter(
-                                    "email",
-                                    search,
-                                    "user",
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            ),
-                            new Filter(
-                                    "phone",
-                                    search,
-                                    "user",
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            )
-                    ), Optional.empty(), Optional.empty()
-            );
-            return new ResponseEntity<>(finderService.getAll(p,criteria), HttpStatus.OK);
         }
+
+        String[] terms = search.trim().toLowerCase().split("\\s+");
+
+        List<Filter> filters = new ArrayList<>();
+
+        filters.add(new Filter("email", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR));
+        filters.add(new Filter("phone", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR));
+
+        for (String term : terms) {
+            filters.add(new Filter("name", term, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR));
+        }
+
+        Criteria criteria = new Criteria(filters, Optional.empty(), Optional.empty());
+
+        return new ResponseEntity<>(finderService.getAll(p, criteria), HttpStatus.OK);
     }
 
     @GetMapping("{userId}")

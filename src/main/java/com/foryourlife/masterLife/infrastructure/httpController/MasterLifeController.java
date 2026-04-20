@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,35 +58,23 @@ public class MasterLifeController {
             @RequestParam(value = "search", defaultValue = "") String search
     ) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-        Criteria criteria = new Criteria(
-                List.of(), Optional.empty(), Optional.empty()
-        );
-        if (!search.isEmpty()) {
-            criteria.filters =
-                    List.of(
-                            new Filter(
-                                    "name",
-                                    search,
-                                    "user",
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            ),
-                            new Filter(
-                                    "email",
-                                    search,
-                                    "user",
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            ),
-                            new Filter(
-                                    "phone",
-                                    search,
-                                    "user",
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            )
-                    );
+
+        if (search == null || search.trim().isEmpty()) {
+            return new ResponseEntity<>(queryMasterLifeService.getAll(p), HttpStatus.OK);
         }
+
+        String[] terms = search.trim().toLowerCase().split("\\s+");
+
+        List<Filter> filters = new ArrayList<>();
+
+        filters.add(new Filter("email", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR));
+        filters.add(new Filter("phone", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR));
+
+        for (String term : terms) {
+            filters.add(new Filter("name", term, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR));
+        }
+
+        Criteria criteria = new Criteria(filters, Optional.empty(), Optional.empty());
         return new ResponseEntity<>(queryMasterLifeService.getAll(p, criteria), HttpStatus.OK);
     }
 }

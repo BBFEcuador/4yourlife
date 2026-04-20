@@ -23,6 +23,7 @@ public interface ParticipantRepository {
 
     List<Participant> getAll();
     Page<Participant> getAll(Pageable pageable,Criteria criteria);
+    Page<Participant> getAll(Pageable pageable);
 
     List<Participant> match(Criteria criteria);
 

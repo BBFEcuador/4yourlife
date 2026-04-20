@@ -32,6 +32,10 @@ public class QueryMasterLifeService {
         return repository.findAll(pageable,criteria);
     }
 
+    public Page<MasterLife> getAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
     public List<MasterLife> match(Criteria criteria) {
         return repository.match(criteria);
     }

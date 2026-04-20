@@ -40,13 +40,17 @@ public class ParticipantController {
             @RequestParam(value = "campusId", defaultValue = "") String campusId
     ) {
         var pageable = PageRequest.of(page, perPage, Sort.by("id").descending());
+
+        if (search == null || search.trim().isEmpty()) {
+            return new ResponseEntity<>(participantQueryService.getAll(pageable), HttpStatus.OK);
+        }
+
         List<Filter> filters = new ArrayList<>();
 
-        String normalized = search.trim().replaceAll("\\s+", " ");
+        String[] terms = search.trim().toLowerCase().split("\\s+");
 
         if (!search.isEmpty()) {
             filters.addAll(List.of(
-                    new Filter("name", normalized, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
                     new Filter("email", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
                     new Filter("phone", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
                     new Filter("city", search, "campus", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
@@ -54,6 +58,10 @@ public class ParticipantController {
                     new Filter("name", search, "teams", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
                     new Filter("courseLevel", search, "participantLevel", Filter.Operation.LIKE, Filter.LogicalOperator.OR)
             ));
+        }
+
+        for (String term : terms) {
+            filters.add(new Filter("name", term, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR));
         }
 
         if (!campusId.isEmpty()) {

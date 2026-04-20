@@ -4,6 +4,7 @@ import com.foryourlife.masterLife.domain.MasterLife;
 import com.foryourlife.masterLife.domain.MasterLifeRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
+import com.foryourlife.staff.domain.Staff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,11 @@ public class MasterLifeRepositoryImpl implements MasterLifeRepository {
     @Override
     public Page<MasterLife> findAll(Pageable pageable, Criteria criteria) {
         return repository.findAll(criteriaConverter.getJpaSpecifications(criteria), pageable);
+    }
+
+    @Override
+    public Page<MasterLife> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override

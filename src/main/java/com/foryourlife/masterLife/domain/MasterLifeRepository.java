@@ -1,6 +1,7 @@
 package com.foryourlife.masterLife.domain;
 
 import com.foryourlife.shared.domain.criteria.Criteria;
+import com.foryourlife.staff.domain.Staff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,6 +14,7 @@ public interface MasterLifeRepository {
     Optional<MasterLife> findById(String id);
     List<MasterLife> findAll();
     Page<MasterLife> findAll(Pageable pageable, Criteria criteria);
+    Page<MasterLife> findAll(Pageable pageable);
     List<MasterLife> findAvailableMasterLife(LocalDate startDate, LocalDate endDate);
 
     List<MasterLife> match(Criteria criteria);

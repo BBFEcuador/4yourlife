@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +40,6 @@ public class StaffController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-
     @GetMapping("")
     public ResponseEntity<?> findStaffByUserId(
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -47,36 +47,23 @@ public class StaffController {
             @RequestParam(value = "search", defaultValue = "") String search
     ) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
-        if (search.isEmpty()) {
+
+        if (search == null || search.trim().isEmpty()) {
             return new ResponseEntity<>(staffFinderService.getAll(p), HttpStatus.OK);
-        } else {
-            Criteria criteria = new Criteria(
-                    List.of(
-                            new Filter(
-                                    "name",
-                                    search,
-                                    "user",
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            ),
-                            new Filter(
-                                    "email",
-                                    search,
-                                    "user",
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            ),
-                            new Filter(
-                                    "phone",
-                                    search,
-                                    "user",
-                                    Filter.Operation.LIKE,
-                                    Filter.LogicalOperator.OR
-                            )
-                    ), Optional.empty(), Optional.empty()
-            );
-            return new ResponseEntity<>(staffFinderService.getAll(p,criteria), HttpStatus.OK);
         }
+
+        String normalized = search.trim().replaceAll("\\s+", " ");
+
+        List<Filter> filters = List.of(
+                new Filter("name", normalized, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                new Filter("email", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                new Filter("phone", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR)
+
+        );
+
+        Criteria criteria = new Criteria(filters, Optional.empty(), Optional.empty());
+
+        return new ResponseEntity<>(staffFinderService.getAll(p, criteria), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

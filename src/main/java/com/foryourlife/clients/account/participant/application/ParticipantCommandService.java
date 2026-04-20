@@ -31,9 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ParticipantCommandService {
@@ -147,6 +146,13 @@ public class ParticipantCommandService {
         if (this._participantRepository.findByEmail(user.getUser().getEmail()).isPresent())
             throw new UserAlreadyCreatedException("El email " + user.getUser().getEmail() + " ya esta registrado");
         try {
+            String fullName = buildFullName(
+                    user.getUser().getName1(),
+                    user.getUser().getName2(),
+                    user.getUser().getLastname1(),
+                    user.getUser().getLastname2()
+            );
+            user.getUser().setName(fullName);
             this._participantRepository.save(user);
 
             this.bus.publish(user.pullDomainEvents());
@@ -157,9 +163,19 @@ public class ParticipantCommandService {
 
     public void update(Participant participant) {
         try {
-            var u = _userRepository.findById(participant.getUser().getId()).orElseThrow(() -> new BaseException("No se encontró el usuario asociado al participante.", List.of()));
+            var u = _userRepository.findById(participant.getUser().getId())
+                    .orElseThrow(() -> new BaseException("No se encontró el usuario asociado al participante.", List.of()));
+
             var auxUser = participant.getUser();
-            u.setName(auxUser.getName1() + " " + auxUser.getName2() + " " + auxUser.getLastname1() + " " + auxUser.getLastname2());
+
+            String fullName = buildFullName(
+                    auxUser.getName1(),
+                    auxUser.getName2(),
+                    auxUser.getLastname1(),
+                    auxUser.getLastname2()
+            );
+
+            u.setName(fullName);
             u.setName1(auxUser.getName1());
             u.setName2(auxUser.getName2());
             u.setLastname1(auxUser.getLastname1());
@@ -167,6 +183,7 @@ public class ParticipantCommandService {
             u.setNickname(auxUser.getNickname());
             u.setEmail(auxUser.getEmail());
             u.setPhone(auxUser.getPhone());
+
             _userRepository.save(u);
             participant.setUser(u);
             participant.setCampus(participant.getCampus() != null ? participant.getCampus() : queryInvitationServices.findInvitationByToken(participant.getInvitationToken()).getCampus());
@@ -193,7 +210,7 @@ public class ParticipantCommandService {
     }
 
     public void createFromAdmin(Participant participant) {
-        if (_participantRepository.findByUserId(participant.getUser().getId()) != null) {
+        if (_participantRepository.findByUserId(participant.getUser().getId()).isPresent()) {
             throw new BaseException("El usuario ya es un Participante", List.of("El usuario ya es un Participante Master Life"));
         }
 
@@ -333,5 +350,15 @@ public class ParticipantCommandService {
         var hashedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(hashedPassword);
         _userRepository.save(user);
+    }
+
+    private String buildFullName(String... parts) {
+        return Arrays.stream(parts)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.joining(" "))
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 }

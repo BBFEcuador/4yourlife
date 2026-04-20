@@ -42,9 +42,11 @@ public class ParticipantController {
         var pageable = PageRequest.of(page, perPage, Sort.by("id").descending());
         List<Filter> filters = new ArrayList<>();
 
+        String normalized = search.trim().replaceAll("\\s+", " ");
+
         if (!search.isEmpty()) {
             filters.addAll(List.of(
-                    new Filter("name", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                    new Filter("name", normalized, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
                     new Filter("email", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
                     new Filter("phone", search, "user", Filter.Operation.LIKE, Filter.LogicalOperator.OR),
                     new Filter("city", search, "campus", Filter.Operation.LIKE, Filter.LogicalOperator.OR),

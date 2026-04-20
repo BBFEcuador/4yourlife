@@ -82,7 +82,7 @@ public class StaffCreatorService {
         if (role.isEmpty()){
             throw new BaseException("El rol no puede estar vacío", List.of("El rol es obligatorio"));
         }
-        if (_repository.findByUserId(userId) != null) {
+        if (_repository.findByUserId(userId).isPresent()) {
             throw new BaseException("El usuario ya es Staff", List.of("Ya es un Staff"));
         }
 

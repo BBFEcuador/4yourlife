@@ -47,7 +47,7 @@ public class JPACriteriaConverter<T> {
                     case LIKE ->
                             criteriaBuilder.like(
                                     criteriaBuilder.lower(join.get(filter.getColumn())),
-                                    criteriaBuilder.literal("%" + filter.getValue().toLowerCase() + "%")
+                                    "%" + filter.getValue().toLowerCase() + "%"
                             );
                     case IN -> {
                         String[] split = filter.getValue().split(",");

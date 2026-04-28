@@ -16,4 +16,6 @@ public interface PromiseRepository {
     Optional<Promise> findLastByUserId(String userId);
     Optional<Promise> findByTrainingNameAndUserId(String trainingName, String userId);
     void saveAll(List<Promise> promises);
+
+    boolean existsByTrainingIdAndUserId(String trainingId, String id);
 }

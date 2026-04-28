@@ -61,6 +61,7 @@ public class PromiseCommandService {
                 .toList();
 
         List<Promise> promises = allUsers.stream()
+                .filter(user -> !promiseRepository.existsByTrainingIdAndUserId(trainingId, user.getId()))
                 .map(user -> {
                     Promise promise = new Promise(
                             UUID.randomUUID().toString(),
@@ -73,7 +74,9 @@ public class PromiseCommandService {
                 })
                 .toList();
 
-        promiseRepository.saveAll(promises);
+        if (!promises.isEmpty()) {
+            promiseRepository.saveAll(promises);
+        }
     }
 
     public void savePromise(PromiseRequest promiseRequest) {

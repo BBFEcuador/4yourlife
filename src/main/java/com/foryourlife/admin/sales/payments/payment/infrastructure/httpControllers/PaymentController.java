@@ -1,11 +1,10 @@
 package com.foryourlife.admin.sales.payments.payment.infrastructure.httpControllers;
 
-import com.foryourlife.admin.sales.payments.payment.application.CommandPaymentService;
+import com.foryourlife.admin.sales.payments.payment.application.PaymentCommandService;
 import com.foryourlife.admin.sales.payments.payment.application.QueryPaymentService;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import jakarta.validation.Valid;
-import javassist.bytecode.ByteArray;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -23,16 +22,16 @@ import java.util.Optional;
 @RequestMapping("/payments")
 public class PaymentController {
     private final QueryPaymentService queryPaymentService;
-    private final CommandPaymentService commandPaymentService;
+    private final PaymentCommandService paymentCommandService;
 
-    public PaymentController(QueryPaymentService queryPaymentService, CommandPaymentService commandPaymentService) {
+    public PaymentController(QueryPaymentService queryPaymentService, PaymentCommandService paymentCommandService) {
         this.queryPaymentService = queryPaymentService;
-        this.commandPaymentService = commandPaymentService;
+        this.paymentCommandService = paymentCommandService;
     }
 
     @PostMapping("")
     public ResponseEntity<?> savePayment(@RequestBody @Valid PaymentRequest request) {
-        return new ResponseEntity<>(commandPaymentService.save(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(paymentCommandService.save(request), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
@@ -78,19 +77,19 @@ public class PaymentController {
 
     @PutMapping("add/payment-history/{paymentId}")
     public ResponseEntity<?> addPaymentHistory(@RequestBody @Valid PaymentHistoryRequest paymentHistory, @PathVariable String paymentId) {
-        commandPaymentService.updatePaymentsHistory(paymentHistory.paymentHistory, paymentId, paymentHistory.cashDrawerId);
+        paymentCommandService.updatePaymentsHistory(paymentHistory.paymentHistory, paymentId, paymentHistory.cashDrawerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping("/change-status/{id}")
     public ResponseEntity<?> changePaymentStatus(@PathVariable String id, @RequestParam(name = "status", defaultValue = "") String status) {
-        commandPaymentService.changeStatus(id, status);
+        paymentCommandService.changeStatus(id, status);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/generate-pdf/{paymentId}")
     public ResponseEntity<byte[]> generateInvoice(@PathVariable String paymentId) {
-        ByteArrayOutputStream pdfBytes = commandPaymentService.generateInvoice(paymentId);
+        ByteArrayOutputStream pdfBytes = paymentCommandService.generateInvoice(paymentId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

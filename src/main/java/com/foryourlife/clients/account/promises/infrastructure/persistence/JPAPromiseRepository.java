@@ -63,4 +63,9 @@ public class JPAPromiseRepository implements PromiseRepository {
     public Optional<Promise> findByTrainingNameAndUserId(String trainingName, String userId) {
         return this.jpaImplPromiseRepository.findByUser_IdAndTraining_Name(userId, trainingName);
     }
+
+    @Override
+    public boolean existsByTrainingIdAndUserId(String trainingId, String id) {
+        return this.jpaImplPromiseRepository.existsByTraining_IdAndUser_Id(trainingId, id);
+    }
 }

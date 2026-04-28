@@ -13,4 +13,6 @@ public interface JPAImplPromiseRepository extends JpaRepository<Promise, String>
     Optional<Promise> findFirstByUser_IdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByStartDateDesc(String userId, LocalDate startDateIsLessThan, LocalDate endDateIsGreaterThan);
 
     Optional<Promise> findByUser_IdAndTraining_Name(String userId, String trainingName);
+
+    boolean existsByTraining_IdAndUser_Id(String trainingId, String userId);
 }

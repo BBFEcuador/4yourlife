@@ -44,7 +44,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CommandPaymentService {
+public class PaymentCommandService {
 
     private final PaymentRepository _paymentRepository;
     private final PaymentMethodRepository _paymentMethodRepository;
@@ -64,7 +64,7 @@ public class CommandPaymentService {
     private final TrainingRepository trainingRepository;
     private final StatementRepository statementRepository;
 
-    public CommandPaymentService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, TrainingRepository trainingRepository, StatementRepository statementRepository) {
+    public PaymentCommandService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, TrainingRepository trainingRepository, StatementRepository statementRepository) {
         this._paymentRepository = _paymentRepository;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
@@ -337,7 +337,8 @@ public class CommandPaymentService {
         BigDecimal productSubtotal = subtotal.divide(BigDecimal.valueOf(productCount), 2, RoundingMode.DOWN);
 
         for (var product : payment.getProducts()) {
-            details.add(new InvoiceContificoJson.Detalle(product.getContificoId(),
+            details.add(new InvoiceContificoJson.Detalle(
+                    product.getContificoId(),
                     1,
                     productSubtotal.doubleValue(),
                     15,
@@ -491,7 +492,7 @@ public class CommandPaymentService {
                     promiseRepository.save(promise);
 
                 }
-                
+
                 var prod = payment.getProducts().getFirst();
 
                 prod.getPrograms().forEach(program -> {

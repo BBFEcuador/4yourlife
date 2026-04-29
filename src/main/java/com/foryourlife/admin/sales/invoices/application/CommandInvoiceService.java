@@ -21,6 +21,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -86,6 +87,22 @@ public class CommandInvoiceService {
                 .orElseThrow(() -> new BaseException("Config for the campus not found", List.of("")));
         String formattedInvoiceDate = invoice.getInvoiceDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
+        BigDecimal divisor = new BigDecimal("1.15");
+
+        BigDecimal subtotal = invoice.getInvoiceContifico().total.divide(divisor, 2, RoundingMode.HALF_UP);
+
+        BigDecimal recalculatedTotal = subtotal.multiply(divisor).setScale(2, RoundingMode.HALF_UP);
+
+        if (recalculatedTotal.compareTo(invoice.getInvoiceContifico().total) != 0) {
+            BigDecimal diff = invoice.getInvoiceContifico().total.subtract(recalculatedTotal);
+
+            subtotal = subtotal.add(diff.divide(divisor, 2, RoundingMode.HALF_UP));
+        }
+
+//        BigDecimal taxAmount = invoice.getInvoiceContifico().total.subtract(subtotal);
+
+        invoice.getInvoiceContifico().getDetalles().getFirst().setPrecio(subtotal);
+        invoice.getInvoiceContifico().getDetalles().getFirst().setBase_gravable(subtotal);
         InvoiceContificoJson contificoJson = new InvoiceContificoJson(
                 configContifico.getApiKey(),
                 formattedInvoiceDate,

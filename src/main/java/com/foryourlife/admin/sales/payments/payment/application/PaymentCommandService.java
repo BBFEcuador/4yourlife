@@ -363,11 +363,11 @@ public class PaymentCommandService {
             details.add(new InvoiceContificoJson.Detalle(
                     product.getContificoId(),
                     1,
-                    value.doubleValue(),
+                    value,
                     15,
                     0,
                     0,
-                    value.doubleValue(),
+                    value,
                     0,
                     0,
                     0.0

@@ -163,9 +163,10 @@ public class Payment extends AuditableEntity {
 
     @JsonProperty("remainingBalance")
     public BigDecimal getRemainingBalance() {
-        BigDecimal totalPayments = BigDecimal.valueOf(this.paymentshistory.stream()
-                .mapToDouble(PaymentHistory::getAmount)
-                .sum());
+        BigDecimal totalPayments = this.paymentshistory.stream()
+                .map(PaymentHistory::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return this.total.subtract(totalPayments);
     }
 

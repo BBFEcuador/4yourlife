@@ -3,21 +3,23 @@ package com.foryourlife.admin.sales.payments.cashDrawer.domain;
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethod;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 
 public class PaymentMethodSummary implements Serializable {
     private PaymentMethod paymentMethod;
-    private double totalAmount;
+    private BigDecimal totalAmount;
     private int transactionCount;
 
     public PaymentMethodSummary(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
-        this.totalAmount = 0;
+        this.totalAmount = BigDecimal.ZERO;
         this.transactionCount = 0;
     }
 
-    public void addPayment(double amount) {
-        this.totalAmount += amount;
+    public void addPayment(BigDecimal amount) {
+        if (amount == null) return;
+        this.totalAmount = this.totalAmount.add(amount);
         this.transactionCount++;
     }
 
@@ -29,12 +31,12 @@ public class PaymentMethodSummary implements Serializable {
         this.paymentMethod = paymentMethod;
     }
 
-    public double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount == null ? BigDecimal.ZERO : totalAmount;
     }
 
     public int getTransactionCount() {

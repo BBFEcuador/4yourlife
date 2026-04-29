@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -62,7 +63,7 @@ public class CashDrawerCommandService {
         return  this.getCloseReport(existingDrawer.getId());
     }
     @Transactional
-    public CashDrawer openDrawer(String cashBoxId, String userId, Double openingBalance, String detail) {
+    public CashDrawer openDrawer(String cashBoxId, String userId, BigDecimal openingBalance, String detail) {
 
         var cashBox = cashBoxRepository.findById(cashBoxId).orElseThrow(
                 () -> new BaseException("Cash box not found", List.of(""))
@@ -112,23 +113,28 @@ public class CashDrawerCommandService {
         return save(newDrawer);
     }
 
+    public BigDecimal getActualBalance(CashDrawer cashDrawer) {
 
-    public Double getActualBalance(CashDrawer cashDrawer) {
-        Double totalPayments = 0.0;
+        BigDecimal totalPayments = BigDecimal.ZERO;
+
         if (cashDrawer.getCashDrawerDetails() == null || cashDrawer.getCashDrawerDetails().isEmpty()) {
             return cashDrawer.getOpeningBalance();
         }
+
         for (CashDrawerDetail detail : cashDrawer.getCashDrawerDetails()) {
             Payment payment = detail.getPayment();
+
             if (payment != null) {
                 for (PaymentHistory paymentHistory : payment.getPaymentshistory()) {
+
                     if (paymentHistory.getId().equals(detail.getPaymentHistoryId())) {
-                        totalPayments += paymentHistory.getAmount();
+                        totalPayments = totalPayments.add(paymentHistory.getAmount());
                     }
                 }
             }
         }
-        return cashDrawer.getOpeningBalance() + totalPayments;
+
+        return cashDrawer.getOpeningBalance().add(totalPayments);
     }
 
     public void lockCashDrawer(String id, String pin) {

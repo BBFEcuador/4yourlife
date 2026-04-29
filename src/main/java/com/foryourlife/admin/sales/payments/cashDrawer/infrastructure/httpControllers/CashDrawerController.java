@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +56,7 @@ public class CashDrawerController {
     }
 
     @PutMapping("/open/{cashBoxId}")
-    public ResponseEntity<CashDrawer> openDrawer(@PathVariable String cashBoxId, @RequestParam String userId, @RequestParam Double openingBalance, @RequestParam String detail) {
+    public ResponseEntity<CashDrawer> openDrawer(@PathVariable String cashBoxId, @RequestParam String userId, @RequestParam BigDecimal openingBalance, @RequestParam String detail) {
         return new ResponseEntity<>(commandService.openDrawer(cashBoxId, userId, openingBalance, detail), HttpStatus.OK);
     }
 

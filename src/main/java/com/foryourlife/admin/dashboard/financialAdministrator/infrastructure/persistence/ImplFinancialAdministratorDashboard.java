@@ -6,6 +6,7 @@ import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.PaymentMethodSummary;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.shared.domain.exception.BaseException;
@@ -75,7 +76,7 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
 
         for (Payment payment : payments) {
             BigDecimal totalPaid = payment.getPaymentshistory().stream()
-                    .map(ph -> BigDecimal.valueOf(ph.getAmount()))
+                    .map(PaymentHistory::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             if (PaymentStatus.PENDING.equals(payment.getStatus())) {
@@ -95,7 +96,7 @@ public class ImplFinancialAdministratorDashboard implements FinancialAdministrat
         List<PaymentMethodSummary> paymentMethods = new ArrayList<>(paymentMethodMap.values());
 
         BigDecimal totalIncome = paymentMethods.stream()
-                .map(pm -> BigDecimal.valueOf(pm.getTotalAmount()))
+                .map(PaymentMethodSummary::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new FinancialAdministratorDashboard(

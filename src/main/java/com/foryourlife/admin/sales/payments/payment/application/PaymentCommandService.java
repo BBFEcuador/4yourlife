@@ -50,7 +50,6 @@ public class PaymentCommandService {
     private final PaymentMethodRepository _paymentMethodRepository;
     private final ProductRepository _productRepository;
     private final ParticipantQueryService participantQueryService;
-    private final QueryCampusService queryCampusService;
     private final QueryInvoiceService queryInvoiceService;
     private final CashDrawerDetailCommandService cashDrawerDetailCommandService;
     private final CashDrawerQueryService cashDrawerQueryService;
@@ -64,12 +63,11 @@ public class PaymentCommandService {
     private final TrainingRepository trainingRepository;
     private final StatementRepository statementRepository;
 
-    public PaymentCommandService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryCampusService queryCampusService, QueryInvoiceService queryInvoiceService, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, TrainingRepository trainingRepository, StatementRepository statementRepository) {
+    public PaymentCommandService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryInvoiceService queryInvoiceService, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, TrainingRepository trainingRepository, StatementRepository statementRepository) {
         this._paymentRepository = _paymentRepository;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
         this.participantQueryService = participantQueryService;
-        this.queryCampusService = queryCampusService;
         this.queryInvoiceService = queryInvoiceService;
         this.cashDrawerDetailCommandService = cashDrawerDetailCommandService;
         this.cashDrawerQueryService = cashDrawerQueryService;
@@ -99,9 +97,11 @@ public class PaymentCommandService {
                 throw new BaseException("El método de pago no existe", List.of(""));
             }
         });
+        var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
 
-        var total = BigDecimal.valueOf(paymentReq.paymentsHistory.stream().mapToDouble(PaymentHistory::getAmount).sum());
-
+        BigDecimal total = paymentReq.paymentsHistory.stream()
+                .map(PaymentHistory::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         List<Product> products = paymentReq.products.stream().map(productId -> {
             return _productRepository.findById(productId).orElseThrow(() -> new BaseException("Producto no encontrado", List.of("")));
@@ -167,7 +167,7 @@ public class PaymentCommandService {
                 products,
                 paymentReq.discount,
                 participant,
-                queryCampusService.findById(paymentReq.campus),
+                cashDrawer.getCashBox().getStore().getCampus(),
                 paymentReq.paymentsHistory,
                 paymentReq.total,
                 paymentReq.status != null ? paymentReq.status : PaymentStatus.PENDING,
@@ -176,8 +176,19 @@ public class PaymentCommandService {
         );
         _paymentRepository.save(payment);
 
-        BigDecimal divisor = BigDecimal.valueOf(1.15);
-        BigDecimal taxAmount = total.subtract(total.divide(divisor, 2, RoundingMode.DOWN));
+        BigDecimal divisor = new BigDecimal("1.15");
+
+        BigDecimal subtotal = total.divide(divisor, 2, RoundingMode.HALF_UP);
+
+        BigDecimal recalculatedTotal = subtotal.multiply(divisor).setScale(2, RoundingMode.HALF_UP);
+
+        if (recalculatedTotal.compareTo(total) != 0) {
+            BigDecimal diff = total.subtract(recalculatedTotal);
+
+            subtotal = subtotal.add(diff.divide(divisor, 2, RoundingMode.HALF_UP));
+        }
+
+        BigDecimal taxAmount = total.subtract(subtotal);
 
         if (!paymentReq.paymentsHistory.isEmpty()) {
             var invoice = Invoice.create(
@@ -202,7 +213,6 @@ public class PaymentCommandService {
             payment.getPaymentshistory().forEach(paymentHistory -> {
                 cashDrawerDetailCommandService.save(paymentHistory.getId(), paymentReq.cashDrawerId, payment);
             });
-            var cashDrawer = cashDrawerQueryService.getCashDrawerById(paymentReq.cashDrawerId);
             _paymentRepository.save(payment);
             var newInvoice = createInvoice(invoice, cashDrawer, payment, payment.getPaymentshistory());
             this.paymentCreated(payment);
@@ -300,7 +310,7 @@ public class PaymentCommandService {
             InvoiceContificoJson.Cobros c = new InvoiceContificoJson.Cobros();
 
             c.setForma_cobro(sh.getPaymentMethod().getCode());
-            c.setMonto(BigDecimal.valueOf(sh.getAmount()));
+            c.setMonto(sh.getAmount());
             c.setFecha(formattedDate);
 
             if (sh.getPaymentMethod().getCode().equals("TRA")) {
@@ -332,22 +342,36 @@ public class PaymentCommandService {
     }
 
     private List<InvoiceContificoJson.Detalle> buildProductDetails(Payment payment, BigDecimal subtotal) {
-        List<InvoiceContificoJson.Detalle> details = new ArrayList<>();
-        int productCount = payment.getProducts().size();
-        BigDecimal productSubtotal = subtotal.divide(BigDecimal.valueOf(productCount), 2, RoundingMode.DOWN);
 
-        for (var product : payment.getProducts()) {
+        List<InvoiceContificoJson.Detalle> details = new ArrayList<>();
+        int count = payment.getProducts().size();
+
+        BigDecimal base = subtotal.divide(BigDecimal.valueOf(count), 2, RoundingMode.DOWN);
+        BigDecimal acumulado = BigDecimal.ZERO;
+
+        for (int i = 0; i < count; i++) {
+            BigDecimal value = base;
+
+            if (i == count - 1) {
+                value = subtotal.subtract(acumulado);
+            }
+
+            acumulado = acumulado.add(value);
+
+            var product = payment.getProducts().get(i);
+
             details.add(new InvoiceContificoJson.Detalle(
                     product.getContificoId(),
                     1,
-                    productSubtotal.doubleValue(),
+                    value.doubleValue(),
                     15,
                     0,
                     0,
-                    productSubtotal.doubleValue(),
+                    value.doubleValue(),
                     0,
                     0,
-                    0.0));
+                    0.0
+            ));
         }
 
         return details;
@@ -368,16 +392,19 @@ public class PaymentCommandService {
             throw new BaseException("El método de pago no existe", List.of(""));
         }
 
-        double currentTotal = payment.getPaymentshistory().stream()
-                .mapToDouble(PaymentHistory::getAmount)
-                .sum();
-        double newTotal = currentTotal + paymentHistory.getAmount();
+        BigDecimal currentTotal = payment.getPaymentshistory().stream()
+                .map(PaymentHistory::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal newTotal = currentTotal.add(
+                paymentHistory.getAmount() != null ? paymentHistory.getAmount() : BigDecimal.ZERO
+        );
 
         if (payment.getStatus() == PaymentStatus.COMPLETED) {
             throw new BaseException("No se puede actualizar, el pago ya ha sido completado", List.of(""));
         }
 
-        if (BigDecimal.valueOf(newTotal).compareTo(payment.getTotal()) > 0) {
+        if (newTotal.compareTo(payment.getTotal()) > 0) {
             throw new BaseException(
                     "El pago no puede superar el total de la compra",
                     List.of("Total actual: " + newTotal + ", Total de la compra: " + payment.getTotal())
@@ -394,7 +421,7 @@ public class PaymentCommandService {
             );
         }
 
-        if (BigDecimal.valueOf(newTotal).compareTo(payment.getTotal()) == 0 && payment.getStatus() != PaymentStatus.COMPLETED) {
+        if (newTotal.compareTo(payment.getTotal()) == 0 && payment.getStatus() != PaymentStatus.COMPLETED) {
             payment.setStatus(PaymentStatus.COMPLETED);
             payment.getProducts().forEach(product -> {
                 product.getPrograms().forEach(program -> {
@@ -406,7 +433,7 @@ public class PaymentCommandService {
         }
 
         var originalInvoice = queryInvoiceService.getByPaymentId(paymentId);
-        BigDecimal amount = BigDecimal.valueOf(paymentHistory.getAmount());
+        BigDecimal amount = paymentHistory.getAmount();
         BigDecimal divisor = BigDecimal.valueOf(1.15);
         BigDecimal taxAmount = amount.subtract(amount.divide(divisor, 2, RoundingMode.DOWN));
 

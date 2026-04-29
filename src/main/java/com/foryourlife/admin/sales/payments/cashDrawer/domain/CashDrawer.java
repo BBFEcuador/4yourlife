@@ -42,11 +42,11 @@ public class CashDrawer {
     @Column(
             name = "opening_balance"
     )
-    private Double openingBalance;
+    private BigDecimal openingBalance;
     @Column(
             name = "closing_balance"
     )
-    private Double closedBalance;
+    private BigDecimal closedBalance;
     @Column(
             name = "details"
     )
@@ -74,7 +74,7 @@ public class CashDrawer {
     protected CashDrawer() {
     }
 
-    public CashDrawer(String id, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, CashBox cashBox) {
+    public CashDrawer(String id, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, BigDecimal openingBalance, BigDecimal closedBalance, String detail, CashBox cashBox) {
         this.id = id;
         this.status = status;
         this.openedByUser = openedByUser;
@@ -87,7 +87,7 @@ public class CashDrawer {
         this.cashBox = cashBox;
     }
 
-    public static CashDrawer create(String id, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, Double openingBalance, Double closedBalance, String detail, CashBox cashBox) {
+    public static CashDrawer create(String id, CashDrawerStatus status, User openedByUser, User closedByUser, LocalDateTime startDate, LocalDateTime closeDate, BigDecimal openingBalance, BigDecimal closedBalance, String detail, CashBox cashBox) {
         return new CashDrawer(id, status, openedByUser, closedByUser, startDate, closeDate, openingBalance, closedBalance, detail, cashBox);
     }
 
@@ -143,19 +143,19 @@ public class CashDrawer {
         this.closeDate = closeDate;
     }
 
-    public Double getOpeningBalance() {
+    public BigDecimal getOpeningBalance() {
         return openingBalance;
     }
 
-    public void setOpeningBalance(Double openingBalance) {
+    public void setOpeningBalance(BigDecimal openingBalance) {
         this.openingBalance = openingBalance;
     }
 
-    public Double getClosedBalance() {
+    public BigDecimal getClosedBalance() {
         return closedBalance;
     }
 
-    public void setClosedBalance(Double closedBalance) {
+    public void setClosedBalance(BigDecimal closedBalance) {
         this.closedBalance = closedBalance;
     }
 
@@ -183,7 +183,7 @@ public class CashDrawer {
         BigDecimal totalPayments = BigDecimal.ZERO;
 
         if (this.cashDrawerDetails == null || this.cashDrawerDetails.isEmpty()) {
-            return BigDecimal.valueOf(this.openingBalance)
+            return this.openingBalance
                     .setScale(2, RoundingMode.HALF_UP);
         }
 
@@ -193,14 +193,14 @@ public class CashDrawer {
                 for (PaymentHistory paymentHistory : payment.getPaymentshistory()) {
                     if (paymentHistory.getId().equals(detail.getPaymentHistoryId())) {
                         totalPayments = totalPayments.add(
-                                BigDecimal.valueOf(paymentHistory.getAmount())
+                                paymentHistory.getAmount()
                         );
                     }
                 }
             }
         }
 
-        return BigDecimal.valueOf(this.openingBalance)
+        return this.openingBalance
                 .add(totalPayments)
                 .setScale(2, RoundingMode.HALF_UP);
     }

@@ -2,6 +2,7 @@ package com.foryourlife.admin.sales.payments.payment.infrastructure.persistence;
 
 import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
+import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.clients.account.participant.domain.Participant;
@@ -95,7 +96,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         );
         context.setVariable("paymentList", payment.getPaymentshistory());
         BigDecimal total = payment.getPaymentshistory().stream()
-                .map(p -> BigDecimal.valueOf(p.getAmount()))
+                .map(PaymentHistory::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         context.setVariable("totalPaid", total.setScale(2, RoundingMode.HALF_UP));
         return templateEngine.process("templates/Payment-pdf", context);

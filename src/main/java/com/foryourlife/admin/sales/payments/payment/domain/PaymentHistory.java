@@ -3,13 +3,14 @@ package com.foryourlife.admin.sales.payments.payment.domain;
 import com.foryourlife.admin.sales.payments.paymentMethod.domain.PaymentMethod;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class PaymentHistory {
     private String id = UUID.randomUUID().toString();
     @NotNull
     private PaymentMethod paymentMethod;
-    private double amount;
+    private BigDecimal amount;
     private String date;
     private String transactionId;
     private String pingType;
@@ -18,7 +19,7 @@ public class PaymentHistory {
     private String creditCardType;
     private String paymentType;
 
-    public PaymentHistory(PaymentMethod paymentMethod, double amount, String date) {
+    public PaymentHistory(PaymentMethod paymentMethod, BigDecimal amount, String date) {
         this.paymentMethod = paymentMethod;
         this.amount = amount;
         this.date = date;
@@ -32,11 +33,11 @@ public class PaymentHistory {
         this.paymentMethod = paymentMethod;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

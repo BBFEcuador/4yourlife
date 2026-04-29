@@ -18,6 +18,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -93,9 +94,9 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
 
         PaymentMethodSummary[] paymentMethods = paymentMethodMap.values().toArray(new PaymentMethodSummary[0]);
 
-        double totalIncome = Arrays.stream(paymentMethods)
-                .mapToDouble(PaymentMethodSummary::getTotalAmount)
-                .sum();
+        BigDecimal totalIncome = Arrays.stream(paymentMethods)
+                .map(PaymentMethodSummary::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         List<Map<String, Object>> simplifiedDetails = details.stream()
                 .flatMap(detail -> {

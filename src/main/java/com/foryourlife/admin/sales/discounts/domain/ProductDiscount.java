@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
+
 @Table(name = "product_discounts")
 @Entity
 public class ProductDiscount {
@@ -15,7 +17,7 @@ public class ProductDiscount {
     @Column(name = "discount_type")
     private String discountType;
     @Column(name = "discount_value")
-    private Float discountValue;
+    private BigDecimal discountValue;
     @Column(name = "need_supervision")
     private Boolean needSupervision;
     @Column(name = "is_active")
@@ -24,7 +26,7 @@ public class ProductDiscount {
     protected ProductDiscount() {
     }
 
-    private ProductDiscount(String id, String name, String discountType, Float discountValue, Boolean needSupervision, Boolean isActive) {
+    private ProductDiscount(String id, String name, String discountType, BigDecimal discountValue, Boolean needSupervision, Boolean isActive) {
         this.id = id;
         this.name = name;
         this.discountType = discountType;
@@ -33,7 +35,7 @@ public class ProductDiscount {
         this.isActive = isActive;
     }
 
-    public static ProductDiscount create(String id, String name, String discountType, Float discountValue, Boolean needSupervision, Boolean isActive) {
+    public static ProductDiscount create(String id, String name, String discountType, BigDecimal discountValue, Boolean needSupervision, Boolean isActive) {
         return new ProductDiscount(id, name, discountType, discountValue, needSupervision, isActive);
     }
 
@@ -50,13 +52,14 @@ public class ProductDiscount {
         return discountType;
     }
 
-    public Float getDiscountValue() {
+    public BigDecimal getDiscountValue() {
         return discountValue;
     }
 
     public Boolean getNeedSupervision() {
         return needSupervision;
     }
+
     @JsonProperty("isActive")
     public Boolean getIsActive() {
         return isActive;

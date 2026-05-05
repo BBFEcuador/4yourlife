@@ -98,6 +98,20 @@ public class CashDrawerController {
         }
     }
 
+    @PostMapping("generate-excel-report")
+    public ResponseEntity<?> getExcelReport(@RequestParam(value = "id", defaultValue = "") String id) {
+        if (!id.isEmpty()) {
+            ByteArrayOutputStream excel = commandService.excelCloseReport(id);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("filename", "cash-drawer-report.xlsx");
+            return new ResponseEntity<>(excel.toByteArray(), headers, HttpStatus.OK);
+        } else {
+            throw new BaseException("Id esta vacío", List.of(""));
+        }
+    }
+
     @GetMapping("opened-user/{userId}")
     public ResponseEntity<?> getOpenedUser(@PathVariable String userId) {
         return new ResponseEntity<>(queryService.getCashDrawerOpenedByUser(userId), HttpStatus.OK);

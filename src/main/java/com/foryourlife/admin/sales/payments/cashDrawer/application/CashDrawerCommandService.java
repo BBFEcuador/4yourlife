@@ -207,4 +207,19 @@ public class CashDrawerCommandService {
 //            throw new BaseException("Error sending email", List.of(ex.getMessage()));
 //        }
     }
+
+    public ByteArrayOutputStream excelCloseReport(String id) {
+        var existingDrawer = repository.getById(id).orElseThrow(
+                () -> new BaseException("La caja no existe", List.of(""))
+        );
+
+        ByteArrayOutputStream excel;
+
+        try {
+            excel = repository.generateExcelReport(existingDrawer);
+            return excel;
+        } catch (Exception e) {
+            throw new BaseException("Error generating invoice", List.of(e.getMessage()));
+        }
+    }
 }

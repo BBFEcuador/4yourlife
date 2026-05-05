@@ -39,7 +39,7 @@ public class ParticipantController {
             @RequestParam(value = "search", defaultValue = "") String search,
             @RequestParam(value = "campusId", defaultValue = "") String campusId
     ) {
-        var pageable = PageRequest.of(page, perPage, Sort.by("id").descending());
+        var pageable = PageRequest.of(page, perPage, Sort.by("user.name").ascending());
 
         if (search == null || search.trim().isEmpty()) {
             return new ResponseEntity<>(participantQueryService.getAll(pageable), HttpStatus.OK);

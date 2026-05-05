@@ -32,7 +32,6 @@ import java.util.Locale;
 @Entity
 @Table(name = "payments")
 public class Payment extends AuditableEntity {
-
     @Id
     private String id;
 

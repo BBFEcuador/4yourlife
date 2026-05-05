@@ -2,10 +2,12 @@ package com.foryourlife.admin.programs.teams.infrastructure.httpControllers;
 
 import com.foryourlife.admin.programs.teams.application.CommandTeamService;
 import com.foryourlife.admin.programs.teams.application.QueryTeamService;
-import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.*;
+import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.PromotionLifeRequest;
+import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.PromotionYourRequest;
+import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.SaveFocusTeamsRequest;
+import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.SaveTeamRequest;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
-import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -179,6 +180,7 @@ public class TeamController {
         commandTeamService.updateTrainer(id, trainerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
     @PostMapping("participant-list/{id}")
     public ResponseEntity<?> participantList(@PathVariable String id) throws IOException {
         String timestamp = LocalDateTime.now().format(

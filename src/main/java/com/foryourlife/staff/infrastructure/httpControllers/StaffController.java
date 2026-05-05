@@ -46,7 +46,7 @@ public class StaffController {
             @RequestParam(value = "perPage", defaultValue = "10") int perPage,
             @RequestParam(value = "search", defaultValue = "") String search
     ) {
-        var p = PageRequest.of(page, perPage, Sort.by("id").descending());
+        var p = PageRequest.of(page, perPage, Sort.by("user.name").ascending());
 
         if (search == null || search.trim().isEmpty()) {
             return new ResponseEntity<>(staffFinderService.getAll(p), HttpStatus.OK);

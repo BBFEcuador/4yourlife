@@ -3,11 +3,13 @@ package com.foryourlife.admin.auth.infrastructure.persistence;
 import com.foryourlife.admin.auth.domain.Admin;
 import com.foryourlife.admin.auth.domain.AdminLoginResponse;
 import com.foryourlife.admin.auth.domain.AdminRepository;
-import com.foryourlife.admin.sales.payments.cashBox.domain.CashBoxRepository;
-import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerRepository;
 import com.foryourlife.shared.JWTUtils;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.infrastructure.JpaUserRepository;
+import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,16 +28,16 @@ public class AdminRepositoryImpl implements AdminRepository {
     private final JPAAdminRepository repository;
     private final JpaUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JPACriteriaConverter<Admin> criteriaConverter;
     private final JWTUtils jwtUtils;
     private Admin loadAdmin;
-    private final CashDrawerRepository cashDrawerRepository;
 
-    public AdminRepositoryImpl(JPAAdminRepository repository, JpaUserRepository userRepository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils, CashDrawerRepository cashDrawerRepository) {
+    public AdminRepositoryImpl(JPAAdminRepository repository, JpaUserRepository userRepository, PasswordEncoder passwordEncoder, JPACriteriaConverter<Admin> criteriaConverter, JWTUtils jwtUtils) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.criteriaConverter = criteriaConverter;
         this.jwtUtils = jwtUtils;
-        this.cashDrawerRepository = cashDrawerRepository;
     }
 
     @Override
@@ -57,8 +59,16 @@ public class AdminRepositoryImpl implements AdminRepository {
     }
 
     @Override
-    public List<Admin> getAll() {
-        return this.repository.findAll();
+    public Page<Admin> findAll(Pageable pageable, Criteria criteria) {
+        return this.repository.findAll(
+                criteriaConverter.getJpaSpecifications(criteria),
+                pageable
+        );
+    }
+
+    @Override
+    public Page<Admin> findAll(Pageable pageable) {
+        return this.repository.findAll(pageable);
     }
 
     @Override

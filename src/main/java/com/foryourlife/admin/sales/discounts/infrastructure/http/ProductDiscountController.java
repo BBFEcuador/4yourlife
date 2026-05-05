@@ -28,12 +28,6 @@ public class ProductDiscountController {
         this.queryService = queryService;
     }
 
-    @PostMapping("/available")
-    public ResponseEntity<List<ProductDiscount>> create(@Valid @RequestBody ProductDiscountRequest request) {
-        List<ProductDiscount> productDiscounts = queryService.findAll();
-        return ResponseEntity.ok(productDiscounts);
-    }
-
     @PostMapping("")
     public ResponseEntity<Void> findAvailable(@Valid @RequestBody ProductDiscountRequest request) {
         commandService.save(request);
@@ -50,8 +44,7 @@ public class ProductDiscountController {
     public ResponseEntity<Page<ProductDiscount>> getAll(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "perPage", defaultValue = "10") int perPage,
-            @RequestParam(value = "search", defaultValue = "") String search,
-            @RequestParam(value = "campusId", defaultValue = "") String campusId
+            @RequestParam(value = "search", defaultValue = "") String search
     ) {
         var p = PageRequest.of(page, perPage, Sort.by("id").descending());
         Criteria criteria = new Criteria(
@@ -71,6 +64,33 @@ public class ProductDiscountController {
                     );
         }
         Page<ProductDiscount> productDiscounts = queryService.findAll(p, criteria);
+        return ResponseEntity.ok(productDiscounts);
+    }
+
+    @GetMapping("available")
+    public ResponseEntity<Page<ProductDiscount>> findAvailable(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "perPage", defaultValue = "10") int perPage,
+            @RequestParam(value = "search", defaultValue = "") String search
+    ) {
+        var p = PageRequest.of(page, perPage, Sort.by("name").ascending());
+        Criteria criteria = new Criteria(
+                List.of(), Optional.empty(), Optional.empty()
+        );
+
+        if (!search.isEmpty()) {
+            criteria.filters =
+                    List.of(
+                            new Filter(
+                                    "name",
+                                    search,
+                                    null,
+                                    Filter.Operation.LIKE,
+                                    Filter.LogicalOperator.OR
+                            )
+                    );
+        }
+        Page<ProductDiscount> productDiscounts = queryService.findAvailable(p, criteria);
         return ResponseEntity.ok(productDiscounts);
     }
 }

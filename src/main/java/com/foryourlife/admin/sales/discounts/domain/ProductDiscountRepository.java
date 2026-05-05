@@ -15,7 +15,7 @@ public interface ProductDiscountRepository {
 
     Page<ProductDiscount> findAll(Pageable pageable, Criteria criteria);
 
-    List<ProductDiscount> findAvailable();
+    Page<ProductDiscount> findAvailable(Pageable pageable, Criteria criteria);
 
     Optional<ProductDiscount> findById(String id);
 }

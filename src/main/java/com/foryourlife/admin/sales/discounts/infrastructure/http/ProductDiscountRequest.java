@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
+import java.math.BigDecimal;
+
 public class ProductDiscountRequest {
     public String id;
     @NotNull(message = "El nombre es requerido")
@@ -14,9 +16,7 @@ public class ProductDiscountRequest {
     @Pattern(regexp = "^[PE]$", message = "el tipo debe ser P (porcentaje) o E (efectivo)")
     public String discountType;
     @NotNull(message = "El valor del descuento es requerido")
-    @NotEmpty(message = "El valor del descuento no puede estar vacío")
-    @Pattern(message = "El valor del descuento debe ser un número", regexp = "^[0-9]+(\\.[0-9]+)?$")
-    public String discountValue;
+    public BigDecimal discountValue;
     public Boolean needSupervision = false;
     public Boolean isActive = true;
 }

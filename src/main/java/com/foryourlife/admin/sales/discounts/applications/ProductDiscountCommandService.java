@@ -6,6 +6,7 @@ import com.foryourlife.admin.sales.discounts.infrastructure.http.ChangeStatusReq
 import com.foryourlife.admin.sales.discounts.infrastructure.http.ProductDiscountRequest;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -20,7 +21,7 @@ public class ProductDiscountCommandService  {
                 request.id != null ? request.id : UUID.randomUUID().toString(),
                 request.name,
                 request.discountType,
-                Float.parseFloat(request.discountValue),
+                request.discountValue,
                 request.needSupervision,
                 request.isActive
         );

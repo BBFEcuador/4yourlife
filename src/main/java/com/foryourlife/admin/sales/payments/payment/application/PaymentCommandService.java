@@ -3,7 +3,6 @@ package com.foryourlife.admin.sales.payments.payment.application;
 import com.foryourlife.admin.contifico.config.application.ConfigContificoQueryService;
 import com.foryourlife.admin.crm.statement.domain.StatementRepository;
 import com.foryourlife.admin.crm.statement.domain.StatementStatusEnum;
-import com.foryourlife.admin.programs.campus.application.QueryCampusService;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
@@ -214,7 +213,7 @@ public class PaymentCommandService {
                 cashDrawerDetailCommandService.save(paymentHistory.getId(), paymentReq.cashDrawerId, payment);
             });
             _paymentRepository.save(payment);
-            var newInvoice = createInvoice(invoice, cashDrawer, payment, payment.getPaymentshistory());
+            createInvoice(invoice, cashDrawer, payment, payment.getPaymentshistory());
             this.paymentCreated(payment);
         }
 
@@ -224,14 +223,17 @@ public class PaymentCommandService {
     }
 
     @Transactional
-    public Invoice createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment
+    public void createInvoice(Invoice invoice, CashDrawer cashDrawer, Payment
             payment, List<PaymentHistory> paymentHistories) {
         try {
             String invoiceNumber = getNextInvoiceNumber(cashDrawer);
             invoice.setInvoiceNumber(invoiceNumber);
 
             var config = configContificoQueryService.findConfigContificoByCampusId(payment.getCampus().getId());
-            if (config == null) return commandInvoiceService.save(invoice);
+            if (config == null) {
+                commandInvoiceService.save(invoice);
+                return;
+            }
 
             String storeCode = cashDrawer.getCashBox().getStore().getNumber();
             String cashBoxCode = cashDrawer.getCashBox().getNumber();
@@ -283,11 +285,8 @@ public class PaymentCommandService {
             Invoice saved = commandInvoiceService.save(invoice);
             commandInvoiceService.sendInvoiceToContifico(saved);
 
-            return saved;
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return invoice;
         }
     }
 

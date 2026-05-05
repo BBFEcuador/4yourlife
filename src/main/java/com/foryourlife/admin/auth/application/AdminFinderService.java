@@ -3,9 +3,12 @@ package com.foryourlife.admin.auth.application;
 import com.foryourlife.admin.auth.domain.Admin;
 import com.foryourlife.admin.auth.domain.AdminLoginResponse;
 import com.foryourlife.admin.auth.domain.AdminRepository;
+import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,8 +29,13 @@ public class AdminFinderService {
     public Admin findByEmail(String email) {
         return repository.findByEmail(email).orElse(null);
     }
-    public List<Admin> getAll() {
-        return repository.getAll();
+
+    public Page<Admin> findAll(Pageable pageable, Criteria criteria) {
+        return repository.findAll(pageable, criteria);
+    }
+
+    public Page<Admin> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     public AdminLoginResponse login(String username, String password){

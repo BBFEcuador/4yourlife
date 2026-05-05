@@ -6,6 +6,7 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,12 +35,20 @@ public class ProductDiscountRepositoryImpl implements ProductDiscountRepository 
 
     @Override
     public Page<ProductDiscount> findAll(Pageable pageable, Criteria criteria) {
-        return repository.findAll(criteriaConverter.getJpaSpecifications(criteria), pageable);
+        return repository.findAll(
+                criteriaConverter.getJpaSpecifications(criteria),
+                pageable
+        );
     }
 
     @Override
-    public List<ProductDiscount> findAvailable() {
-        return repository.findByIsActiveTrue();
+    public Page<ProductDiscount> findAvailable(Pageable pageable, Criteria criteria) {
+
+        Specification<ProductDiscount> spec = Specification
+                .where(criteriaConverter.getJpaSpecifications(criteria))
+                .and((root, query, cb) -> cb.isTrue(root.get("isActive")));
+
+        return repository.findAll(spec, pageable);
     }
 
     @Override

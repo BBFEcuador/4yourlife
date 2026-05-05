@@ -4,6 +4,7 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Optional;
 
 public interface CashDrawerRepository {
@@ -17,5 +18,5 @@ public interface CashDrawerRepository {
     String generatePdfReport(CashDrawer cashDrawer);
     Optional<CashDrawer> findByStatusIsNotAndOpenedByUserId(CashDrawerStatus cashDrawerStatus, String userId);
     Optional<CashDrawer> findByStatusIsAndOpenedByUserId(CashDrawerStatus cashDrawerStatus, String userId);
-
+    ByteArrayOutputStream generateExcelReport(CashDrawer cashDrawer);
 }

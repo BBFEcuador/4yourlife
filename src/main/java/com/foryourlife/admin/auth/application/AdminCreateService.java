@@ -8,15 +8,11 @@ import com.foryourlife.admin.auth.infrastructure.httpControllers.CreateAdminRequ
 import com.foryourlife.admin.auth.infrastructure.httpControllers.DisableAdminRequest;
 import com.foryourlife.admin.auth.infrastructure.httpControllers.UpdateAdminRequest;
 import com.foryourlife.admin.auth.infrastructure.httpControllers.UpdatePassAdminRequest;
-import com.foryourlife.shared.domain.bus.EventBus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.domain.user.User;
 import com.foryourlife.shared.domain.user.UserEntities;
-import com.foryourlife.shared.domain.user.UserRepository;
 import com.foryourlife.shared.domain.user.UserType;
 import com.foryourlife.shared.domain.user.applications.CommandGeneralUserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,16 +27,14 @@ public class AdminCreateService {
     private final PasswordEncoder passwordEncoder;
     private final CommandGeneralUserService commandGeneralUserService;
     private final AdminRoleRepository roleFinderService;
-    private final EventBus bus;
-    private final Logger logger = LoggerFactory.getLogger(AdminCreateService.class);
 
-    public AdminCreateService(AdminRepository repository, PasswordEncoder passwordEncoder, UserRepository userRepository, CommandGeneralUserService commandGeneralUserService, AdminRoleRepository roleFinderService, EventBus bus) {
+    public AdminCreateService(AdminRepository repository, PasswordEncoder passwordEncoder, CommandGeneralUserService commandGeneralUserService, AdminRoleRepository roleFinderService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.commandGeneralUserService = commandGeneralUserService;
         this.roleFinderService = roleFinderService;
-        this.bus = bus;
     }
+
     @Transactional
     public void create(CreateAdminRequest admin) {
         var adminId = admin.id != null ? admin.id : UUID.randomUUID().toString();

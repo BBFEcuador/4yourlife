@@ -33,11 +33,11 @@ public class ContactController {
 
     @PutMapping("")
     public ResponseEntity<?> updateContact(@RequestBody SaveContactRequest request) {
-        if(!queryContactService.findById(request.getId()).isPresent()){
+        if (!queryContactService.findById(request.getId()).isPresent()) {
             throw new BaseException("Contact not found", List.of(request.getId()));
         }
-            commandContactService.save(request);
-            return new ResponseEntity<>(HttpStatus.OK);
+        commandContactService.save(request);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

@@ -6,7 +6,6 @@ import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.programs.domain.Program;
 import com.foryourlife.admin.sales.rules.domain.Rule;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;

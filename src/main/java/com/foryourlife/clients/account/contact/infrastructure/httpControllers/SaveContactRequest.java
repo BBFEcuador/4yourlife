@@ -24,7 +24,7 @@ public class SaveContactRequest {
     }
 
     public Contact toDomain() {
-        return Contact.create(id != null ? id: UUID.randomUUID().toString(), name, relationship, phone, null);
+        return Contact.create(id != null ? id : UUID.randomUUID().toString(), name, relationship, phone, null);
     }
 
     public String getId() {

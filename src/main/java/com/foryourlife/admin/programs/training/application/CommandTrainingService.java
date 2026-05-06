@@ -9,16 +9,15 @@ import com.foryourlife.admin.programs.training.infrastructure.httpControllers.Tr
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import com.foryourlife.shared.domain.exception.BaseException;
-import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.foryourlife.shared.domain.level.CourseLevel.*;
+import static com.foryourlife.shared.domain.level.CourseLevel.FOCUS;
+import static com.foryourlife.shared.domain.level.CourseLevel.YOUR;
 
 @Service
 public class CommandTrainingService {

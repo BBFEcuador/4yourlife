@@ -5,7 +5,7 @@ import com.foryourlife.admin.crm.call.domain.CallRepository;
 import com.foryourlife.admin.crm.statement.application.StatementCommandService;
 import com.foryourlife.admin.crm.statement.domain.Statement;
 import com.foryourlife.admin.crm.statement.domain.StatementStatusEnum;
-import com.foryourlife.admin.programs.attendance.application.CommandAttendanceService;
+import com.foryourlife.admin.programs.attendance.application.AttendanceCommandService;
 import com.foryourlife.admin.programs.attendance.domain.Attendance;
 import com.foryourlife.admin.programs.attendance.domain.FylStage;
 import com.foryourlife.admin.programs.attendance.infraestructure.AttendanceRepositoryImpl;
@@ -52,7 +52,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @Service
-public class CommandTeamService {
+public class TeamCommandService {
     private final AttendanceRepositoryImpl attendanceRepository;
     private final CallRepository callRepository;
     private final TrainingRepository trainingRepository;
@@ -66,13 +66,13 @@ public class CommandTeamService {
     private final QueryTrainingService queryTrainingService;
     private final TrainerQueryService trainerQueryService;
     private final QueryMasterLifeService queryMasterLifeService;
-    private final Logger logger = LoggerFactory.getLogger(CommandTeamService.class);
+    private final Logger logger = LoggerFactory.getLogger(TeamCommandService.class);
     private final ParticipantLevelRepository participantLevelRepository;
     private final TeamBadgePdfService teamBadgePdfService;
-    private final CommandAttendanceService commandAttendanceService;
+    private final AttendanceCommandService attendanceCommandService;
     private final StatementCommandService statementCommandService;
 
-    public CommandTeamService(AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, TrainingRepository trainingRepository, TeamRepository _teamRepository, EventBus bus, PromiseRepository promiseRepository, ParticipantRepository _participantRepository, MasterLifeRepository masterLifeRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, ParticipantLevelRepository participantLevelRepository, TeamBadgePdfService teamBadgePdfService, CommandAttendanceService commandAttendanceService, StatementCommandService statementCommandService) {
+    public TeamCommandService(AttendanceRepositoryImpl attendanceRepository, CallRepository callRepository, TrainingRepository trainingRepository, TeamRepository _teamRepository, EventBus bus, PromiseRepository promiseRepository, ParticipantRepository _participantRepository, MasterLifeRepository masterLifeRepository, StaffRepository staffRepository, VisionaryRepository visionaryRepository, QueryTrainingService queryTrainingService, TrainerQueryService trainerQueryService, QueryMasterLifeService queryMasterLifeService, ParticipantLevelRepository participantLevelRepository, TeamBadgePdfService teamBadgePdfService, AttendanceCommandService attendanceCommandService, StatementCommandService statementCommandService) {
         this.attendanceRepository = attendanceRepository;
         this.callRepository = callRepository;
         this.trainingRepository = trainingRepository;
@@ -88,7 +88,7 @@ public class CommandTeamService {
         this.queryMasterLifeService = queryMasterLifeService;
         this.participantLevelRepository = participantLevelRepository;
         this.teamBadgePdfService = teamBadgePdfService;
-        this.commandAttendanceService = commandAttendanceService;
+        this.attendanceCommandService = attendanceCommandService;
         this.statementCommandService = statementCommandService;
     }
 
@@ -127,7 +127,7 @@ public class CommandTeamService {
                 new ArrayList<>()
         );
         this._teamRepository.save(team);
-        commandAttendanceService.assignAttendancesAndDeclarations(team, team.getTraining());
+        attendanceCommandService.assignAttendancesAndDeclarations(team, team.getTraining());
         initializeTeamProperties(team);
     }
 
@@ -285,7 +285,7 @@ public class CommandTeamService {
         team.getStaffs().clear();
         _teamRepository.save(team);
         assignParticipantLevelToUsers(team.getUsers(), training);
-        commandAttendanceService.assignAttendancesAndDeclarations(team, team.getTraining());
+        attendanceCommandService.assignAttendancesAndDeclarations(team, team.getTraining());
     }
 
     @Transactional
@@ -358,7 +358,7 @@ public class CommandTeamService {
 
         _teamRepository.save(team);
         assignParticipantLevelToUsers(team.getUsers(), team.getTraining());
-        commandAttendanceService.assignAttendancesAndDeclarations(team, team.getTraining());
+        attendanceCommandService.assignAttendancesAndDeclarations(team, team.getTraining());
     }
 
     private void initializeTeamProperties(Team team) {

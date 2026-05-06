@@ -199,7 +199,7 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
 
         // Columna FACTURA siempre al final
         int facturaCol = PAYMENT_COL_START + paymentMethodNames.size();
-        int totalCols  = facturaCol + 1;
+        int totalCols = facturaCol + 1;
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("CIERRE CAJA");
@@ -274,14 +274,14 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
             String OpenerNames = cashDrawer.getOpenedByUser().getName();
 
             Row row3 = sheet.createRow(3);
-                Cell ec = row3.createCell(1 );
-                ec.setCellValue(OpenerNames.toUpperCase());
-                CellStyle es = workbook.createCellStyle();
-                Font ef = workbook.createFont();
-                ef.setBold(true);
-                es.setFont(ef);
-                es.setAlignment(HorizontalAlignment.CENTER);
-                ec.setCellStyle(es);
+            Cell ec = row3.createCell(1);
+            ec.setCellValue(OpenerNames.toUpperCase());
+            CellStyle es = workbook.createCellStyle();
+            Font ef = workbook.createFont();
+            ef.setBold(true);
+            es.setFont(ef);
+            es.setAlignment(HorizontalAlignment.CENTER);
+            ec.setCellStyle(es);
 
 
             // ── Fila 4: Encabezados fijos + dinámicos + FACTURA ───────────────────
@@ -311,9 +311,9 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
 
             // ── Filas de datos ────────────────────────────────────────────────────
             int dataStartRow = 5;
-            int rowNum       = dataStartRow;
-            int seq          = 1;
-            int maxDataRows  = 18;
+            int rowNum = dataStartRow;
+            int seq = 1;
+            int maxDataRows = 18;
 
             for (int i = 0; i < maxDataRows; i++) {
                 Row dataRow = sheet.createRow(rowNum + i);
@@ -353,17 +353,17 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
                 Row dataRow = sheet.getRow(rowNum);
                 rowNum++;
 
-                Payment payment     = detail.getPayment();
+                Payment payment = detail.getPayment();
                 String enrollerName = Optional.ofNullable(payment.getParticipant())
                         .map(Participant::getInvitationToken)
                         .map(enrollerNameByToken::get)
                         .orElse("");
-                String type         = payment.getParticipant() != null ? "Participante" : "ML";
+                String type = payment.getParticipant() != null ? "Participante" : "ML";
                 String enrolledName = payment.getParticipant() != null
                         ? payment.getParticipant().getUser().getName() : "";
-                String authNumber   = ph.getTransactionId() != null ? ph.getTransactionId() : "";
-                BigDecimal amount   = ph.getAmount();
-                String methodType   = ph.getPaymentMethod().getType().toUpperCase();
+                String authNumber = ph.getTransactionId() != null ? ph.getTransactionId() : "";
+                BigDecimal amount = ph.getAmount();
+                String methodType = ph.getPaymentMethod().getType().toUpperCase();
 
                 String bankName = Optional.ofNullable(ph.getPaymentMethod())
                         .map(PaymentMethod::getBank)
@@ -398,7 +398,7 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
 
             // SUM dinámica por cada columna de método de pago
             for (int col : paymentColIndex.values()) {
-                Cell sumCell     = totalsRow.createCell(col);
+                Cell sumCell = totalsRow.createCell(col);
                 String colLetter = CellReference.convertNumToColString(col);
                 sumCell.setCellFormula(String.format("SUM(%s%d:%s%d)",
                         colLetter, dataStartRow + 1,

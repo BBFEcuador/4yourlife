@@ -3,7 +3,6 @@ package com.foryourlife.admin.sales.product.application;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foryourlife.admin.contifico.config.domain.ConfigContificoRepository;
-import com.foryourlife.admin.programs.campus.domain.CampusRepository;
 import com.foryourlife.admin.sales.product.domain.Product;
 import com.foryourlife.admin.sales.product.domain.ProductRepository;
 import com.foryourlife.shared.domain.bus.EventBus;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,14 +32,14 @@ public class ProductCreateService {
 
     public void saveProduct(Product product) {
         this.repository.save(product);
-        if(configContificoRepository.findByCampusId(product.getCampus().getId()).isPresent()){
+        if (configContificoRepository.findByCampusId(product.getCampus().getId()).isPresent()) {
             eventBus.publish(product.pullDomainEvents());
         }
     }
 
     public void syncProductsToContifico(String campusId) {
         repository.findAllByCampusId(campusId).forEach(product -> {
-            if (!product.getContificoId().isBlank()){
+            if (!product.getContificoId().isBlank()) {
                 product.record(new ProductCreated(product));
                 eventBus.publish(product.pullDomainEvents());
             }

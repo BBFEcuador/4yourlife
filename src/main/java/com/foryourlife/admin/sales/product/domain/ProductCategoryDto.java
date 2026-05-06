@@ -30,7 +30,8 @@ public class ProductCategoryDto {
     @JsonProperty("cuenta_inventario")
     private String cuentaInventario;
 
-    public ProductCategoryDto() {}
+    public ProductCategoryDto() {
+    }
 
     public ProductCategoryDto(String id, String nombre, String padreId, boolean agrupar, String tipoProducto, String cuentaVenta, String cuentaCompra, String cuentaInventario) {
         this.id = id;

@@ -1,9 +1,7 @@
 package com.foryourlife.admin.sales.invoices.infrastructure.http;
 
-import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
+import com.foryourlife.admin.sales.invoices.application.InvoiceCommandService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
-import com.foryourlife.admin.sales.invoices.domain.Invoice;
-import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;
 import org.springframework.data.domain.PageRequest;
@@ -20,29 +18,29 @@ import java.util.Optional;
 @RequestMapping("/invoices")
 public class InvoiceController {
 
-    private final CommandInvoiceService commandInvoiceService;
+    private final InvoiceCommandService invoiceCommandService;
     private final QueryInvoiceService queryInvoiceService;
 
-    public InvoiceController(CommandInvoiceService commandInvoiceService, QueryInvoiceService queryInvoiceService) {
-        this.commandInvoiceService = commandInvoiceService;
+    public InvoiceController(InvoiceCommandService invoiceCommandService, QueryInvoiceService queryInvoiceService) {
+        this.invoiceCommandService = invoiceCommandService;
         this.queryInvoiceService = queryInvoiceService;
     }
 
     @PostMapping("")
     public ResponseEntity<?> saveInvoice(@RequestBody InvoiceRequest request) {
-        commandInvoiceService.save(request.toDomain());
+        invoiceCommandService.save(request.toDomain());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("send")
     public ResponseEntity<?> sendInvoicesContifico(@RequestParam(value = "campusId", defaultValue = "") String campusId) {
-        commandInvoiceService.resendToContifico(campusId);
+        invoiceCommandService.resendToContifico(campusId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("")
     public ResponseEntity<?> updateInvoice(@RequestBody InvoiceRequest request) {
-        commandInvoiceService.update(request);
+        invoiceCommandService.update(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -77,7 +75,7 @@ public class InvoiceController {
 
     @PostMapping("resend-payment-history")
     public ResponseEntity<?> sendPaymentHistory(@RequestParam(value = "paymentId") String paymentId) {
-        commandInvoiceService.resendPaymentHistoryToContifico(paymentId);
+        invoiceCommandService.resendPaymentHistoryToContifico(paymentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

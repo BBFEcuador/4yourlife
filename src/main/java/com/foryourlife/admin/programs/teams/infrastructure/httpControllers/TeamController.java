@@ -1,6 +1,6 @@
 package com.foryourlife.admin.programs.teams.infrastructure.httpControllers;
 
-import com.foryourlife.admin.programs.teams.application.CommandTeamService;
+import com.foryourlife.admin.programs.teams.application.TeamCommandService;
 import com.foryourlife.admin.programs.teams.application.QueryTeamService;
 import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.PromotionLifeRequest;
 import com.foryourlife.admin.programs.teams.infrastructure.httpControllers.request.PromotionYourRequest;
@@ -28,11 +28,11 @@ import java.util.Optional;
 @RequestMapping("/teams")
 public class TeamController {
 
-    private final CommandTeamService commandTeamService;
+    private final TeamCommandService teamCommandService;
     private final QueryTeamService queryTeamService;
 
-    public TeamController(CommandTeamService commandTeamService, QueryTeamService queryTeamService) {
-        this.commandTeamService = commandTeamService;
+    public TeamController(TeamCommandService teamCommandService, QueryTeamService queryTeamService) {
+        this.teamCommandService = teamCommandService;
         this.queryTeamService = queryTeamService;
     }
 
@@ -70,7 +70,7 @@ public class TeamController {
                 HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=gefetes" + timestamp + ".pdf"
         );
-        byte[] excelBytes = this.commandTeamService.gafetes(id);
+        byte[] excelBytes = this.teamCommandService.gafetes(id);
         return ResponseEntity
                 .ok()
                 .headers(headers)
@@ -84,19 +84,19 @@ public class TeamController {
 
     @PostMapping("/save/focus")
     public ResponseEntity<?> saveTeamFocus(@Valid @RequestBody SaveFocusTeamsRequest request) {
-        commandTeamService.saveFocusTeam(request);
+        teamCommandService.saveFocusTeam(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/promotion/life")
     public ResponseEntity<?> promoTeamToLife(@Valid @RequestBody PromotionLifeRequest request) {
-        commandTeamService.promotionLifeTeam(request);
+        teamCommandService.promotionLifeTeam(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/promotion/your")
     public ResponseEntity<?> promoTeamToYour(@Valid @RequestBody PromotionYourRequest request) {
-        commandTeamService.promotionYourTeam(request);
+        teamCommandService.promotionYourTeam(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -107,14 +107,14 @@ public class TeamController {
 
     @PutMapping("/update")
     public ResponseEntity<?> updateTeam(@RequestBody SaveTeamRequest request) {
-        commandTeamService.update(request.toDomain());
+        teamCommandService.update(request.toDomain());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/assignParticipants")
     public ResponseEntity<?> assignParticipants(@RequestBody AssignParticipantsRequest request) {
         for (var user : request.getUsers()) {
-            commandTeamService.assignParticipants(request.getTeamId(), user.getId());
+            teamCommandService.assignParticipants(request.getTeamId(), user.getId());
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -122,7 +122,7 @@ public class TeamController {
     @PostMapping("/assignMaterlife")
     public ResponseEntity<?> assignMasterlife(@RequestBody AssignParticipantsRequest request) {
         for (var user : request.getUsers()) {
-            commandTeamService.assignMastersLife(request.getTeamId(), user.getId());
+            teamCommandService.assignMastersLife(request.getTeamId(), user.getId());
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -130,7 +130,7 @@ public class TeamController {
     @PutMapping("/removeParticipants")
     public ResponseEntity<?> removeParticipants(@RequestBody AssignParticipantsRequest request) {
         for (var user : request.getUsers()) {
-            commandTeamService.removeParticipants(request.getTeamId(), user.getId(), user.getIsLingerer(), user.getIsDesertor());
+            teamCommandService.removeParticipants(request.getTeamId(), user.getId(), user.getIsLingerer(), user.getIsDesertor());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -138,7 +138,7 @@ public class TeamController {
     @PutMapping("/removeMasterlife")
     public ResponseEntity<?> removeMasterlife(@RequestBody AssignParticipantsRequest request) {
         for (var user : request.getUsers()) {
-            commandTeamService.removeMastersLife(request.getTeamId(), user.getId());
+            teamCommandService.removeMastersLife(request.getTeamId(), user.getId());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -146,7 +146,7 @@ public class TeamController {
     @PutMapping("/removeStaffs")
     public ResponseEntity<?> removeStaffs(@RequestBody AssignParticipantsRequest request) {
         for (var user : request.getUsers()) {
-            commandTeamService.removeStaffs(request.getTeamId(), user.getId());
+            teamCommandService.removeStaffs(request.getTeamId(), user.getId());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -154,7 +154,7 @@ public class TeamController {
     @PutMapping("/removeVisionaries")
     public ResponseEntity<?> removeVisionaries(@RequestBody AssignParticipantsRequest request) {
         for (var user : request.getUsers()) {
-            commandTeamService.removeVisionaries(request.getTeamId(), user.getId());
+            teamCommandService.removeVisionaries(request.getTeamId(), user.getId());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -171,13 +171,13 @@ public class TeamController {
 
     @PutMapping("/add-users/{teamId}")
     public ResponseEntity<?> addUsersToTeam(@PathVariable String teamId, @RequestBody AddUsersToTeamRequest request) {
-        commandTeamService.addParticipants(teamId, request);
+        teamCommandService.addParticipants(teamId, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/{id}/trainer/{trainerId}")
     public ResponseEntity<?> updateTrainer(@PathVariable String trainerId,@PathVariable String id) {
-        commandTeamService.updateTrainer(id, trainerId);
+        teamCommandService.updateTrainer(id, trainerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -194,7 +194,7 @@ public class TeamController {
                 HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=gefetes" + timestamp + ".pdf"
         );
-        var excelBytes = commandTeamService.getParticipantList(id);
+        var excelBytes = teamCommandService.getParticipantList(id);
         return ResponseEntity
                 .ok()
                 .headers(headers)

@@ -65,7 +65,7 @@ public class OnCreatedProduct {
                     ((ObjectNode) jsonNode).put("categoria_id", categoryId);
                     json = jsonNode.toString();
                 }
-            }else {
+            } else {
                 throw new RuntimeException("Failed to fetch categories from Contifico API: " + categoryResponse.getBody());
             }
 

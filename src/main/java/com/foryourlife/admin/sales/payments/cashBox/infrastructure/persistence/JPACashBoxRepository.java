@@ -2,7 +2,6 @@ package com.foryourlife.admin.sales.payments.cashBox.infrastructure.persistence;
 
 import com.foryourlife.admin.sales.payments.cashBox.domain.CashBox;
 import com.foryourlife.admin.sales.payments.cashBox.domain.CashBoxRepository;
-import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

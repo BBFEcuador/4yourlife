@@ -17,23 +17,23 @@ public class QueryPaymentService {
         _paymentRepository = paymentRepository;
     }
 
-    public Payment findById(String id){
+    public Payment findById(String id) {
         return _paymentRepository.findById(id);
     }
 
-    public Page<Payment> findAll(Pageable pageable){
+    public Page<Payment> findAll(Pageable pageable) {
         return _paymentRepository.findAll(pageable);
     }
 
-    public Page<Payment> findAll(Pageable pageable, Criteria criteria){
+    public Page<Payment> findAll(Pageable pageable, Criteria criteria) {
         return _paymentRepository.findAll(pageable, criteria);
     }
 
-    public Page<Payment> findByParticipantId(String id, Pageable pageable){
-        return  _paymentRepository.findByAllParticipantId(id, pageable);
+    public Page<Payment> findByParticipantId(String id, Pageable pageable) {
+        return _paymentRepository.findByAllParticipantId(id, pageable);
     }
 
     public List<Payment> findAllByParticipantIn(String id) {
-        return  _paymentRepository.findByAllParticipantId(id);
+        return _paymentRepository.findByAllParticipantId(id);
     }
 }

@@ -47,7 +47,7 @@ public class CommandMasterLifeService {
     @Transactional
     public void saveFromParticipant(String id) {
         repository.findByUserId(id).ifPresent(masterLife -> {
-            throw new BaseException("Masterlife already created with the user "+masterLife.getUser().getName(), List.of());
+            throw new BaseException("Masterlife already created with the user " + masterLife.getUser().getName(), List.of());
         });
         var user = userRepository.findById(id).orElseThrow(
                 () -> new BaseException("User not found", List.of())

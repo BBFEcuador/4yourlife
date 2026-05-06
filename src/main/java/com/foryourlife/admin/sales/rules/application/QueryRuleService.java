@@ -18,7 +18,7 @@ public class QueryRuleService {
         return _ruleRepository.findById(id);
     }
 
-    public List<Rule> findAllByProductId(String id){
+    public List<Rule> findAllByProductId(String id) {
         return _ruleRepository.findAllByProduct(id);
     }
 }

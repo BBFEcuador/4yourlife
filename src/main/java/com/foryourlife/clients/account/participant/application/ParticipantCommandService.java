@@ -107,7 +107,7 @@ public class ParticipantCommandService {
         if (!token.getActive())
             throw new BaseException("Token expirado", List.of("El token ya fue utilizado"));
         _profileDetailsRepository.findByDni(user.getProfile().getDni()).ifPresent(profileDetails -> {
-            throw new BaseException("Error al crear", List.of("Ya existe un participante con el documento "+user.getProfile().getDni()));
+            throw new BaseException("Error al crear", List.of("Ya existe un participante con el documento " + user.getProfile().getDni()));
         });
         commandGeneralUserService.save(user.getUser());
 

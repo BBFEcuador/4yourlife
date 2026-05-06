@@ -8,7 +8,6 @@ import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.shared.infrastructure.criteria.JPACriteriaConverter;
 import jakarta.transaction.Transactional;
-import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;

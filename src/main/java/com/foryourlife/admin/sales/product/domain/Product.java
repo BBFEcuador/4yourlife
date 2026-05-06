@@ -10,7 +10,6 @@ import com.foryourlife.shared.domain.events.ProductCreated;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -27,7 +26,7 @@ public class Product extends AggregateRoot implements Serializable {
 
     private String currency;
 
-    @Column(name="is_active")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     private String description;
@@ -71,7 +70,7 @@ public class Product extends AggregateRoot implements Serializable {
     }
 
     public static Product create(String id, String name, String code, Double basePrice, String currency, Boolean isActive, String description, List<Rule> rules, List<Program> programs, Campus campus, String contificoId) {
-        var product = new Product(id, name, code,basePrice,currency, isActive, description, rules, programs, campus, contificoId);
+        var product = new Product(id, name, code, basePrice, currency, isActive, description, rules, programs, campus, contificoId);
         product.record(new ProductCreated(product));
         return product;
     }

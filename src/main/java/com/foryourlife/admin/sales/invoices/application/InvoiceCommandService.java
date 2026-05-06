@@ -2,16 +2,11 @@ package com.foryourlife.admin.sales.invoices.application;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.foryourlife.admin.contifico.config.domain.ConfigContificoRepository;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceRepository;
 import com.foryourlife.admin.sales.invoices.infrastructure.http.InvoiceRequest;
-import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
-import com.foryourlife.shared.domain.bus.EventBus;
-import com.foryourlife.shared.domain.events.PaymentHistoryCreated;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -25,23 +20,17 @@ import java.math.RoundingMode;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static org.bouncycastle.crypto.tls.ConnectionEnd.client;
-
 @Service
-public class CommandInvoiceService {
+public class InvoiceCommandService {
     private final InvoiceRepository invoiceRepository;
     private final ConfigContificoRepository configContificoRepository;
-    private final ObjectMapper objectMapper;
     @Qualifier("restClient")
     private final RestClient httpClient;
-    private final EventBus eventBus;
 
-    public CommandInvoiceService(InvoiceRepository invoiceRepository, ConfigContificoRepository configContificoRepository, ObjectMapper objectMapper, RestClient httpClient, EventBus eventBus) {
+    public InvoiceCommandService(InvoiceRepository invoiceRepository, ConfigContificoRepository configContificoRepository, RestClient httpClient) {
         this.invoiceRepository = invoiceRepository;
         this.configContificoRepository = configContificoRepository;
-        this.objectMapper = objectMapper;
         this.httpClient = httpClient;
-        this.eventBus = eventBus;
     }
 
     public Invoice save(Invoice invoice) {

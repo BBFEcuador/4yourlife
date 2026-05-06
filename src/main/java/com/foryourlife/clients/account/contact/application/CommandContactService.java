@@ -3,11 +3,10 @@ package com.foryourlife.clients.account.contact.application;
 import com.foryourlife.clients.account.contact.domain.Contact;
 import com.foryourlife.clients.account.contact.domain.ContactRepository;
 import com.foryourlife.clients.account.contact.infrastructure.httpControllers.SaveContactRequest;
-import com.foryourlife.shared.domain.exception.BaseException;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
+import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

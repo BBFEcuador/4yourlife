@@ -1,6 +1,5 @@
 package com.foryourlife.admin.programs.training.infrastructure;
 
-import com.foryourlife.admin.programs.training.domain.StartDate;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;

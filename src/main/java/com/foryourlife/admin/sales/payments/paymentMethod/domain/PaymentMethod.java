@@ -3,7 +3,6 @@ package com.foryourlife.admin.sales.payments.paymentMethod.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.foryourlife.admin.bank.domain.Bank;
 import com.foryourlife.admin.programs.campus.domain.Campus;
-import com.foryourlife.admin.sales.payments.payment.domain.PaymentHistory;
 import com.foryourlife.shared.infrastructure.auditable.AuditableEntity;
 import jakarta.persistence.*;
 

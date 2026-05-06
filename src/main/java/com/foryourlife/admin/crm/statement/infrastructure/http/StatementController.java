@@ -2,7 +2,6 @@ package com.foryourlife.admin.crm.statement.infrastructure.http;
 
 import com.foryourlife.admin.crm.statement.application.StatementCommandService;
 import com.foryourlife.admin.crm.statement.application.StatementQueryService;
-import com.foryourlife.admin.crm.statement.domain.Statement;
 import com.foryourlife.admin.crm.statement.domain.StatementDTO;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import com.foryourlife.shared.domain.criteria.Filter;

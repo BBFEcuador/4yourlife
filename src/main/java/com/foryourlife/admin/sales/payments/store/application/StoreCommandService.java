@@ -73,7 +73,7 @@ public class StoreCommandService {
         var campus = queryCampusService.findById(store.getCampusId());
 
         var newStore = new Store(
-                store.id != null? store.getId() : UUID.randomUUID().toString(),
+                store.id != null ? store.getId() : UUID.randomUUID().toString(),
                 store.getAddress(),
                 String.format("%03d", Integer.parseInt(store.getNumber())),
                 campus

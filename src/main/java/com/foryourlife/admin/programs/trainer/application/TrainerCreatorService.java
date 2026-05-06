@@ -11,8 +11,8 @@ import java.util.List;
 
 @Service
 public class TrainerCreatorService {
-    private PasswordEncoder passwordEncoder;
-    private TrainerRepository repository;
+    private final PasswordEncoder passwordEncoder;
+    private final TrainerRepository repository;
 
     public TrainerCreatorService(PasswordEncoder passwordEncoder, TrainerRepository repository) {
         this.passwordEncoder = passwordEncoder;

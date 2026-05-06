@@ -15,7 +15,8 @@ public class RuleContext {
     private boolean isPreEntry;
     private boolean isEvent;
 
-    public RuleContext() {}
+    public RuleContext() {
+    }
 
     public RuleContext(String day, String timePeriod, boolean isWeekend, boolean isMaster, boolean isDuringTraining, boolean isPreEntry, boolean isEvent) {
         this.day = day;
@@ -31,7 +32,7 @@ public class RuleContext {
         RuleContext ctx = new RuleContext();
 
         DayOfWeek dayOfWeek = LocalDate.now().getDayOfWeek();
-        ctx.day = dayOfWeek.getDisplayName(TextStyle.FULL,new Locale("es", "ES")).toUpperCase(); // "SUNDAY", "SATURDAY", etc.
+        ctx.day = dayOfWeek.getDisplayName(TextStyle.FULL, new Locale("es", "ES")).toUpperCase(); // "SUNDAY", "SATURDAY", etc.
 
         LocalTime now = LocalTime.now();
         if (now.isBefore(LocalTime.of(12, 0))) {

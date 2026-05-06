@@ -2,7 +2,6 @@ package com.foryourlife.admin.programs.trainer.infrastructure.httpControllers;
 
 import com.foryourlife.admin.programs.trainer.application.TrainerLoginService;
 import com.foryourlife.admin.programs.trainer.domain.LoginTrainerResponse;
-import com.foryourlife.shared.domain.exception.BaseException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

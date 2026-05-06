@@ -2,7 +2,6 @@ package com.foryourlife.clients.account.contact.application;
 
 import com.foryourlife.clients.account.contact.domain.Contact;
 import com.foryourlife.clients.account.contact.domain.ContactRepository;
-import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

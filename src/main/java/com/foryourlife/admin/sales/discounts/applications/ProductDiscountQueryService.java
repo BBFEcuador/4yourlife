@@ -3,7 +3,6 @@ package com.foryourlife.admin.sales.discounts.applications;
 import com.foryourlife.admin.sales.discounts.domain.ProductDiscount;
 import com.foryourlife.admin.sales.discounts.domain.ProductDiscountRepository;
 import com.foryourlife.shared.domain.criteria.Criteria;
-import com.foryourlife.shared.domain.criteria.Filter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

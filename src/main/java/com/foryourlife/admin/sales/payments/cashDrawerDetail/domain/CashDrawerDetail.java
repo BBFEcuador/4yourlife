@@ -3,7 +3,6 @@ package com.foryourlife.admin.sales.payments.cashDrawerDetail.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawer;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
-import com.foryourlife.shared.domain.user.User;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,7 +16,7 @@ public class CashDrawerDetail {
             referencedColumnName = "id"
     )
     private Payment payment;
-    @Column(name = "payment_history_id",nullable = true)
+    @Column(name = "payment_history_id", nullable = true)
     private String paymentHistoryId;
     @ManyToOne
     @JoinColumn(

@@ -87,10 +87,6 @@ public class PromiseCommandService {
                         List.of("El ID proporcionado no corresponde a ninguna promesa existente.")
                 ));
 
-        LocalDate today = LocalDate.now();
-        LocalDate start = promise.getTraining().getStartDate();
-        LocalDate end = promise.getTraining().getEndDate();
-
         DaysEnum dayEnum = DaysEnum.fromString(promiseRequest.day);
 
         switch (dayEnum) {

@@ -20,7 +20,7 @@ public class StoreQueryService {
 
     public Store getStoreById(String id) {
         return repository.findById(id).orElseThrow(
-                ()-> new BaseException("Store not found", List.of("The store does not exist"))
+                () -> new BaseException("Store not found", List.of("The store does not exist"))
         );
     }
 
@@ -28,7 +28,7 @@ public class StoreQueryService {
         return repository.getByCampusId(campusId);
     }
 
-    public Page<Store> getAllStores(Pageable pageable, Criteria criteria){
-        return repository.getAll(pageable,criteria);
+    public Page<Store> getAllStores(Pageable pageable, Criteria criteria) {
+        return repository.getAll(pageable, criteria);
     }
 }

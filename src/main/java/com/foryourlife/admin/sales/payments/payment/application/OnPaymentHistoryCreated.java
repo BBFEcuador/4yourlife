@@ -15,7 +15,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
 @Service
 @DomainEventSubscriber(value = PaymentHistoryCreated.class)

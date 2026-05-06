@@ -58,9 +58,9 @@ public class ProductController {
 
         if (!search.isEmpty()) {
             filters.addAll(List.of(
-                    new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                    new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
-                    new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)
+                            new Filter("name", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("code", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR),
+                            new Filter("description", search, null, Filter.Operation.LIKE, Filter.LogicalOperator.OR)
                     )
             );
         }

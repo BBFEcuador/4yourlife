@@ -1,19 +1,20 @@
 package com.foryourlife.admin.crm.statement.application;
 
-import com.foryourlife.admin.crm.statement.domain.*;
+import com.foryourlife.admin.crm.statement.domain.Statement;
+import com.foryourlife.admin.crm.statement.domain.StatementRepository;
+import com.foryourlife.admin.crm.statement.domain.StatementStatusEnum;
+import com.foryourlife.admin.crm.statement.domain.StatementStatusHistory;
 import com.foryourlife.admin.crm.statement.infrastructure.http.StatementChangeStatusRequest;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.PaymentStatus;
 import com.foryourlife.shared.domain.exception.BaseException;
-import com.foryourlife.shared.domain.level.CourseLevel;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class CommandAttendanceService {
+public class AttendanceCommandService {
     private final AttendanceRepository _attendanceRepository;
     private final CallRepository callRepository;
     private final PromiseCommandService promiseCommandService;
     private final ParticipantRepository _participantRepository;
     private final StatementCommandService statementCommandService;
 
-    public CommandAttendanceService(AttendanceRepository _attendanceRepository, CallRepository callRepository, PromiseCommandService promiseCommandService, ParticipantRepository _participantRepository, StatementCommandService statementCommandService) {
+    public AttendanceCommandService(AttendanceRepository _attendanceRepository, CallRepository callRepository, PromiseCommandService promiseCommandService, ParticipantRepository _participantRepository, StatementCommandService statementCommandService) {
         this._attendanceRepository = _attendanceRepository;
         this.callRepository = callRepository;
         this.promiseCommandService = promiseCommandService;

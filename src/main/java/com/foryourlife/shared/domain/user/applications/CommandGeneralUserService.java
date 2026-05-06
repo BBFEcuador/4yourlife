@@ -12,7 +12,6 @@ import com.foryourlife.staff.domain.Staff;
 import com.foryourlife.staff.domain.StaffRepository;
 import com.foryourlife.visionary.domain.Visionary;
 import com.foryourlife.visionary.domain.VisionaryRepository;
-import com.foryourlife.visionary.infrastructure.httpControllers.VisionaryController;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

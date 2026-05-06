@@ -2,8 +2,6 @@ package com.foryourlife.admin.programs.attendance.application;
 
 import com.foryourlife.admin.programs.attendance.domain.AttendanceRepository;
 import com.foryourlife.admin.programs.attendance.domain.AttendanceStatus;
-import com.foryourlife.admin.programs.teams.domain.TeamRepository;
-import com.foryourlife.admin.programs.training.domain.TrainingRepository;
 import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.shared.domain.bus.DomainEventSubscriber;
 import com.foryourlife.shared.domain.events.OnNullDesistedAttend;

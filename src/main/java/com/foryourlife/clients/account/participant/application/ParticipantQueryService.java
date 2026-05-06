@@ -1,9 +1,9 @@
 package com.foryourlife.clients.account.participant.application;
 
 import com.foryourlife.admin.programs.teams.domain.TeamRepository;
-import com.foryourlife.clients.account.participant.domain.UserNotFoundException;
-import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
 import com.foryourlife.clients.account.participant.domain.Participant;
+import com.foryourlife.clients.account.participant.domain.ParticipantRepository;
+import com.foryourlife.clients.account.participant.domain.UserNotFoundException;
 import com.foryourlife.shared.domain.criteria.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +31,8 @@ public class ParticipantQueryService {
         return this._participantRepository.findById(id).orElseThrow(() -> new UserNotFoundException("The participant Id: " + id + " doesn't exist."));
     }
 
-    public Page<Participant> getAll(Pageable pageable,Criteria criteria) {
-        return this._participantRepository.getAll(pageable,criteria);
+    public Page<Participant> getAll(Pageable pageable, Criteria criteria) {
+        return this._participantRepository.getAll(pageable, criteria);
     }
 
     public Page<Participant> getAll(Pageable pageable) {

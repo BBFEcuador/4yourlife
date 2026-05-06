@@ -6,7 +6,6 @@ import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDe
 import com.foryourlife.admin.sales.payments.cashDrawerDetail.domain.CashDrawerDetailRepository;
 import com.foryourlife.admin.sales.payments.payment.domain.Payment;
 import com.foryourlife.shared.domain.exception.BaseException;
-import com.foryourlife.shared.domain.user.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +15,10 @@ import java.util.UUID;
 public class CashDrawerDetailCommandService {
     private final CashDrawerRepository cashDrawerRepository;
     private final CashDrawerDetailRepository repository;
-    private final UserRepository userRepository;
 
-    public CashDrawerDetailCommandService(CashDrawerRepository cashDrawerRepository, CashDrawerDetailRepository repository, UserRepository userRepository) {
+    public CashDrawerDetailCommandService(CashDrawerRepository cashDrawerRepository, CashDrawerDetailRepository repository) {
         this.cashDrawerRepository = cashDrawerRepository;
         this.repository = repository;
-        this.userRepository = userRepository;
     }
 
     public void save(String paymentHistoryId, String cashDrawerId, Payment payment) {
@@ -33,10 +30,11 @@ public class CashDrawerDetailCommandService {
             throw new BaseException("La caja no está abierta", List.of(""));
         }
 
-        var detail = new CashDrawerDetail(UUID.randomUUID().toString(), payment, paymentHistoryId,cashDrawer);
+        var detail = new CashDrawerDetail(UUID.randomUUID().toString(), payment, paymentHistoryId, cashDrawer);
 
         repository.save(detail);
     }
+
     public void deleteByPaymentHistoryId(String paymentHistoryId) {
         repository.deleteByPaymentHistoryId(paymentHistoryId);
     }

@@ -4,7 +4,7 @@ import com.foryourlife.admin.contifico.config.application.ConfigContificoQuerySe
 import com.foryourlife.admin.crm.statement.domain.StatementRepository;
 import com.foryourlife.admin.crm.statement.domain.StatementStatusEnum;
 import com.foryourlife.admin.programs.training.domain.TrainingRepository;
-import com.foryourlife.admin.sales.invoices.application.CommandInvoiceService;
+import com.foryourlife.admin.sales.invoices.application.InvoiceCommandService;
 import com.foryourlife.admin.sales.invoices.application.QueryInvoiceService;
 import com.foryourlife.admin.sales.invoices.domain.Invoice;
 import com.foryourlife.admin.sales.invoices.domain.InvoiceContificoJson;
@@ -53,7 +53,7 @@ public class PaymentCommandService {
     private final CashDrawerDetailCommandService cashDrawerDetailCommandService;
     private final CashDrawerQueryService cashDrawerQueryService;
     private final ConfigContificoQueryService configContificoQueryService;
-    private final CommandInvoiceService commandInvoiceService;
+    private final InvoiceCommandService invoiceCommandService;
     private final ClientModuleCreatorService clientModuleCreatorService;
     private final QueryInvitationServices queryInvitationServices;
     private final PromiseRepository promiseRepository;
@@ -62,7 +62,7 @@ public class PaymentCommandService {
     private final TrainingRepository trainingRepository;
     private final StatementRepository statementRepository;
 
-    public PaymentCommandService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryInvoiceService queryInvoiceService, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, CommandInvoiceService commandInvoiceService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, TrainingRepository trainingRepository, StatementRepository statementRepository) {
+    public PaymentCommandService(PaymentRepository _paymentRepository, PaymentMethodRepository _paymentMethodRepository, ProductRepository _productRepository, ParticipantQueryService participantQueryService, QueryInvoiceService queryInvoiceService, CashDrawerDetailCommandService cashDrawerDetailCommandService, CashDrawerQueryService cashDrawerQueryService, ConfigContificoQueryService configContificoQueryService, InvoiceCommandService invoiceCommandService, ClientModuleCreatorService clientModuleCreatorService, QueryInvitationServices queryInvitationServices, PromiseRepository promiseRepository, ParticipantRepository participantRepository, ParticipantLevelService participantLevelRepository, TrainingRepository trainingRepository, StatementRepository statementRepository) {
         this._paymentRepository = _paymentRepository;
         this._paymentMethodRepository = _paymentMethodRepository;
         this._productRepository = _productRepository;
@@ -71,7 +71,7 @@ public class PaymentCommandService {
         this.cashDrawerDetailCommandService = cashDrawerDetailCommandService;
         this.cashDrawerQueryService = cashDrawerQueryService;
         this.configContificoQueryService = configContificoQueryService;
-        this.commandInvoiceService = commandInvoiceService;
+        this.invoiceCommandService = invoiceCommandService;
         this.clientModuleCreatorService = clientModuleCreatorService;
         this.queryInvitationServices = queryInvitationServices;
         this.promiseRepository = promiseRepository;
@@ -231,7 +231,7 @@ public class PaymentCommandService {
 
             var config = configContificoQueryService.findConfigContificoByCampusId(payment.getCampus().getId());
             if (config == null) {
-                commandInvoiceService.save(invoice);
+                invoiceCommandService.save(invoice);
                 return;
             }
 
@@ -282,8 +282,8 @@ public class PaymentCommandService {
             adjustRucIfNeeded(json);
             invoice.setInvoiceContifico(json);
 
-            Invoice saved = commandInvoiceService.save(invoice);
-            commandInvoiceService.sendInvoiceToContifico(saved);
+            Invoice saved = invoiceCommandService.save(invoice);
+            invoiceCommandService.sendInvoiceToContifico(saved);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());

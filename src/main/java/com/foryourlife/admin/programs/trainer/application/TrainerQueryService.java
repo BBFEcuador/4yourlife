@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +15,7 @@ import java.util.Optional;
 public class TrainerQueryService {
 
     private final TrainingRepository trainingRepository;
-    private TrainerRepository repository;
+    private final TrainerRepository repository;
 
 
     public TrainerQueryService(TrainerRepository repository, TrainingRepository trainingRepository) {
@@ -24,13 +23,15 @@ public class TrainerQueryService {
         this.trainingRepository = trainingRepository;
     }
 
-    public List<Trainer> findTrainers(){
+    public List<Trainer> findTrainers() {
         return repository.getTrainers();
     }
-    public Page<Trainer> findTrainers(Pageable pageable, Criteria criteria){
-        return repository.getTrainers(pageable,criteria);
+
+    public Page<Trainer> findTrainers(Pageable pageable, Criteria criteria) {
+        return repository.getTrainers(pageable, criteria);
     }
-    public List<Trainer> findTrainersAvailable(String trainingId){
+
+    public List<Trainer> findTrainersAvailable(String trainingId) {
         var training = trainingRepository.findById(trainingId).orElseThrow();
         return repository.getAvailableTrainers(training.getNextLevel().getStartDate(), training.getNextLevel().getEndDate());
     }

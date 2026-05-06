@@ -2,12 +2,10 @@ package com.foryourlife.admin.sales.payments.cashBox.application;
 
 import com.foryourlife.admin.sales.payments.cashBox.domain.CashBox;
 import com.foryourlife.admin.sales.payments.cashBox.domain.CashBoxRepository;
-import com.foryourlife.admin.sales.payments.cashDrawer.domain.CashDrawerStatus;
 import com.foryourlife.shared.domain.exception.BaseException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CashBoxQueryService {

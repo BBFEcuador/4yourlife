@@ -1,11 +1,9 @@
 package com.foryourlife.admin.crm.call.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.foryourlife.admin.crm.callLogs.domain.CallLog;
 import com.foryourlife.admin.programs.training.domain.Training;
 import com.foryourlife.clients.account.invitations.domain.Invitation;
 import com.foryourlife.clients.account.participant.domain.Participant;
-import com.foryourlife.shared.domain.user.User;
 
 import java.util.ArrayList;
 import java.util.List;

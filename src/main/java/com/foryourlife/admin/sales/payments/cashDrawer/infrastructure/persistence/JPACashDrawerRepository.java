@@ -174,13 +174,6 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
     public ByteArrayOutputStream generateExcelReport(CashDrawer cashDrawer) {
         var details = cashDrawerDetailQueryService.getByCashDrawerId(cashDrawer.getId());
 
-        Map<String, PaymentMethodSummary> paymentMethodMap = getStringPaymentMethodSummaryMap(details);
-        PaymentMethodSummary[] paymentMethods = paymentMethodMap.values().toArray(new PaymentMethodSummary[0]);
-
-        BigDecimal totalIncome = Arrays.stream(paymentMethods)
-                .map(PaymentMethodSummary::getTotalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         // ── Columnas de pago dinámicas ─────────────────────────────────────────
         // Se extraen los nombres únicos de métodos de pago en el orden en que aparecen
         List<String> paymentMethodNames = details.stream()
@@ -313,7 +306,7 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
             int dataStartRow = 5;
             int rowNum = dataStartRow;
             int seq = 1;
-            int maxDataRows = 18;
+            int maxDataRows = Math.max(details.size(), 18);
 
             for (int i = 0; i < maxDataRows; i++) {
                 Row dataRow = sheet.createRow(rowNum + i);
@@ -397,26 +390,29 @@ public class JPACashDrawerRepository implements CashDrawerRepository {
             sheet.addMergedRegion(new CellRangeAddress(totalsRowIndex, totalsRowIndex, 0, 7));
 
             // SUM dinámica por cada columna de método de pago
-            for (int col : paymentColIndex.values()) {
-                Cell sumCell = totalsRow.createCell(col);
-                String colLetter = CellReference.convertNumToColString(col);
-                sumCell.setCellFormula(String.format("SUM(%s%d:%s%d)",
-                        colLetter, dataStartRow + 1,
-                        colLetter, dataStartRow + maxDataRows));
-                sumCell.setCellStyle(totalStyle);
+            if (!paymentColIndex.isEmpty()) {
+                for (int col : paymentColIndex.values()) {
+                    Cell sumCell = totalsRow.createCell(col);
+                    String colLetter = CellReference.convertNumToColString(col);
+                    sumCell.setCellFormula(String.format("SUM(%s%d:%s%d)",
+                            colLetter, dataStartRow + 1,
+                            colLetter, dataStartRow + maxDataRows));
+                    sumCell.setCellStyle(totalStyle);
+                }
             }
 
             // ── Fila gran total ───────────────────────────────────────────────────
             int grandTotalRowIndex = totalsRowIndex + 1;
             Row grandTotalRow = sheet.createRow(grandTotalRowIndex);
-            Cell grandTotalCell = grandTotalRow.createCell(PAYMENT_COL_START);
 
-            // Suma de todas las columnas de pago dinámicas
-            String formula = paymentColIndex.values().stream()
-                    .map(col -> CellReference.convertNumToColString(col) + (totalsRowIndex + 1))
-                    .collect(Collectors.joining("+"));
-            grandTotalCell.setCellFormula(formula);
-            grandTotalCell.setCellStyle(totalStyle);
+            if (!paymentColIndex.isEmpty()) {
+                Cell grandTotalCell = grandTotalRow.createCell(PAYMENT_COL_START);
+                String formula = paymentColIndex.values().stream()
+                        .map(col -> CellReference.convertNumToColString(col) + (totalsRowIndex + 1))
+                        .collect(Collectors.joining("+"));
+                grandTotalCell.setCellFormula(formula);
+                grandTotalCell.setCellStyle(totalStyle);
+            }
 
             // ── Anchos de columna ─────────────────────────────────────────────────
             int[] fixedWidths = {6, 20, 14, 20, 14, 20, 22, 28};

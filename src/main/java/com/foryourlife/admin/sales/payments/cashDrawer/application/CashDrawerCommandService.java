@@ -219,7 +219,7 @@ public class CashDrawerCommandService {
             excel = repository.generateExcelReport(existingDrawer);
             return excel;
         } catch (Exception e) {
-            throw new BaseException("Error generating invoice", List.of(e.getMessage()));
+            throw new BaseException("Error generating report", List.of(e.getMessage()));
         }
     }
 }

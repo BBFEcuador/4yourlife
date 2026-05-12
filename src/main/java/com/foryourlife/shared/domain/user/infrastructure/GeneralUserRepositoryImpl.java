@@ -35,4 +35,9 @@ public class GeneralUserRepositoryImpl implements UserRepository {
     public List<User> findAllByIds(List<String> ids) {
         return repository.findAllByIdIn(ids);
     }
+
+    @Override
+    public List<User> findAllById(List<String> senderIds) {
+        return repository.findAllByIdIn(senderIds);
+    }
 }

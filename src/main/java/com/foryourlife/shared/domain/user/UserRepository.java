@@ -8,4 +8,5 @@ public interface UserRepository {
     Optional<User> findByEmail (String email);
     Optional<User> findById (String id);
     List<User> findAllByIds (List<String> ids);
+    List<User> findAllById(List<String> senderIds);
 }

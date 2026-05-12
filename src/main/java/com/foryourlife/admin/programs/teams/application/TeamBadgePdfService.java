@@ -105,7 +105,7 @@ public class TeamBadgePdfService {
                 continue;
             }
 
-            table.addCell(createBadge(user, i + 1, "PARTICIPANTES", new DeviceRgb(0, 0, 0)));
+            table.addCell(createBadge(user, i + 1, "PARTICIPANTE", new DeviceRgb(0, 0, 0)));
         }
 
         for (int i = 0; i < visionary.size(); i++) {

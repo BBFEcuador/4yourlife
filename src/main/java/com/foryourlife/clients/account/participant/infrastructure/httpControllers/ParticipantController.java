@@ -197,4 +197,10 @@ public class ParticipantController {
         participantCommandService.changeParticipantPassword(participantId, request.getNewPassword());
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("set-course-level/{participantId}/{courseLevel}")
+    public ResponseEntity<?> setCourseLevel(@PathVariable String participantId, @PathVariable CourseLevel courseLevel) {
+        participantCommandService.changeCourseLevel(participantId, courseLevel);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

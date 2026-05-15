@@ -352,6 +352,39 @@ public class ParticipantCommandService {
         _userRepository.save(user);
     }
 
+    public void changeCourseLevel(String participantId, CourseLevel courseLevel) {
+
+        var participant = this._participantRepository.findById(participantId)
+                .orElseThrow(() -> new BaseException(
+                        "Participante no encontrado",
+                        List.of("El participante con id " + participantId + " no existe")
+                ));
+
+        var role = this._rolRepository.getRolByLevel(courseLevel);
+
+        boolean hasModule = switch (role.getCourseLevel()) {
+
+            case FOCUS -> Boolean.TRUE.equals(participant.getModules().getHasFocus());
+
+            case YOUR -> Boolean.TRUE.equals(participant.getModules().getHasYour());
+
+            case LIFE -> Boolean.TRUE.equals(participant.getModules().getHasLife());
+
+            default -> true;
+        };
+
+        if (!hasModule) {
+            throw new BaseException(
+                    "El participante no tiene acceso al módulo " + role.getCourseLevel().name(),
+                    List.of()
+            );
+        }
+
+        participant.setParticipantLevel(role);
+
+        _participantRepository.save(participant);
+    }
+
     private String buildFullName(String... parts) {
         return Arrays.stream(parts)
                 .filter(Objects::nonNull)

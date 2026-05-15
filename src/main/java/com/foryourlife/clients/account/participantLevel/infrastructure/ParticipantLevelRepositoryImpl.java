@@ -29,7 +29,7 @@ public class ParticipantLevelRepositoryImpl implements ParticipantLevelRepositor
     }
 
     @Override
-    public List<ParticipantLevel> getAll() {
+    public List<ParticipantLevel> findAll() {
         return this.repository.findAll();
     }
 
